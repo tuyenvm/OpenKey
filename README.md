@@ -1,6 +1,10 @@
 # OpenKey
 ### Open source Vietnamese Input App for macOS
 New Vietnamese input for macOS. Annoying underline issue fixed. Intelligent engine. Free and open source.
+
+![Giao diện](https://github.com/tuyenvm/OpenKey/raw/master/Release/screenshot1.png "Main UI")
+![Menu](https://github.com/tuyenvm/OpenKey/raw/master/Release/screenshot2.png "Menu bar")
+
 ##### Input Type
 - Telex
 - VNI
