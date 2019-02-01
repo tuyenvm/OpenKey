@@ -24,10 +24,10 @@ New Vietnamese input for macOS. Annoying underline issue fixed. Intelligent engi
 - Switch input mode by shortcut key.
 - Autocorrect fixed.
 - Underline issue fixed on macOS.
-- 
+- ...
 
 ##### Download Binary:
-Available soon
+[macOS](https://github.com/tuyenvm/OpenKey/blob/master/Release/OpenKey1.0.1.zip)
 
 ##### Author
 Mai Vũ Tuyên (maivutuyen.91@gmail.com)
