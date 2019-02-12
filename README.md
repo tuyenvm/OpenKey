@@ -27,7 +27,9 @@ New Vietnamese input for macOS. Annoying underline issue fixed. Intelligent engi
 - ...
 
 ### Download Binary:
-[macOS](https://github.com/tuyenvm/OpenKey/raw/master/Release/OpenKey1.0.3.zip)
+v1.0.3: [macOS](https://github.com/tuyenvm/OpenKey/raw/master/Release/OpenKey1.0.3.zip)
+
+[Changelog](https://github.com/tuyenvm/OpenKey/blob/master/CHANGELOG.md)
 
 ### Note:
 OpenKey needs Accessibility permission, go to System Preferences -> Security & Privacy -> Accessibility, enable OpenKey.app. Don't turn off while using.
