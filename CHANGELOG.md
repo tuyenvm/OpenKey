@@ -5,6 +5,10 @@
 - Macro (On/Off).
 - Macro table.
 
+##### Version 1.0.7: (15/02/2019)
+- Fix case "duongd".
+- Fix end consonant "t".
+
 ##### Version 1.0.6: (15/02/2019)
 - Fix case "quatw".
 
@@ -26,6 +30,10 @@
 - Gõ nhanh: cc=ch, gg=gi, kk=kh, nn=ng, qq=qu, pp=ph, tt=th (On/Off)
 - Gõ tắt (On/Off).
 - Bảng gõ tắt.
+
+##### Version 1.0.7: (15/02/2019)
+- Sửa lỗi "duongd".
+- Sửa lỗi phụ âm cuối "t".
 
 ##### Version 1.0.6: (15/02/2019)
 - Sửa lỗi "quatw".
