@@ -5,6 +5,9 @@
 - Macro (On/Off).
 - Macro table.
 
+##### Version 1.0.6: (15/02/2019)
+- Fix case "quatw".
+
 ##### Version 1.0.5: (13/02/2019)
 - Spelling enhanced.
 - Correct 1x menu icon.
@@ -23,6 +26,9 @@
 - Gõ nhanh: cc=ch, gg=gi, kk=kh, nn=ng, qq=qu, pp=ph, tt=th (On/Off)
 - Gõ tắt (On/Off).
 - Bảng gõ tắt.
+
+##### Version 1.0.6: (15/02/2019)
+- Sửa lỗi "quatw".
 
 ##### Version 1.0.5: (13/02/2019)
 - Nâng cao chính tả.
