@@ -5,6 +5,9 @@
 - Macro (On/Off).
 - Macro table.
 
+##### Version 1.0.8: (19/02/2019)
+- Switch key: Control + Command + Space  --> Control + Z
+
 ##### Version 1.0.7: (15/02/2019)
 - Fix case "duongd".
 - Fix end consonant "t".
@@ -30,6 +33,9 @@
 - Gõ nhanh: cc=ch, gg=gi, kk=kh, nn=ng, qq=qu, pp=ph, tt=th (On/Off)
 - Gõ tắt (On/Off).
 - Bảng gõ tắt.
+
+##### Version 1.0.8: (19/02/2019)
+- Phím chuyển: Control + Command + Space  --> Control + Z
 
 ##### Version 1.0.7: (15/02/2019)
 - Sửa lỗi "duongd".
