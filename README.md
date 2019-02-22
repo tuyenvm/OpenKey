@@ -28,9 +28,8 @@ Bộ gõ tiếng Việt mới cho macOS, sử dụng kỹ thuật backkey. Loạ
 - Underline issue fixed on macOS - Sửa lỗi gạch chân trên macOS.
 - ...
 
-### Download Binary - Tải xuống:
-v1.0.7: [macOS](https://github.com/tuyenvm/OpenKey/raw/master/Release/OpenKey1.0.7.dmg)  
-v1.0.8: [macOS](https://github.com/tuyenvm/OpenKey/raw/master/Release/OpenKey1.0.8.dmg)
+### Download Binary - Tải xuống: 
+v1.0.9: [macOS](https://github.com/tuyenvm/OpenKey/raw/master/Release/OpenKey1.0.9.dmg)
 
 [Changelog](https://github.com/tuyenvm/OpenKey/blob/master/CHANGELOG.md)
 

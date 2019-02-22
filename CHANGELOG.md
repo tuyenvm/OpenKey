@@ -5,6 +5,9 @@
 - Macro (On/Off).
 - Macro table.
 
+##### Version 1.0.9: (22/02/2019)
+- Fix incorrect word when switch language without pressing Space key.
+
 ##### Version 1.0.8: (19/02/2019)
 - Switch key: Control + Command + Space  --> Control + Z
 
@@ -33,6 +36,9 @@
 - Gõ nhanh: cc=ch, gg=gi, kk=kh, nn=ng, qq=qu, pp=ph, tt=th (On/Off)
 - Gõ tắt (On/Off).
 - Bảng gõ tắt.
+
+##### Version 1.0.9: (22/02/2019)
+- Sửa lỗi từ sai khi đổi chế độ mà không bấm phím Space.
 
 ##### Version 1.0.8: (19/02/2019)
 - Phím chuyển: Control + Command + Space  --> Control + Z
