@@ -29,7 +29,7 @@ Bộ gõ tiếng Việt mới cho macOS, sử dụng kỹ thuật backkey. Loạ
 - ...
 
 ### Download Binary - Tải xuống: 
-v1.0.9: [macOS](https://github.com/tuyenvm/OpenKey/raw/master/Release/OpenKey1.0.9.dmg)
+v1.0.10: [macOS](https://github.com/tuyenvm/OpenKey/raw/master/Release/OpenKey1.0.10.dmg)
 
 [Changelog](https://github.com/tuyenvm/OpenKey/blob/master/CHANGELOG.md)
 
