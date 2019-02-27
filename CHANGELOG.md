@@ -5,8 +5,11 @@
 - Macro (On/Off).
 - Macro table.
 
+##### Version 1.0.11: (27/02/2019)
+- Add case "chú thòong", "gòong".
+
 ##### Version 1.0.10: (26/02/2019)
-- Fix case "duocd"
+- Fix case "duocd".
 
 ##### Version 1.0.9: (22/02/2019)
 - Fix incorrect word when switch language without pressing Space key.
@@ -40,8 +43,11 @@
 - Gõ tắt (On/Off).
 - Bảng gõ tắt.
 
+##### Version 1.0.11: (27/02/2019)
+- Thêm trường hợp "chú thòong", "gòong".
+
 ##### Version 1.0.10: (26/02/2019)
-- Sửa lỗi "duocd"
+- Sửa lỗi "duocd".
 
 ##### Version 1.0.9: (22/02/2019)
 - Sửa lỗi từ sai khi đổi chế độ mà không bấm phím Space.
