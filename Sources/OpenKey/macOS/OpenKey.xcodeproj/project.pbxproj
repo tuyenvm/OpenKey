@@ -1,0 +1,621 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 50;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		232DB1E421FAED290049A0B5 /* StatusHighlighted.png in Resources */ = {isa = PBXBuildFile; fileRef = 232DB1E021FAED280049A0B5 /* StatusHighlighted.png */; };
+		232DB1E521FAED290049A0B5 /* Status.png in Resources */ = {isa = PBXBuildFile; fileRef = 232DB1E121FAED280049A0B5 /* Status.png */; };
+		232DB1E621FAED290049A0B5 /* Status@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 232DB1E221FAED280049A0B5 /* Status@2x.png */; };
+		232DB1E721FAED290049A0B5 /* StatusHighlighted@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 232DB1E321FAED280049A0B5 /* StatusHighlighted@2x.png */; };
+		232EDA5921F1B33E0085D362 /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 232EDA5821F1B33E0085D362 /* AppDelegate.m */; };
+		232EDA5C21F1B33E0085D362 /* ViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 232EDA5B21F1B33E0085D362 /* ViewController.m */; };
+		232EDA5E21F1B33F0085D362 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 232EDA5D21F1B33F0085D362 /* Assets.xcassets */; };
+		232EDA6121F1B33F0085D362 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 232EDA5F21F1B33F0085D362 /* Main.storyboard */; };
+		232EDA6421F1B33F0085D362 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 232EDA6321F1B33F0085D362 /* main.m */; };
+		23355FD821F2D31D00625798 /* Vietnamese.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 23355FD621F2D31D00625798 /* Vietnamese.cpp */; };
+		234F70AC21FB50BD00D2F2CA /* StatusHighlightedEng.png in Resources */ = {isa = PBXBuildFile; fileRef = 234F70A821FB50BC00D2F2CA /* StatusHighlightedEng.png */; };
+		234F70AD21FB50BD00D2F2CA /* StatusEng@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 234F70A921FB50BC00D2F2CA /* StatusEng@2x.png */; };
+		234F70AE21FB50BD00D2F2CA /* StatusHighlightedEng@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 234F70AA21FB50BC00D2F2CA /* StatusHighlightedEng@2x.png */; };
+		234F70AF21FB50BD00D2F2CA /* StatusEng.png in Resources */ = {isa = PBXBuildFile; fileRef = 234F70AB21FB50BD00D2F2CA /* StatusEng.png */; };
+		2374A1302216720E005B0375 /* AboutViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 2374A12F2216720E005B0375 /* AboutViewController.m */; };
+		237559B62204156000FB8CB9 /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 237559B52204156000FB8CB9 /* AppDelegate.m */; };
+		237559B82204156000FB8CB9 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 237559B72204156000FB8CB9 /* Assets.xcassets */; };
+		237559BB2204156000FB8CB9 /* MainMenu.xib in Resources */ = {isa = PBXBuildFile; fileRef = 237559B92204156000FB8CB9 /* MainMenu.xib */; };
+		237559BE2204156000FB8CB9 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 237559BD2204156000FB8CB9 /* main.m */; };
+		238519F021F1B70E00E79A41 /* Engine.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 238519EF21F1B70E00E79A41 /* Engine.cpp */; };
+		238519F521F1B9B900E79A41 /* OpenKey.mm in Sources */ = {isa = PBXBuildFile; fileRef = 238519F421F1B9B900E79A41 /* OpenKey.mm */; };
+		238519F821F1BF3C00E79A41 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 238519F221F1B8E200E79A41 /* Foundation.framework */; };
+		238519FF21F1BF8A00E79A41 /* EventKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 238519FD21F1BF5100E79A41 /* EventKit.framework */; };
+		23851A0021F1BFA300E79A41 /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 238519FB21F1BF4900E79A41 /* Cocoa.framework */; };
+		23851A0121F1C1A400E79A41 /* CoreGraphics.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 238519F921F1BF4400E79A41 /* CoreGraphics.framework */; };
+		2388EFB422041C4200DACE7C /* OpenKeyHelper.app in CopyFiles */ = {isa = PBXBuildFile; fileRef = 237559B22204156000FB8CB9 /* OpenKeyHelper.app */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
+		2389467D21FDDB920030A13B /* OpenKeyManager.m in Sources */ = {isa = PBXBuildFile; fileRef = 2389467C21FDDB920030A13B /* OpenKeyManager.m */; };
+		238AF96522042C1600AEFA17 /* OK@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 238AF96422042C1600AEFA17 /* OK@2x.png */; };
+		238AF96722042D4900AEFA17 /* ExitButton@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 238AF96622042D4900AEFA17 /* ExitButton@2x.png */; };
+		238AF96922042E2500AEFA17 /* ThumbUp@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 238AF96822042E2500AEFA17 /* ThumbUp@2x.png */; };
+		238AF97122042EC600AEFA17 /* Icon.icns in Resources */ = {isa = PBXBuildFile; fileRef = 238AF97022042EC600AEFA17 /* Icon.icns */; };
+		23963B5022040C720097189E /* ServiceManagement.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 23963B4F22040C720097189E /* ServiceManagement.framework */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXCopyFilesBuildPhase section */
+		237559C4220417DD00FB8CB9 /* CopyFiles */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = Contents/Library/LoginItems;
+			dstSubfolderSpec = 1;
+			files = (
+				2388EFB422041C4200DACE7C /* OpenKeyHelper.app in CopyFiles */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXCopyFilesBuildPhase section */
+
+/* Begin PBXFileReference section */
+		232DB1E021FAED280049A0B5 /* StatusHighlighted.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = StatusHighlighted.png; sourceTree = "<group>"; };
+		232DB1E121FAED280049A0B5 /* Status.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = Status.png; sourceTree = "<group>"; };
+		232DB1E221FAED280049A0B5 /* Status@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "Status@2x.png"; sourceTree = "<group>"; };
+		232DB1E321FAED280049A0B5 /* StatusHighlighted@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "StatusHighlighted@2x.png"; sourceTree = "<group>"; };
+		232EDA5421F1B33E0085D362 /* OpenKey.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = OpenKey.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		232EDA5721F1B33E0085D362 /* AppDelegate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = AppDelegate.h; sourceTree = "<group>"; };
+		232EDA5821F1B33E0085D362 /* AppDelegate.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = AppDelegate.m; sourceTree = "<group>"; };
+		232EDA5A21F1B33E0085D362 /* ViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ViewController.h; sourceTree = "<group>"; };
+		232EDA5B21F1B33E0085D362 /* ViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = ViewController.m; sourceTree = "<group>"; };
+		232EDA5D21F1B33F0085D362 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
+		232EDA6021F1B33F0085D362 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
+		232EDA6221F1B33F0085D362 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		232EDA6321F1B33F0085D362 /* main.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = "<group>"; };
+		232EDA6521F1B33F0085D362 /* ModernKey.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = ModernKey.entitlements; sourceTree = "<group>"; };
+		23355FD621F2D31D00625798 /* Vietnamese.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = Vietnamese.cpp; sourceTree = "<group>"; };
+		23355FD721F2D31D00625798 /* Vietnamese.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = Vietnamese.h; sourceTree = "<group>"; };
+		234584A721F1E96C00DE1DEC /* DataType.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = DataType.h; sourceTree = "<group>"; };
+		234F70A821FB50BC00D2F2CA /* StatusHighlightedEng.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = StatusHighlightedEng.png; sourceTree = "<group>"; };
+		234F70A921FB50BC00D2F2CA /* StatusEng@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "StatusEng@2x.png"; sourceTree = "<group>"; };
+		234F70AA21FB50BC00D2F2CA /* StatusHighlightedEng@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "StatusHighlightedEng@2x.png"; sourceTree = "<group>"; };
+		234F70AB21FB50BD00D2F2CA /* StatusEng.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = StatusEng.png; sourceTree = "<group>"; };
+		2374A12E2216720E005B0375 /* AboutViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = AboutViewController.h; sourceTree = "<group>"; };
+		2374A12F2216720E005B0375 /* AboutViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = AboutViewController.m; sourceTree = "<group>"; };
+		237559B22204156000FB8CB9 /* OpenKeyHelper.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = OpenKeyHelper.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		237559B42204156000FB8CB9 /* AppDelegate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = AppDelegate.h; sourceTree = "<group>"; };
+		237559B52204156000FB8CB9 /* AppDelegate.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = AppDelegate.m; sourceTree = "<group>"; };
+		237559B72204156000FB8CB9 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
+		237559BA2204156000FB8CB9 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = Base; path = Base.lproj/MainMenu.xib; sourceTree = "<group>"; };
+		237559BC2204156000FB8CB9 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		237559BD2204156000FB8CB9 /* main.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = "<group>"; };
+		237559BF2204156000FB8CB9 /* OpenKeyHelper.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = OpenKeyHelper.entitlements; sourceTree = "<group>"; };
+		238519EE21F1B70E00E79A41 /* Engine.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Engine.h; sourceTree = "<group>"; };
+		238519EF21F1B70E00E79A41 /* Engine.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Engine.cpp; sourceTree = "<group>"; };
+		238519F221F1B8E200E79A41 /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = System/Library/Frameworks/Foundation.framework; sourceTree = SDKROOT; };
+		238519F421F1B9B900E79A41 /* OpenKey.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = OpenKey.mm; sourceTree = "<group>"; };
+		238519F921F1BF4400E79A41 /* CoreGraphics.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreGraphics.framework; path = System/Library/Frameworks/CoreGraphics.framework; sourceTree = SDKROOT; };
+		238519FB21F1BF4900E79A41 /* Cocoa.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Cocoa.framework; path = System/Library/Frameworks/Cocoa.framework; sourceTree = SDKROOT; };
+		238519FD21F1BF5100E79A41 /* EventKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = EventKit.framework; path = System/Library/Frameworks/EventKit.framework; sourceTree = SDKROOT; };
+		23874B0F220160A500000BC8 /* Carbon.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Carbon.framework; path = System/Library/Frameworks/Carbon.framework; sourceTree = SDKROOT; };
+		2389467C21FDDB920030A13B /* OpenKeyManager.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = OpenKeyManager.m; sourceTree = "<group>"; };
+		2389467E21FDDC3F0030A13B /* OpenKeyManager.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = OpenKeyManager.h; sourceTree = "<group>"; };
+		238AF96422042C1600AEFA17 /* OK@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "OK@2x.png"; sourceTree = "<group>"; };
+		238AF96622042D4900AEFA17 /* ExitButton@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "ExitButton@2x.png"; sourceTree = "<group>"; };
+		238AF96822042E2500AEFA17 /* ThumbUp@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "ThumbUp@2x.png"; sourceTree = "<group>"; };
+		238AF97022042EC600AEFA17 /* Icon.icns */ = {isa = PBXFileReference; lastKnownFileType = image.icns; path = Icon.icns; sourceTree = "<group>"; };
+		23963B4F22040C720097189E /* ServiceManagement.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = ServiceManagement.framework; path = System/Library/Frameworks/ServiceManagement.framework; sourceTree = SDKROOT; };
+		23A984BE220ED07E000914A2 /* IOKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = IOKit.framework; path = System/Library/Frameworks/IOKit.framework; sourceTree = SDKROOT; };
+/* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		232EDA5121F1B33E0085D362 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				23963B5022040C720097189E /* ServiceManagement.framework in Frameworks */,
+				23851A0121F1C1A400E79A41 /* CoreGraphics.framework in Frameworks */,
+				23851A0021F1BFA300E79A41 /* Cocoa.framework in Frameworks */,
+				238519FF21F1BF8A00E79A41 /* EventKit.framework in Frameworks */,
+				238519F821F1BF3C00E79A41 /* Foundation.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		237559AF2204156000FB8CB9 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		232DB1DF21FAED280049A0B5 /* Resources */ = {
+			isa = PBXGroup;
+			children = (
+				238AF97022042EC600AEFA17 /* Icon.icns */,
+				238AF96822042E2500AEFA17 /* ThumbUp@2x.png */,
+				238AF96622042D4900AEFA17 /* ExitButton@2x.png */,
+				238AF96422042C1600AEFA17 /* OK@2x.png */,
+				234F70AB21FB50BD00D2F2CA /* StatusEng.png */,
+				234F70A921FB50BC00D2F2CA /* StatusEng@2x.png */,
+				234F70A821FB50BC00D2F2CA /* StatusHighlightedEng.png */,
+				234F70AA21FB50BC00D2F2CA /* StatusHighlightedEng@2x.png */,
+				232DB1E021FAED280049A0B5 /* StatusHighlighted.png */,
+				232DB1E121FAED280049A0B5 /* Status.png */,
+				232DB1E221FAED280049A0B5 /* Status@2x.png */,
+				232DB1E321FAED280049A0B5 /* StatusHighlighted@2x.png */,
+			);
+			path = Resources;
+			sourceTree = "<group>";
+		};
+		232EDA4B21F1B33E0085D362 = {
+			isa = PBXGroup;
+			children = (
+				232EDA5621F1B33E0085D362 /* ModernKey */,
+				238519ED21F1B70E00E79A41 /* engine */,
+				237559B32204156000FB8CB9 /* OpenKeyHelper */,
+				232EDA5521F1B33E0085D362 /* Products */,
+				238519F121F1B8E200E79A41 /* Frameworks */,
+			);
+			sourceTree = "<group>";
+		};
+		232EDA5521F1B33E0085D362 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				232EDA5421F1B33E0085D362 /* OpenKey.app */,
+				237559B22204156000FB8CB9 /* OpenKeyHelper.app */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		232EDA5621F1B33E0085D362 /* ModernKey */ = {
+			isa = PBXGroup;
+			children = (
+				232DB1DF21FAED280049A0B5 /* Resources */,
+				232EDA5721F1B33E0085D362 /* AppDelegate.h */,
+				232EDA5821F1B33E0085D362 /* AppDelegate.m */,
+				232EDA5A21F1B33E0085D362 /* ViewController.h */,
+				232EDA5B21F1B33E0085D362 /* ViewController.m */,
+				2374A12E2216720E005B0375 /* AboutViewController.h */,
+				2374A12F2216720E005B0375 /* AboutViewController.m */,
+				232EDA5D21F1B33F0085D362 /* Assets.xcassets */,
+				232EDA5F21F1B33F0085D362 /* Main.storyboard */,
+				232EDA6221F1B33F0085D362 /* Info.plist */,
+				232EDA6321F1B33F0085D362 /* main.m */,
+				232EDA6521F1B33F0085D362 /* ModernKey.entitlements */,
+				2389467E21FDDC3F0030A13B /* OpenKeyManager.h */,
+				2389467C21FDDB920030A13B /* OpenKeyManager.m */,
+				238519F421F1B9B900E79A41 /* OpenKey.mm */,
+			);
+			path = ModernKey;
+			sourceTree = "<group>";
+		};
+		237559B32204156000FB8CB9 /* OpenKeyHelper */ = {
+			isa = PBXGroup;
+			children = (
+				237559B42204156000FB8CB9 /* AppDelegate.h */,
+				237559B52204156000FB8CB9 /* AppDelegate.m */,
+				237559B72204156000FB8CB9 /* Assets.xcassets */,
+				237559B92204156000FB8CB9 /* MainMenu.xib */,
+				237559BC2204156000FB8CB9 /* Info.plist */,
+				237559BD2204156000FB8CB9 /* main.m */,
+				237559BF2204156000FB8CB9 /* OpenKeyHelper.entitlements */,
+			);
+			path = OpenKeyHelper;
+			sourceTree = "<group>";
+		};
+		238519ED21F1B70E00E79A41 /* engine */ = {
+			isa = PBXGroup;
+			children = (
+				234584A721F1E96C00DE1DEC /* DataType.h */,
+				23355FD621F2D31D00625798 /* Vietnamese.cpp */,
+				23355FD721F2D31D00625798 /* Vietnamese.h */,
+				238519EE21F1B70E00E79A41 /* Engine.h */,
+				238519EF21F1B70E00E79A41 /* Engine.cpp */,
+			);
+			name = engine;
+			path = ../engine;
+			sourceTree = "<group>";
+		};
+		238519F121F1B8E200E79A41 /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				23A984BE220ED07E000914A2 /* IOKit.framework */,
+				23963B4F22040C720097189E /* ServiceManagement.framework */,
+				23874B0F220160A500000BC8 /* Carbon.framework */,
+				238519FD21F1BF5100E79A41 /* EventKit.framework */,
+				238519FB21F1BF4900E79A41 /* Cocoa.framework */,
+				238519F921F1BF4400E79A41 /* CoreGraphics.framework */,
+				238519F221F1B8E200E79A41 /* Foundation.framework */,
+			);
+			name = Frameworks;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		232EDA5321F1B33E0085D362 /* OpenKey */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 232EDA6821F1B33F0085D362 /* Build configuration list for PBXNativeTarget "OpenKey" */;
+			buildPhases = (
+				232EDA5021F1B33E0085D362 /* Sources */,
+				232EDA5121F1B33E0085D362 /* Frameworks */,
+				232EDA5221F1B33E0085D362 /* Resources */,
+				237559C4220417DD00FB8CB9 /* CopyFiles */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = OpenKey;
+			productName = ModernKey;
+			productReference = 232EDA5421F1B33E0085D362 /* OpenKey.app */;
+			productType = "com.apple.product-type.application";
+		};
+		237559B12204156000FB8CB9 /* OpenKeyHelper */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 237559C02204156000FB8CB9 /* Build configuration list for PBXNativeTarget "OpenKeyHelper" */;
+			buildPhases = (
+				237559AE2204156000FB8CB9 /* Sources */,
+				237559AF2204156000FB8CB9 /* Frameworks */,
+				237559B02204156000FB8CB9 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = OpenKeyHelper;
+			productName = OpenKeyHelper;
+			productReference = 237559B22204156000FB8CB9 /* OpenKeyHelper.app */;
+			productType = "com.apple.product-type.application";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		232EDA4C21F1B33E0085D362 /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				LastUpgradeCheck = 1010;
+				ORGANIZATIONNAME = "Tuyen Mai";
+				TargetAttributes = {
+					232EDA5321F1B33E0085D362 = {
+						CreatedOnToolsVersion = 10.1;
+						SystemCapabilities = {
+							com.apple.Sandbox = {
+								enabled = 1;
+							};
+						};
+					};
+					237559B12204156000FB8CB9 = {
+						CreatedOnToolsVersion = 10.1;
+					};
+				};
+			};
+			buildConfigurationList = 232EDA4F21F1B33E0085D362 /* Build configuration list for PBXProject "OpenKey" */;
+			compatibilityVersion = "Xcode 9.3";
+			developmentRegion = en;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				en,
+				Base,
+			);
+			mainGroup = 232EDA4B21F1B33E0085D362;
+			productRefGroup = 232EDA5521F1B33E0085D362 /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				232EDA5321F1B33E0085D362 /* OpenKey */,
+				237559B12204156000FB8CB9 /* OpenKeyHelper */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		232EDA5221F1B33E0085D362 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				238AF96722042D4900AEFA17 /* ExitButton@2x.png in Resources */,
+				234F70AC21FB50BD00D2F2CA /* StatusHighlightedEng.png in Resources */,
+				232DB1E721FAED290049A0B5 /* StatusHighlighted@2x.png in Resources */,
+				238AF97122042EC600AEFA17 /* Icon.icns in Resources */,
+				234F70AE21FB50BD00D2F2CA /* StatusHighlightedEng@2x.png in Resources */,
+				232DB1E421FAED290049A0B5 /* StatusHighlighted.png in Resources */,
+				238AF96522042C1600AEFA17 /* OK@2x.png in Resources */,
+				234F70AF21FB50BD00D2F2CA /* StatusEng.png in Resources */,
+				234F70AD21FB50BD00D2F2CA /* StatusEng@2x.png in Resources */,
+				232DB1E621FAED290049A0B5 /* Status@2x.png in Resources */,
+				232DB1E521FAED290049A0B5 /* Status.png in Resources */,
+				238AF96922042E2500AEFA17 /* ThumbUp@2x.png in Resources */,
+				232EDA5E21F1B33F0085D362 /* Assets.xcassets in Resources */,
+				232EDA6121F1B33F0085D362 /* Main.storyboard in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		237559B02204156000FB8CB9 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				237559B82204156000FB8CB9 /* Assets.xcassets in Resources */,
+				237559BB2204156000FB8CB9 /* MainMenu.xib in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		232EDA5021F1B33E0085D362 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				232EDA5C21F1B33E0085D362 /* ViewController.m in Sources */,
+				2389467D21FDDB920030A13B /* OpenKeyManager.m in Sources */,
+				2374A1302216720E005B0375 /* AboutViewController.m in Sources */,
+				238519F021F1B70E00E79A41 /* Engine.cpp in Sources */,
+				238519F521F1B9B900E79A41 /* OpenKey.mm in Sources */,
+				232EDA6421F1B33F0085D362 /* main.m in Sources */,
+				23355FD821F2D31D00625798 /* Vietnamese.cpp in Sources */,
+				232EDA5921F1B33E0085D362 /* AppDelegate.m in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		237559AE2204156000FB8CB9 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				237559BE2204156000FB8CB9 /* main.m in Sources */,
+				237559B62204156000FB8CB9 /* AppDelegate.m in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin PBXVariantGroup section */
+		232EDA5F21F1B33F0085D362 /* Main.storyboard */ = {
+			isa = PBXVariantGroup;
+			children = (
+				232EDA6021F1B33F0085D362 /* Base */,
+			);
+			name = Main.storyboard;
+			sourceTree = "<group>";
+		};
+		237559B92204156000FB8CB9 /* MainMenu.xib */ = {
+			isa = PBXVariantGroup;
+			children = (
+				237559BA2204156000FB8CB9 /* Base */,
+			);
+			name = MainMenu.xib;
+			sourceTree = "<group>";
+		};
+/* End PBXVariantGroup section */
+
+/* Begin XCBuildConfiguration section */
+		232EDA6621F1B33F0085D362 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_LOCALIZABILITY_NONLOCALIZED = YES;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				CODE_SIGN_IDENTITY = "-";
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_TESTABILITY = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				MACOSX_DEPLOYMENT_TARGET = 10.14;
+				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
+				MTL_FAST_MATH = YES;
+				ONLY_ACTIVE_ARCH = YES;
+				SDKROOT = macosx;
+			};
+			name = Debug;
+		};
+		232EDA6721F1B33F0085D362 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_LOCALIZABILITY_NONLOCALIZED = YES;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				CODE_SIGN_IDENTITY = "-";
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				MACOSX_DEPLOYMENT_TARGET = 10.14;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				MTL_FAST_MATH = YES;
+				SDKROOT = macosx;
+			};
+			name = Release;
+		};
+		232EDA6921F1B33F0085D362 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CLANG_ENABLE_MODULES = NO;
+				CODE_SIGN_ENTITLEMENTS = ModernKey/ModernKey.entitlements;
+				CODE_SIGN_STYLE = Automatic;
+				COMBINE_HIDPI_IMAGES = YES;
+				DEVELOPMENT_TEAM = 7X875U5EVD;
+				HEADER_SEARCH_PATHS = "";
+				INFOPLIST_FILE = ModernKey/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+				);
+				MACOSX_DEPLOYMENT_TARGET = 10.10;
+				OTHER_LDFLAGS = (
+					"-lc++\n-lc++",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = com.tuyenmai.openkey;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+			};
+			name = Debug;
+		};
+		232EDA6A21F1B33F0085D362 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CLANG_ENABLE_MODULES = NO;
+				CODE_SIGN_ENTITLEMENTS = ModernKey/ModernKey.entitlements;
+				CODE_SIGN_STYLE = Automatic;
+				COMBINE_HIDPI_IMAGES = YES;
+				DEVELOPMENT_TEAM = 7X875U5EVD;
+				HEADER_SEARCH_PATHS = "";
+				INFOPLIST_FILE = ModernKey/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+				);
+				MACOSX_DEPLOYMENT_TARGET = 10.10;
+				OTHER_LDFLAGS = (
+					"-lc++\n-lc++",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = com.tuyenmai.openkey;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+			};
+			name = Release;
+		};
+		237559C12204156000FB8CB9 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_ENTITLEMENTS = OpenKeyHelper/OpenKeyHelper.entitlements;
+				CODE_SIGN_STYLE = Automatic;
+				COMBINE_HIDPI_IMAGES = YES;
+				DEVELOPMENT_TEAM = 7X875U5EVD;
+				INFOPLIST_FILE = OpenKeyHelper/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = com.tuyenmai.OpenKeyHelper;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SKIP_INSTALL = YES;
+			};
+			name = Debug;
+		};
+		237559C22204156000FB8CB9 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_ENTITLEMENTS = OpenKeyHelper/OpenKeyHelper.entitlements;
+				CODE_SIGN_STYLE = Automatic;
+				COMBINE_HIDPI_IMAGES = YES;
+				DEVELOPMENT_TEAM = 7X875U5EVD;
+				INFOPLIST_FILE = OpenKeyHelper/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = com.tuyenmai.OpenKeyHelper;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SKIP_INSTALL = YES;
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		232EDA4F21F1B33E0085D362 /* Build configuration list for PBXProject "OpenKey" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				232EDA6621F1B33F0085D362 /* Debug */,
+				232EDA6721F1B33F0085D362 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		232EDA6821F1B33F0085D362 /* Build configuration list for PBXNativeTarget "OpenKey" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				232EDA6921F1B33F0085D362 /* Debug */,
+				232EDA6A21F1B33F0085D362 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		237559C02204156000FB8CB9 /* Build configuration list for PBXNativeTarget "OpenKeyHelper" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				237559C12204156000FB8CB9 /* Debug */,
+				237559C22204156000FB8CB9 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = 232EDA4C21F1B33E0085D362 /* Project object */;
+}
