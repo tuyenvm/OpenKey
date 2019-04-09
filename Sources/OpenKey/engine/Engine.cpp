@@ -258,6 +258,8 @@ void checkCorrectVowel(vector<vector<Uint16>>& charset, int& i, int& k, const Ui
     if (isCorect && charset[i].size() > 1 && (IS_KEY_F(markKey) || IS_KEY_X(markKey) || IS_KEY_R(markKey))) {
         if (charset[i][1] == KEY_C || charset[i][1] == KEY_T) {
             isCorect = false;
+        } else if (charset[i].size() > 2 && (charset[i][2] == KEY_T)) {
+            isCorect = false;
         }
     }
     
@@ -496,7 +498,7 @@ void insertMark(const Uint32& markMask, const bool& canModifyFlag) {
             TypingWord[ii] &= ~MARK_MASK;
             hData[kk--] = GET(TypingWord[ii]);
         }
-        _index = 0;
+        //_index = 0;
         tempDisableKey = true;
     } else {
         //remove other mark
@@ -931,7 +933,8 @@ void vKeyHandleEvent(const vKeyEvent& event,
         }
     }
     
+    //Debug
     //cout<<(int)_index<<endl;
     //cout<<(int)hBPC<<endl;
-    //cout<<(int)hNCC<<endl;
+    //cout<<(int)hNCC<<endl<<endl;
 }

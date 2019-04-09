@@ -1,9 +1,13 @@
 # OpenKey Change Log
 
-##### Version 1.1: (Under construction)
+##### Version 1.1: (in plan)
 - Quick Telex: cc=ch, gg=gi, kk=kh, nn=ng, qq=qu, pp=ph, tt=th (On/Off)
 - Macro (On/Off).
 - Macro table.
+
+##### Version 1.0.14: (09/04/2019)
+- Add case "uýt".
+- Improve typing English in Vietnamese mode.
 
 ##### Version 1.0.11: (27/02/2019)
 - Add case "chú thòong", "gòong".
