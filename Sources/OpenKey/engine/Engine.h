@@ -78,7 +78,7 @@ void* vKeyInit();
 void vKeyHandleEvent(const vKeyEvent& event,
                      const vKeyEventState& state,
                      const Uint16& data,
-                     const bool& isCaps=false,
+                     const Uint8& capsStatus=0,
                      const bool& otherControlKey=false);
 
 /**

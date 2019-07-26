@@ -195,7 +195,7 @@ extern "C" {
             vKeyHandleEvent(vKeyEvent::Keyboard,
                             vKeyEventState::KeyDown,
                             _keycode,
-                            (_flag & kCGEventFlagMaskAlphaShift) || (_flag & kCGEventFlagMaskShift),
+                            _flag & kCGEventFlagMaskShift ? 1 : (_flag & kCGEventFlagMaskAlphaShift ? 2 : 0),
                                 (_flag & kCGEventFlagMaskCommand) || (_flag & kCGEventFlagMaskControl) ||
                                 (_flag & kCGEventFlagMaskAlternate) || (_flag & kCGEventFlagMaskSecondaryFn) ||
                                 (_flag & kCGEventFlagMaskNumericPad) || (_flag & kCGEventFlagMaskHelp));

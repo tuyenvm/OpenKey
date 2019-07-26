@@ -69,6 +69,7 @@ static int l;
 static bool isRestoredW;
 static Uint16 keyForAEO;
 static bool isCheckedGrammar;
+static bool _isCaps = false;
 
 //function prototype
 void findAndCalculateVowel(const bool& forGrammar=false);
@@ -880,10 +881,11 @@ void handleQuickTelex(const Uint16& data, const bool& isCaps) {
 void vKeyHandleEvent(const vKeyEvent& event,
                      const vKeyEventState& state,
                      const Uint16& data,
-                     const bool& isCaps,
+                     const Uint8& capsStatus,
                      const bool& otherControlKey) {
-    
-    if (otherControlKey || isWordBreak(event, state, data) || (_index == 0 && data == KEY_9)) {
+    _isCaps = (capsStatus == 1 || //shift
+               capsStatus == 2); //caps lock
+    if ((capsStatus == 1 && vInputType == vVNI) || otherControlKey || isWordBreak(event, state, data) || (_index == 0 && data == KEY_9)) {
         hCode = vDoNothing;
         hBPC = 0;
         hNCC = 0;
@@ -904,20 +906,20 @@ void vKeyHandleEvent(const vKeyEvent& event,
     } else {
         if (!IS_SPECIALKEY(data) || tempDisableKey) { //do nothing
             if (vQuickTelex && IS_QUICK_TELEX_KEY(data)) {
-                handleQuickTelex(data, isCaps);
+                handleQuickTelex(data, _isCaps);
                 return;
             } else {
                 hCode = vDoNothing;
                 hBPC = 0;
                 hNCC = 0;
                 hExt = 3; //normal key
-                insertKey(data, isCaps);
+                insertKey(data, _isCaps);
             }
         } else { //check and update key
             //restore state
             hCode = vDoNothing;
             hExt = 3; //normal key
-            handleMainKey(data, isCaps);
+            handleMainKey(data, _isCaps);
         }
         
         if (!vFreeMark && !IS_KEY_D(data)) {
@@ -929,7 +931,7 @@ void vKeyHandleEvent(const vKeyEvent& event,
         }
         
         if (hCode == vRestore) {
-            insertKey(data, isCaps);
+            insertKey(data, _isCaps);
         }
     }
     
