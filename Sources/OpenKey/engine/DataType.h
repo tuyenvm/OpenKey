@@ -169,4 +169,7 @@ struct vKeyHookState {
 
 #define IS_QUICK_TELEX_KEY(code) (_index > 0 && (code == KEY_C || code == KEY_G || code == KEY_K || code == KEY_N || code == KEY_Q || code == KEY_P || code == KEY_T) && \
                                     (Uint16)TypingWord[_index-1] == code)
+
+#define IS_NUMBER_KEY(code) (code == KEY_1 || code == KEY_2 || code == KEY_3 || code == KEY_4 || code == KEY_5 || code == KEY_6 || code == KEY_7 || code == KEY_8 || code == KEY_9 || code == KEY_0)
+
 #endif /* DataType_h */
