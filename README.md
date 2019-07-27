@@ -3,8 +3,8 @@
 New Vietnamese input for macOS. Annoying underline issue fixed. Intelligent engine. Free and open source.  
 Bộ gõ tiếng Việt mới cho macOS, sử dụng kỹ thuật backkey. Loại bỏ lỗi gặt chân khó chịu ở bộ gõ mặc định. Hoàn toàn miễn phí và là nguồn mở, luôn cập nhật và phát triển.
 
-![Giao diện](https://github.com/tuyenvm/OpenKey/raw/master/Release/screenshot1.png "Main UI")
-![Menu](https://github.com/tuyenvm/OpenKey/raw/master/Release/screenshot2.png "Menu bar")
+![Giao diện](https://github.com/tuyenvm/OpenKey/raw/master/Images/screenshot1.png "Main UI")
+![Menu](https://github.com/tuyenvm/OpenKey/raw/master/Images/screenshot2.png "Menu bar")
 
 ##### Input Type - Hỗ trợ kiểu gõ
 - Telex
@@ -35,7 +35,7 @@ v1.0.16: [macOS](https://github.com/tuyenvm/OpenKey/releases/download/1.0.16/Ope
 
 ### Note - Lưu ý:
 OpenKey needs Accessibility permission, go to System Preferences -> Security & Privacy -> Accessibility, enable OpenKey.app. Don't turn off while using.
-![Guide](https://github.com/tuyenvm/OpenKey/raw/master/Release/screenshot3.png "Accessibility").
+![Guide](https://github.com/tuyenvm/OpenKey/raw/master/Images/screenshot3.png "Accessibility").
 
 ### Author
 Mai Vũ Tuyên.
