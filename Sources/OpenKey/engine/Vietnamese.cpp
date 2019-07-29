@@ -106,6 +106,7 @@ vector<vector<Uint16>> _consonantD = {
     {KEY_D, KEY_E, KEY_T},
     {KEY_D, KEY_E, KEY_U},
     {KEY_D, KEY_E, KEY_O},
+    {KEY_D, KEY_E, KEY_P},
     
     {KEY_D, KEY_U, KEY_N, KEY_G},
     {KEY_D, KEY_U, KEY_N},
@@ -116,6 +117,8 @@ vector<vector<Uint16>> _consonantD = {
     {KEY_D, KEY_U, KEY_O, KEY_N},
     {KEY_D, KEY_U, KEY_O, KEY_N, KEY_G},
     {KEY_D, KEY_U},
+    {KEY_D, KEY_U, KEY_P},
+    {KEY_D, KEY_U, KEY_T},
     
     {KEY_D, KEY_I, KEY_C, KEY_H},
     {KEY_D, KEY_I, KEY_C},
@@ -124,12 +127,16 @@ vector<vector<Uint16>> _consonantD = {
     {KEY_D, KEY_I},
     {KEY_D, KEY_I, KEY_A},
     {KEY_D, KEY_I, KEY_E},
+    {KEY_D, KEY_I, KEY_E, KEY_C},
     {KEY_D, KEY_I, KEY_E, KEY_N},
     {KEY_D, KEY_I, KEY_E, KEY_M},
+    {KEY_D, KEY_I, KEY_E, KEY_P},
+    {KEY_D, KEY_I, KEY_T},
     
     {KEY_D, KEY_O},
     {KEY_D, KEY_O, KEY_A},
     {KEY_D, KEY_O, KEY_A, KEY_N},
+    {KEY_D, KEY_O, KEY_A, KEY_N, KEY_G},
     {KEY_D, KEY_O, KEY_A, KEY_N, KEY_H},
     {KEY_D, KEY_O, KEY_A, KEY_M},
     {KEY_D, KEY_O, KEY_E},
