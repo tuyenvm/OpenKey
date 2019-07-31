@@ -9,27 +9,35 @@
 #import "ViewController.h"
 #import "OpenKeyManager.h"
 #import "AppDelegate.h"
+#import "MyTextField.h"
 
 extern AppDelegate* appDelegate;
 
 ViewController* viewController;
 extern int vFreeMark;
 extern int vCheckSpelling;
+extern int vUseModernOrthography;
+extern int vSwitchKeyStatus;
+extern int vQuickTelex;
 
 @implementation ViewController {
-    
+    __weak IBOutlet NSButton *CustomSwitchCommand;
+    __weak IBOutlet NSButton *CustomSwitchOption;
+    __weak IBOutlet NSButton *CustomSwitchControl;
+    __weak IBOutlet MyTextField *CustomSwitchKey;
 }
 
 - (void)viewDidLoad {
     [super viewDidLoad];
 
     viewController = self;
-    //[[[self view] window] windowController].window.title = @"ahihi";
+    CustomSwitchKey.Parent = self;
+    
     self.appOK.hidden = YES;
     self.permissionWarning.hidden = YES;
     self.retryButton.enabled = NO;
  
-    NSArray* inputTypeData = [[NSArray alloc] initWithObjects:@"Telex", @"VNI", nil];
+    NSArray* inputTypeData = [[NSArray alloc] initWithObjects:@"Telex", @"VNI", @"Simple Telex", nil];
     NSArray* codeData = [[NSArray alloc] initWithObjects:
                          @"Unicode",
                          @"TCVN3 (ABC)",
@@ -81,10 +89,6 @@ extern int vCheckSpelling;
     [appDelegate onCodeTableChanged:(int)[self.popupCode indexOfSelectedItem]];
 }
 
-- (IBAction)onSwitchKeyChanged:(id)sender {
-    [appDelegate onSwitchKeySelectedIndex:(int)((NSButton*)sender).tag];
-}
-
 - (IBAction)onLanguageChanged:(id)sender {
     [appDelegate onInputMethodSelected];
 }
@@ -98,47 +102,78 @@ extern int vCheckSpelling;
 }
 
 - (IBAction)onFreeMark:(NSButton *)sender {
-    NSInteger val = 0;
-    if (sender.state == NSControlStateValueOn) {
-        val = 1;
-    } else {
-        val = 0;
-    }
-    [[NSUserDefaults standardUserDefaults] setInteger:val forKey:@"FreeMark"];
+    NSInteger val = [self setCustomValue:sender keyToSet:@"FreeMark"];
     vFreeMark = (int)val;
 }
 
+- (IBAction)onModernOrthography:(NSButton *)sender {
+    NSInteger val = [self setCustomValue:sender keyToSet:@"ModernOrthography"];
+    vUseModernOrthography = (int)val;
+}
+
 - (IBAction)onCheckSpelling:(NSButton *)sender {
-    NSInteger val = 0;
-    if (sender.state == NSControlStateValueOn) {
-        val = 1;
-    } else {
-        val = 0;
-    }
-    [[NSUserDefaults standardUserDefaults] setInteger:val forKey:@"Spelling"];
+    NSInteger val = [self setCustomValue:sender keyToSet:@"Spelling"];
     vCheckSpelling = (int)val;
 }
 
 - (IBAction)onShowUIOnStartup:(NSButton *)sender {
-    NSInteger val = 0;
-    if (sender.state == NSControlStateValueOn) {
-        val = 1;
-    } else {
-        val = 0;
-    }
-    [[NSUserDefaults standardUserDefaults] setInteger:val forKey:@"ShowUIOnStartup"];
+    [self setCustomValue:sender keyToSet:@"ShowUIOnStartup"];
 }
 
 - (IBAction)onRunOnStartup:(NSButton *)sender {
+    NSInteger val = [self setCustomValue:sender keyToSet:@"RunOnStartup"];
+    [appDelegate setRunOnStartup:val];
+}
+
+- (IBAction)onGrayIcon:(id)sender {
+    NSInteger val = [self setCustomValue:sender keyToSet:@"GrayIcon"];
+    [appDelegate setGrayIcon:val];
+}
+
+- (IBAction)onQuickTelex:(id)sender {
+    NSInteger val = [self setCustomValue:sender keyToSet:@"QuickTelex"];
+    vQuickTelex = (int)val;
+}
+
+- (IBAction)onControlSwitchKey:(NSButton *)sender {
+    NSInteger val = [self setCustomValue:sender keyToSet:nil];
+    vSwitchKeyStatus &= (~0x100);
+    vSwitchKeyStatus |= val << 8;
+    [[NSUserDefaults standardUserDefaults] setInteger:vSwitchKeyStatus forKey:@"SwitchKeyStatus"];
+}
+
+- (IBAction)onOptionSwitchKey:(NSButton *)sender {
+    NSInteger val = [self setCustomValue:sender keyToSet:nil];
+    vSwitchKeyStatus &= (~0x200);
+    vSwitchKeyStatus |= val << 9;
+    [[NSUserDefaults standardUserDefaults] setInteger:vSwitchKeyStatus forKey:@"SwitchKeyStatus"];
+}
+
+- (IBAction)onCommandSwitchKey:(NSButton *)sender {
+    NSInteger val = [self setCustomValue:sender keyToSet:nil];
+    vSwitchKeyStatus &= (~0x400);
+    vSwitchKeyStatus |= val << 10;
+    [[NSUserDefaults standardUserDefaults] setInteger:vSwitchKeyStatus forKey:@"SwitchKeyStatus"];
+}
+
+-(void)onSwitchKeyChange:(unsigned short)keyCode character:(unsigned short)ch {
+    vSwitchKeyStatus &= 0xFFFFFF00;
+    vSwitchKeyStatus |= (char)keyCode;
+    vSwitchKeyStatus &= 0x00FFFFFF;
+    vSwitchKeyStatus |= ((int)ch<<24);
+    [[NSUserDefaults standardUserDefaults] setInteger:vSwitchKeyStatus forKey:@"SwitchKeyStatus"];
+}
+
+- (NSInteger)setCustomValue:(NSButton*)sender keyToSet:(NSString*) key {
     NSInteger val = 0;
     if (sender.state == NSControlStateValueOn) {
         val = 1;
     } else {
         val = 0;
     }
-    [[NSUserDefaults standardUserDefaults] setInteger:val forKey:@"RunOnStartup"];
-    
-    [appDelegate setRunOnStartup:val];
+    if (key != nil)
+        [[NSUserDefaults standardUserDefaults] setInteger:val forKey:key];
+    return val;
 }
 
 - (IBAction)onTerminateApp:(id)sender {
@@ -159,41 +194,33 @@ extern int vCheckSpelling;
     NSInteger intCodeTable = [[NSUserDefaults standardUserDefaults] integerForKey:@"CodeTable"];
     [self.popupCode selectItemAtIndex:intCodeTable];
     
-    NSInteger intSwitchKey = [[NSUserDefaults standardUserDefaults] integerForKey:@"SwitchKey"];
-    if (intSwitchKey == 1) {
-        self.OptionZButton.state = NSControlStateValueOn;
-    } else if (intSwitchKey == 0) {
-        self.CtrlShiftButton.state = NSControlStateValueOn;
-    }
-    
     //option
     NSInteger showui = [[NSUserDefaults standardUserDefaults] integerForKey:@"ShowUIOnStartup"];
-    if (showui == 0) {
-        self.ShowUIButton.state = NSControlStateValueOff;
-    } else {
-        self.ShowUIButton.state = NSControlStateValueOn;
-    }
+    self.ShowUIButton.state = showui ? NSControlStateValueOn : NSControlStateValueOff;
     
     NSInteger freeMark = [[NSUserDefaults standardUserDefaults] integerForKey:@"FreeMark"];
-    if (freeMark == 0) {
-        self.FreeMarkButton.state = NSControlStateValueOff;
-    } else {
-        self.FreeMarkButton.state = NSControlStateValueOn;
-    }
+    self.FreeMarkButton.state = freeMark ? NSControlStateValueOn : NSControlStateValueOff;
+    
+    NSInteger useModernOrthography = [[NSUserDefaults standardUserDefaults] integerForKey:@"ModernOrthography"];
+    self.UseModernOrthography.state = useModernOrthography ? NSControlStateValueOn : NSControlStateValueOff;
     
     NSInteger spelling = [[NSUserDefaults standardUserDefaults] integerForKey:@"Spelling"];
-    if (spelling == 0) {
-        self.CheckSpellingButton.state = NSControlStateValueOff;
-    } else {
-        self.CheckSpellingButton.state = NSControlStateValueOn;
-    }
+    self.CheckSpellingButton.state = spelling ? NSControlStateValueOn : NSControlStateValueOff;
     
     NSInteger runOnStartup = [[NSUserDefaults standardUserDefaults] integerForKey:@"RunOnStartup"];
-    if (runOnStartup == 0) {
-        self.RunOnStartupButton.state = NSControlStateValueOff;
-    } else {
-        self.RunOnStartupButton.state = NSControlStateValueOn;
-    }
+    self.RunOnStartupButton.state = runOnStartup ? NSControlStateValueOn : NSControlStateValueOff;
+    
+    NSInteger useGrayIcon = [[NSUserDefaults standardUserDefaults] integerForKey:@"GrayIcon"];
+    self.UseGrayIcon.state = useGrayIcon ? NSControlStateValueOn : NSControlStateValueOff;
+    
+    NSInteger quicTelex = [[NSUserDefaults standardUserDefaults] integerForKey:@"QuickTelex"];
+    self.QuickTelex.state = quicTelex ? NSControlStateValueOn : NSControlStateValueOff;
+    
+    CustomSwitchControl.state = (vSwitchKeyStatus & 0x100) ? NSControlStateValueOn : NSControlStateValueOff;
+    CustomSwitchOption.state = (vSwitchKeyStatus & 0x200) ? NSControlStateValueOn : NSControlStateValueOff;
+    CustomSwitchCommand.state = (vSwitchKeyStatus & 0x400) ? NSControlStateValueOn : NSControlStateValueOff;
+    [CustomSwitchKey setTextByChar:((vSwitchKeyStatus>>24) & 0xFF)];
+    
 }
 
 - (IBAction)onOK:(id)sender {

@@ -1,14 +1,15 @@
 # OpenKey
 ### Open source Vietnamese Input App for macOS - Bộ gõ tiếng Việt nguồn mở cho macOS.
 New Vietnamese input for macOS. Annoying underline issue fixed. Intelligent engine. Free and open source.  
-Bộ gõ tiếng Việt mới cho macOS, sử dụng kỹ thuật backkey. Loại bỏ lỗi gặt chân khó chịu ở bộ gõ mặc định. Hoàn toàn miễn phí và là nguồn mở, luôn cập nhật và phát triển.
+Bộ gõ tiếng Việt mới cho macOS, sử dụng kỹ thuật backkey. Loại bỏ lỗi gạch chân khó chịu ở bộ gõ mặc định. Hoàn toàn miễn phí và là nguồn mở, luôn cập nhật và phát triển.
 
-![Giao diện](https://github.com/tuyenvm/OpenKey/raw/master/Images/screenshot1.png "Main UI")
+![Giao diện](https://github.com/tuyenvm/OpenKey/raw/master/Images/screenshot1.0.17.png "Main UI")
 ![Menu](https://github.com/tuyenvm/OpenKey/raw/master/Images/screenshot2.png "Menu bar")
 
 ##### Input Type - Hỗ trợ kiểu gõ
 - Telex
 - VNI
+- Simple Telex
 
 ##### Code - Bảng mã:
 - Unicode (Unicode dựng sẵn).
@@ -19,6 +20,8 @@ Bộ gõ tiếng Việt mới cho macOS, sử dụng kỹ thuật backkey. Loạ
 - ...
 
 ##### Feature - Tính năng:
+- Modern orthography (On/Off) - Đặt dấu oà, uý thay vì òa, úy.
+- Quick Telex (On/Off) - Gõ nhanh (cc=ch, gg=gi, kk=kh, nn=ng, qq=qu, pp=ph, tt=th).
 - Free mark (On/Off) - Bỏ dấu tự do.
 - Grammar check (On/Off) - Kiểm tra ngữ pháp.
 - Spelling check (On/Off) - Kiểm tra chính tả.
@@ -29,7 +32,7 @@ Bộ gõ tiếng Việt mới cho macOS, sử dụng kỹ thuật backkey. Loạ
 - ...
 
 ### Download Binary - Tải xuống: 
-v1.0.16: [macOS](https://github.com/tuyenvm/OpenKey/releases/download/1.0.16/OpenKey1.0.16.dmg)
+Release: [Download](https://github.com/tuyenvm/OpenKey/releases)
 
 [Changelog](https://github.com/tuyenvm/OpenKey/blob/master/CHANGELOG.md)
 

@@ -17,11 +17,13 @@ extern ViewController* viewController;
 //see document in Engine.h
 int vLanguage = 1;
 int vInputType = 0;
-int vSwitchKey = 0;
 int vFreeMark = 0;
 int vCodeTable = 0;
 int vCheckSpelling = 1;
+int vUseModernOrthography = 1;
 int vQuickTelex = 0;
+#define DEFAULT_SWITCH_STATUS 0x7A000206 //default option + z
+int vSwitchKeyStatus = DEFAULT_SWITCH_STATUS;
 
 @interface AppDelegate ()
 
@@ -37,6 +39,7 @@ int vQuickTelex = 0;
     
     NSMenuItem* mnuTelex;
     NSMenuItem* mnuVNI;
+    NSMenuItem* mnuSimpleTelex;
     
     NSMenuItem* mnuUnicode;
     NSMenuItem* mnuTCVN;
@@ -67,6 +70,8 @@ int vQuickTelex = 0;
     //load saved data
     vFreeMark = (int)[[NSUserDefaults standardUserDefaults] integerForKey:@"FreeMark"];
     vCheckSpelling = (int)[[NSUserDefaults standardUserDefaults] integerForKey:@"Spelling"];
+    vQuickTelex = (int)[[NSUserDefaults standardUserDefaults] integerForKey:@"QuickTelex"];
+    vUseModernOrthography = (int)[[NSUserDefaults standardUserDefaults] integerForKey:@"ModernOrthography"];
     
     //init
     dispatch_async(dispatch_get_main_queue(), ^{
@@ -139,10 +144,13 @@ int vQuickTelex = 0;
 
     vLanguage = 1; [[NSUserDefaults standardUserDefaults] setInteger:vLanguage forKey:@"InputMethod"];
     vInputType = 0; [[NSUserDefaults standardUserDefaults] setInteger:vInputType forKey:@"InputType"];
-    vSwitchKey = 0; [[NSUserDefaults standardUserDefaults] setInteger:vSwitchKey forKey:@"SwitchKey"];
     vFreeMark = 0; [[NSUserDefaults standardUserDefaults] setInteger:vFreeMark forKey:@"FreeMark"];
     vCheckSpelling = 1; [[NSUserDefaults standardUserDefaults] setInteger:vCheckSpelling forKey:@"Spelling"];
     vCodeTable = 0; [[NSUserDefaults standardUserDefaults] setInteger:vCodeTable forKey:@"CodeTable"];
+    vSwitchKeyStatus = DEFAULT_SWITCH_STATUS; [[NSUserDefaults standardUserDefaults] setInteger:vCodeTable forKey:@"SwitchKeyStatus"];
+    vQuickTelex = 0; [[NSUserDefaults standardUserDefaults] setInteger:vQuickTelex forKey:@"QuickTelex"];
+    vUseModernOrthography = 1; [[NSUserDefaults standardUserDefaults] setInteger:vUseModernOrthography forKey:@"ModernOrthography"];
+    
     [self fillData];
     [viewController fillData];
 }
@@ -150,6 +158,10 @@ int vQuickTelex = 0;
 -(void)setRunOnStartup:(BOOL)val {
     CFStringRef appId = (__bridge CFStringRef)@"com.tuyenmai.OpenKeyHelper";
     SMLoginItemSetEnabled(appId, val);
+}
+
+-(void)setGrayIcon:(BOOL)val {
+    [self fillData];
 }
 #pragma mark -StatusBar menu data
 
@@ -161,6 +173,8 @@ int vQuickTelex = 0;
     mnuTelex.tag = 0;
     mnuVNI = [sub addItemWithTitle:@"VNI" action:@selector(onInputTypeSelected:) keyEquivalent:@""];
     mnuVNI.tag = 1;
+    mnuSimpleTelex = [sub addItemWithTitle:@"Simple Telex" action:@selector(onInputTypeSelected:) keyEquivalent:@""];
+    mnuSimpleTelex.tag = 2;
     [theMenu setSubmenu:sub forItem:parent];
 }
 
@@ -179,13 +193,16 @@ int vQuickTelex = 0;
 - (void) fillData {
     //fill data
     NSInteger intInputMethod = [[NSUserDefaults standardUserDefaults] integerForKey:@"InputMethod"];
+    NSInteger grayIcon = [[NSUserDefaults standardUserDefaults] integerForKey:@"GrayIcon"];
     if (intInputMethod == 1) {
         [menuInputMethod setState:NSControlStateValueOn];
         statusItem.button.image = [NSImage imageNamed:@"Status"];
+        [statusItem.button.image setTemplate:(grayIcon ? YES : NO)];
         statusItem.button.alternateImage = [NSImage imageNamed:@"StatusHighlighted"];
     } else {
         [menuInputMethod setState:NSControlStateValueOff];
         statusItem.button.image = [NSImage imageNamed:@"StatusEng"];
+        [statusItem.button.image setTemplate:(grayIcon ? YES : NO)];
         statusItem.button.alternateImage = [NSImage imageNamed:@"StatusHighlightedEng"];
     }
     vLanguage = (int)intInputMethod;
@@ -193,15 +210,20 @@ int vQuickTelex = 0;
     NSInteger intInputType = [[NSUserDefaults standardUserDefaults] integerForKey:@"InputType"];
     [mnuTelex setState:NSControlStateValueOff];
     [mnuVNI setState:NSControlStateValueOff];
+    [mnuSimpleTelex setState:NSControlStateValueOff];
     if (intInputType == 0) {
         [mnuTelex setState:NSControlStateValueOn];
     } else if (intInputType == 1) {
         [mnuVNI setState:NSControlStateValueOn];
+    } else if (intInputType == 2) {
+        [mnuSimpleTelex setState:NSControlStateValueOn];
     }
     vInputType = (int)intInputType;
     
-    NSInteger intSwitchKey = [[NSUserDefaults standardUserDefaults] integerForKey:@"SwitchKey"];
-    vSwitchKey = (int)intSwitchKey;
+    NSInteger intSwitchKeyStatus = [[NSUserDefaults standardUserDefaults] integerForKey:@"SwitchKeyStatus"];
+    vSwitchKeyStatus = (int)intSwitchKeyStatus;
+    if (vSwitchKeyStatus == 0)
+        vSwitchKeyStatus = DEFAULT_SWITCH_STATUS;
     
     NSInteger intCode = [[NSUserDefaults standardUserDefaults] integerForKey:@"CodeTable"];
     [mnuUnicode setState:NSControlStateValueOff];
@@ -258,13 +280,6 @@ int vQuickTelex = 0;
 - (void)onCodeTableChanged:(int)index {
     [[NSUserDefaults standardUserDefaults] setInteger:index forKey:@"CodeTable"];
     vCodeTable = index;
-    [self fillData];
-    [viewController fillData];
-}
-
-- (void)onSwitchKeySelectedIndex:(int)index {
-    [[NSUserDefaults standardUserDefaults] setInteger:index forKey:@"SwitchKey"];
-    vSwitchKey = index;
     [self fillData];
     [viewController fillData];
 }

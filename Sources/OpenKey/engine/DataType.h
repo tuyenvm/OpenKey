@@ -26,7 +26,8 @@ enum vKeyEventState {
 
 enum vKeyInputType {
     vTelex = 0,
-    vVNI
+    vVNI,
+    vSimpleTelex
 };
 
 typedef unsigned char Byte;
@@ -162,7 +163,10 @@ struct vKeyHookState {
             keyCode == KEY_Z || keyCode == KEY_X || keyCode == KEY_W \
         : (vInputType == vVNI ? \
             keyCode == KEY_1 || keyCode == KEY_2 || keyCode == KEY_3 || keyCode == KEY_4 || \
-            keyCode == KEY_5 || keyCode == KEY_6 || keyCode == KEY_7 || keyCode == KEY_8 || keyCode == KEY_9 || keyCode == KEY_0 : false))
+            keyCode == KEY_5 || keyCode == KEY_6 || keyCode == KEY_7 || keyCode == KEY_8 || keyCode == KEY_9 || keyCode == KEY_0 \
+        : (vInputType == vSimpleTelex ? \
+            keyCode == KEY_W || keyCode == KEY_E || keyCode == KEY_R || keyCode == KEY_O || keyCode == KEY_A || keyCode == KEY_S || \
+            keyCode == KEY_D || keyCode == KEY_F || keyCode == KEY_J ||   keyCode == KEY_Z || keyCode == KEY_X || keyCode == KEY_W : false)))
 
 //is VNI or Unicode compound...
 #define IS_DOUBLE_CODE(code) (code == 2 || code == 3)

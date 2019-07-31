@@ -16,6 +16,15 @@
 #define LOBYTE(data) (data & 0xFF)
 #define HIBYTE(data) ((data>>8) & 0xFF)
 
+#define GET_SWITCH_KEY(data) (data & 0xFF)
+#define HAS_CONTROL(data) (data & 0x100)
+#define HAS_OPTION(data) (data & 0x200)
+#define HAS_COMMAND(data) (data & 0x400)
+#define SET_SWITCH_KEY(data, key) data = (data & 0xFF) | key
+#define SET_CONTROL_KEY(data, val) data|=val<<8;
+#define SET_OPTION_KEY(data, val) data|=val<<9;
+#define SET_COMMAND_KEY(data, val) data|=val<<10;
+
 //define these variable in your application
 //API
 /*
@@ -44,16 +53,24 @@ extern int vFreeMark;
 extern int vCodeTable;
 
 /*
- * 0: Ctrl + Shift
- * 1: Option + Z
+ * first 8 bit: keycode
+ * bit 8: Control on/off
+ * bit 9: Option on/off
+ * bit 10: Command on/off
  */
-extern int vSwitchKey;
+extern int vSwitchKeyStatus;
 
 /**
  * 0: No
  * 1: Yes
  */
 extern int vCheckSpelling;
+
+/*
+ * 0: òa, úy
+ * 1: oà uý
+*/
+extern int vUseModernOrthography;
 
 /**
  * 0: No

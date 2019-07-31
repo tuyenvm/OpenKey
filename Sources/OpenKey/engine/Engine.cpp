@@ -11,20 +11,21 @@
 #include <string.h>
 
 static vector<Uint8> _breakCode = {
-    KEY_ESC, KEY_TAB, KEY_ENTER, KEY_RETURN, KEY_SPACE, KEY_LEFT, KEY_RIGHT, KEY_DOWN, KEY_UP,
+    KEY_ESC, KEY_TAB, KEY_ENTER, KEY_RETURN, KEY_LEFT, KEY_RIGHT, KEY_DOWN, KEY_UP,
     43, 47, 44, 41, 39, 42, 27, 24, 50, 48
 };
 
 static Uint16 ProcessingChar[][11] = {
     {KEY_S, KEY_F, KEY_R, KEY_X, KEY_J, KEY_A, KEY_O, KEY_E, KEY_W, KEY_D, KEY_Z}, //Telex
-    {KEY_1, KEY_2, KEY_3, KEY_4, KEY_5, KEY_6, KEY_6, KEY_7, KEY_8, KEY_9, KEY_0} //VNI
+    {KEY_1, KEY_2, KEY_3, KEY_4, KEY_5, KEY_6, KEY_6, KEY_7, KEY_8, KEY_9, KEY_0}, //VNI
+    {KEY_S, KEY_F, KEY_R, KEY_X, KEY_J, KEY_A, KEY_O, KEY_E, KEY_W, KEY_D, KEY_Z} //Simple Telex
 };
 
 #define IS_KEY_Z(key) (ProcessingChar[vInputType][10] == key)
 #define IS_KEY_D(key) (ProcessingChar[vInputType][9] == key)
-#define IS_KEY_W(key) (vInputType == vTelex ? ProcessingChar[vInputType][8] == key : \
+#define IS_KEY_W(key) ((vInputType == vTelex || vInputType == vSimpleTelex) ? ProcessingChar[vInputType][8] == key : \
                                     (vInputType == vVNI ? (ProcessingChar[vInputType][8] == key || ProcessingChar[vInputType][7] == key) : false))
-#define IS_KEY_DOUBLE(key) (vInputType == vTelex ? (ProcessingChar[vInputType][5] == key || ProcessingChar[vInputType][6] == key || ProcessingChar[vInputType][7] == key) :\
+#define IS_KEY_DOUBLE(key) ((vInputType == vTelex || vInputType == vSimpleTelex) ? (ProcessingChar[vInputType][5] == key || ProcessingChar[vInputType][6] == key || ProcessingChar[vInputType][7] == key) :\
                                         (vInputType == vVNI ? ProcessingChar[vInputType][6] == key : false))
 #define IS_KEY_S(key) (ProcessingChar[vInputType][0] == key)
 #define IS_KEY_F(key) (ProcessingChar[vInputType][1] == key)
@@ -32,8 +33,8 @@ static Uint16 ProcessingChar[][11] = {
 #define IS_KEY_X(key) (ProcessingChar[vInputType][3] == key)
 #define IS_KEY_J(key) (ProcessingChar[vInputType][4] == key)
 
-#define IS_MARK_KEY(keyCode) ((vInputType == 0 && (keyCode == KEY_S || keyCode == KEY_F || keyCode == KEY_R || keyCode == KEY_J || keyCode == KEY_X)) || \
-                                        (vInputType == 1 && (keyCode == KEY_1 || keyCode == KEY_2 || keyCode == KEY_3 || keyCode == KEY_5 || keyCode == KEY_4)))
+#define IS_MARK_KEY(keyCode) (((vInputType == vTelex || vInputType == vSimpleTelex) && (keyCode == KEY_S || keyCode == KEY_F || keyCode == KEY_R || keyCode == KEY_J || keyCode == KEY_X)) || \
+                                        (vInputType == vVNI && (keyCode == KEY_1 || keyCode == KEY_2 || keyCode == KEY_3 || keyCode == KEY_5 || keyCode == KEY_4)))
 
 #define VSI vowelStartIndex
 #define VEI vowelEndIndex
@@ -70,6 +71,7 @@ static bool isRestoredW;
 static Uint16 keyForAEO;
 static bool isCheckedGrammar;
 static bool _isCaps = false;
+static int _spaceCount = 0; //add: July 30th, 2019
 
 //function prototype
 void findAndCalculateVowel(const bool& forGrammar=false);
@@ -376,6 +378,126 @@ void removeMark() {
     }
 }
 
+void handleModernMark() {
+    //default
+    VWSM = VEI;
+    hBPC = (_index - VEI);
+    
+    //rule 2
+    if (vowelCount == 3 && ((CHR(VSI) == KEY_O && CHR(VSI+1) == KEY_A && CHR(VSI+2) == KEY_I) ||
+                            (CHR(VSI) == KEY_U && CHR(VSI+1) == KEY_Y && CHR(VSI+2) == KEY_U) ||
+                            (CHR(VSI) == KEY_O && CHR(VSI+1) == KEY_E && CHR(VSI+2) == KEY_O) ||
+                            (CHR(VSI) == KEY_U && CHR(VSI+1) == KEY_Y && CHR(VSI+2) == KEY_A))) {
+        VWSM = VSI + 1;
+        hBPC = _index - VWSM;
+    } else if ((CHR(VSI) == KEY_O && CHR(VSI+1) == KEY_I) ||
+               (CHR(VSI) == KEY_A && CHR(VSI+1) == KEY_I) ||
+               (CHR(VSI)== KEY_U && CHR(VSI+1) == KEY_I) ) {
+        
+        VWSM = VSI;
+        hBPC = _index - VWSM;
+    } else if (CHR(VEI-1) == KEY_A && CHR(VEI) == KEY_Y) {
+        VWSM = VEI - 1;
+        hBPC = (_index - VEI) + 1;
+    } else if ((CHR(VSI) == KEY_U && CHR(VSI+1) == KEY_O) /*||
+                                                           (CHR(VSI) == KEY_U && CHR(VSI+1) == KEY_A)*/) {
+                                                               VWSM = VSI + 1;
+                                                               hBPC = _index - VWSM;
+                                                               
+                                                           } else if (CHR(VSI+1) == KEY_O || CHR(VSI+1) == KEY_U) {
+                                                               VWSM = VEI - 1;
+                                                               hBPC = (_index - VEI) + 1;
+                                                           } else if (CHR(VSI) == KEY_O || CHR(VSI) == KEY_U) {
+                                                               VWSM = VEI;
+                                                               hBPC = (_index - VEI);
+                                                           }
+    
+    //rule 3.1
+    if ((CHR(VSI) == KEY_I && (TypingWord[VSI+1] & (KEY_E | TONE_MASK))) ||
+        (CHR(VSI) == KEY_Y && (TypingWord[VSI+1] & (KEY_E | TONE_MASK))) ||
+        (CHR(VSI) == KEY_U && (TypingWord[VSI+1] == (KEY_O | TONE_MASK))) ||
+        ((TypingWord[VSI] == (KEY_U | TONEW_MASK)) && (TypingWord[VSI+1] == (KEY_O | TONEW_MASK)))){
+        
+        if (VSI+2 < _index) {
+            if (CHR(VSI+2) == KEY_P || CHR(VSI+2) == KEY_T ||
+                CHR(VSI+2) == KEY_M || CHR(VSI+2) == KEY_N ||
+                CHR(VSI+2) == KEY_O || CHR(VSI+2) == KEY_U ||
+                CHR(VSI+2) == KEY_I || CHR(VSI+2) == KEY_C ||
+                (VSI+3 < _index && CHR(VSI+2) == KEY_C && CHR(VSI+2) == KEY_H) ||
+                (VSI+3 < _index && CHR(VSI+2) == KEY_N && CHR(VSI+2) == KEY_H) ||
+                (VSI+3 < _index && CHR(VSI+2) == KEY_N && CHR(VSI+2) == KEY_G)) {
+                
+                VWSM = VSI + 1;
+                hBPC = _index - VWSM;
+            } else {
+                VWSM = VSI;
+                hBPC = _index - VWSM;
+            }
+        } else {
+            VWSM = VSI;
+            hBPC = _index - VWSM;
+        }
+    }
+    //rule 3.2
+    else if ((CHR(VSI) == KEY_I && (CHR(VSI) == KEY_A)) ||
+             (CHR(VSI) == KEY_Y && (CHR(VSI) == KEY_A)) ||
+             (CHR(VSI) == KEY_U && (CHR(VSI) == KEY_A)) ||
+             (CHR(VSI) == KEY_U && (TypingWord[VSI+1] == (KEY_U | TONEW_MASK)))){
+        
+        VWSM = VSI;
+        hBPC = _index - VWSM;
+    }
+    
+    //rule 4
+    if (vowelCount == 2) {
+        if (((CHR(VSI) == KEY_I) && (CHR(VSI+1) == KEY_A)) ||
+            ((CHR(VSI) == KEY_I) && (CHR(VSI+1) == KEY_U)) ||
+            ((CHR(VSI) == KEY_I) && (CHR(VSI+1) == KEY_O))) {
+            
+            if (VSI == 0 || (CHR(VSI-1) != KEY_G)) { //dont have G
+                VWSM = VSI;
+                hBPC = _index - VWSM;
+            } else {
+                VWSM = VSI + 1;
+                hBPC = _index - VWSM;
+            }
+        } else if ((CHR(VSI) == KEY_U) && (CHR(VSI+1) == KEY_A)) {
+            if (VSI == 0 || (CHR(VSI-1) != KEY_Q)) { //dont have Q
+                if (VEI + 1 >= _index) {
+                    VWSM = VSI;
+                    hBPC = _index - VWSM;
+                }
+            } else {
+                VWSM = VSI + 1;
+                hBPC = _index - VWSM;
+            }
+        }
+    }
+}
+
+void handleOldMark() {
+    //default
+    VWSM = vowelStartIndex;
+    hBPC = (_index - vowelStartIndex);
+    
+    //rule 2
+    if (vowelCount == 3 || (VEI + 1 < _index && IS_CONSONANT(CHR(VEI + 1)))) {
+        VWSM = VSI + 1;
+        hBPC = _index - VWSM;
+    }
+    
+    //rule 3
+    for (ii = VSI; ii <= VEI; ii++) {
+        if ((CHR(ii) == KEY_E && TypingWord[ii] & TONE_MASK) || (CHR(ii) == KEY_O && TypingWord[ii] & TONEW_MASK)) {
+            VWSM = ii;
+            hBPC = _index - VWSM;
+            break;
+        }
+    }
+    
+    hNCC = hBPC;
+}
+
 void insertMark(const Uint32& markMask, const bool& canModifyFlag) {
     vowelCount = 0;
     
@@ -391,102 +513,12 @@ void insertMark(const Uint32& markMask, const bool& canModifyFlag) {
         VWSM = VEI;
         hBPC = (_index - VEI);
     } else { //vowel = 2 or 3
-        //default
-        VWSM = VEI;
-        hBPC = (_index - VEI);
-        
-        //rule 2
-        if (vowelCount == 3 && ((CHR(VSI) == KEY_O && CHR(VSI+1) == KEY_A && CHR(VSI+2) == KEY_I) ||
-                                (CHR(VSI) == KEY_U && CHR(VSI+1) == KEY_Y && CHR(VSI+2) == KEY_U) ||
-                                (CHR(VSI) == KEY_O && CHR(VSI+1) == KEY_E && CHR(VSI+2) == KEY_O) ||
-                                (CHR(VSI) == KEY_U && CHR(VSI+1) == KEY_Y && CHR(VSI+2) == KEY_A))) {
-            VWSM = VSI + 1;
-            hBPC = _index - VWSM;
-        } else if ((CHR(VSI) == KEY_O && CHR(VSI+1) == KEY_I) ||
-                   (CHR(VSI) == KEY_A && CHR(VSI+1) == KEY_I) ||
-                   (CHR(VSI)== KEY_U && CHR(VSI+1) == KEY_I) ) {
-            
-            VWSM = VSI;
-            hBPC = _index - VWSM;
-        } else if (CHR(VEI-1) == KEY_A && CHR(VEI) == KEY_Y) {
-            VWSM = VEI - 1;
-            hBPC = (_index - VEI) + 1;
-        } else if ((CHR(VSI) == KEY_U && CHR(VSI+1) == KEY_O) /*||
-                                                           (CHR(VSI) == KEY_U && CHR(VSI+1) == KEY_A)*/) {
-                                                               VWSM = VSI + 1;
-                                                               hBPC = _index - VWSM;
-                                                               
-                                                           } else if (CHR(VSI+1) == KEY_O || CHR(VSI+1) == KEY_U) {
-                                                               VWSM = VEI - 1;
-                                                               hBPC = (_index - VEI) + 1;
-                                                           } else if (CHR(VSI) == KEY_O || CHR(VSI) == KEY_U) {
-                                                               VWSM = VEI;
-                                                               hBPC = (_index - VEI);
-                                                           }
-        
-        //rule 3.1
-        if ((CHR(VSI) == KEY_I && (TypingWord[VSI+1] & (KEY_E | TONE_MASK))) ||
-            (CHR(VSI) == KEY_Y && (TypingWord[VSI+1] & (KEY_E | TONE_MASK))) ||
-            (CHR(VSI) == KEY_U && (TypingWord[VSI+1] == (KEY_O | TONE_MASK))) ||
-            ((TypingWord[VSI] == (KEY_U | TONEW_MASK)) && (TypingWord[VSI+1] == (KEY_O | TONEW_MASK)))){
-            
-            if (VSI+2 < _index) {
-                if (CHR(VSI+2) == KEY_P || CHR(VSI+2) == KEY_T ||
-                    CHR(VSI+2) == KEY_M || CHR(VSI+2) == KEY_N ||
-                    CHR(VSI+2) == KEY_O || CHR(VSI+2) == KEY_U ||
-                    CHR(VSI+2) == KEY_I || CHR(VSI+2) == KEY_C ||
-                    (VSI+3 < _index && CHR(VSI+2) == KEY_C && CHR(VSI+2) == KEY_H) ||
-                    (VSI+3 < _index && CHR(VSI+2) == KEY_N && CHR(VSI+2) == KEY_H) ||
-                    (VSI+3 < _index && CHR(VSI+2) == KEY_N && CHR(VSI+2) == KEY_G)) {
-                    
-                    VWSM = VSI + 1;
-                    hBPC = _index - VWSM;
-                } else {
-                    VWSM = VSI;
-                    hBPC = _index - VWSM;
-                }
-            } else {
-                VWSM = VSI;
-                hBPC = _index - VWSM;
-            }
-        }
-        //rule 3.2
-        else if ((CHR(VSI) == KEY_I && (CHR(VSI) == KEY_A)) ||
-                 (CHR(VSI) == KEY_Y && (CHR(VSI) == KEY_A)) ||
-                 (CHR(VSI) == KEY_U && (CHR(VSI) == KEY_A)) ||
-                 (CHR(VSI) == KEY_U && (TypingWord[VSI+1] == (KEY_U | TONEW_MASK)))){
-            
-            VWSM = VSI;
-            hBPC = _index - VWSM;
-        }
-        
-        //rule 4
-        if (vowelCount == 2) {
-            if (((CHR(VSI) == KEY_I) && (CHR(VSI+1) == KEY_A)) ||
-                ((CHR(VSI) == KEY_I) && (CHR(VSI+1) == KEY_U)) ||
-                ((CHR(VSI) == KEY_I) && (CHR(VSI+1) == KEY_O))) {
-                
-                if (VSI == 0 || (CHR(VSI-1) != KEY_G)) { //dont have G
-                    VWSM = VSI;
-                    hBPC = _index - VWSM;
-                } else {
-                    VWSM = VSI + 1;
-                    hBPC = _index - VWSM;
-                }
-            } else if ((CHR(VSI) == KEY_U) && (CHR(VSI+1) == KEY_A)) {
-                if (VSI == 0 || (CHR(VSI-1) != KEY_Q)) { //dont have Q
-                    if (VEI + 1 >= _index) {
-                        VWSM = VSI;
-                        hBPC = _index - VWSM;
-                    }
-                } else {
-                    VWSM = VSI + 1;
-                    hBPC = _index - VWSM;
-                }
-            }
-        }
+        if (vUseModernOrthography == 0)
+            handleOldMark();
+        else
+            handleModernMark();
     }
-
+    
     //send data
     kk = _index - 1 - VSI;
     //if duplicate same mark -> restore
@@ -837,7 +869,7 @@ void handleMainKey(const Uint16& data, const bool& isCaps) {
                 VEI = i;
         }
     }
-    keyForAEO = (vInputType == vTelex ? data : ((data == KEY_7 || data == KEY_8 ? KEY_W : (data == KEY_6 ? TypingWord[VEI] : data))));
+    keyForAEO = ((vInputType == vTelex || vInputType == vSimpleTelex) ? data : ((data == KEY_7 || data == KEY_8 ? KEY_W : (data == KEY_6 ? TypingWord[VEI] : data))));
     vector<vector<Uint16>>& charset = _vowel[keyForAEO];
     isCorect = false;
     isChanged = false;
@@ -891,19 +923,33 @@ void vKeyHandleEvent(const vKeyEvent& event,
         hNCC = 0;
         hExt = 1; //word break
         startNewSession();
-    } else if (data == KEY_DELETE) {
-        if (_index > 0){
-            _index--;
-            if (vCheckSpelling)
-                checkSpelling();
-        }
+    } else if (data == KEY_SPACE) {
         hCode = vDoNothing;
-        hBPC = 0;
-        hNCC = 0;
-        hExt = 2; //delete key
-        if (_index == 0)
-            startNewSession();
+        _spaceCount++;
+    } else if (data == KEY_DELETE) {
+        if (_spaceCount > 0) { //previous char is space
+            _spaceCount--;
+        } else {
+            if (_index > 0){
+                _index--;
+                if (vCheckSpelling)
+                    checkSpelling();
+            }
+            hCode = vDoNothing;
+            hBPC = 0;
+            hNCC = 0;
+            hExt = 2; //delete key
+            if (_index == 0)
+                startNewSession();
+        }
     } else {
+        if (_spaceCount > 0) {
+            _spaceCount = 0;
+            hBPC = 0;
+            hNCC = 0;
+            hExt = 0;
+            startNewSession();
+        }
         if (!IS_SPECIALKEY(data) || tempDisableKey) { //do nothing
             if (vQuickTelex && IS_QUICK_TELEX_KEY(data)) {
                 handleQuickTelex(data, _isCaps);

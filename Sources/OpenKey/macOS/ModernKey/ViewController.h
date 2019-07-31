@@ -20,16 +20,20 @@
 @property (weak) IBOutlet NSButton *VietButton;
 @property (weak) IBOutlet NSButton *EngButton;
 
-@property (weak) IBOutlet NSButton *CtrlShiftButton;
-@property (weak) IBOutlet NSButton *OptionZButton;
-
 @property (weak) IBOutlet NSButton *FreeMarkButton;
+@property (weak) IBOutlet NSButton *UseModernOrthography;
+
 @property (weak) IBOutlet NSButton *CheckSpellingButton;
 
 @property (weak) IBOutlet NSButton *RunOnStartupButton;
 @property (weak) IBOutlet NSButton *ShowUIButton;
+
+@property (weak) IBOutlet NSButton *UseGrayIcon;
+@property (weak) IBOutlet NSButton *QuickTelex;
+
 @property (weak) IBOutlet NSImageView *cursorImage;
 
 -(void)fillData;
+-(void)onSwitchKeyChange:(unsigned short)keyCode character:(unsigned short)ch;
 @end
 

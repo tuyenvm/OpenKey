@@ -19,7 +19,8 @@ extern "C" {
     NSArray* _specialApp = @[@"com.google.Chrome",
                              @"com.apple.Safari",
                              @"org.mozilla.firefox",
-                             @"com.jetbrains.rider"];
+                             @"com.jetbrains.rider",
+                             @"com.barebones.textwrangler"];
     
     CGEventSourceRef myEventSource = NULL;
     vKeyHookState* pData;
@@ -140,6 +141,17 @@ extern "C" {
         }
     }
     
+    bool canSwitchKey() {
+        if (HAS_CONTROL(vSwitchKeyStatus) && !(_flag & kCGEventFlagMaskControl))
+            return false;
+        if (HAS_OPTION(vSwitchKeyStatus) && !(_flag & kCGEventFlagMaskAlternate))
+            return false;
+        if (HAS_COMMAND(vSwitchKeyStatus) && !(_flag & kCGEventFlagMaskCommand))
+            return false;
+        if (GET_SWITCH_KEY(vSwitchKeyStatus) != _keycode)
+            return false;
+        return true;
+    }
     
     /*MAIN Callback*/
     CGEventRef OpenKeyCallback(CGEventTapProxy proxy, CGEventType type, CGEventRef event, void *refcon) {
@@ -148,20 +160,17 @@ extern "C" {
         _keycode = (CGKeyCode)CGEventGetIntegerValueField(event, kCGKeyboardEventKeycode);
         
         //switch language shortcut
-        if ((type == kCGEventKeyDown) &&
-            ((vSwitchKey == 0 && (_flag & kCGEventFlagMaskControl) && (_keycode == KEY_Z)) ||
-             (vSwitchKey == 1 && (_flag & kCGEventFlagMaskAlternate) && (_keycode == KEY_Z)))) {
-                
-                if (vLanguage == 0)
-                    vLanguage = 1;
-                else
-                    vLanguage = 0;
-                NSBeep();
-                [appDelegate onInputMethodSelected];
-                
-                startNewSession();
-                
-                return NULL;
+        if ((type == kCGEventKeyDown) && canSwitchKey()) {
+            if (vLanguage == 0)
+                vLanguage = 1;
+            else
+                vLanguage = 0;
+            NSBeep();
+            [appDelegate onInputMethodSelected];
+            
+            startNewSession();
+            
+            return NULL;
         }
         
         if (vLanguage == 0) //ignore if is english
