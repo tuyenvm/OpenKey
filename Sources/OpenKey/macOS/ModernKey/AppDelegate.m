@@ -30,7 +30,8 @@ int vSwitchKeyStatus = DEFAULT_SWITCH_STATUS;
 @end
 
 @implementation AppDelegate {
-    NSStoryboard *sb;
+    NSWindowController *_mainWC;
+    NSWindowController *_aboutWC;
     
     NSStatusItem *statusItem;
     NSMenu *theMenu;
@@ -60,8 +61,6 @@ int vSwitchKeyStatus = DEFAULT_SWITCH_STATUS;
     }
     
     [NSApp setActivationPolicy: NSApplicationActivationPolicyAccessory];
-    
-    sb = [NSStoryboard storyboardWithName:@"Main" bundle:nil];
     
     NSBeep();
 
@@ -288,17 +287,25 @@ int vSwitchKeyStatus = DEFAULT_SWITCH_STATUS;
     NSMenuItem *menuItem = (NSMenuItem*) sender;
     [self onCodeTableChanged:(int)menuItem.tag];
 }
-    
+
 -(void) onControlPanelSelected {
-    NSWindowController *view = [sb instantiateControllerWithIdentifier:@"OpenKey"];
-    [view.window makeKeyAndOrderFront:nil];
-    [view.window setLevel:NSStatusWindowLevel];
+    if (_mainWC == nil) {
+        _mainWC = [[NSStoryboard storyboardWithName:@"Main" bundle:nil] instantiateControllerWithIdentifier:@"OpenKey"];
+    }
+    if ([_mainWC.window isVisible])
+        return;
+    [_mainWC.window makeKeyAndOrderFront:nil];
+    [_mainWC.window setLevel:NSStatusWindowLevel];
 }
 
 -(void) onAboutSelected {
-    NSWindowController *view = [sb instantiateControllerWithIdentifier:@"AboutWindow"];
-    [view.window makeKeyAndOrderFront:nil];
-    [view.window setLevel:NSStatusWindowLevel];
+    if (_aboutWC == nil) {
+        _aboutWC = [[NSStoryboard storyboardWithName:@"Main" bundle:nil] instantiateControllerWithIdentifier:@"AboutWindow"];
+    }
+    if ([_aboutWC.window isVisible])
+        return;
+    [_aboutWC.window makeKeyAndOrderFront:nil];
+    [_aboutWC.window setLevel:NSStatusWindowLevel];
 }
 
 #pragma mark -Short key event
