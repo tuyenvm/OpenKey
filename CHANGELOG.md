@@ -5,6 +5,15 @@
 - Macro (On/Off).
 - Macro table.
 
+##### Version 1.0.17: (31/07/2019)
+- Add Simple Telex mode.
+- Black/White icon on menu bar.
+- Space and back key improved.
+- Modern orthography.
+- Custom switch key.
+- Quick telex (cc=ch, gg=gi, kk=kh, nn=ng, qq=qu, pp=ph, tt=th).
+- Support TextWrangler.
+
 ##### Version 1.0.14: (09/04/2019)
 - Add case "uýt".
 - Improve typing English in Vietnamese mode.
@@ -46,6 +55,15 @@
 - Gõ nhanh: cc=ch, gg=gi, kk=kh, nn=ng, qq=qu, pp=ph, tt=th (On/Off)
 - Gõ tắt (On/Off).
 - Bảng gõ tắt.
+
+##### Version 1.0.17: (31/07/2019)
+- Thêm chế độ Simple Telex.
+- Icon trắng đen trên menu bar.
+- Lỡ bấm phím Space, xoá space vẫn có thể bỏ dấu.
+- Bỏ dấu kiểu cũ/mới: òa, úy | oà, uý.
+- Tuỳ chọn phím chuyển.
+- Gõ nhanh (cc=ch, gg=gi, kk=kh, nn=ng, qq=qu, pp=ph, tt=th).
+- Hỗ trợ TextWrangler.
 
 ##### Version 1.0.11: (27/02/2019)
 - Thêm trường hợp "chú thòong", "gòong".
