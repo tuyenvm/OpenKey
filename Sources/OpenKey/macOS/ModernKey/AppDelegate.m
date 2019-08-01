@@ -62,7 +62,8 @@ int vSwitchKeyStatus = DEFAULT_SWITCH_STATUS;
     
     [NSApp setActivationPolicy: NSApplicationActivationPolicyAccessory];
     
-    NSBeep();
+    if (vSwitchKeyStatus & 0x8000)
+        NSBeep();
 
     [self createStatusBarMenu];
     
@@ -259,7 +260,8 @@ int vSwitchKeyStatus = DEFAULT_SWITCH_STATUS;
         intInputMethod = 0;
     vLanguage = (int)intInputMethod;
     [[NSUserDefaults standardUserDefaults] setInteger:intInputMethod forKey:@"InputMethod"];
-    NSBeep();
+    if (vSwitchKeyStatus & 0x8000)
+        NSBeep();
     [self fillData];
     [viewController fillData];
 }

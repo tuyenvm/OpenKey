@@ -26,9 +26,12 @@
         
         if (!eventMonitor) {
             eventMonitor = [NSEvent addLocalMonitorForEventsMatchingMask:NSKeyDownMask handler:^(NSEvent *event) {
-                if (event.keyCode == kVK_Space || event.keyCode == kVK_Delete || event.keyCode == kVK_ForwardDelete) {
+                if (event.keyCode == kVK_Space) {
                     [self setStringValue:@"Space"];
                     [self.Parent onSwitchKeyChange:kVK_Space character:kVK_Space];
+                } else if (event.keyCode == kVK_Delete || event.keyCode == kVK_ForwardDelete) {
+                    [self setStringValue:@""];
+                    [self.Parent onSwitchKeyChange:0xFE character:0xFE];
                 } else {
                     [self setStringValue:@""];
                     char t =event.characters.UTF8String[0];
@@ -51,6 +54,8 @@
 -(void)setTextByChar:(unsigned short)chr {
     if (chr == kVK_Space) {
         [self setStringValue:@"Space"];
+    } else if (chr == 0xFE) {
+        [self setStringValue:@""];
     } else {
         NSString* str = [NSString stringWithFormat:@"%c", chr];
         [self setStringValue:str];

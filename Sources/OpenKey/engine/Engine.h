@@ -20,6 +20,8 @@
 #define HAS_CONTROL(data) (data & 0x100)
 #define HAS_OPTION(data) (data & 0x200)
 #define HAS_COMMAND(data) (data & 0x400)
+#define HAS_SHIFT(data) (data & 0x800)
+#define HAS_BEEP(data) (data & 0x8000)
 #define SET_SWITCH_KEY(data, key) data = (data & 0xFF) | key
 #define SET_CONTROL_KEY(data, val) data|=val<<8;
 #define SET_OPTION_KEY(data, val) data|=val<<9;

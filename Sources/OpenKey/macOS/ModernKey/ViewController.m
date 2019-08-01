@@ -24,7 +24,9 @@ extern int vQuickTelex;
     __weak IBOutlet NSButton *CustomSwitchCommand;
     __weak IBOutlet NSButton *CustomSwitchOption;
     __weak IBOutlet NSButton *CustomSwitchControl;
+    __weak IBOutlet NSButton *CustomSwitchShift;
     __weak IBOutlet MyTextField *CustomSwitchKey;
+    __weak IBOutlet NSButton *CustomBeepSound;
 }
 
 - (void)viewDidLoad {
@@ -156,11 +158,25 @@ extern int vQuickTelex;
     [[NSUserDefaults standardUserDefaults] setInteger:vSwitchKeyStatus forKey:@"SwitchKeyStatus"];
 }
 
+- (IBAction)onShiftSwitchKey:(NSButton *)sender {
+    NSInteger val = [self setCustomValue:sender keyToSet:nil];
+    vSwitchKeyStatus &= (~0x800);
+    vSwitchKeyStatus |= val << 11;
+    [[NSUserDefaults standardUserDefaults] setInteger:vSwitchKeyStatus forKey:@"SwitchKeyStatus"];
+}
+
 -(void)onSwitchKeyChange:(unsigned short)keyCode character:(unsigned short)ch {
     vSwitchKeyStatus &= 0xFFFFFF00;
-    vSwitchKeyStatus |= (char)keyCode;
+    vSwitchKeyStatus |= keyCode;
     vSwitchKeyStatus &= 0x00FFFFFF;
-    vSwitchKeyStatus |= ((int)ch<<24);
+    vSwitchKeyStatus |= ((unsigned int)ch<<24);
+    [[NSUserDefaults standardUserDefaults] setInteger:vSwitchKeyStatus forKey:@"SwitchKeyStatus"];
+}
+
+- (IBAction)onBeepSound:(NSButton *)sender {
+    unsigned int val = (unsigned int)[self setCustomValue:sender keyToSet:nil];
+    vSwitchKeyStatus &= (~0x8000);
+    vSwitchKeyStatus |= val << 15;
     [[NSUserDefaults standardUserDefaults] setInteger:vSwitchKeyStatus forKey:@"SwitchKeyStatus"];
 }
 
@@ -219,6 +235,8 @@ extern int vQuickTelex;
     CustomSwitchControl.state = (vSwitchKeyStatus & 0x100) ? NSControlStateValueOn : NSControlStateValueOff;
     CustomSwitchOption.state = (vSwitchKeyStatus & 0x200) ? NSControlStateValueOn : NSControlStateValueOff;
     CustomSwitchCommand.state = (vSwitchKeyStatus & 0x400) ? NSControlStateValueOn : NSControlStateValueOff;
+    CustomSwitchShift.state = (vSwitchKeyStatus & 0x800) ? NSControlStateValueOn : NSControlStateValueOff;
+    CustomBeepSound.state = (vSwitchKeyStatus & 0x8000) ? NSControlStateValueOn : NSControlStateValueOff;
     [CustomSwitchKey setTextByChar:((vSwitchKeyStatus>>24) & 0xFF)];
     
 }

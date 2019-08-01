@@ -42,6 +42,7 @@ static CFRunLoopSourceRef runLoopSource;
     // Create an event tap. We are interested in key presses.
     eventMask = ((1 << kCGEventKeyDown) |
                  (1 << kCGEventKeyUp) |
+                 (1 << kCGEventFlagsChanged) |
                  (1 << kCGEventLeftMouseDown) |
                  (1 << kCGEventRightMouseDown) |
                  (1 << kCGEventLeftMouseDragged) |

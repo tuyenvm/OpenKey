@@ -141,15 +141,19 @@ extern "C" {
         }
     }
     
-    bool canSwitchKey() {
+    bool canSwitchKey(bool checkKeyCode=true) {
         if (HAS_CONTROL(vSwitchKeyStatus) && !(_flag & kCGEventFlagMaskControl))
             return false;
         if (HAS_OPTION(vSwitchKeyStatus) && !(_flag & kCGEventFlagMaskAlternate))
             return false;
         if (HAS_COMMAND(vSwitchKeyStatus) && !(_flag & kCGEventFlagMaskCommand))
             return false;
-        if (GET_SWITCH_KEY(vSwitchKeyStatus) != _keycode)
+        if (HAS_SHIFT(vSwitchKeyStatus) && !(_flag & kCGEventFlagMaskShift))
             return false;
+        if (checkKeyCode) {
+            if (GET_SWITCH_KEY(vSwitchKeyStatus) != _keycode)
+                return false;
+        }
         return true;
     }
     
@@ -160,17 +164,20 @@ extern "C" {
         _keycode = (CGKeyCode)CGEventGetIntegerValueField(event, kCGKeyboardEventKeycode);
         
         //switch language shortcut
-        if ((type == kCGEventKeyDown) && canSwitchKey()) {
-            if (vLanguage == 0)
-                vLanguage = 1;
-            else
-                vLanguage = 0;
-            NSBeep();
-            [appDelegate onInputMethodSelected];
-            
-            startNewSession();
-            
-            return NULL;
+        if (type == kCGEventKeyDown || type == kCGEventFlagsChanged) {
+            if (canSwitchKey(type != kCGEventFlagsChanged || GET_SWITCH_KEY(vSwitchKeyStatus) != 0xFE)) {
+                if (vLanguage == 0)
+                    vLanguage = 1;
+                else
+                    vLanguage = 0;
+                if (HAS_BEEP(vSwitchKeyStatus))
+                    NSBeep();
+                [appDelegate onInputMethodSelected];
+                
+                startNewSession();
+                
+                return NULL;
+            }
         }
         
         if (vLanguage == 0) //ignore if is english
