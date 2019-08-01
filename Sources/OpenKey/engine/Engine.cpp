@@ -917,7 +917,8 @@ void vKeyHandleEvent(const vKeyEvent& event,
                      const bool& otherControlKey) {
     _isCaps = (capsStatus == 1 || //shift
                capsStatus == 2); //caps lock
-    if ((IS_NUMBER_KEY(data) && capsStatus == 1 && vInputType == vVNI) || otherControlKey || isWordBreak(event, state, data) || (_index == 0 && data == KEY_9)) {
+    if ((IS_NUMBER_KEY(data) && capsStatus == 1)
+        || otherControlKey || isWordBreak(event, state, data) || (_index == 0 && IS_NUMBER_KEY(data))) {
         hCode = vDoNothing;
         hBPC = 0;
         hNCC = 0;
