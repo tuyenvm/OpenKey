@@ -477,8 +477,11 @@ void handleModernMark() {
 
 void handleOldMark() {
     //default
-    VWSM = vowelStartIndex;
-    hBPC = (_index - vowelStartIndex);
+    if (vowelCount == 0 && CHR(VEI) == KEY_I)
+        VWSM = VEI;
+    else
+        VWSM = VSI;
+    hBPC = (_index - VWSM);
     
     //rule 2
     if (vowelCount == 3 || (VEI + 1 < _index && IS_CONSONANT(CHR(VEI + 1)))) {
