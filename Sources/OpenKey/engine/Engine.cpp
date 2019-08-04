@@ -471,6 +471,9 @@ void handleModernMark() {
                 VWSM = VSI + 1;
                 hBPC = _index - VWSM;
             }
+        } else if ((CHR(VSI) == KEY_O) && (CHR(VSI+1) == KEY_O)) { //thoong
+            VWSM = VEI;
+            hBPC = _index - VWSM;
         }
     }
 }
@@ -600,7 +603,8 @@ void insertAOE(const Uint16& data, const bool& isCaps) {
                 TypingWord[ii] &= ~TONE_MASK;
                 hData[_index - 1 - ii] = TypingWord[ii];
                 //_index = 0;
-                tempDisableKey = true;
+                if (data != KEY_O) //case thoòng
+                    tempDisableKey = true;
                 break;
             } else {
                 TypingWord[ii] |= TONE_MASK;
