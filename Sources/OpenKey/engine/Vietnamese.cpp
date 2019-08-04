@@ -304,6 +304,8 @@ vector<vector<Uint16>> _doubleWAllowed = {
  * 0: Unicode
  * 1: TCVN3
  * 2: VNI
+ * 3: Unicode Compound
+ * 4: Vietnamese Locale CP 1258
  */
 map<Uint32, vector<Uint16>> _codeTable[] = {
     {

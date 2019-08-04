@@ -11,16 +11,23 @@
 #import "AppDelegate.h"
 
 #import "ViewController.h"
+
+#define FRONT_APP [[NSWorkspace sharedWorkspace] frontmostApplication].bundleIdentifier]
+
 extern ViewController* viewController;
 
 extern AppDelegate* appDelegate;
 
 extern "C" {
+    //app which must sent special empty character
     NSArray* _specialApp = @[@"com.google.Chrome",
                              @"com.apple.Safari",
                              @"org.mozilla.firefox",
                              @"com.jetbrains.rider",
                              @"com.barebones.textwrangler"];
+    
+    //app which error with unicode Compound
+    NSArray* _unicodeCompoundApp = @[@"com.apple.Stickies"];
     
     CGEventSourceRef myEventSource = NULL;
     vKeyHookState* pData;
@@ -56,9 +63,7 @@ extern "C" {
     }
     
     void SendKeyCode(Uint32 data) {
-        //sleep(1);
         _newChar = (Uint16)data;
-        
         if (_newChar < 128) {
             if (IS_DOUBLE_CODE(vCodeTable)) //VNI
                 InsertKeyLength(1);
@@ -111,10 +116,9 @@ extern "C" {
     }
     
     void SendEmptyCharacter() {
-        //sleep(1);
         if (IS_DOUBLE_CODE(vCodeTable)) //VNI or Unicode Compound
             InsertKeyLength(1);
-        if ([_specialApp containsObject:[[NSWorkspace sharedWorkspace] frontmostApplication].bundleIdentifier]) {
+        if ([_specialApp containsObject:FRONT_APP) {
             _newChar = 0x202F;
         } else {
             _newChar = 0x200C; //Unicode character with empty space
@@ -126,17 +130,29 @@ extern "C" {
         CGEventPost(kCGHIDEventTap, _newEventDown);
         CFRelease(_newEventDown);
     }
+    
+    void SendVirtualKey(const Byte& vKey) {
+        CGEventRef eventVkeyDown = CGEventCreateKeyboardEvent (myEventSource, vKey, true);
+        CGEventRef eventVkeyUp = CGEventCreateKeyboardEvent (myEventSource, vKey, false);
+        
+        CGEventPost(kCGSessionEventTap, eventVkeyDown);
+        CGEventPost(kCGSessionEventTap, eventVkeyUp);
+        
+        CFRelease(eventVkeyDown);
+        CFRelease(eventVkeyUp);
+    }
 
     void SendBackspace() {
-        //sleep(1);
         CGEventPost(kCGSessionEventTap, eventBackSpaceDown);
         CGEventPost(kCGSessionEventTap, eventBackSpaceUp);
         
         if (IS_DOUBLE_CODE(vCodeTable)) { //VNI or Unicode Compound
             _syncIndex--;
             if (_syncKey[_syncIndex] > 1) {
-                CGEventPost(kCGSessionEventTap, eventBackSpaceDown);
-                CGEventPost(kCGSessionEventTap, eventBackSpaceUp);
+                if (!(vCodeTable == 3 && [_unicodeCompoundApp containsObject:FRONT_APP)) {
+                    CGEventPost(kCGSessionEventTap, eventBackSpaceDown);
+                    CGEventPost(kCGSessionEventTap, eventBackSpaceUp);
+                }
             }
         }
     }
@@ -159,7 +175,7 @@ extern "C" {
     
     /*MAIN Callback*/
     CGEventRef OpenKeyCallback(CGEventTapProxy proxy, CGEventType type, CGEventRef event, void *refcon) {
-        //NSLog(@"%@", [[NSWorkspace sharedWorkspace] frontmostApplication].bundleIdentifier);
+        //NSLog(@"%@", FRONT_APP);
         _flag = CGEventGetFlags(event);
         _keycode = (CGKeyCode)CGEventGetIntegerValueField(event, kCGKeyboardEventKeycode);
         
@@ -175,7 +191,6 @@ extern "C" {
                 [appDelegate onInputMethodSelected];
                 
                 startNewSession();
-                
                 return NULL;
             }
         }
@@ -232,7 +247,6 @@ extern "C" {
                 //fix autocomplete
                 SendEmptyCharacter();
                 pData->backspaceCount++;
-   
                 //send backspace
                 if (pData->backspaceCount > 0 && pData->backspaceCount <= 7) {
                     for (int i = 0; i < pData->backspaceCount; i++) {
