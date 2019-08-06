@@ -36,7 +36,7 @@ extern "C" {
     UniChar _newChar, _newCharHi;
     CGEventRef _newEventDown;
     CGKeyCode _keycode;
-    CGEventFlags _flag, _privateFlag;
+    CGEventFlags _flag, _lastFlag = 0, _privateFlag;
     
     Uint16 _syncKey[MAX_BUFF];
     Uint8 _syncIndex = 0, _i = 0;
@@ -156,23 +156,31 @@ extern "C" {
             }
         }
     }
-    
-    bool canSwitchKey(bool checkKeyCode=true) {
-        if (HAS_CONTROL(vSwitchKeyStatus) && !(_flag & kCGEventFlagMaskControl))
-            return false;
-        if (HAS_OPTION(vSwitchKeyStatus) && !(_flag & kCGEventFlagMaskAlternate))
-            return false;
-        if (HAS_COMMAND(vSwitchKeyStatus) && !(_flag & kCGEventFlagMaskCommand))
-            return false;
-        if (HAS_SHIFT(vSwitchKeyStatus) && !(_flag & kCGEventFlagMaskShift))
-            return false;
+            
+    void handleSwitchKey(bool checkKeyCode=true) {
+        if (HAS_CONTROL(vSwitchKeyStatus) ^ GET_BOOL(_lastFlag & kCGEventFlagMaskControl))
+            return;
+        if (HAS_OPTION(vSwitchKeyStatus) ^ GET_BOOL(_lastFlag & kCGEventFlagMaskAlternate))
+            return;
+        if (HAS_COMMAND(vSwitchKeyStatus) ^ GET_BOOL(_lastFlag & kCGEventFlagMaskCommand))
+            return;
+        if (HAS_SHIFT(vSwitchKeyStatus) ^ GET_BOOL(_lastFlag & kCGEventFlagMaskShift))
+            return;
         if (checkKeyCode) {
             if (GET_SWITCH_KEY(vSwitchKeyStatus) != _keycode)
-                return false;
+                return;
         }
-        return true;
+        if (vLanguage == 0)
+            vLanguage = 1;
+        else
+            vLanguage = 0;
+        if (HAS_BEEP(vSwitchKeyStatus))
+            NSBeep();
+        [appDelegate onInputMethodSelected];
+
+        startNewSession();
     }
-    
+
     /*MAIN Callback*/
     CGEventRef OpenKeyCallback(CGEventTapProxy proxy, CGEventType type, CGEventRef event, void *refcon) {
         //NSLog(@"%@", FRONT_APP);
@@ -180,18 +188,21 @@ extern "C" {
         _keycode = (CGKeyCode)CGEventGetIntegerValueField(event, kCGKeyboardEventKeycode);
         
         //switch language shortcut
-        if (type == kCGEventKeyDown || type == kCGEventFlagsChanged) {
-            if (canSwitchKey(type != kCGEventFlagsChanged || GET_SWITCH_KEY(vSwitchKeyStatus) != 0xFE)) {
-                if (vLanguage == 0)
-                    vLanguage = 1;
-                else
-                    vLanguage = 0;
-                if (HAS_BEEP(vSwitchKeyStatus))
-                    NSBeep();
-                [appDelegate onInputMethodSelected];
-                
-                startNewSession();
-                return NULL;
+        if (type == kCGEventKeyDown) {
+            if (GET_SWITCH_KEY(vSwitchKeyStatus) != _keycode) {
+                _lastFlag = 0;
+            } else {
+                handleSwitchKey(GET_SWITCH_KEY(vSwitchKeyStatus) != 0xFE);
+                return event;
+            }
+        } else if (type == kCGEventFlagsChanged) {
+            if (_lastFlag == 0 || _lastFlag < _flag) {
+                _lastFlag = _flag;
+            } else if (_lastFlag > _flag)  {
+                //check swith
+                handleSwitchKey(GET_SWITCH_KEY(vSwitchKeyStatus) != 0xFE);
+                _lastFlag = 0;
+                return event;
             }
         }
         
@@ -219,7 +230,7 @@ extern "C" {
         if (CGEventGetIntegerValueField(event, kCGEventSourceStateID) == CGEventSourceGetSourceStateID(myEventSource)) {
             return event;
         }
-        
+
         //handle keyboard
         if (type == kCGEventKeyDown) {
             //send event signal to Engine

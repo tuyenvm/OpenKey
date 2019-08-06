@@ -78,8 +78,10 @@ void findAndCalculateVowel(const bool& forGrammar=false);
 void insertMark(const Uint32& markMask, const bool& canModifyFlag=true);
 Uint32 getCharacterCode(const Uint32& data);
 
+void copyBuffer(Uint32 buffer[]) {
+    memcpy(buffer, TypingWord, _index);
+}
 
-extern void _convert();
 void* vKeyInit() {
     _index = 0;
     memset(&HookState, sizeof(vKeyEventState), 0);

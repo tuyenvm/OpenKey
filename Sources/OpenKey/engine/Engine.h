@@ -17,10 +17,11 @@
 #define HIBYTE(data) ((data>>8) & 0xFF)
 
 #define GET_SWITCH_KEY(data) (data & 0xFF)
-#define HAS_CONTROL(data) (data & 0x100)
-#define HAS_OPTION(data) (data & 0x200)
-#define HAS_COMMAND(data) (data & 0x400)
-#define HAS_SHIFT(data) (data & 0x800)
+#define HAS_CONTROL(data) ((data & 0x100) ? 1 : 0)
+#define HAS_OPTION(data) ((data & 0x200) ? 1 : 0)
+#define HAS_COMMAND(data) ((data & 0x400) ? 1 : 0)
+#define HAS_SHIFT(data) ((data & 0x800) ? 1 : 0)
+#define GET_BOOL(data) (data ? 1 : 0)
 #define HAS_BEEP(data) (data & 0x8000)
 #define SET_SWITCH_KEY(data, key) data = (data & 0xFF) | key
 #define SET_CONTROL_KEY(data, val) data|=val<<8;
@@ -104,4 +105,10 @@ void vKeyHandleEvent(const vKeyEvent& event,
  * Start a new word
  */
 void startNewSession();
+
+/**
+ * copy TypingWord, use for macro feature
+ * Chức năng này dành cho gõ tắt
+ */
+void copyBuffer(Uint32 buffer[]);
 #endif /* Engine_h */
