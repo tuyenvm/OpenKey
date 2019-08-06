@@ -238,6 +238,10 @@ void insertKey(const Uint16& keyCode, const bool& isCaps, const bool& isCheckSpe
     
     if (vCheckSpelling && isCheckSpelling)
         checkSpelling();
+    
+    //allow d after consonant
+    if (keyCode == KEY_D && _index - 2 >= 0 && IS_CONSONANT(CHR(_index - 2)))
+        tempDisableKey = false;
 }
 
 void startNewSession() {
@@ -672,6 +676,11 @@ void insertW(const Uint16& data, const bool& isCaps) {
             } else if ((CHR(VSI) == KEY_I && CHR(VSI+1) == KEY_O) ||
                        (CHR(VSI) == KEY_O && CHR(VSI+1) == KEY_A)) {
                 TypingWord[VSI+1] |= TONEW_MASK;
+            } else {
+                //don't do anything
+                tempDisableKey = true;
+                isChanged = false;
+                hCode = vDoNothing;
             }
             
             for (ii = VSI; ii < _index; ii++) {
@@ -785,7 +794,6 @@ void checkForStandaloneChar(const Uint16& data, const bool& isCaps, const Uint32
 }
 
 void handleMainKey(const Uint16& data, const bool& isCaps) {
-    
     //if is Z key, remove mark
     if (IS_KEY_Z(data)) {
         removeMark();
@@ -817,13 +825,17 @@ void handleMainKey(const Uint16& data, const bool& isCaps) {
             isCorect = true;
             checkCorrectVowel(_consonantD, i, k, data);
             
+            //allow d after consonant
+            if (!isCorect && _index - 2 >= 0 && CHR(_index-1) == KEY_D && IS_CONSONANT(CHR(_index-2))) {
+                isCorect = true;
+            }
             if (isCorect) {
                 isChanged = true;
                 insertD(data, isCaps);
                 break;
             }
         }
-        
+    
         if (!isChanged) {
             insertKey(data, isCaps);
         }
@@ -874,10 +886,13 @@ void handleMainKey(const Uint16& data, const bool& isCaps) {
     //check Vowel
     if (vInputType == vVNI) {
         for (i = _index-1; i >= 0; i--) {
-            if (CHR(i) == KEY_O || CHR(i) == KEY_A || CHR(i) == KEY_E)
+            if (CHR(i) == KEY_O || CHR(i) == KEY_A || CHR(i) == KEY_E) {
                 VEI = i;
+                break;
+            }
         }
     }
+    
     keyForAEO = ((vInputType == vTelex || vInputType == vSimpleTelex) ? data : ((data == KEY_7 || data == KEY_8 ? KEY_W : (data == KEY_6 ? TypingWord[VEI] : data))));
     vector<vector<Uint16>>& charset = _vowel[keyForAEO];
     isCorect = false;
@@ -960,7 +975,7 @@ void vKeyHandleEvent(const vKeyEvent& event,
             hExt = 0;
             startNewSession();
         }
-        if (!IS_SPECIALKEY(data) || tempDisableKey) { //do nothing
+        if (!IS_SPECIALKEY(data) || (tempDisableKey)) { //do nothing
             if (vQuickTelex && IS_QUICK_TELEX_KEY(data)) {
                 handleQuickTelex(data, _isCaps);
                 return;
@@ -992,7 +1007,7 @@ void vKeyHandleEvent(const vKeyEvent& event,
     }
     
     //Debug
-    //cout<<(int)_index<<endl;
+    //cout<<"index "<<(int)_index<<endl;
     //cout<<(int)hBPC<<endl;
     //cout<<(int)hNCC<<endl<<endl;
 }

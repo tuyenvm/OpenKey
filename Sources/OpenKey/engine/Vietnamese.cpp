@@ -178,6 +178,8 @@ map<Uint16, vector<vector<Uint16>>> _vowelForMark = {
             {KEY_A, KEY_P},
             {KEY_A},
             {KEY_A, KEY_C},
+            {KEY_A, KEY_I},
+            {KEY_A, KEY_O},
             {KEY_A, KEY_C, KEY_H},
         }
     }, {
