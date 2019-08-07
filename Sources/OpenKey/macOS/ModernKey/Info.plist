@@ -19,7 +19,7 @@
 	<key>CFBundlePackageType</key>
 	<string>APPL</string>
 	<key>CFBundleShortVersionString</key>
-	<string>1.0.20</string>
+	<string>1.0.20.2</string>
 	<key>CFBundleVersion</key>
 	<string>20</string>
 	<key>LSApplicationCategoryType</key>
@@ -27,6 +27,8 @@
 	<key>LSMinimumSystemVersion</key>
 	<string>$(MACOSX_DEPLOYMENT_TARGET)</string>
 	<key>LSMultipleInstancesProhibited</key>
+	<true/>
+	<key>LSUIElement</key>
 	<true/>
 	<key>NSAppleEventsUsageDescription</key>
 	<string>Used for keyboard</string>
@@ -36,7 +38,5 @@
 	<string>Main</string>
 	<key>NSPrincipalClass</key>
 	<string>NSApplication</string>
-    <key>LSUIElement</key>
-    <true/>
 </dict>
 </plist>

@@ -83,6 +83,14 @@ extern int vUseModernOrthography;
 extern int vQuickTelex;
 
 /**
+ * Work together with vCheckSpelling
+ * 0: No
+ * 1: Yes
+ *
+ */
+extern int vRestoreIfWrongSpelling;
+
+/**
  * Call this function first to receive data pointer
  */
 void* vKeyInit();

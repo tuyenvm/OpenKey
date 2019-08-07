@@ -51,8 +51,18 @@ static Uint16 ProcessingChar[][11] = {
 vKeyHookState HookState;
 
 //private data
-static Byte _index = 0;
+/**
+ * data structure of each element in TypingWord (Uint32)
+ * first 2 byte is character code or key code.
+ * bit 16: has caps or not
+ * bit 17: has tone ^ or not
+ * bit 18: has tone w or not
+ * bit 19 - > 23: has mark or not (Sắc, huyền, hỏi, ngã, nặng)
+ * bit 24: is standalone key? (w, [, ])
+ * bit 25: mark insert first (1) or tone (0)
+ */
 static Uint32 TypingWord[MAX_BUFF];
+static Byte _index = 0;
 static bool tempDisableKey = false;
 static int capsElem;
 static int key;
@@ -138,8 +148,10 @@ void checkSpelling() {
         //check next vowel
         k = j;
         for (l = 0; l < 3; l++) {
-            if (k < _index && !IS_CONSONANT(CHR(k)))
+            if (k < _index && !IS_CONSONANT(CHR(k))) {
+                cout<<(int)CHR(k)<<endl;
                 k++;
+            }
         }
         
         if (k > j) { //has vowel, continue check last consonant
@@ -165,7 +177,7 @@ void checkSpelling() {
     }
     tempDisableKey = !_spellingOK;
     
-    //cout<<"spelling: "<<(_spellingOK ? "OK": "Err")<<endl;
+    cout<<"spelling: "<<(_spellingOK ? "OK": "Err")<<endl;
 }
 
 void checkGrammar(const int& deltaBackSpace) {
@@ -932,6 +944,36 @@ void handleQuickTelex(const Uint16& data, const bool& isCaps) {
     hData[0] = _quickTelex[data][1] | isCaps;
     insertKey(_quickTelex[data][1], isCaps, false);
 }
+
+void checkRestoreIfWrongSpelling() {
+    if (tempDisableKey) {
+        hCode = vRestore;
+        hBPC = 0;
+        hNCC = 0;
+        k = 0;
+        for (i = _index - 1; i >= 0; i--) {
+            if (IS_CONSONANT(CHR(i))) {
+                hData[k++] = TypingWord[i];
+                hNCC++;
+            } else { //is vowel
+                //check if standalone first
+                if (TypingWord[i] & STANDALONE_MASK) {
+                    if (CHR(i) == KEY_U) { //restore w key
+                        TypingWord[i] = KEY_W | ((TypingWord[i] & CAPS_MASK) ? CAPS_MASK : 0);
+                        hData[k++] = GET(TypingWord[i]);
+                        hNCC++;
+                    }
+                } else {
+                    hData[k++] = TypingWord[i];
+                    hNCC++;
+                }
+            }
+            hBPC++;
+        }
+       
+        cout<<"grammar error"<<endl;
+    }
+}
 /*==========================================================================================================*/
 
 void vKeyHandleEvent(const vKeyEvent& event,
@@ -949,8 +991,16 @@ void vKeyHandleEvent(const vKeyEvent& event,
         hExt = 1; //word break
         startNewSession();
     } else if (data == KEY_SPACE) {
-        hCode = vDoNothing;
-        _spaceCount++;
+        if (vRestoreIfWrongSpelling) { //restore key if wrong spelling
+            checkRestoreIfWrongSpelling();
+            insertKey(data, _isCaps);
+        } else {
+            hCode = vDoNothing;
+            _spaceCount++;
+        }
+        
+        //hCode = vDoNothing;
+        //_spaceCount++;
     } else if (data == KEY_DELETE) {
         if (_spaceCount > 0) { //previous char is space
             _spaceCount--;
@@ -1006,8 +1056,9 @@ void vKeyHandleEvent(const vKeyEvent& event,
         }
     }
     
+    
     //Debug
     //cout<<"index "<<(int)_index<<endl;
-    //cout<<(int)hBPC<<endl;
-    //cout<<(int)hNCC<<endl<<endl;
+    cout<<"backspace "<<(int)hBPC<<endl;
+    cout<<"new char "<<(int)hNCC<<endl<<endl;
 }

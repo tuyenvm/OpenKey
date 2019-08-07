@@ -24,6 +24,7 @@ int vUseModernOrthography = 1;
 int vQuickTelex = 0;
 #define DEFAULT_SWITCH_STATUS 0x7A000206 //default option + z
 int vSwitchKeyStatus = DEFAULT_SWITCH_STATUS;
+int vRestoreIfWrongSpelling = 1;
 
 @interface AppDelegate ()
 
@@ -31,6 +32,7 @@ int vSwitchKeyStatus = DEFAULT_SWITCH_STATUS;
 
 @implementation AppDelegate {
     NSWindowController *_mainWC;
+    NSWindowController *_macroWC;
     NSWindowController *_aboutWC;
     
     NSStatusItem *statusItem;
@@ -60,7 +62,7 @@ int vSwitchKeyStatus = DEFAULT_SWITCH_STATUS;
         return;
     }
     
-    [NSApp setActivationPolicy: NSApplicationActivationPolicyAccessory];
+    //[NSApp setActivationPolicy: NSApplicationActivationPolicyProhibited];
     
     if (vSwitchKeyStatus & 0x8000)
         NSBeep();
@@ -125,6 +127,7 @@ int vSwitchKeyStatus = DEFAULT_SWITCH_STATUS;
     
     [theMenu addItem:[NSMenuItem separatorItem]];
     [theMenu addItemWithTitle:@"Bảng điều khiển" action:@selector(onControlPanelSelected) keyEquivalent:@""];
+    [theMenu addItemWithTitle:@"Gõ tắt" action:@selector(onMacroSelected) keyEquivalent:@""];
     [theMenu addItemWithTitle:@"Giới thiệu" action:@selector(onAboutSelected) keyEquivalent:@""];
     [theMenu addItem:[NSMenuItem separatorItem]];
     
@@ -298,6 +301,16 @@ int vSwitchKeyStatus = DEFAULT_SWITCH_STATUS;
         return;
     [_mainWC.window makeKeyAndOrderFront:nil];
     [_mainWC.window setLevel:NSStatusWindowLevel];
+}
+
+-(void) onMacroSelected {
+    if (_macroWC == nil) {
+        _macroWC = [[NSStoryboard storyboardWithName:@"Main" bundle:nil] instantiateControllerWithIdentifier:@"MacroWindow"];
+    }
+    if ([_macroWC.window isVisible])
+        return;
+    [_macroWC.window makeKeyAndOrderFront:nil];
+    [_macroWC.window setLevel:NSStatusWindowLevel];
 }
 
 -(void) onAboutSelected {
