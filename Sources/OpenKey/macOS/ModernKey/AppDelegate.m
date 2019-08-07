@@ -24,7 +24,7 @@ int vUseModernOrthography = 1;
 int vQuickTelex = 0;
 #define DEFAULT_SWITCH_STATUS 0x7A000206 //default option + z
 int vSwitchKeyStatus = DEFAULT_SWITCH_STATUS;
-int vRestoreIfWrongSpelling = 1;
+int vRestoreIfWrongSpelling = 0;
 
 @interface AppDelegate ()
 
@@ -153,7 +153,7 @@ int vRestoreIfWrongSpelling = 1;
     vSwitchKeyStatus = DEFAULT_SWITCH_STATUS; [[NSUserDefaults standardUserDefaults] setInteger:vCodeTable forKey:@"SwitchKeyStatus"];
     vQuickTelex = 0; [[NSUserDefaults standardUserDefaults] setInteger:vQuickTelex forKey:@"QuickTelex"];
     vUseModernOrthography = 1; [[NSUserDefaults standardUserDefaults] setInteger:vUseModernOrthography forKey:@"ModernOrthography"];
-    
+    vRestoreIfWrongSpelling = 0; [[NSUserDefaults standardUserDefaults] setInteger:vRestoreIfWrongSpelling forKey:@"RestoreIfInvalidWord"];
     [self fillData];
     [viewController fillData];
 }

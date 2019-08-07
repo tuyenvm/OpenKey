@@ -12,7 +12,7 @@
 //#define V_PLATFORM_MAC              1
 //#define V_PLATFORM_WINDOWS          2
 
-#define MAX_BUFF 16
+#define MAX_BUFF 32
 
 enum vKeyEvent {
     Keyboard,
@@ -64,7 +64,7 @@ struct vKeyHookState {
      */
     Byte extCode;
     
-    Uint32 charData[MAX_BUFF * 2]; //new character will be put in queue
+    Uint32 charData[MAX_BUFF]; //new character will be put in queue
 };
 
 //define Key code for mac keyboard
@@ -152,8 +152,6 @@ struct vKeyHookState {
 //Check whether the data is create by standalone key or not (W)
 #define STANDALONE_MASK                         0x1000000
 
-//check data has insert mark first or not
-#define MARK_ORDER(data)                        (data & 0x2000000)
 
 //Utilities macro
 #define IS_CONSONANT(keyCode) !(keyCode == KEY_A || keyCode == KEY_E || keyCode == KEY_U || keyCode == KEY_Y || keyCode == KEY_I || keyCode == KEY_O)

@@ -31,6 +31,8 @@
 @property (weak) IBOutlet NSButton *UseGrayIcon;
 @property (weak) IBOutlet NSButton *QuickTelex;
 
+@property (weak) IBOutlet NSButton *RestoreIfInvalidWord;
+
 @property (weak) IBOutlet NSImageView *cursorImage;
 
 -(void)fillData;

@@ -52,17 +52,23 @@ vKeyHookState HookState;
 
 //private data
 /**
- * data structure of each element in TypingWord (Uint32)
+ * data structure of each element in TypingWord (Uint64)
  * first 2 byte is character code or key code.
  * bit 16: has caps or not
  * bit 17: has tone ^ or not
  * bit 18: has tone w or not
  * bit 19 - > 23: has mark or not (Sắc, huyền, hỏi, ngã, nặng)
  * bit 24: is standalone key? (w, [, ])
- * bit 25: mark insert first (1) or tone (0)
  */
 static Uint32 TypingWord[MAX_BUFF];
 static Byte _index = 0;
+
+/**
+ * Use for restore key if invalid word
+ */
+static Uint32 KeyStates[MAX_BUFF];
+static Byte _stateIndex = 0;
+
 static bool tempDisableKey = false;
 static int capsElem;
 static int key;
@@ -94,6 +100,7 @@ void copyBuffer(Uint32 buffer[]) {
 
 void* vKeyInit() {
     _index = 0;
+    _stateIndex = 0;
     memset(&HookState, sizeof(vKeyEventState), 0);
     return &HookState;
 }
@@ -149,7 +156,6 @@ void checkSpelling() {
         k = j;
         for (l = 0; l < 3; l++) {
             if (k < _index && !IS_CONSONANT(CHR(k))) {
-                cout<<(int)CHR(k)<<endl;
                 k++;
             }
         }
@@ -177,7 +183,7 @@ void checkSpelling() {
     }
     tempDisableKey = !_spellingOK;
     
-    cout<<"spelling: "<<(_spellingOK ? "OK": "Err")<<endl;
+    //cout<<"spelling: "<<(_spellingOK ? "OK": "Err")<<endl;
 }
 
 void checkGrammar(const int& deltaBackSpace) {
@@ -256,11 +262,24 @@ void insertKey(const Uint16& keyCode, const bool& isCaps, const bool& isCheckSpe
         tempDisableKey = false;
 }
 
+void insertState(const Uint16& keyCode, const bool& isCaps) {
+    if (_stateIndex >= MAX_BUFF) {
+        //left shift
+        for (iii = 0; iii < MAX_BUFF - 1; iii++) {
+            KeyStates[iii] = KeyStates[iii + 1];
+        }
+        KeyStates[_stateIndex-1] = keyCode | (isCaps ? CAPS_MASK : 0);
+    } else {
+        KeyStates[_stateIndex++] = keyCode | (isCaps ? CAPS_MASK : 0);
+    }
+}
+
 void startNewSession() {
     _index = 0;
     hBPC = 0;
     hNCC = 0;
     tempDisableKey = false;
+    _stateIndex = 0;
 }
 
 void checkCorrectVowel(vector<vector<Uint16>>& charset, int& i, int& k, const Uint16& markKey) {
@@ -563,7 +582,6 @@ void insertMark(const Uint32& markMask, const bool& canModifyFlag) {
         
         //add mark
         TypingWord[VWSM] |= markMask;
-        
         for (ii = VSI; ii < _index; ii++) {
             if (ii != VWSM) { //remove mark for other vowel
                 TypingWord[ii] &= ~MARK_MASK;
@@ -573,7 +591,6 @@ void insertMark(const Uint32& markMask, const bool& canModifyFlag) {
         
         hBPC = _index - VSI;
     }
-    
     hNCC = hBPC;
 }
 
@@ -945,34 +962,25 @@ void handleQuickTelex(const Uint16& data, const bool& isCaps) {
     insertKey(_quickTelex[data][1], isCaps, false);
 }
 
-void checkRestoreIfWrongSpelling() {
-    if (tempDisableKey) {
-        hCode = vRestore;
-        hBPC = 0;
-        hNCC = 0;
-        k = 0;
-        for (i = _index - 1; i >= 0; i--) {
-            if (IS_CONSONANT(CHR(i))) {
-                hData[k++] = TypingWord[i];
-                hNCC++;
-            } else { //is vowel
-                //check if standalone first
-                if (TypingWord[i] & STANDALONE_MASK) {
-                    if (CHR(i) == KEY_U) { //restore w key
-                        TypingWord[i] = KEY_W | ((TypingWord[i] & CAPS_MASK) ? CAPS_MASK : 0);
-                        hData[k++] = GET(TypingWord[i]);
-                        hNCC++;
-                    }
-                } else {
-                    hData[k++] = TypingWord[i];
-                    hNCC++;
-                }
+bool checkRestoreIfWrongSpelling() {
+    for (ii = 0; ii < _index; ii++) {
+        if (!IS_CONSONANT(CHR(ii)) &&
+            (TypingWord[ii] & MARK_MASK || TypingWord[ii] & TONE_MASK || TypingWord[ii] & TONEW_MASK)) {
+            
+            hCode = vRestore;
+            hBPC = _index;
+            hNCC = _stateIndex;
+            for (i = 0; i < _stateIndex; i++) {
+                TypingWord[i] = KeyStates[i];
+                hData[_stateIndex - 1 - i] = TypingWord[i];
             }
-            hBPC++;
+            _index = _stateIndex;
+            
+            return true;
         }
-       
-        cout<<"grammar error"<<endl;
     }
+    
+    return false;
 }
 /*==========================================================================================================*/
 
@@ -991,16 +999,18 @@ void vKeyHandleEvent(const vKeyEvent& event,
         hExt = 1; //word break
         startNewSession();
     } else if (data == KEY_SPACE) {
-        if (vRestoreIfWrongSpelling) { //restore key if wrong spelling
-            checkRestoreIfWrongSpelling();
-            insertKey(data, _isCaps);
+        if (vRestoreIfWrongSpelling && tempDisableKey) { //restore key if wrong spelling
+            if (checkRestoreIfWrongSpelling()) {
+                insertKey(data, _isCaps);
+                insertState(data, _isCaps);
+            } else {
+                hCode = vDoNothing;
+            }
+            _spaceCount++;
         } else {
             hCode = vDoNothing;
             _spaceCount++;
         }
-        
-        //hCode = vDoNothing;
-        //_spaceCount++;
     } else if (data == KEY_DELETE) {
         if (_spaceCount > 0) { //previous char is space
             _spaceCount--;
@@ -1009,6 +1019,9 @@ void vKeyHandleEvent(const vKeyEvent& event,
                 _index--;
                 if (vCheckSpelling)
                     checkSpelling();
+            }
+            if (_stateIndex > 0) {
+                _stateIndex--;
             }
             hCode = vDoNothing;
             hBPC = 0;
@@ -1025,6 +1038,9 @@ void vKeyHandleEvent(const vKeyEvent& event,
             hExt = 0;
             startNewSession();
         }
+        
+        insertState(data, _isCaps); //save state
+        
         if (!IS_SPECIALKEY(data) || (tempDisableKey)) { //do nothing
             if (vQuickTelex && IS_QUICK_TELEX_KEY(data)) {
                 handleQuickTelex(data, _isCaps);
@@ -1053,12 +1069,13 @@ void vKeyHandleEvent(const vKeyEvent& event,
         
         if (hCode == vRestore) {
             insertKey(data, _isCaps);
+            _stateIndex--;
         }
     }
     
-    
     //Debug
-    //cout<<"index "<<(int)_index<<endl;
-    cout<<"backspace "<<(int)hBPC<<endl;
-    cout<<"new char "<<(int)hNCC<<endl<<endl;
+    cout<<"index "<<(int)_index<<endl;
+    cout<<"state index "<<(int)_stateIndex<<endl;
+    //cout<<"backspace "<<(int)hBPC<<endl;
+    //cout<<"new char "<<(int)hNCC<<endl<<endl;
 }

@@ -19,6 +19,7 @@ extern int vCheckSpelling;
 extern int vUseModernOrthography;
 extern int vSwitchKeyStatus;
 extern int vQuickTelex;
+extern int vRestoreIfWrongSpelling;
 
 @implementation ViewController {
     __weak IBOutlet NSButton *CustomSwitchCommand;
@@ -137,6 +138,11 @@ extern int vQuickTelex;
     vQuickTelex = (int)val;
 }
 
+- (IBAction)onRestoreIfInvalidWord:(id)sender {
+    NSInteger val = [self setCustomValue:sender keyToSet:@"RestoreIfInvalidWord"];
+    vRestoreIfWrongSpelling = (int)val;
+}
+
 - (IBAction)onControlSwitchKey:(NSButton *)sender {
     NSInteger val = [self setCustomValue:sender keyToSet:nil];
     vSwitchKeyStatus &= (~0x100);
@@ -231,6 +237,9 @@ extern int vQuickTelex;
     
     NSInteger quicTelex = [[NSUserDefaults standardUserDefaults] integerForKey:@"QuickTelex"];
     self.QuickTelex.state = quicTelex ? NSControlStateValueOn : NSControlStateValueOff;
+    
+    NSInteger restoreIfInvalidWord = [[NSUserDefaults standardUserDefaults] integerForKey:@"RestoreIfInvalidWord"];
+    self.RestoreIfInvalidWord.state = restoreIfInvalidWord ? NSControlStateValueOn : NSControlStateValueOff;
     
     CustomSwitchControl.state = (vSwitchKeyStatus & 0x100) ? NSControlStateValueOn : NSControlStateValueOff;
     CustomSwitchOption.state = (vSwitchKeyStatus & 0x200) ? NSControlStateValueOn : NSControlStateValueOff;
