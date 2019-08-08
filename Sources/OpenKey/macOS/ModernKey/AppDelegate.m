@@ -25,6 +25,7 @@ int vQuickTelex = 0;
 #define DEFAULT_SWITCH_STATUS 0x7A000206 //default option + z
 int vSwitchKeyStatus = DEFAULT_SWITCH_STATUS;
 int vRestoreIfWrongSpelling = 0;
+int vFixRecommendBrowser = 1;
 
 @interface AppDelegate ()
 
@@ -74,6 +75,8 @@ int vRestoreIfWrongSpelling = 0;
     vCheckSpelling = (int)[[NSUserDefaults standardUserDefaults] integerForKey:@"Spelling"];
     vQuickTelex = (int)[[NSUserDefaults standardUserDefaults] integerForKey:@"QuickTelex"];
     vUseModernOrthography = (int)[[NSUserDefaults standardUserDefaults] integerForKey:@"ModernOrthography"];
+    vRestoreIfWrongSpelling = (int)[[NSUserDefaults standardUserDefaults] integerForKey:@"RestoreIfInvalidWord"];
+    vFixRecommendBrowser = (int)[[NSUserDefaults standardUserDefaults] integerForKey:@"FixRecommendBrowser"];
     
     //init
     dispatch_async(dispatch_get_main_queue(), ^{
@@ -154,6 +157,7 @@ int vRestoreIfWrongSpelling = 0;
     vQuickTelex = 0; [[NSUserDefaults standardUserDefaults] setInteger:vQuickTelex forKey:@"QuickTelex"];
     vUseModernOrthography = 1; [[NSUserDefaults standardUserDefaults] setInteger:vUseModernOrthography forKey:@"ModernOrthography"];
     vRestoreIfWrongSpelling = 0; [[NSUserDefaults standardUserDefaults] setInteger:vRestoreIfWrongSpelling forKey:@"RestoreIfInvalidWord"];
+    vFixRecommendBrowser = 1; [[NSUserDefaults standardUserDefaults] setInteger:vFixRecommendBrowser forKey:@"FixRecommendBrowser"];
     [self fillData];
     [viewController fillData];
 }

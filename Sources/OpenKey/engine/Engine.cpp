@@ -124,9 +124,11 @@ void setKeyData(const Byte& index, const Uint16& keyCode, const bool& isCaps) {
 
 bool _spellingOK = false;
 bool _spellingFlag = false;
+bool _spellingVowelOK = false;
 
-void checkSpelling() {
+void checkSpelling(const bool& forceCheckVowel=false) {
     _spellingOK = false;
+    _spellingVowelOK = true;
     if (_index > 0) {
         j = 0;
         //Check first consonant
@@ -160,7 +162,30 @@ void checkSpelling() {
             }
         }
         
-        if (k > j) { //has vowel, continue check last consonant
+        if (k > j) { //has vowel,
+            _spellingVowelOK = false;
+            //check correct combined vowel
+            if (k - j > 1 && (IS_CONSONANT(CHR(_index - 1)) || forceCheckVowel)) {
+                vector<vector<Uint32>>& vowelSet = _vowelCombine[CHR(j)];
+                for (l = 0; l < vowelSet.size(); l++) {
+                    _spellingFlag = false;
+                    for (ii = 1; ii < vowelSet[l].size(); ii++) {
+                        if (j + ii - 1 < _index && vowelSet[l][ii] != ((CHR(j + ii - 1) | (TypingWord[j + ii - 1] & TONEW_MASK) | (TypingWord[j + ii - 1] & TONE_MASK)))) {
+                            _spellingFlag = true;
+                            break;
+                        }
+                    }
+                    if (_spellingFlag || (k < _index && !vowelSet[l][0]) || (j + ii - 1 < _index && !IS_CONSONANT(CHR(j + ii - 1))))
+                        continue;
+                    
+                    _spellingVowelOK = true;
+                    break;
+                }
+            } else if (!IS_CONSONANT(CHR(j))) {
+                _spellingVowelOK = true;
+            }
+            
+            //continue check last consonant
             for (ii = 0; ii < _endConsonantTable.size(); ii++) {
                 _spellingFlag = false;
    
@@ -173,17 +198,20 @@ void checkSpelling() {
                 if (_spellingFlag)
                     continue;
                 
-                if (k + j >= _index)
+                if (k + j >= _index) {
                     _spellingOK = true;
+                    break;
+                }
             }
             
         }
     } else {
         _spellingOK = true;
     }
-    tempDisableKey = !_spellingOK;
+    tempDisableKey = !(_spellingOK && _spellingVowelOK);
     
-    //cout<<"spelling: "<<(_spellingOK ? "OK": "Err")<<endl;
+    //cout<<"spelling vowel: "<<(_spellingVowelOK ? "OK": "Err")<<endl;
+    //cout<<"spelling: "<<(_spellingOK ? "OK": "Err")<<endl<<endl;
 }
 
 void checkGrammar(const int& deltaBackSpace) {
@@ -999,31 +1027,35 @@ void vKeyHandleEvent(const vKeyEvent& event,
         hExt = 1; //word break
         startNewSession();
     } else if (data == KEY_SPACE) {
+        if (!tempDisableKey) {
+            checkSpelling(true); //force check spelling
+        }
         if (vRestoreIfWrongSpelling && tempDisableKey) { //restore key if wrong spelling
             if (checkRestoreIfWrongSpelling()) {
                 insertKey(data, _isCaps);
                 insertState(data, _isCaps);
             } else {
                 hCode = vDoNothing;
+                _spaceCount++;
             }
-            _spaceCount++;
         } else {
             hCode = vDoNothing;
             _spaceCount++;
         }
     } else if (data == KEY_DELETE) {
+        hCode = vDoNothing;
         if (_spaceCount > 0) { //previous char is space
             _spaceCount--;
         } else {
+            if (_stateIndex > 0) {
+                _stateIndex--;
+            }
             if (_index > 0){
                 _index--;
                 if (vCheckSpelling)
                     checkSpelling();
             }
-            if (_stateIndex > 0) {
-                _stateIndex--;
-            }
-            hCode = vDoNothing;
+            
             hBPC = 0;
             hNCC = 0;
             hExt = 2; //delete key
@@ -1074,8 +1106,7 @@ void vKeyHandleEvent(const vKeyEvent& event,
     }
     
     //Debug
-    cout<<"index "<<(int)_index<<endl;
-    cout<<"state index "<<(int)_stateIndex<<endl;
+    //cout<<"index "<<(int)_index<< ", stateIndex "<<(int)_stateIndex<< endl;
     //cout<<"backspace "<<(int)hBPC<<endl;
     //cout<<"new char "<<(int)hNCC<<endl<<endl;
 }

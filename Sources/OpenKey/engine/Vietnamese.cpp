@@ -98,69 +98,70 @@ map<Uint16, vector<vector<Uint16>>> _vowel = {
 map<Uint16, vector<vector<Uint32>>> _vowelCombine = {
     {
         KEY_A, {
-            {KEY_A, KEY_I},
-            {KEY_A, KEY_O},
-            {KEY_A, KEY_U},
-            {KEY_A|TONE_MASK, KEY_U},
-            {KEY_A, KEY_Y},
-            {KEY_A|TONE_MASK, KEY_Y},
+            //fist elem can has end consonant or not
+            {0, KEY_A, KEY_I},
+            {0, KEY_A, KEY_O},
+            {0, KEY_A, KEY_U},
+            {0, KEY_A|TONE_MASK, KEY_U},
+            {0, KEY_A, KEY_Y},
+            {0, KEY_A|TONE_MASK, KEY_Y},
         }
     }, {
         KEY_E, {
-            {KEY_E, KEY_O},
-            {KEY_E|TONE_MASK, KEY_U},
+            {0, KEY_E, KEY_O},
+            {0, KEY_E|TONE_MASK, KEY_U},
         }
     }, {
         KEY_I, {
-            {KEY_I, KEY_E|TONE_MASK, KEY_U},
-            {KEY_I, KEY_A},
-            {KEY_I, KEY_E|TONE_MASK},
-            {KEY_I, KEY_U},
+            {1, KEY_I, KEY_E|TONE_MASK, KEY_U},
+            {0, KEY_I, KEY_A},
+            {1, KEY_I, KEY_E|TONE_MASK},
+            {0, KEY_I, KEY_U},
             
         }
     }, {
         KEY_O, {
-            {KEY_O, KEY_A, KEY_I},
-            {KEY_O, KEY_A, KEY_O},
-            {KEY_O, KEY_A, KEY_Y},
-            {KEY_O, KEY_E, KEY_O},
-            {KEY_O, KEY_A},
-            {KEY_O, KEY_A|TONEW_MASK},
-            {KEY_O, KEY_E},
-            {KEY_O, KEY_I},
-            {KEY_O|TONE_MASK, KEY_I},
-            {KEY_O|TONEW_MASK, KEY_I},
-            {KEY_O, KEY_O},
-            {KEY_O|TONE_MASK, KEY_O|TONE_MASK},
+            {0, KEY_O, KEY_A, KEY_I},
+            {0, KEY_O, KEY_A, KEY_O},
+            {0, KEY_O, KEY_A, KEY_Y},
+            {0, KEY_O, KEY_E, KEY_O},
+            {1, KEY_O, KEY_A},
+            {1, KEY_O, KEY_A|TONEW_MASK},
+            {1, KEY_O, KEY_E},
+            {0, KEY_O, KEY_I},
+            {0, KEY_O|TONE_MASK, KEY_I},
+            {0, KEY_O|TONEW_MASK, KEY_I},
+            {1, KEY_O, KEY_O},
+            {1, KEY_O|TONE_MASK, KEY_O|TONE_MASK},
         }
     }, {
         KEY_U, {
-            {KEY_U, KEY_Y, KEY_U},
-            {KEY_U, KEY_Y, KEY_E|TONE_MASK},
-            {KEY_U, KEY_Y, KEY_A},
-            {KEY_U|TONEW_MASK, KEY_O|TONEW_MASK, KEY_U},
-            {KEY_U|TONEW_MASK, KEY_O|TONEW_MASK, KEY_I},
-            {KEY_U, KEY_O|TONE_MASK, KEY_I},
-            {KEY_U, KEY_A|TONE_MASK, KEY_Y},
-            {KEY_U, KEY_A, KEY_O},
-            {KEY_U, KEY_A},
-            {KEY_U, KEY_A|TONEW_MASK},
-            {KEY_U, KEY_A|TONE_MASK},
-            {KEY_U|TONEW_MASK, KEY_A},
-            {KEY_U, KEY_E|TONE_MASK},
-            {KEY_U, KEY_I},
-            {KEY_U|TONEW_MASK, KEY_I},
-            {KEY_U, KEY_O},
-            {KEY_U, KEY_O|TONE_MASK},
-            {KEY_U, KEY_O|TONEW_MASK},
-            {KEY_U|TONEW_MASK, KEY_O|TONEW_MASK},
-            {KEY_U|TONEW_MASK, KEY_U},
-            {KEY_U, KEY_Y},
+            {0, KEY_U, KEY_Y, KEY_U},
+            {1, KEY_U, KEY_Y, KEY_E|TONE_MASK},
+            {0, KEY_U, KEY_Y, KEY_A},
+            {0, KEY_U|TONEW_MASK, KEY_O|TONEW_MASK, KEY_U},
+            {0, KEY_U|TONEW_MASK, KEY_O|TONEW_MASK, KEY_I},
+            {0, KEY_U, KEY_O|TONE_MASK, KEY_I},
+            {0, KEY_U, KEY_A|TONE_MASK, KEY_Y},
+            {1, KEY_U, KEY_A, KEY_O},
+            {1, KEY_U, KEY_A},
+            {1, KEY_U, KEY_A|TONEW_MASK},
+            {1, KEY_U, KEY_A|TONE_MASK},
+            {0, KEY_U|TONEW_MASK, KEY_A},
+            {1, KEY_U, KEY_E|TONE_MASK},
+            {0, KEY_U, KEY_I},
+            {0, KEY_U|TONEW_MASK, KEY_I},
+            {1, KEY_U, KEY_O},
+            {1, KEY_U, KEY_O|TONE_MASK},
+            {0, KEY_U, KEY_O|TONEW_MASK},
+            {1, KEY_U|TONEW_MASK, KEY_O|TONEW_MASK},
+            {0, KEY_U|TONEW_MASK, KEY_U},
+            {1, KEY_U, KEY_Y},
         }
     }, {
         KEY_Y, {
-            {KEY_Y, KEY_E|TONE_MASK, KEY_U},
-            {KEY_Y, KEY_E|TONE_MASK},
+            {0, KEY_Y, KEY_E|TONE_MASK, KEY_U},
+            {1, KEY_Y, KEY_E|TONE_MASK},
         }
     }
 };

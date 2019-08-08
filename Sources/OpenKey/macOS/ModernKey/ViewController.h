@@ -32,6 +32,7 @@
 @property (weak) IBOutlet NSButton *QuickTelex;
 
 @property (weak) IBOutlet NSButton *RestoreIfInvalidWord;
+@property (weak) IBOutlet NSButton *FixRecommendBrowser;
 
 @property (weak) IBOutlet NSImageView *cursorImage;
 

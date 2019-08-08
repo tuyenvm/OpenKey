@@ -90,6 +90,13 @@ extern int vQuickTelex;
  */
 extern int vRestoreIfWrongSpelling;
 
+/*
+ * Fix recommend browser's address, excel,...
+ * 0: No
+ * 1: Yes
+ */
+extern int vFixRecommendBrowser;
+
 /**
  * Call this function first to receive data pointer
  */

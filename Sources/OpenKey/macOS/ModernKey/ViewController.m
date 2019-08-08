@@ -20,6 +20,7 @@ extern int vUseModernOrthography;
 extern int vSwitchKeyStatus;
 extern int vQuickTelex;
 extern int vRestoreIfWrongSpelling;
+extern int vFixRecommendBrowser;
 
 @implementation ViewController {
     __weak IBOutlet NSButton *CustomSwitchCommand;
@@ -143,6 +144,11 @@ extern int vRestoreIfWrongSpelling;
     vRestoreIfWrongSpelling = (int)val;
 }
 
+- (IBAction)onFixRecommendBrowser:(id)sender {
+    NSInteger val = [self setCustomValue:sender keyToSet:@"FixRecommendBrowser"];
+    vFixRecommendBrowser = (int)val;
+}
+
 - (IBAction)onControlSwitchKey:(NSButton *)sender {
     NSInteger val = [self setCustomValue:sender keyToSet:nil];
     vSwitchKeyStatus &= (~0x100);
@@ -240,6 +246,9 @@ extern int vRestoreIfWrongSpelling;
     
     NSInteger restoreIfInvalidWord = [[NSUserDefaults standardUserDefaults] integerForKey:@"RestoreIfInvalidWord"];
     self.RestoreIfInvalidWord.state = restoreIfInvalidWord ? NSControlStateValueOn : NSControlStateValueOff;
+    
+    NSInteger fixRecommendBrowser = [[NSUserDefaults standardUserDefaults] integerForKey:@"FixRecommendBrowser"];
+    self.FixRecommendBrowser.state = fixRecommendBrowser ? NSControlStateValueOn : NSControlStateValueOff;
     
     CustomSwitchControl.state = (vSwitchKeyStatus & 0x100) ? NSControlStateValueOn : NSControlStateValueOff;
     CustomSwitchOption.state = (vSwitchKeyStatus & 0x200) ? NSControlStateValueOn : NSControlStateValueOff;

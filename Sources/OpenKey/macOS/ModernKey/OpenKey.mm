@@ -21,11 +21,9 @@ extern AppDelegate* appDelegate;
 
 extern "C" {
     //app which must sent special empty character
-    NSArray* _specialApp = @[@"com.google.Chrome",
-                             @"com.apple.Safari",
-                             @"org.mozilla.firefox",
-                             @"com.jetbrains.rider",
-                             @"com.barebones.textwrangler"];
+    NSArray* _niceSpaceApp = @[@"com.sublimetext.3",
+                               @"com.sublimetext.2",
+                             ];
     
     //app which error with unicode Compound
     NSArray* _unicodeCompoundApp = @[@"com.apple.Stickies"];
@@ -53,14 +51,14 @@ extern "C" {
         
         //init macro feature
         //test
-        Byte test[] = {1, 0, 2, KEY_K, KEY_O, 2, 'k', 'o', 5, 0, 'k', 'h', 'o', 'n', 'g'};
+       /* Byte test[] = {1, 0, 2, KEY_K, KEY_O, 2, 'k', 'o', 5, 0, 'k', 'h', 'o', 'n', 'g'};
         NSData* data = [NSData dataWithBytes:test length:15];
         NSUserDefaults *prefs = [NSUserDefaults standardUserDefaults];
         [prefs setObject:data forKey:@"macroData"];
         
         NSData *data2 = [prefs objectForKey:@"macroData"];
         //memcpy(&playfield, data.bytes, data.length);
-        initMacroMap((Byte*)data2.bytes, data2.length);
+        initMacroMap((Byte*)data2.bytes, data2.length);*/
     }
     
     void InsertKeyLength(const Uint8& len) {
@@ -130,12 +128,11 @@ extern "C" {
     void SendEmptyCharacter() {
         if (IS_DOUBLE_CODE(vCodeTable)) //VNI or Unicode Compound
             InsertKeyLength(1);
-        if ([_specialApp containsObject:FRONT_APP]) {
-            _newChar = 0x202F;
-        } else {
+        
+        _newChar = 0x202F; //empty char
+        if ([_niceSpaceApp containsObject:FRONT_APP]) {
             _newChar = 0x200C; //Unicode character with empty space
         }
-        //_newChar = 0x2060;
         
         _newEventDown = CGEventCreateKeyboardEvent(myEventSource, 0, true);
         CGEventKeyboardSetUnicodeString(_newEventDown, 1, &_newChar);
@@ -271,8 +268,11 @@ extern "C" {
             } else if (pData->code == 1 || pData->code == 3) { //handle result signal
                 
                 //fix autocomplete
-                SendEmptyCharacter();
-                pData->backspaceCount++;
+                if (vFixRecommendBrowser) {
+                    SendEmptyCharacter();
+                    pData->backspaceCount++;
+                }
+                
                 //send backspace
                 if (pData->backspaceCount > 0 && pData->backspaceCount < MAX_BUFF) {
                     for (int i = 0; i < pData->backspaceCount; i++) {
