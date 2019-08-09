@@ -26,6 +26,7 @@ int vQuickTelex = 0;
 int vSwitchKeyStatus = DEFAULT_SWITCH_STATUS;
 int vRestoreIfWrongSpelling = 0;
 int vFixRecommendBrowser = 1;
+int vUseMacro = 1;
 
 @interface AppDelegate ()
 
@@ -71,7 +72,7 @@ int vFixRecommendBrowser = 1;
     [self createStatusBarMenu];
     
     //load saved data
-    vFreeMark = (int)[[NSUserDefaults standardUserDefaults] integerForKey:@"FreeMark"];
+    vFreeMark = 0;//(int)[[NSUserDefaults standardUserDefaults] integerForKey:@"FreeMark"];
     vCheckSpelling = (int)[[NSUserDefaults standardUserDefaults] integerForKey:@"Spelling"];
     vQuickTelex = (int)[[NSUserDefaults standardUserDefaults] integerForKey:@"QuickTelex"];
     vUseModernOrthography = (int)[[NSUserDefaults standardUserDefaults] integerForKey:@"ModernOrthography"];

@@ -9,6 +9,12 @@
 
 #include "Engine.h"
 #include <string.h>
+#include "Macro.h"
+
+static vector<Uint8> _charKeyCode = {
+    50, KEY_1, KEY_2, KEY_3, KEY_4, KEY_5, KEY_6, KEY_7, KEY_8, KEY_9, KEY_0, 25, 29, 27, 24, KEY_LEFT_BRACKET, KEY_RIGHT_BRACKET, 42,
+    41, 39, 43, 47, 44
+};
 
 static vector<Uint8> _breakCode = {
     KEY_ESC, KEY_TAB, KEY_ENTER, KEY_RETURN, KEY_LEFT, KEY_RIGHT, KEY_DOWN, KEY_UP,
@@ -45,7 +51,8 @@ static Uint16 ProcessingChar[][11] = {
 #define hExt HookState.extCode
 #define hData HookState.charData
 #define GET getCharacterCode
-
+#define hMacroKey HookState.macroKey
+#define hMacroData HookState.macroData
 
 //Data to sendback to main program
 vKeyHookState HookState;
@@ -88,20 +95,17 @@ static Uint16 keyForAEO;
 static bool isCheckedGrammar;
 static bool _isCaps = false;
 static int _spaceCount = 0; //add: July 30th, 2019
+static bool _hasHandledMacro = false; //for macro flag August 9th, 2019
 
 //function prototype
 void findAndCalculateVowel(const bool& forGrammar=false);
 void insertMark(const Uint32& markMask, const bool& canModifyFlag=true);
-Uint32 getCharacterCode(const Uint32& data);
 
-void copyBuffer(Uint32 buffer[]) {
-    memcpy(buffer, TypingWord, _index);
-}
 
 void* vKeyInit() {
     _index = 0;
     _stateIndex = 0;
-    memset(&HookState, sizeof(vKeyEventState), 0);
+    //memset(&HookState, 0, sizeof(vKeyEventState));
     return &HookState;
 }
 
@@ -308,6 +312,8 @@ void startNewSession() {
     hNCC = 0;
     tempDisableKey = false;
     _stateIndex = 0;
+    _hasHandledMacro = false;
+    hMacroKey.clear();
 }
 
 void checkCorrectVowel(vector<vector<Uint16>>& charset, int& i, int& k, const Uint16& markKey) {
@@ -1003,11 +1009,9 @@ bool checkRestoreIfWrongSpelling() {
                 hData[_stateIndex - 1 - i] = TypingWord[i];
             }
             _index = _stateIndex;
-            
             return true;
         }
     }
-    
     return false;
 }
 /*==========================================================================================================*/
@@ -1026,19 +1030,27 @@ void vKeyHandleEvent(const vKeyEvent& event,
         hNCC = 0;
         hExt = 1; //word break
         startNewSession();
+        
+        //insert key for macro function
+        if (vUseMacro && state == KeyDown && std::find(_charKeyCode.begin(), _charKeyCode.end(), data) != _charKeyCode.end()) {
+            hMacroKey.push_back(data | (_isCaps ? CAPS_MASK : 0));
+        }
     } else if (data == KEY_SPACE) {
         if (!tempDisableKey) {
             checkSpelling(true); //force check spelling
         }
-        if (vRestoreIfWrongSpelling && tempDisableKey) { //restore key if wrong spelling
-            if (checkRestoreIfWrongSpelling()) {
-                insertKey(data, _isCaps);
-                insertState(data, _isCaps);
-            } else {
+        
+        if (vUseMacro && !_hasHandledMacro && findMacro(hMacroKey, hMacroData)) { //macro
+            hCode = vReplaceMaro;
+            hBPC = hMacroKey.size();
+            _spaceCount++;
+            _hasHandledMacro = true;
+        } else if (vRestoreIfWrongSpelling && tempDisableKey && !_hasHandledMacro) { //restore key if wrong spelling
+            if (!checkRestoreIfWrongSpelling()) {
                 hCode = vDoNothing;
-                _spaceCount++;
             }
-        } else {
+            _spaceCount++;
+        } else { //do nothing with SPACE KEY
             hCode = vDoNothing;
             _spaceCount++;
         }
@@ -1055,6 +1067,9 @@ void vKeyHandleEvent(const vKeyEvent& event,
                 if (vCheckSpelling)
                     checkSpelling();
             }
+            if (vUseMacro && hMacroKey.size() > 0) {
+                hMacroKey.pop_back();
+            }
             
             hBPC = 0;
             hNCC = 0;
@@ -1062,7 +1077,7 @@ void vKeyHandleEvent(const vKeyEvent& event,
             if (_index == 0)
                 startNewSession();
         }
-    } else {
+    } else { //START AND CHECK KEY
         if (_spaceCount > 0) {
             _spaceCount = 0;
             hBPC = 0;
@@ -1070,10 +1085,10 @@ void vKeyHandleEvent(const vKeyEvent& event,
             hExt = 0;
             startNewSession();
         }
-        
+
         insertState(data, _isCaps); //save state
         
-        if (!IS_SPECIALKEY(data) || (tempDisableKey)) { //do nothing
+        if (!IS_SPECIALKEY(data) || tempDisableKey) { //do nothing
             if (vQuickTelex && IS_QUICK_TELEX_KEY(data)) {
                 handleQuickTelex(data, _isCaps);
                 return;
@@ -1102,6 +1117,22 @@ void vKeyHandleEvent(const vKeyEvent& event,
         if (hCode == vRestore) {
             insertKey(data, _isCaps);
             _stateIndex--;
+        }
+        
+        //insert or replace key for macro feature
+        if (vUseMacro) {
+            if (hCode == vDoNothing) {
+                hMacroKey.push_back(data | (_isCaps ? CAPS_MASK : 0));
+            } else if (hCode == vWillProcess || hCode == vRestore) {
+                for (i = 0; i < hBPC; i++) {
+                    if (hMacroKey.size() > 0) {
+                        hMacroKey.pop_back();
+                    }
+                }
+                for (i = _index - hBPC; i < hNCC + (_index - hBPC); i++) {
+                    hMacroKey.push_back(TypingWord[i]);
+                }
+            }
         }
     }
     

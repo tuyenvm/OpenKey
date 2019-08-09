@@ -41,6 +41,8 @@ extern "C" {
     Uint8 _syncIndex = 0, _i = 0;
     Uint16 _uniChar[2];
     
+    string macroText, macroContent;
+    
     void OpenKeyInit() {
         memset(&_syncKey, 0, sizeof(_syncKey));
         myEventSource = CGEventSourceCreate(kCGEventSourceStatePrivate);
@@ -49,16 +51,9 @@ extern "C" {
         eventBackSpaceDown = CGEventCreateKeyboardEvent (myEventSource, 51, true);
         eventBackSpaceUp = CGEventCreateKeyboardEvent (myEventSource, 51, false);
         
-        //init macro feature
-        //test
-       /* Byte test[] = {1, 0, 2, KEY_K, KEY_O, 2, 'k', 'o', 5, 0, 'k', 'h', 'o', 'n', 'g'};
-        NSData* data = [NSData dataWithBytes:test length:15];
         NSUserDefaults *prefs = [NSUserDefaults standardUserDefaults];
-        [prefs setObject:data forKey:@"macroData"];
-        
-        NSData *data2 = [prefs objectForKey:@"macroData"];
-        //memcpy(&playfield, data.bytes, data.length);
-        initMacroMap((Byte*)data2.bytes, data2.length);*/
+        NSData *data = [prefs objectForKey:@"macroData"];
+        initMacroMap((Byte*)data.bytes, (int)data.length);
     }
     
     void InsertKeyLength(const Uint8& len) {
@@ -70,6 +65,13 @@ extern "C" {
         } else {
             _syncKey[_syncIndex++] = len;
         }
+    }
+    
+    void SendPureCharacter(const Uint16& ch) {
+        _newEventDown = CGEventCreateKeyboardEvent(myEventSource, 0, true);
+        CGEventKeyboardSetUnicodeString(_newEventDown, 1, &ch);
+        CGEventPost(kCGHIDEventTap, _newEventDown);
+        CFRelease(_newEventDown);
     }
     
     void SendKeyCode(Uint32 data) {
@@ -218,8 +220,9 @@ extern "C" {
             }
         }
         
-        if (vLanguage == 0) //ignore if is english
+        if (vLanguage == 0){ //ignore if is english
             return event;
+        }
         
         // Also check correct event hooked
         if ((type != kCGEventKeyDown) && (type != kCGEventKeyUp) &&
@@ -289,6 +292,22 @@ extern "C" {
                 if (pData->code == 3) {
                     SendKeyCode(_keycode | ((_flag & kCGEventFlagMaskAlphaShift) || (_flag & kCGEventFlagMaskShift) ? CAPS_MASK : 0));
                 }
+            } else if (pData->code == 4) { //MACRO
+                //send backspace
+                if (pData->backspaceCount > 0) {
+                    for (int i = 0; i < pData->backspaceCount; i++) {
+                        SendBackspace();
+                    }
+                }
+                //send real data
+                for (int i = 0; i < pData->macroData.size(); i++) {
+                    if (pData->macroData[i] & PURE_CHARACTER_MASK) {
+                        SendPureCharacter(pData->macroData[i]);
+                    } else {
+                        SendKeyCode(pData->macroData[i]);
+                    }
+                }
+                SendPureCharacter(' ');
             }
             
             return NULL;

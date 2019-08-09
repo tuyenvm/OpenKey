@@ -9,6 +9,10 @@
 #ifndef DataType_h
 #define DataType_h
 
+#include <vector>
+
+using namespace std;
+
 //#define V_PLATFORM_MAC              1
 //#define V_PLATFORM_WINDOWS          2
 
@@ -42,7 +46,8 @@ enum HoolCodeState {
     vDoNothing = 0, //do not do anything
     vWillProcess, //will reverse
     vBreakWord, //start new
-    vRestore //restore character to old char
+    vRestore, //restore character to old char
+    vReplaceMaro //replace by macro
 };
 
 //bytes data for main program
@@ -52,6 +57,7 @@ struct vKeyHookState {
      * 1: Process
      * 2: Word break;
      * 3: Restore
+     * 4: replace by macro
      */
     Byte code;
     Byte backspaceCount;
@@ -65,6 +71,9 @@ struct vKeyHookState {
     Byte extCode;
     
     Uint32 charData[MAX_BUFF]; //new character will be put in queue
+    
+    vector<Uint32> macroKey; //used for macro function; it is a key
+    vector<Uint32> macroData; //used for macro function; it is keycode data
 };
 
 //define Key code for mac keyboard
@@ -152,6 +161,7 @@ struct vKeyHookState {
 //Check whether the data is create by standalone key or not (W)
 #define STANDALONE_MASK                         0x1000000
 
+#define PURE_CHARACTER_MASK                     0x80000000
 
 //Utilities macro
 #define IS_CONSONANT(keyCode) !(keyCode == KEY_A || keyCode == KEY_E || keyCode == KEY_U || keyCode == KEY_Y || keyCode == KEY_I || keyCode == KEY_O)

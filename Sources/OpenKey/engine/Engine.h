@@ -98,6 +98,11 @@ extern int vRestoreIfWrongSpelling;
 extern int vFixRecommendBrowser;
 
 /**
+ * Macro on or off
+ */
+extern int vUseMacro;
+
+/**
  * Call this function first to receive data pointer
  */
 void* vKeyInit();
@@ -121,9 +126,5 @@ void vKeyHandleEvent(const vKeyEvent& event,
  */
 void startNewSession();
 
-/**
- * copy TypingWord, use for macro feature
- * Chức năng này dành cho gõ tắt
- */
-void copyBuffer(Uint32 buffer[]);
+
 #endif /* Engine_h */
