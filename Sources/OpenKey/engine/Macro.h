@@ -57,6 +57,4 @@ bool deleteMacro(const string& macroText);
  */
 void onTableCodeChange();
 
-Uint32 getCharacterCode(const Uint32& data);
-
 #endif /* Macro_h */

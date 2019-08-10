@@ -313,7 +313,6 @@ void startNewSession() {
     tempDisableKey = false;
     _stateIndex = 0;
     _hasHandledMacro = false;
-    hMacroKey.clear();
 }
 
 void checkCorrectVowel(vector<vector<Uint16>>& charset, int& i, int& k, const Uint16& markKey) {
@@ -1016,6 +1015,30 @@ bool checkRestoreIfWrongSpelling() {
 }
 /*==========================================================================================================*/
 
+void vEnglishMode(const vKeyEventState& state, const Uint16& data, const bool& isCaps, const bool& otherControlKey) {
+    hCode = vDoNothing;
+    if (state == vKeyEventState::MouseDown || (otherControlKey && !isCaps)) {
+        hMacroKey.clear();
+    } else if (data == KEY_SPACE) {
+        if (!_hasHandledMacro && findMacro(hMacroKey, hMacroData)) {
+            hCode = vReplaceMaro;
+            hBPC = hMacroKey.size();
+        }
+        hMacroKey.clear();
+    } else if (data == KEY_DELETE) {
+        if (hMacroKey.size() > 0) {
+            hMacroKey.pop_back();
+        }
+    } else {
+        if (isWordBreak(vKeyEvent::Keyboard, state, data) &&
+            std::find(_charKeyCode.begin(), _charKeyCode.end(), data) == _charKeyCode.end()) {
+            hMacroKey.clear();
+        } else {
+            hMacroKey.push_back(data | (_isCaps ? CAPS_MASK : 0));
+        }
+    }
+}
+
 void vKeyHandleEvent(const vKeyEvent& event,
                      const vKeyEventState& state,
                      const Uint16& data,
@@ -1032,20 +1055,23 @@ void vKeyHandleEvent(const vKeyEvent& event,
         startNewSession();
         
         //insert key for macro function
-        if (vUseMacro && state == KeyDown && std::find(_charKeyCode.begin(), _charKeyCode.end(), data) != _charKeyCode.end()) {
-            hMacroKey.push_back(data | (_isCaps ? CAPS_MASK : 0));
+        if (vUseMacro) {
+            if (state == KeyDown && std::find(_charKeyCode.begin(), _charKeyCode.end(), data) != _charKeyCode.end()) {
+                hMacroKey.push_back(data | (_isCaps ? CAPS_MASK : 0));
+            } else {
+                hMacroKey.clear();
+            }
         }
     } else if (data == KEY_SPACE) {
-        if (!tempDisableKey) {
-            checkSpelling(true); //force check spelling
-        }
-        
         if (vUseMacro && !_hasHandledMacro && findMacro(hMacroKey, hMacroData)) { //macro
             hCode = vReplaceMaro;
             hBPC = hMacroKey.size();
             _spaceCount++;
             _hasHandledMacro = true;
         } else if (vRestoreIfWrongSpelling && tempDisableKey && !_hasHandledMacro) { //restore key if wrong spelling
+            if (!tempDisableKey) {
+                checkSpelling(true); //force check spelling
+            }
             if (!checkRestoreIfWrongSpelling()) {
                 hCode = vDoNothing;
             }
@@ -1053,6 +1079,9 @@ void vKeyHandleEvent(const vKeyEvent& event,
         } else { //do nothing with SPACE KEY
             hCode = vDoNothing;
             _spaceCount++;
+        }
+        if (vUseMacro) {
+            hMacroKey.clear();
         }
     } else if (data == KEY_DELETE) {
         hCode = vDoNothing;

@@ -33,6 +33,8 @@
 
 @property (weak) IBOutlet NSButton *RestoreIfInvalidWord;
 @property (weak) IBOutlet NSButton *FixRecommendBrowser;
+@property (weak) IBOutlet NSButton *UseMacro;
+@property (weak) IBOutlet NSButton *UseMacroInEnglishMode;
 
 @property (weak) IBOutlet NSImageView *cursorImage;
 

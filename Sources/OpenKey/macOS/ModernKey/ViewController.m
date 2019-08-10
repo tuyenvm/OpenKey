@@ -21,6 +21,8 @@ extern int vSwitchKeyStatus;
 extern int vQuickTelex;
 extern int vRestoreIfWrongSpelling;
 extern int vFixRecommendBrowser;
+extern int vUseMacro;
+extern int vUseMacroInEnglishMode;
 
 @implementation ViewController {
     __weak IBOutlet NSButton *CustomSwitchCommand;
@@ -204,6 +206,20 @@ extern int vFixRecommendBrowser;
     return val;
 }
 
+- (IBAction)onMacroButton:(id)sender {
+    [appDelegate onMacroSelected];
+}
+
+- (IBAction)onMacroChanged:(NSButton *)sender {
+    NSInteger val = [self setCustomValue:sender keyToSet:@"UseMacro"];
+    vUseMacro = (int)val;
+}
+
+- (IBAction)onUseMacroInEnglishModeChanged:(NSButton *)sender {
+    NSInteger val = [self setCustomValue:sender keyToSet:@"UseMacroInEnglishMode"];
+    vUseMacroInEnglishMode = (int)val;
+}
+
 - (IBAction)onTerminateApp:(id)sender {
     [NSApp terminate:0];
 }
@@ -249,6 +265,12 @@ extern int vFixRecommendBrowser;
     
     NSInteger fixRecommendBrowser = [[NSUserDefaults standardUserDefaults] integerForKey:@"FixRecommendBrowser"];
     self.FixRecommendBrowser.state = fixRecommendBrowser ? NSControlStateValueOn : NSControlStateValueOff;
+    
+    NSInteger useMacro = [[NSUserDefaults standardUserDefaults] integerForKey:@"UseMacro"];
+    self.UseMacro.state = useMacro ? NSControlStateValueOn : NSControlStateValueOff;
+    
+    NSInteger useMacroInEnglish = [[NSUserDefaults standardUserDefaults] integerForKey:@"UseMacroInEnglishMode"];
+    self.UseMacroInEnglishMode.state = useMacroInEnglish ? NSControlStateValueOn : NSControlStateValueOff;
     
     CustomSwitchControl.state = (vSwitchKeyStatus & 0x100) ? NSControlStateValueOn : NSControlStateValueOff;
     CustomSwitchOption.state = (vSwitchKeyStatus & 0x200) ? NSControlStateValueOn : NSControlStateValueOff;

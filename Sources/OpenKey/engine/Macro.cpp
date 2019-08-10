@@ -82,6 +82,7 @@ static void convert(const string& str, vector<Uint32>& outData) {
     wstring data = utf8ToWideString(str);
     Uint32 t = 0;
     int kSign = -1;
+    int k = 0;
     for (int i = 0; i < data.size(); i++) {
         t = (Uint32)data[i];
         
@@ -92,14 +93,16 @@ static void convert(const string& str, vector<Uint32>& outData) {
         }
         
         //find character which has tone/mark
-        for (map<Uint32, vector<Uint16>>::iterator it = _codeTable[vCodeTable].begin(); it != _codeTable[vCodeTable].end(); ++it) {
+        for (map<Uint32, vector<Uint16>>::iterator it = _codeTable[0].begin(); it != _codeTable[0].end(); ++it) {
             kSign = -1;
+            k = 0;
             for (int j = 0; j < it->second.size(); j++) {
                 if ((Uint16)t == it->second[j]) {
                     kSign = 0;
-                    outData.push_back(t);
+                    outData.push_back(_codeTable[vCodeTable][it->first][k]);
                     break;
                 }//end if
+                k++;
             }
             if (kSign != -1)
                 break;

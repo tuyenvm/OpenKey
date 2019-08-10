@@ -103,9 +103,19 @@ extern int vFixRecommendBrowser;
 extern int vUseMacro;
 
 /**
+ * Still use macro if you are in english mode
+ */
+extern int vUseMacroInEnglishMode;
+
+/**
  * Call this function first to receive data pointer
  */
 void* vKeyInit();
+
+/**
+ * Convert engine character to real character
+ */
+Uint32 getCharacterCode(const Uint32& data);
 
 /**
  * MAIN entry point for each key
@@ -126,5 +136,9 @@ void vKeyHandleEvent(const vKeyEvent& event,
  */
 void startNewSession();
 
+/**
+ * do some task in english mode (use for macro)
+ */
+void vEnglishMode(const vKeyEventState& state, const Uint16& data, const bool& isCaps, const bool& otherControlKey);
 
 #endif /* Engine_h */

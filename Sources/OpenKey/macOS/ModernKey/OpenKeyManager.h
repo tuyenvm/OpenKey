@@ -14,7 +14,6 @@
 @interface OpenKeyManager : NSObject
 +(BOOL)isInited;
 +(BOOL)initEventTap;
-
 @end
 
 #endif /* OpenKeyManager_h */

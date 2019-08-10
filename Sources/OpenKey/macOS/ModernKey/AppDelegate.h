@@ -19,5 +19,7 @@
 -(void)loadDefaultConfig;
 
 -(void)setGrayIcon:(BOOL)val;
+
+-(void) onMacroSelected;
 @end
 

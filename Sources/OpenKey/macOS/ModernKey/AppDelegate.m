@@ -13,6 +13,7 @@
 
 AppDelegate* appDelegate;
 extern ViewController* viewController;
+extern void OnTableCodeChange(void);
 
 //see document in Engine.h
 int vLanguage = 1;
@@ -27,6 +28,7 @@ int vSwitchKeyStatus = DEFAULT_SWITCH_STATUS;
 int vRestoreIfWrongSpelling = 0;
 int vFixRecommendBrowser = 1;
 int vUseMacro = 1;
+int vUseMacroInEnglishMode = 1;
 
 @interface AppDelegate ()
 
@@ -73,11 +75,14 @@ int vUseMacro = 1;
     
     //load saved data
     vFreeMark = 0;//(int)[[NSUserDefaults standardUserDefaults] integerForKey:@"FreeMark"];
+    vCodeTable = (int)[[NSUserDefaults standardUserDefaults] integerForKey:@"CodeTable"];
     vCheckSpelling = (int)[[NSUserDefaults standardUserDefaults] integerForKey:@"Spelling"];
     vQuickTelex = (int)[[NSUserDefaults standardUserDefaults] integerForKey:@"QuickTelex"];
     vUseModernOrthography = (int)[[NSUserDefaults standardUserDefaults] integerForKey:@"ModernOrthography"];
     vRestoreIfWrongSpelling = (int)[[NSUserDefaults standardUserDefaults] integerForKey:@"RestoreIfInvalidWord"];
     vFixRecommendBrowser = (int)[[NSUserDefaults standardUserDefaults] integerForKey:@"FixRecommendBrowser"];
+    vUseMacro = (int)[[NSUserDefaults standardUserDefaults] integerForKey:@"UseMacro"];
+    vUseMacroInEnglishMode = (int)[[NSUserDefaults standardUserDefaults] integerForKey:@"UseMacroInEnglishMode"];
     
     //init
     dispatch_async(dispatch_get_main_queue(), ^{
@@ -159,6 +164,8 @@ int vUseMacro = 1;
     vUseModernOrthography = 1; [[NSUserDefaults standardUserDefaults] setInteger:vUseModernOrthography forKey:@"ModernOrthography"];
     vRestoreIfWrongSpelling = 0; [[NSUserDefaults standardUserDefaults] setInteger:vRestoreIfWrongSpelling forKey:@"RestoreIfInvalidWord"];
     vFixRecommendBrowser = 1; [[NSUserDefaults standardUserDefaults] setInteger:vFixRecommendBrowser forKey:@"FixRecommendBrowser"];
+    vUseMacro = 1; [[NSUserDefaults standardUserDefaults] setInteger:vUseMacro forKey:@"UseMacro"];
+    vUseMacroInEnglishMode = 0; [[NSUserDefaults standardUserDefaults] setInteger:vUseMacroInEnglishMode forKey:@"UseMacroInEnglishMode"];
     [self fillData];
     [viewController fillData];
 }
@@ -291,6 +298,7 @@ int vUseMacro = 1;
     vCodeTable = index;
     [self fillData];
     [viewController fillData];
+    OnTableCodeChange();
 }
 
 - (void)onCodeSelected:(id)sender {

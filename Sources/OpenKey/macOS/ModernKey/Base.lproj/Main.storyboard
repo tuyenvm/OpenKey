@@ -1042,7 +1042,7 @@
                                                 <font key="font" metaFont="system"/>
                                             </buttonCell>
                                             <connections>
-                                                <action selector="onFreeMark:" target="XfG-lQ-9wD" id="IHY-fN-0Xv"/>
+                                                <action selector="onMacroChanged:" target="XfG-lQ-9wD" id="P42-aR-N80"/>
                                             </connections>
                                         </button>
                                         <button verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="0B3-JF-s8a">
@@ -1053,7 +1053,7 @@
                                                 <font key="font" metaFont="system"/>
                                             </buttonCell>
                                             <connections>
-                                                <action selector="onRestart:" target="XfG-lQ-9wD" id="VSb-1I-adv"/>
+                                                <action selector="onMacroButton:" target="XfG-lQ-9wD" id="1UH-Er-oMx"/>
                                             </connections>
                                         </button>
                                         <button verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="0oj-fd-y0l">
@@ -1064,7 +1064,7 @@
                                                 <font key="font" metaFont="system"/>
                                             </buttonCell>
                                             <connections>
-                                                <action selector="onFreeMark:" target="XfG-lQ-9wD" id="DNh-y7-TbX"/>
+                                                <action selector="onUseMacroInEnglishModeChanged:" target="XfG-lQ-9wD" id="4Yi-rD-JFH"/>
                                             </connections>
                                         </button>
                                         <button verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="LNA-pk-XQM">
@@ -1226,6 +1226,8 @@
                         <outlet property="RunOnStartupButton" destination="Leg-Yg-XFR" id="oRL-up-vyq"/>
                         <outlet property="ShowUIButton" destination="Xle-7k-yIf" id="dbk-Zf-T4j"/>
                         <outlet property="UseGrayIcon" destination="HEa-Qp-9qT" id="ApG-gR-H4l"/>
+                        <outlet property="UseMacro" destination="eCY-Z0-cgW" id="0z8-vh-VlK"/>
+                        <outlet property="UseMacroInEnglishMode" destination="0oj-fd-y0l" id="rD2-9a-ehn"/>
                         <outlet property="UseModernOrthography" destination="r8q-NU-lqe" id="lmX-Q6-FBh"/>
                         <outlet property="VietButton" destination="qjz-9i-VOQ" id="Jpa-0e-ZDo"/>
                         <outlet property="appOK" destination="S26-ZU-sFD" id="f3J-H0-epQ"/>

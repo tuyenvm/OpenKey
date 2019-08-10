@@ -14,6 +14,9 @@
 #import "ViewController.h"
 
 #define FRONT_APP [[NSWorkspace sharedWorkspace] frontmostApplication].bundleIdentifier
+#define OTHER_CONTROL_KEY (_flag & kCGEventFlagMaskCommand) || (_flag & kCGEventFlagMaskControl) || \
+                            (_flag & kCGEventFlagMaskAlternate) || (_flag & kCGEventFlagMaskSecondaryFn) || \
+                            (_flag & kCGEventFlagMaskNumericPad) || (_flag & kCGEventFlagMaskHelp)
 
 extern ViewController* viewController;
 
@@ -54,6 +57,10 @@ extern "C" {
         NSUserDefaults *prefs = [NSUserDefaults standardUserDefaults];
         NSData *data = [prefs objectForKey:@"macroData"];
         initMacroMap((Byte*)data.bytes, (int)data.length);
+    }
+    
+    void OnTableCodeChange() {
+        onTableCodeChange();
     }
     
     void InsertKeyLength(const Uint8& len) {
@@ -192,10 +199,38 @@ extern "C" {
         startNewSession();
         return true;
     }
+    
+    void handleMacro() {
+        //fix autocomplete
+        if (vFixRecommendBrowser) {
+            SendEmptyCharacter();
+            pData->backspaceCount++;
+        }
+        
+        //send backspace
+        if (pData->backspaceCount > 0) {
+            for (int i = 0; i < pData->backspaceCount; i++) {
+                SendBackspace();
+            }
+        }
+        //send real data
+        for (int i = 0; i < pData->macroData.size(); i++) {
+            if (pData->macroData[i] & PURE_CHARACTER_MASK) {
+                SendPureCharacter(pData->macroData[i]);
+            } else {
+                SendKeyCode(pData->macroData[i]);
+            }
+        }
+        SendPureCharacter(' ');
+    }
 
     /*MAIN Callback*/
     CGEventRef OpenKeyCallback(CGEventTapProxy proxy, CGEventType type, CGEventRef event, void *refcon) {
-        //NSLog(@"%@", FRONT_APP);
+        //dont handle my event
+        if (CGEventGetIntegerValueField(event, kCGEventSourceStateID) == CGEventSourceGetSourceStateID(myEventSource)) {
+            return event;
+        }
+        
         _flag = CGEventGetFlags(event);
         _keycode = (CGKeyCode)CGEventGetIntegerValueField(event, kCGKeyboardEventKeycode);
         
@@ -219,16 +254,28 @@ extern "C" {
                 _lastFlag = 0;
             }
         }
-        
-        if (vLanguage == 0){ //ignore if is english
-            return event;
-        }
-        
+
         // Also check correct event hooked
         if ((type != kCGEventKeyDown) && (type != kCGEventKeyUp) &&
             (type != kCGEventLeftMouseDown) && (type != kCGEventRightMouseDown) &&
             (type != kCGEventLeftMouseDragged) && (type != kCGEventRightMouseDragged))
             return event;
+        
+        //If is in english mode
+        if (vLanguage == 0) {
+            if (vUseMacro && vUseMacroInEnglishMode && type == kCGEventKeyDown) {
+                vEnglishMode((type == kCGEventKeyDown ? vKeyEventState::KeyDown : vKeyEventState::MouseDown),
+                             _keycode,
+                             (_flag & kCGEventFlagMaskShift) || (_flag & kCGEventFlagMaskAlphaShift),
+                             OTHER_CONTROL_KEY);
+                
+                if (pData->code == vReplaceMaro) { //handle macro in english mode
+                    handleMacro();
+                    return NULL;
+                }
+            }
+            return event;
+        }
         
         //handle mouse
         if (type == kCGEventLeftMouseDown || type == kCGEventRightMouseDown || type == kCGEventLeftMouseDragged || type == kCGEventRightMouseDragged) {
@@ -240,11 +287,6 @@ extern "C" {
             }
             return event;
         }
-        
-        //dont handle my event
-        if (CGEventGetIntegerValueField(event, kCGEventSourceStateID) == CGEventSourceGetSourceStateID(myEventSource)) {
-            return event;
-        }
 
         //handle keyboard
         if (type == kCGEventKeyDown) {
@@ -253,9 +295,7 @@ extern "C" {
                             vKeyEventState::KeyDown,
                             _keycode,
                             _flag & kCGEventFlagMaskShift ? 1 : (_flag & kCGEventFlagMaskAlphaShift ? 2 : 0),
-                                (_flag & kCGEventFlagMaskCommand) || (_flag & kCGEventFlagMaskControl) ||
-                                (_flag & kCGEventFlagMaskAlternate) || (_flag & kCGEventFlagMaskSecondaryFn) ||
-                                (_flag & kCGEventFlagMaskNumericPad) || (_flag & kCGEventFlagMaskHelp));
+                            OTHER_CONTROL_KEY);
 
             if (pData->code == 0) { //do nothing
                 if (IS_DOUBLE_CODE(vCodeTable)) { //VNI
@@ -293,21 +333,7 @@ extern "C" {
                     SendKeyCode(_keycode | ((_flag & kCGEventFlagMaskAlphaShift) || (_flag & kCGEventFlagMaskShift) ? CAPS_MASK : 0));
                 }
             } else if (pData->code == 4) { //MACRO
-                //send backspace
-                if (pData->backspaceCount > 0) {
-                    for (int i = 0; i < pData->backspaceCount; i++) {
-                        SendBackspace();
-                    }
-                }
-                //send real data
-                for (int i = 0; i < pData->macroData.size(); i++) {
-                    if (pData->macroData[i] & PURE_CHARACTER_MASK) {
-                        SendPureCharacter(pData->macroData[i]);
-                    } else {
-                        SendKeyCode(pData->macroData[i]);
-                    }
-                }
-                SendPureCharacter(' ');
+                handleMacro();
             }
             
             return NULL;
