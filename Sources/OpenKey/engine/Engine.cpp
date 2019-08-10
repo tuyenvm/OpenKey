@@ -970,7 +970,7 @@ void handleMainKey(const Uint16& data, const bool& isCaps) {
             isChanged = true;
             if (IS_KEY_DOUBLE(data)) {
                 insertAOE(keyForAEO, isCaps);
-            } else if (IS_KEY_W(data) && !(vInputType == vVNI && data == KEY_8 && CHR(VEI) != KEY_A)) {
+            } else if (IS_KEY_W(data) && !(vInputType == vVNI && ((data == KEY_8 && CHR(VEI) != KEY_A) || (data == KEY_7 && CHR(VEI) != KEY_U && CHR(VEI) != KEY_O)))) {
                 insertW(keyForAEO, isCaps);
             }
             break;
