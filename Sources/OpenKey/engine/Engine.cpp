@@ -160,16 +160,18 @@ void checkSpelling(const bool& forceCheckVowel=false) {
         
         //check next vowel
         k = j;
+        VSI = k;
         for (l = 0; l < 3; l++) {
             if (k < _index && !IS_CONSONANT(CHR(k))) {
                 k++;
+                VEI = k;
             }
         }
         
         if (k > j) { //has vowel,
             _spellingVowelOK = false;
             //check correct combined vowel
-            if (k - j > 1 && (IS_CONSONANT(CHR(_index - 1)) || forceCheckVowel)) {
+            if (k - j > 1 && forceCheckVowel) {
                 vector<vector<Uint32>>& vowelSet = _vowelCombine[CHR(j)];
                 for (l = 0; l < vowelSet.size(); l++) {
                     _spellingFlag = false;
@@ -1063,15 +1065,15 @@ void vKeyHandleEvent(const vKeyEvent& event,
             }
         }
     } else if (data == KEY_SPACE) {
+        if (!tempDisableKey && vCheckSpelling) {
+            checkSpelling(true); //force check spelling
+        }
         if (vUseMacro && !_hasHandledMacro && findMacro(hMacroKey, hMacroData)) { //macro
             hCode = vReplaceMaro;
             hBPC = hMacroKey.size();
             _spaceCount++;
             _hasHandledMacro = true;
         } else if (vRestoreIfWrongSpelling && tempDisableKey && !_hasHandledMacro) { //restore key if wrong spelling
-            if (!tempDisableKey) {
-                checkSpelling(true); //force check spelling
-            }
             if (!checkRestoreIfWrongSpelling()) {
                 hCode = vDoNothing;
             }

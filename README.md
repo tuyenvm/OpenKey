@@ -5,8 +5,9 @@ Bộ gõ tiếng Việt mới cho macOS, sử dụng kỹ thuật backkey. Loạ
 
 ### Lưu ý, khi sử dụng OpenKey, bạn nên tắt hẳn bộ gõ khác vì 2 chương trình bộ gõ sẽ xung đột nhau, dẫn đến thao tác không chính xác.
 
-![Giao diện](https://github.com/tuyenvm/OpenKey/raw/master/Images/screenshot1.0.18.png "Main UI")
+![Giao diện](https://github.com/tuyenvm/OpenKey/raw/master/Images/screenshot1.1.png "Main UI")
 ![Menu](https://github.com/tuyenvm/OpenKey/raw/master/Images/screenshot2.png "Menu bar")
+![Gõ tắt](https://github.com/tuyenvm/OpenKey/raw/master/Images/screenshot4.png "Macro")
 
 ##### Input Type - Hỗ trợ kiểu gõ
 - Telex
@@ -24,12 +25,14 @@ Bộ gõ tiếng Việt mới cho macOS, sử dụng kỹ thuật backkey. Loạ
 ##### Feature - Tính năng:
 - Modern orthography (On/Off) - Đặt dấu oà, uý thay vì òa, úy.
 - Quick Telex (On/Off) - Gõ nhanh (cc=ch, gg=gi, kk=kh, nn=ng, qq=qu, pp=ph, tt=th).
-- Free mark (On/Off) - Bỏ dấu tự do.
 - Grammar check (On/Off) - Kiểm tra ngữ pháp.
 - Spelling check (On/Off) - Kiểm tra chính tả.
+- Restore key if invalid word (on/off) - Phục hồi phím với từ sai.
 - Run on startup (On/Off) - Chạy cùng macOS.
-- Switch input mode by shortcut key. - Đổi chế độ gõ bằng phím tắt.
-- Autocorrect fixed - Sửa lỗi autocorrect trên trình duyệt như Chrome, Safari, Firefox, Microsoft Excel.
+- Macro - Tính năng gõ tắt vô cùng tiện lợi.
+- Gray menu bar icon (On/Off) - Biểu tượng xám trên thanh menu phù hợp với chế độ Dark mode.
+- Switch input mode by shortcut key. - Đổi chế độ gõ bằng phím tắt tùy chọn.
+- Autocorrect fixed (On/Off) - Sửa lỗi autocorrect trên trình duyệt như Chrome, Safari, Firefox, Microsoft Excel.
 - Underline issue fixed on macOS - Sửa lỗi gạch chân trên macOS.
 - ...
 
