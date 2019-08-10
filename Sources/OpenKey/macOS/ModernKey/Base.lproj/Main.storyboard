@@ -1250,6 +1250,7 @@
                         <windowStyleMask key="styleMask" titled="YES" closable="YES" miniaturizable="YES" resizable="YES"/>
                         <rect key="contentRect" x="425" y="461" width="480" height="270"/>
                         <rect key="screenRect" x="0.0" y="0.0" width="2560" height="1417"/>
+                        <value key="minSize" type="size" width="480" height="270"/>
                         <connections>
                             <outlet property="delegate" destination="R7d-gd-cDk" id="OnC-X6-98t"/>
                         </connections>

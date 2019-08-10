@@ -950,7 +950,7 @@ void handleMainKey(const Uint16& data, const bool& isCaps) {
     //check Vowel
     if (vInputType == vVNI) {
         for (i = _index-1; i >= 0; i--) {
-            if (CHR(i) == KEY_O || CHR(i) == KEY_A || CHR(i) == KEY_E) {
+            if (CHR(i) == KEY_O || CHR(i) == KEY_U || CHR(i) == KEY_A || CHR(i) == KEY_E) {
                 VEI = i;
                 break;
             }
