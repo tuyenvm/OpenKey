@@ -26,19 +26,9 @@
         
         if (!eventMonitor) {
             eventMonitor = [NSEvent addLocalMonitorForEventsMatchingMask:NSKeyDownMask handler:^(NSEvent *event) {
-                if (event.keyCode == kVK_Space) {
-                    [self setStringValue:@"Space"];
-                    [self.Parent onSwitchKeyChange:kVK_Space character:kVK_Space];
-                } else if (event.keyCode == kVK_Delete || event.keyCode == kVK_ForwardDelete) {
-                    [self setStringValue:@""];
-                    [self.Parent onSwitchKeyChange:0xFE character:0xFE];
-                } else {
-                    [self setStringValue:@""];
-                    char t =event.characters.UTF8String[0];
-                    [self.Parent onSwitchKeyChange:event.keyCode character:t];
-                    return event;
-                }
-                return (NSEvent*)nil;
+                self.LastKeyCode = event.keyCode;
+                self.LastKeyChar = event.characters.UTF8String[0];
+                return event;
             } ];
             
         }
@@ -49,6 +39,20 @@
 -(void) textDidEndEditing:(NSNotification *)notification {
     [NSEvent removeMonitor:eventMonitor];
     eventMonitor = nil;
+}
+
+- (void)textDidChange:(NSNotification *)notification {
+    if (self.LastKeyCode == kVK_Space) {
+        [self setStringValue:@"Space"];
+        [self.Parent onSwitchKeyChange:kVK_Space character:kVK_Space];
+    } else if (self.LastKeyCode == kVK_Delete || self.LastKeyCode == kVK_ForwardDelete) {
+        [self setStringValue:@""];
+        [self.Parent onSwitchKeyChange:0xFE character:0xFE];
+    } else {
+        [self setStringValue:@""];
+        [self.Parent onSwitchKeyChange:self.LastKeyCode character:self.LastKeyChar];
+        [self setStringValue:[NSString stringWithFormat:@"%c", self.LastKeyChar]];
+    }
 }
 
 -(void)setTextByChar:(unsigned short)chr {

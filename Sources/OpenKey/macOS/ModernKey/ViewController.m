@@ -36,6 +36,7 @@ extern int vSendKeyStepByStep;
 
 - (void)viewDidLoad {
     [super viewDidLoad];
+    CustomSwitchKey.delegate = CustomSwitchKey;
     viewController = self;
     CustomSwitchKey.Parent = self;
     

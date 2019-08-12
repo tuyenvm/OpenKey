@@ -9,8 +9,10 @@
 #import <Cocoa/Cocoa.h>
 #import "ViewController.h"
 
-@interface MyTextField : NSTextField
+@interface MyTextField : NSTextField<NSTextDelegate>
 @property (weak, nonatomic) ViewController* Parent;
+@property unsigned short LastKeyCode;
+@property unsigned short LastKeyChar;
 
 -(void)setTextByChar:(unsigned short)chr;
 @end

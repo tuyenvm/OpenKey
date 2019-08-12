@@ -6,7 +6,7 @@ Bộ gõ tiếng Việt mới cho macOS, sử dụng kỹ thuật backkey. Loạ
 ### Lưu ý, khi sử dụng OpenKey, bạn nên tắt hẳn bộ gõ khác vì 2 chương trình bộ gõ sẽ xung đột nhau, dẫn đến thao tác không chính xác.
 
 ![Giao diện](https://github.com/tuyenvm/OpenKey/raw/master/Images/screenshot1.1.png "Main UI")
-![Menu](https://github.com/tuyenvm/OpenKey/raw/master/Images/screenshot2.png "Menu bar")
+![Menu](https://github.com/tuyenvm/OpenKey/raw/master/Images/screenshot2.1.png "Menu bar")
 ![Gõ tắt](https://github.com/tuyenvm/OpenKey/raw/master/Images/screenshot4.png "Macro")
 
 ##### Input Type - Hỗ trợ kiểu gõ
@@ -34,6 +34,7 @@ Bộ gõ tiếng Việt mới cho macOS, sử dụng kỹ thuật backkey. Loạ
 - Switch input mode by shortcut key. - Đổi chế độ gõ bằng phím tắt tùy chọn.
 - Autocorrect fixed (On/Off) - Sửa lỗi autocorrect trên trình duyệt như Chrome, Safari, Firefox, Microsoft Excel.
 - Underline issue fixed on macOS - Sửa lỗi gạch chân trên macOS.
+- **Chế độ “Gửi từng phím”:** OpenKey bản mới >1.1 mặc định dùng kỹ thuật mới gửi dữ liệu 1 lần thay vì gửi nhiều lần cho chuỗi ký tự, nên nếu có ứng dụng nào không tương thích, hãy bật tính năng này lên, mặc định thì nên tắt vì kỹ thuật mới sẽ chạy nhanh hơn.
 - ...
 
 ### Download Binary - Tải xuống: 

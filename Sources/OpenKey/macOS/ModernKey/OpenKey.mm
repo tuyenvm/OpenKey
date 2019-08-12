@@ -18,6 +18,9 @@
                             (_flag & kCGEventFlagMaskAlternate) || (_flag & kCGEventFlagMaskSecondaryFn) || \
                             (_flag & kCGEventFlagMaskNumericPad) || (_flag & kCGEventFlagMaskHelp)
 
+#define DYNA_DATA(macro, pos) (macro ? pData->macroData[pos] : pData->charData[pos])
+#define MAX_UNICODE_STRING  20
+
 extern ViewController* viewController;
 
 extern AppDelegate* appDelegate;
@@ -41,13 +44,15 @@ extern "C" {
     CGEventFlags _flag, _lastFlag = 0, _privateFlag;
     CGEventTapProxy _proxy;
     
-    Uint16 _newCharString[MAX_BUFF * 2];
+    Uint16 _newCharString[MAX_UNICODE_STRING];
     Uint16 _newCharSize;
+    bool _willContinuteSending = false;
     
     Uint16 _syncKey[MAX_BUFF];
     Uint8 _syncIndex = 0;
     Uint16 _uniChar[2];
-    int _i, _j;
+    int _i, _j, _k;
+    Uint32 _tempChar;
     
     string macroText, macroContent;
     
@@ -182,60 +187,76 @@ extern "C" {
         }
     }
     
-    void SendNewCharString() {
-        int j = 0;
-        _newCharSize = pData->newCharCount;
-        if (pData->newCharCount > 0 && pData->newCharCount <= MAX_BUFF) {
-            for (int i = pData->newCharCount - 1; i >= 0; i--) {
-                if (pData->charData[i] < 128) {
+    void SendNewCharString(const bool& dataFromMacro=false, const Uint16& offset=0) {
+        _j = 0;
+        _newCharSize = dataFromMacro ? pData->macroData.size() : pData->newCharCount;
+        _willContinuteSending = false;
+        
+        if (_newCharSize > 0) {
+            for (_k = dataFromMacro ? offset : pData->newCharCount - 1;
+                 dataFromMacro ? _k < pData->macroData.size() : _k >= 0;
+                 dataFromMacro ? _k++ : _k--) {
+                
+                _tempChar = DYNA_DATA(dataFromMacro, _k);
+                if (_tempChar & PURE_CHARACTER_MASK) {
+                    _newCharString[_j++] = _tempChar;
+                } else if (_tempChar < 128 || ((Uint16)_tempChar < 128 && (_tempChar & CAPS_MASK))) {
                     if (IS_DOUBLE_CODE(vCodeTable)) //VNI
                         InsertKeyLength(1);
-                    _newCharString[j++] = keyCodeToCharacter(pData->charData[i]);
+                    _newCharString[_j++] = keyCodeToCharacter(_tempChar);
                 } else {
                     if (vCodeTable == 0) {  //unicode 2 bytes code
-                        _newCharString[j++] = pData->charData[i];
+                        _newCharString[_j++] = _tempChar;
                     } else if (vCodeTable == 1 || vCodeTable == 2 || vCodeTable == 4) { //others such as VNI Windows, TCVN3: 1 byte code
-                        _newChar = pData->charData[i];
+                        _newChar = _tempChar;
                         _newCharHi = HIBYTE(_newChar);
                         _newChar = LOBYTE(_newChar);
-                        _newCharString[j++] = _newChar;
+                        _newCharString[_j++] = _newChar;
                         
                         if (_newCharHi > 32) {
                             if (vCodeTable == 2) //VNI
                                 InsertKeyLength(2);
-                            _newCharString[j++] = _newCharHi;
+                            _newCharString[_j++] = _newCharHi;
                             _newCharSize++;
                         } else {
                             if (vCodeTable == 2) //VNI
                                 InsertKeyLength(1);
                         }
-                        //_j++;
                     } else if (vCodeTable == 3) { //Unicode Compound
-                        _newChar = pData->charData[i];
+                        _newChar = _tempChar;
                         _newCharHi = (_newChar >> 13);
                         _newChar &= 0x1FFF;
                         
                         InsertKeyLength(_newCharHi > 0 ? 2 : 1);
-                        _newCharString[j++] = _newChar;
+                        _newCharString[_j++] = _newChar;
                         if (_newCharHi > 0) {
                             _newCharSize++;
-                            _newCharString[j++] = _unicodeCompoundMark[_newCharHi - 1];
+                            _newCharString[_j++] = _unicodeCompoundMark[_newCharHi - 1];
                         }
                         
                     }
                 }
-            }
+                
+                if (_j > 16) {
+                    _willContinuteSending = true;
+                    break;
+                }
+            }//end for
         }
         
-        if (pData->code == 3) { //if is restore
+        if (!_willContinuteSending && pData->code == 3) { //if is restore
             _newCharSize++;
-            _newCharString[j++] = keyCodeToCharacter(_keycode | ((_flag & kCGEventFlagMaskAlphaShift) || (_flag & kCGEventFlagMaskShift) ? CAPS_MASK : 0));
+            _newCharString[_j++] = keyCodeToCharacter(_keycode | ((_flag & kCGEventFlagMaskAlphaShift) || (_flag & kCGEventFlagMaskShift) ? CAPS_MASK : 0));
         }
         
         _newEventDown = CGEventCreateKeyboardEvent(myEventSource, 0, true);
-        CGEventKeyboardSetUnicodeString(_newEventDown, _newCharSize, _newCharString);
+        CGEventKeyboardSetUnicodeString(_newEventDown, _willContinuteSending ? 16 : _newCharSize - offset, _newCharString);
         CGEventTapPostEvent(_proxy, _newEventDown);
         CFRelease(_newEventDown);
+
+        if (_willContinuteSending) {
+            SendNewCharString(dataFromMacro, _k);
+        }
     }
             
     bool handleSwitchKey(bool checkKeyCode=true) {
@@ -277,17 +298,24 @@ extern "C" {
             }
         }
         //send real data
-        for (int i = 0; i < pData->macroData.size(); i++) {
-            if (pData->macroData[i] & PURE_CHARACTER_MASK) {
-                SendPureCharacter(pData->macroData[i]);
-            } else {
-                SendKeyCode(pData->macroData[i]);
+        if (!vSendKeyStepByStep) {
+            SendNewCharString(true);
+        } else {
+            for (int i = 0; i < pData->macroData.size(); i++) {
+                if (pData->macroData[i] & PURE_CHARACTER_MASK) {
+                    SendPureCharacter(pData->macroData[i]);
+                } else {
+                    SendKeyCode(pData->macroData[i]);
+                }
             }
         }
         SendPureCharacter(' ');
     }
 
-    /*MAIN Callback*/
+    /**
+     * MAIN HOOK entry, very important function.
+     * MAIN Callback.
+     */
     CGEventRef OpenKeyCallback(CGEventTapProxy proxy, CGEventType type, CGEventRef event, void *refcon) {
         //dont handle my event
         if (CGEventGetIntegerValueField(event, kCGEventSourceStateID) == CGEventSourceGetSourceStateID(myEventSource)) {
