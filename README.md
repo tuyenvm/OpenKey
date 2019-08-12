@@ -29,11 +29,11 @@ Bộ gõ tiếng Việt mới cho macOS, sử dụng kỹ thuật backkey. Loạ
 - Spelling check (On/Off) - Kiểm tra chính tả.
 - Restore key if invalid word (on/off) - Phục hồi phím với từ sai.
 - Run on startup (On/Off) - Chạy cùng macOS.
-- Macro - Tính năng gõ tắt vô cùng tiện lợi.
 - Gray menu bar icon (On/Off) - Biểu tượng xám trên thanh menu phù hợp với chế độ Dark mode.
 - Switch input mode by shortcut key. - Đổi chế độ gõ bằng phím tắt tùy chọn.
 - Autocorrect fixed (On/Off) - Sửa lỗi autocorrect trên trình duyệt như Chrome, Safari, Firefox, Microsoft Excel.
 - Underline issue fixed on macOS - Sửa lỗi gạch chân trên macOS.
+- Macro - Tính năng gõ tắt vô cùng tiện lợi. Gõ tắt của macOS chỉ hỗ trợ 20 ký tự, còn OpenKey không giới hạn ký tự.
 - **Chế độ “Gửi từng phím”:** OpenKey bản mới >1.1 mặc định dùng kỹ thuật mới gửi dữ liệu 1 lần thay vì gửi nhiều lần cho chuỗi ký tự, nên nếu có ứng dụng nào không tương thích, hãy bật tính năng này lên, mặc định thì nên tắt vì kỹ thuật mới sẽ chạy nhanh hơn.
 - ...
 
