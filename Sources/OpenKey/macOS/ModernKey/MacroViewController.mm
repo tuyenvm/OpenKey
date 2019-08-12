@@ -65,6 +65,8 @@
     string text = [[self.macroName stringValue] UTF8String];
     string content = [[self.macroContent stringValue] UTF8String];
     if (addMacro(text, content)) {
+        self.macroName.stringValue = @"";
+        self.macroContent.stringValue = @"";
         [self saveAndReload];
     } else {
         [self showMessage:@"Bạn đã thêm từ này rồi!"];

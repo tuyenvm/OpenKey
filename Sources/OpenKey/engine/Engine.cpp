@@ -950,7 +950,7 @@ void handleMainKey(const Uint16& data, const bool& isCaps) {
     //check Vowel
     if (vInputType == vVNI) {
         for (i = _index-1; i >= 0; i--) {
-            if (CHR(i) == KEY_O || CHR(i) == KEY_U || CHR(i) == KEY_A || CHR(i) == KEY_E) {
+            if (CHR(i) == KEY_O || CHR(i) == KEY_A || CHR(i) == KEY_E) {
                 VEI = i;
                 break;
             }
@@ -972,7 +972,17 @@ void handleMainKey(const Uint16& data, const bool& isCaps) {
             isChanged = true;
             if (IS_KEY_DOUBLE(data)) {
                 insertAOE(keyForAEO, isCaps);
-            } else if (IS_KEY_W(data) && !(vInputType == vVNI && ((data == KEY_8 && CHR(VEI) != KEY_A) || (data == KEY_7 && CHR(VEI) != KEY_U && CHR(VEI) != KEY_O)))) {
+            } else if (IS_KEY_W(data)) {
+                if (vInputType == vVNI) {
+                    for (j = _index-1; j >= 0; j--) {
+                        if (CHR(j) == KEY_O || CHR(j) == KEY_U ||CHR(j) == KEY_A || CHR(j) == KEY_E) {
+                            VEI = j;
+                            break;
+                        }
+                    }
+                    if ((data == KEY_7 && CHR(VEI) == KEY_A) || (data == KEY_8 && (CHR(VEI) == KEY_O || CHR(VEI) == KEY_U)))
+                        break;
+                }
                 insertW(keyForAEO, isCaps);
             }
             break;

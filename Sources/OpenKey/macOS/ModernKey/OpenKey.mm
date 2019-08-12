@@ -21,7 +21,7 @@
 extern ViewController* viewController;
 
 extern AppDelegate* appDelegate;
-
+extern int vSendKeyStepByStep;
 extern "C" {
     //app which must sent special empty character
     NSArray* _niceSpaceApp = @[@"com.sublimetext.3",
@@ -39,10 +39,15 @@ extern "C" {
     CGEventRef _newEventDown;
     CGKeyCode _keycode;
     CGEventFlags _flag, _lastFlag = 0, _privateFlag;
+    CGEventTapProxy _proxy;
+    
+    Uint16 _newCharString[MAX_BUFF * 2];
+    Uint16 _newCharSize;
     
     Uint16 _syncKey[MAX_BUFF];
-    Uint8 _syncIndex = 0, _i = 0;
+    Uint8 _syncIndex = 0;
     Uint16 _uniChar[2];
+    int _i, _j;
     
     string macroText, macroContent;
     
@@ -77,7 +82,7 @@ extern "C" {
     void SendPureCharacter(const Uint16& ch) {
         _newEventDown = CGEventCreateKeyboardEvent(myEventSource, 0, true);
         CGEventKeyboardSetUnicodeString(_newEventDown, 1, &ch);
-        CGEventPost(kCGHIDEventTap, _newEventDown);
+        CGEventTapPostEvent(_proxy, _newEventDown);
         CFRelease(_newEventDown);
     }
     
@@ -95,27 +100,29 @@ extern "C" {
             } else {
                 _privateFlag &= ~kCGEventFlagMaskShift;
             }
+            _privateFlag |= kCGEventFlagMaskNonCoalesced;
+            
             CGEventSetFlags(_newEventDown, _privateFlag);
-            CGEventPost(kCGSessionEventTap, _newEventDown);
+            CGEventTapPostEvent(_proxy, _newEventDown);
         } else {
             if (vCodeTable == 0) { //unicode 2 bytes code
                 _newEventDown = CGEventCreateKeyboardEvent(myEventSource, 0, true);
                 CGEventKeyboardSetUnicodeString(_newEventDown, 1, &_newChar);
-                CGEventPost(kCGHIDEventTap, _newEventDown);
+                CGEventTapPostEvent(_proxy, _newEventDown);
             } else if (vCodeTable == 1 || vCodeTable == 2 || vCodeTable == 4) { //others such as VNI Windows, TCVN3: 1 byte code
                 _newCharHi = HIBYTE(_newChar);
                 _newChar = LOBYTE(_newChar);
                 
                 _newEventDown = CGEventCreateKeyboardEvent(myEventSource, 0, true);
                 CGEventKeyboardSetUnicodeString(_newEventDown, 1, &_newChar);
-                CGEventPost(kCGHIDEventTap, _newEventDown);
+                CGEventTapPostEvent(_proxy, _newEventDown);
                 
                 if (_newCharHi > 32) {
                     if (vCodeTable == 2) //VNI
                         InsertKeyLength(2);
                     _newEventDown = CGEventCreateKeyboardEvent(myEventSource, 0, true);
                     CGEventKeyboardSetUnicodeString(_newEventDown, 1, &_newCharHi);
-                    CGEventPost(kCGHIDEventTap, _newEventDown);
+                    CGEventTapPostEvent(_proxy, _newEventDown);
                 } else {
                     if (vCodeTable == 2) //VNI
                         InsertKeyLength(1);
@@ -128,7 +135,7 @@ extern "C" {
                 InsertKeyLength(_newCharHi > 0 ? 2 : 1);
                 _newEventDown = CGEventCreateKeyboardEvent(myEventSource, 0, true);
                 CGEventKeyboardSetUnicodeString(_newEventDown, (_newCharHi > 0 ? 2 : 1), _uniChar);
-                CGEventPost(kCGHIDEventTap, _newEventDown);
+                CGEventTapPostEvent(_proxy, _newEventDown);
             }
         }
         CFRelease(_newEventDown);
@@ -145,7 +152,7 @@ extern "C" {
         
         _newEventDown = CGEventCreateKeyboardEvent(myEventSource, 0, true);
         CGEventKeyboardSetUnicodeString(_newEventDown, 1, &_newChar);
-        CGEventPost(kCGHIDEventTap, _newEventDown);
+        CGEventTapPostEvent(_proxy, _newEventDown);
         CFRelease(_newEventDown);
     }
     
@@ -153,26 +160,82 @@ extern "C" {
         CGEventRef eventVkeyDown = CGEventCreateKeyboardEvent (myEventSource, vKey, true);
         CGEventRef eventVkeyUp = CGEventCreateKeyboardEvent (myEventSource, vKey, false);
         
-        CGEventPost(kCGSessionEventTap, eventVkeyDown);
-        CGEventPost(kCGSessionEventTap, eventVkeyUp);
+        CGEventTapPostEvent(_proxy, eventVkeyDown);
+        CGEventTapPostEvent(_proxy, eventVkeyUp);
         
         CFRelease(eventVkeyDown);
         CFRelease(eventVkeyUp);
     }
 
     void SendBackspace() {
-        CGEventPost(kCGSessionEventTap, eventBackSpaceDown);
-        CGEventPost(kCGSessionEventTap, eventBackSpaceUp);
+        CGEventTapPostEvent(_proxy, eventBackSpaceDown);
+        CGEventTapPostEvent(_proxy, eventBackSpaceUp);
         
         if (IS_DOUBLE_CODE(vCodeTable)) { //VNI or Unicode Compound
             _syncIndex--;
             if (_syncKey[_syncIndex] > 1) {
                 if (!(vCodeTable == 3 && [_unicodeCompoundApp containsObject:FRONT_APP])) {
-                    CGEventPost(kCGSessionEventTap, eventBackSpaceDown);
-                    CGEventPost(kCGSessionEventTap, eventBackSpaceUp);
+                    CGEventTapPostEvent(_proxy, eventBackSpaceDown);
+                    CGEventTapPostEvent(_proxy, eventBackSpaceUp);
                 }
             }
         }
+    }
+    
+    void SendNewCharString() {
+        int j = 0;
+        _newCharSize = pData->newCharCount;
+        if (pData->newCharCount > 0 && pData->newCharCount <= MAX_BUFF) {
+            for (int i = pData->newCharCount - 1; i >= 0; i--) {
+                if (pData->charData[i] < 128) {
+                    if (IS_DOUBLE_CODE(vCodeTable)) //VNI
+                        InsertKeyLength(1);
+                    _newCharString[j++] = keyCodeToCharacter(pData->charData[i]);
+                } else {
+                    if (vCodeTable == 0) {  //unicode 2 bytes code
+                        _newCharString[j++] = pData->charData[i];
+                    } else if (vCodeTable == 1 || vCodeTable == 2 || vCodeTable == 4) { //others such as VNI Windows, TCVN3: 1 byte code
+                        _newChar = pData->charData[i];
+                        _newCharHi = HIBYTE(_newChar);
+                        _newChar = LOBYTE(_newChar);
+                        _newCharString[j++] = _newChar;
+                        
+                        if (_newCharHi > 32) {
+                            if (vCodeTable == 2) //VNI
+                                InsertKeyLength(2);
+                            _newCharString[j++] = _newCharHi;
+                            _newCharSize++;
+                        } else {
+                            if (vCodeTable == 2) //VNI
+                                InsertKeyLength(1);
+                        }
+                        //_j++;
+                    } else if (vCodeTable == 3) { //Unicode Compound
+                        _newChar = pData->charData[i];
+                        _newCharHi = (_newChar >> 13);
+                        _newChar &= 0x1FFF;
+                        
+                        InsertKeyLength(_newCharHi > 0 ? 2 : 1);
+                        _newCharString[j++] = _newChar;
+                        if (_newCharHi > 0) {
+                            _newCharSize++;
+                            _newCharString[j++] = _unicodeCompoundMark[_newCharHi - 1];
+                        }
+                        
+                    }
+                }
+            }
+        }
+        
+        if (pData->code == 3) { //if is restore
+            _newCharSize++;
+            _newCharString[j++] = keyCodeToCharacter(_keycode | ((_flag & kCGEventFlagMaskAlphaShift) || (_flag & kCGEventFlagMaskShift) ? CAPS_MASK : 0));
+        }
+        
+        _newEventDown = CGEventCreateKeyboardEvent(myEventSource, 0, true);
+        CGEventKeyboardSetUnicodeString(_newEventDown, _newCharSize, _newCharString);
+        CGEventTapPostEvent(_proxy, _newEventDown);
+        CFRelease(_newEventDown);
     }
             
     bool handleSwitchKey(bool checkKeyCode=true) {
@@ -239,8 +302,9 @@ extern "C" {
             if (GET_SWITCH_KEY(vSwitchKeyStatus) != _keycode) {
                 _lastFlag = 0;
             } else {
-                if (handleSwitchKey(GET_SWITCH_KEY(vSwitchKeyStatus) != 0xFE))
+                if (handleSwitchKey(GET_SWITCH_KEY(vSwitchKeyStatus) != 0xFE)){
                     return NULL;
+                }
             }
         } else if (type == kCGEventFlagsChanged) {
             if (_lastFlag == 0 || _lastFlag < _flag) {
@@ -260,6 +324,8 @@ extern "C" {
             (type != kCGEventLeftMouseDown) && (type != kCGEventRightMouseDown) &&
             (type != kCGEventLeftMouseDragged) && (type != kCGEventRightMouseDragged))
             return event;
+        
+        _proxy = proxy;
         
         //If is in english mode
         if (vLanguage == 0) {
@@ -318,19 +384,23 @@ extern "C" {
                 
                 //send backspace
                 if (pData->backspaceCount > 0 && pData->backspaceCount < MAX_BUFF) {
-                    for (int i = 0; i < pData->backspaceCount; i++) {
+                    for (_i = 0; _i < pData->backspaceCount; _i++) {
                         SendBackspace();
                     }
                 }
                 
                 //send new character
-                if (pData->newCharCount > 0 && pData->newCharCount <= MAX_BUFF) {
-                    for (int i = pData->newCharCount - 1; i >= 0; i--) {
-                        SendKeyCode(pData->charData[i]);
+                if (!vSendKeyStepByStep) {
+                    SendNewCharString();
+                } else {
+                    if (pData->newCharCount > 0 && pData->newCharCount <= MAX_BUFF) {
+                        for (int i = pData->newCharCount - 1; i >= 0; i--) {
+                            SendKeyCode(pData->charData[i]);
+                        }
                     }
-                }
-                if (pData->code == 3) {
-                    SendKeyCode(_keycode | ((_flag & kCGEventFlagMaskAlphaShift) || (_flag & kCGEventFlagMaskShift) ? CAPS_MASK : 0));
+                    if (pData->code == 3) {
+                        SendKeyCode(_keycode | ((_flag & kCGEventFlagMaskAlphaShift) || (_flag & kCGEventFlagMaskShift) ? CAPS_MASK : 0));
+                    }
                 }
             } else if (pData->code == 4) { //MACRO
                 handleMacro();

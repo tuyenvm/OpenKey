@@ -78,6 +78,7 @@ map<Uint16, vector<vector<Uint16>>> _vowel = {
             {KEY_U, KEY_C},
             {KEY_U, KEY_A},
             {KEY_U, KEY_I},
+            {KEY_U, KEY_T},
             {KEY_U},
             
             {KEY_A, KEY_P},
@@ -477,3 +478,73 @@ map<Uint32, vector<Uint16>> _quickTelex = {
     {KEY_T, {KEY_T, KEY_H}},
     {KEY_U, {KEY_U, KEY_U}},
 };
+
+map<Uint32, Uint32> _characterMap = {
+    {'a', KEY_A}, {'A', KEY_A|CAPS_MASK},
+    {'b', KEY_B}, {'B', KEY_B|CAPS_MASK},
+    {'c', KEY_C}, {'C', KEY_C|CAPS_MASK},
+    {'d', KEY_D}, {'D', KEY_D|CAPS_MASK},
+    {'e', KEY_E}, {'E', KEY_E|CAPS_MASK},
+    {'f', KEY_F}, {'F', KEY_F|CAPS_MASK},
+    {'g', KEY_G}, {'G', KEY_G|CAPS_MASK},
+    {'h', KEY_H}, {'H', KEY_H|CAPS_MASK},
+    {'i', KEY_I}, {'I', KEY_I|CAPS_MASK},
+    {'j', KEY_J}, {'J', KEY_J|CAPS_MASK},
+    {'k', KEY_K}, {'K', KEY_K|CAPS_MASK},
+    {'l', KEY_L}, {'L', KEY_L|CAPS_MASK},
+    {'m', KEY_M}, {'M', KEY_M|CAPS_MASK},
+    {'n', KEY_N}, {'N', KEY_N|CAPS_MASK},
+    {'o', KEY_O}, {'O', KEY_O|CAPS_MASK},
+    {'p', KEY_P}, {'P', KEY_P|CAPS_MASK},
+    {'q', KEY_Q}, {'Q', KEY_Q|CAPS_MASK},
+    {'r', KEY_R}, {'R', KEY_R|CAPS_MASK},
+    {'s', KEY_S}, {'S', KEY_S|CAPS_MASK},
+    {'t', KEY_T}, {'T', KEY_T|CAPS_MASK},
+    {'u', KEY_U}, {'U', KEY_U|CAPS_MASK},
+    {'v', KEY_V}, {'V', KEY_V|CAPS_MASK},
+    {'w', KEY_W}, {'W', KEY_W|CAPS_MASK},
+    {'x', KEY_X}, {'X', KEY_X|CAPS_MASK},
+    {'y', KEY_Y}, {'Y', KEY_Y|CAPS_MASK},
+    {'z', KEY_Z}, {'Z', KEY_Z|CAPS_MASK},
+    {'1', KEY_1}, {'!', KEY_1|CAPS_MASK},
+    {'2', KEY_2}, {'@', KEY_2|CAPS_MASK},
+    {'3', KEY_3}, {'#', KEY_3|CAPS_MASK},
+    {'4', KEY_4}, {'$', KEY_4|CAPS_MASK},
+    {'5', KEY_5}, {'%', KEY_5|CAPS_MASK},
+    {'6', KEY_6}, {'^', KEY_6|CAPS_MASK},
+    {'7', KEY_7}, {'&', KEY_7|CAPS_MASK},
+    {'8', KEY_8}, {'*', KEY_8|CAPS_MASK},
+    {'9', KEY_9}, {'(', KEY_9|CAPS_MASK},
+    {'0', KEY_0}, {')', KEY_0|CAPS_MASK},
+    {'`', 50}, {'~', 50|CAPS_MASK},
+    {'-', 27}, {'_', 27|CAPS_MASK},
+    {'=', 24}, {'+', 24|CAPS_MASK},
+    {'[', KEY_LEFT_BRACKET}, {'{', KEY_LEFT_BRACKET|CAPS_MASK},
+    {']', KEY_RIGHT_BRACKET}, {'}', KEY_RIGHT_BRACKET|CAPS_MASK},
+    {'\\', 42}, {'|', 42|CAPS_MASK},
+    {';', 41}, {':', 41|CAPS_MASK},
+    {'\'', 39}, {'"', 39|CAPS_MASK},
+    {',', 43}, {'<', 43|CAPS_MASK},
+    {'.', 47}, {'>', 47|CAPS_MASK},
+    {'/', 44}, {'?', 44|CAPS_MASK},
+    {' ', KEY_SPACE}
+};
+
+map<Uint32, Uint32> _keyCodeToChar;
+
+void initKeyCodeToChar() {
+    _keyCodeToChar.clear();
+    for (std::map<Uint32, Uint32>::iterator it = _characterMap.begin(); it != _characterMap.end(); ++it) {
+        _keyCodeToChar[it->second] = it->first;
+    }
+}
+
+Uint16 keyCodeToCharacter(const Uint32& keyCode) {
+    if (_keyCodeToChar.size() == 0) { //init data if it is empty
+        initKeyCodeToChar();
+    }
+    if (_keyCodeToChar.find(keyCode) != _keyCodeToChar.end()) {
+        return _keyCodeToChar[keyCode];
+    }
+    return 0;
+}

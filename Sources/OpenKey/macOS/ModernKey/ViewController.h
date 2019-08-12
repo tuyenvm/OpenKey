@@ -36,6 +36,8 @@
 @property (weak) IBOutlet NSButton *UseMacro;
 @property (weak) IBOutlet NSButton *UseMacroInEnglishMode;
 
+@property (weak) IBOutlet NSButton *SendKeyStepByStep;
+
 @property (weak) IBOutlet NSImageView *cursorImage;
 
 -(void)fillData;

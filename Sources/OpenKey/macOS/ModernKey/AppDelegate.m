@@ -29,6 +29,7 @@ int vRestoreIfWrongSpelling = 0;
 int vFixRecommendBrowser = 1;
 int vUseMacro = 1;
 int vUseMacroInEnglishMode = 1;
+int vSendKeyStepByStep = 0;
 
 @interface AppDelegate ()
 
@@ -83,6 +84,7 @@ int vUseMacroInEnglishMode = 1;
     vFixRecommendBrowser = (int)[[NSUserDefaults standardUserDefaults] integerForKey:@"FixRecommendBrowser"];
     vUseMacro = (int)[[NSUserDefaults standardUserDefaults] integerForKey:@"UseMacro"];
     vUseMacroInEnglishMode = (int)[[NSUserDefaults standardUserDefaults] integerForKey:@"UseMacroInEnglishMode"];
+    vSendKeyStepByStep = (int)[[NSUserDefaults standardUserDefaults] integerForKey:@"SendKeyStepByStep"];
     
     //init
     dispatch_async(dispatch_get_main_queue(), ^{
@@ -166,6 +168,8 @@ int vUseMacroInEnglishMode = 1;
     vFixRecommendBrowser = 1; [[NSUserDefaults standardUserDefaults] setInteger:vFixRecommendBrowser forKey:@"FixRecommendBrowser"];
     vUseMacro = 1; [[NSUserDefaults standardUserDefaults] setInteger:vUseMacro forKey:@"UseMacro"];
     vUseMacroInEnglishMode = 0; [[NSUserDefaults standardUserDefaults] setInteger:vUseMacroInEnglishMode forKey:@"UseMacroInEnglishMode"];
+    vSendKeyStepByStep = 0;[[NSUserDefaults standardUserDefaults] setInteger:vUseMacroInEnglishMode forKey:@"SendKeyStepByStep"];
+    
     [self fillData];
     [viewController fillData];
 }

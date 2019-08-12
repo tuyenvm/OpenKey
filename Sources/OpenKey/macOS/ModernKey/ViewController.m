@@ -23,6 +23,7 @@ extern int vRestoreIfWrongSpelling;
 extern int vFixRecommendBrowser;
 extern int vUseMacro;
 extern int vUseMacroInEnglishMode;
+extern int vSendKeyStepByStep;
 
 @implementation ViewController {
     __weak IBOutlet NSButton *CustomSwitchCommand;
@@ -35,7 +36,6 @@ extern int vUseMacroInEnglishMode;
 
 - (void)viewDidLoad {
     [super viewDidLoad];
-
     viewController = self;
     CustomSwitchKey.Parent = self;
     
@@ -120,6 +120,7 @@ extern int vUseMacroInEnglishMode;
 - (IBAction)onCheckSpelling:(NSButton *)sender {
     NSInteger val = [self setCustomValue:sender keyToSet:@"Spelling"];
     vCheckSpelling = (int)val;
+    [self.RestoreIfInvalidWord setEnabled:val];
 }
 
 - (IBAction)onShowUIOnStartup:(NSButton *)sender {
@@ -194,6 +195,11 @@ extern int vUseMacroInEnglishMode;
     [[NSUserDefaults standardUserDefaults] setInteger:vSwitchKeyStatus forKey:@"SwitchKeyStatus"];
 }
 
+- (IBAction)onSendKeyStepByStep:(id)sender {
+    NSInteger val = [self setCustomValue:sender keyToSet:@"SendKeyStepByStep"];
+    vSendKeyStepByStep = (int)val;
+}
+
 - (NSInteger)setCustomValue:(NSButton*)sender keyToSet:(NSString*) key {
     NSInteger val = 0;
     if (sender.state == NSControlStateValueOn) {
@@ -262,6 +268,7 @@ extern int vUseMacroInEnglishMode;
     
     NSInteger restoreIfInvalidWord = [[NSUserDefaults standardUserDefaults] integerForKey:@"RestoreIfInvalidWord"];
     self.RestoreIfInvalidWord.state = restoreIfInvalidWord ? NSControlStateValueOn : NSControlStateValueOff;
+    [self.RestoreIfInvalidWord setEnabled:spelling];
     
     NSInteger fixRecommendBrowser = [[NSUserDefaults standardUserDefaults] integerForKey:@"FixRecommendBrowser"];
     self.FixRecommendBrowser.state = fixRecommendBrowser ? NSControlStateValueOn : NSControlStateValueOff;
@@ -271,6 +278,9 @@ extern int vUseMacroInEnglishMode;
     
     NSInteger useMacroInEnglish = [[NSUserDefaults standardUserDefaults] integerForKey:@"UseMacroInEnglishMode"];
     self.UseMacroInEnglishMode.state = useMacroInEnglish ? NSControlStateValueOn : NSControlStateValueOff;
+    
+    NSInteger sendKeySbS = [[NSUserDefaults standardUserDefaults] integerForKey:@"SendKeyStepByStep"];
+    self.SendKeyStepByStep.state = sendKeySbS ? NSControlStateValueOn : NSControlStateValueOff;
     
     CustomSwitchControl.state = (vSwitchKeyStatus & 0x100) ? NSControlStateValueOn : NSControlStateValueOff;
     CustomSwitchOption.state = (vSwitchKeyStatus & 0x200) ? NSControlStateValueOn : NSControlStateValueOff;
