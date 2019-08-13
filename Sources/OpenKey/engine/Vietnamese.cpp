@@ -185,6 +185,7 @@ vector<vector<Uint16>> _consonantD = {
     {KEY_D, KEY_U, KEY_M},
     {KEY_D, KEY_U, KEY_C},
     {KEY_D, KEY_U, KEY_O},
+    {KEY_D, KEY_U, KEY_A},
     {KEY_D, KEY_U, KEY_O, KEY_C},
     {KEY_D, KEY_U, KEY_O, KEY_N},
     {KEY_D, KEY_U, KEY_O, KEY_N, KEY_G},

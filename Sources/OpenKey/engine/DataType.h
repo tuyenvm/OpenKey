@@ -48,7 +48,8 @@ enum HoolCodeState {
     vWillProcess, //will reverse
     vBreakWord, //start new
     vRestore, //restore character to old char
-    vReplaceMaro //replace by macro
+    vReplaceMaro, //replace by macro
+    vRestoreAndStartNewSession, //special flag: use for restore key if invalid word with break character (, . ")
 };
 
 //bytes data for main program

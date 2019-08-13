@@ -45,6 +45,7 @@ extern "C" {
     Uint16 _newCharString[MAX_UNICODE_STRING];
     Uint16 _newCharSize;
     bool _willContinuteSending = false;
+    bool _willSendControlKey = false;
     
     Uint16 _syncKey[MAX_BUFF];
     Uint8 _syncIndex = 0;
@@ -210,6 +211,7 @@ extern "C" {
         _j = 0;
         _newCharSize = dataFromMacro ? pData->macroData.size() : pData->newCharCount;
         _willContinuteSending = false;
+        _willSendControlKey = false;
         
         if (_newCharSize > 0) {
             for (_k = dataFromMacro ? offset : pData->newCharCount - 1;
@@ -263,9 +265,16 @@ extern "C" {
             }//end for
         }
         
-        if (!_willContinuteSending && pData->code == 3) { //if is restore
-            _newCharSize++;
-            _newCharString[_j++] = keyCodeToCharacter(_keycode | ((_flag & kCGEventFlagMaskAlphaShift) || (_flag & kCGEventFlagMaskShift) ? CAPS_MASK : 0));
+        if (!_willContinuteSending && (pData->code == vRestore || pData->code == vRestoreAndStartNewSession)) { //if is restore
+            if (keyCodeToCharacter(_keycode) != 0) {
+                _newCharSize++;
+                _newCharString[_j++] = keyCodeToCharacter(_keycode | ((_flag & kCGEventFlagMaskAlphaShift) || (_flag & kCGEventFlagMaskShift) ? CAPS_MASK : 0));
+            } else {
+                _willSendControlKey = true;
+            }
+        }
+        if (pData->code == vRestoreAndStartNewSession) {
+            startNewSession();
         }
         
         _newEventDown = CGEventCreateKeyboardEvent(myEventSource, 0, true);
@@ -275,6 +284,11 @@ extern "C" {
 
         if (_willContinuteSending) {
             SendNewCharString(dataFromMacro, _k);
+        }
+        
+        //the case when hCode is vRestore or vRestoreAndStartNewSession, the word is invalid and last key is control key such as TAB, LEFT ARROW, RIGHT ARROW,...
+        if (_willSendControlKey) {
+            SendKeyCode(_keycode);
         }
     }
             
@@ -427,7 +441,7 @@ extern "C" {
                             _flag & kCGEventFlagMaskShift ? 1 : (_flag & kCGEventFlagMaskAlphaShift ? 2 : 0),
                             OTHER_CONTROL_KEY);
 
-            if (pData->code == 0) { //do nothing
+            if (pData->code == vDoNothing) { //do nothing
                 if (IS_DOUBLE_CODE(vCodeTable)) { //VNI
                     if (pData->extCode == 1) {
                         _syncIndex = 0;
@@ -438,7 +452,7 @@ extern "C" {
                     }
                 }
                 return event;
-            } else if (pData->code == 1 || pData->code == 3) { //handle result signal
+            } else if (pData->code == vWillProcess || pData->code == vRestore || pData->code == vRestoreAndStartNewSession) { //handle result signal
                 
                 //fix autocomplete
                 if (vFixRecommendBrowser) {
@@ -462,11 +476,14 @@ extern "C" {
                             SendKeyCode(pData->charData[i]);
                         }
                     }
-                    if (pData->code == 3) {
+                    if (pData->code == vRestore || pData->code == vRestoreAndStartNewSession) {
                         SendKeyCode(_keycode | ((_flag & kCGEventFlagMaskAlphaShift) || (_flag & kCGEventFlagMaskShift) ? CAPS_MASK : 0));
                     }
+                    if (pData->code == vRestoreAndStartNewSession) {
+                        startNewSession();
+                    }
                 }
-            } else if (pData->code == 4) { //MACRO
+            } else if (pData->code == vReplaceMaro) { //MACRO
                 handleMacro();
             }
             

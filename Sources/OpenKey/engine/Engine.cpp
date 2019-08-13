@@ -980,7 +980,7 @@ void handleMainKey(const Uint16& data, const bool& isCaps) {
                             break;
                         }
                     }
-                    if ((data == KEY_7 && CHR(VEI) == KEY_A) || (data == KEY_8 && (CHR(VEI) == KEY_O || CHR(VEI) == KEY_U)))
+                    if ((data == KEY_7 && CHR(VEI) == KEY_A && (VEI-1>=0 ? CHR(VEI-1) != KEY_U : true)) || (data == KEY_8 && (CHR(VEI) == KEY_O || CHR(VEI) == KEY_U)))
                         break;
                 }
                 insertW(keyForAEO, isCaps);
@@ -1007,12 +1007,12 @@ void handleQuickTelex(const Uint16& data, const bool& isCaps) {
     insertKey(_quickTelex[data][1], isCaps, false);
 }
 
-bool checkRestoreIfWrongSpelling() {
+bool checkRestoreIfWrongSpelling(const int& handleCode) {
     for (ii = 0; ii < _index; ii++) {
         if (!IS_CONSONANT(CHR(ii)) &&
             (TypingWord[ii] & MARK_MASK || TypingWord[ii] & TONE_MASK || TypingWord[ii] & TONEW_MASK)) {
             
-            hCode = vRestore;
+            hCode = handleCode;
             hBPC = _index;
             hNCC = _stateIndex;
             for (i = 0; i < _stateIndex; i++) {
@@ -1064,7 +1064,19 @@ void vKeyHandleEvent(const vKeyEvent& event,
         hBPC = 0;
         hNCC = 0;
         hExt = 1; //word break
-        startNewSession();
+        
+        //restore key if wrong spelling with break-key
+        if (vRestoreIfWrongSpelling && isWordBreak(event, state, data)) {
+            if (!tempDisableKey && vCheckSpelling) {
+                checkSpelling(true); //force check spelling
+            }
+            if (tempDisableKey && !checkRestoreIfWrongSpelling(vRestoreAndStartNewSession)) {
+                hCode = vDoNothing;
+            }
+        }
+        
+        if (hCode == vDoNothing)
+            startNewSession();
         
         //insert key for macro function
         if (vUseMacro) {
@@ -1074,6 +1086,7 @@ void vKeyHandleEvent(const vKeyEvent& event,
                 hMacroKey.clear();
             }
         }
+        
     } else if (data == KEY_SPACE) {
         if (!tempDisableKey && vCheckSpelling) {
             checkSpelling(true); //force check spelling
@@ -1084,7 +1097,7 @@ void vKeyHandleEvent(const vKeyEvent& event,
             _spaceCount++;
             _hasHandledMacro = true;
         } else if (vRestoreIfWrongSpelling && tempDisableKey && !_hasHandledMacro) { //restore key if wrong spelling
-            if (!checkRestoreIfWrongSpelling()) {
+            if (!checkRestoreIfWrongSpelling(vRestore)) {
                 hCode = vDoNothing;
             }
             _spaceCount++;
