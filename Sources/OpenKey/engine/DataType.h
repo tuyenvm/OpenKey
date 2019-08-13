@@ -37,6 +37,7 @@ enum vKeyInputType {
 };
 
 typedef unsigned char Byte;
+typedef signed char Int8;
 typedef unsigned char Uint8;
 typedef unsigned short Uint16;
 typedef unsigned int Uint32;

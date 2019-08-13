@@ -24,6 +24,7 @@ extern int vFixRecommendBrowser;
 extern int vUseMacro;
 extern int vUseMacroInEnglishMode;
 extern int vSendKeyStepByStep;
+extern int vUseSmartSwitchKey;
 
 @implementation ViewController {
     __weak IBOutlet NSButton *CustomSwitchCommand;
@@ -227,6 +228,12 @@ extern int vSendKeyStepByStep;
     vUseMacroInEnglishMode = (int)val;
 }
 
+- (IBAction)onAutoRememberSwitchKey:(NSButton *)sender {
+    NSInteger val = [self setCustomValue:sender keyToSet:@"UseSmartSwitchKey"];
+    vUseSmartSwitchKey = (int)val;
+}
+
+
 - (IBAction)onTerminateApp:(id)sender {
     [NSApp terminate:0];
 }
@@ -282,6 +289,9 @@ extern int vSendKeyStepByStep;
     
     NSInteger sendKeySbS = [[NSUserDefaults standardUserDefaults] integerForKey:@"SendKeyStepByStep"];
     self.SendKeyStepByStep.state = sendKeySbS ? NSControlStateValueOn : NSControlStateValueOff;
+    
+    NSInteger useSmartSwitchKey = [[NSUserDefaults standardUserDefaults] integerForKey:@"UseSmartSwitchKey"];
+    self.AutoRememberSwitchKey.state = useSmartSwitchKey ? NSControlStateValueOn : NSControlStateValueOff;
     
     CustomSwitchControl.state = (vSwitchKeyStatus & 0x100) ? NSControlStateValueOn : NSControlStateValueOff;
     CustomSwitchOption.state = (vSwitchKeyStatus & 0x200) ? NSControlStateValueOn : NSControlStateValueOff;

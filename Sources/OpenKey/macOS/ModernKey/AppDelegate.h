@@ -11,9 +11,10 @@
 
 @interface AppDelegate : NSObject <NSApplicationDelegate>
 
+-(void)onImputMethodChanged:(BOOL)willNotify;
 -(void)onInputMethodSelected;
-- (void)onInputTypeSelectedIndex:(int)index;
-- (void)onCodeTableChanged:(int)index;
+-(void)onInputTypeSelectedIndex:(int)index;
+-(void)onCodeTableChanged:(int)index;
 
 -(void)setRunOnStartup:(BOOL)val;
 -(void)loadDefaultConfig;

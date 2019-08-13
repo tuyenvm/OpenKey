@@ -14,6 +14,7 @@
 AppDelegate* appDelegate;
 extern ViewController* viewController;
 extern void OnTableCodeChange(void);
+extern void OnInputMethodChanged(void);
 
 //see document in Engine.h
 int vLanguage = 1;
@@ -30,6 +31,7 @@ int vFixRecommendBrowser = 1;
 int vUseMacro = 1;
 int vUseMacroInEnglishMode = 1;
 int vSendKeyStepByStep = 0;
+int vUseSmartSwitchKey = 0;
 
 @interface AppDelegate ()
 
@@ -85,6 +87,7 @@ int vSendKeyStepByStep = 0;
     vUseMacro = (int)[[NSUserDefaults standardUserDefaults] integerForKey:@"UseMacro"];
     vUseMacroInEnglishMode = (int)[[NSUserDefaults standardUserDefaults] integerForKey:@"UseMacroInEnglishMode"];
     vSendKeyStepByStep = (int)[[NSUserDefaults standardUserDefaults] integerForKey:@"SendKeyStepByStep"];
+    vUseSmartSwitchKey = (int)[[NSUserDefaults standardUserDefaults] integerForKey:@"UseSmartSwitchKey"];
     
     //init
     dispatch_async(dispatch_get_main_queue(), ^{
@@ -169,6 +172,7 @@ int vSendKeyStepByStep = 0;
     vUseMacro = 1; [[NSUserDefaults standardUserDefaults] setInteger:vUseMacro forKey:@"UseMacro"];
     vUseMacroInEnglishMode = 0; [[NSUserDefaults standardUserDefaults] setInteger:vUseMacroInEnglishMode forKey:@"UseMacroInEnglishMode"];
     vSendKeyStepByStep = 0;[[NSUserDefaults standardUserDefaults] setInteger:vUseMacroInEnglishMode forKey:@"SendKeyStepByStep"];
+    vUseSmartSwitchKey = 0;[[NSUserDefaults standardUserDefaults] setInteger:vUseSmartSwitchKey forKey:@"UseSmartSwitchKey"];
     
     [self fillData];
     [viewController fillData];
@@ -269,9 +273,7 @@ int vSendKeyStepByStep = 0;
 
 }
 
-
-#pragma mark -StatusBar menu action
-- (void)onInputMethodSelected {
+-(void)onImputMethodChanged:(BOOL)willNotify {
     NSInteger intInputMethod = [[NSUserDefaults standardUserDefaults] integerForKey:@"InputMethod"];
     if (intInputMethod == 0)
         intInputMethod = 1;
@@ -283,6 +285,14 @@ int vSendKeyStepByStep = 0;
         NSBeep();
     [self fillData];
     [viewController fillData];
+    
+    if (willNotify)
+        OnInputMethodChanged();
+}
+
+#pragma mark -StatusBar menu action
+- (void)onInputMethodSelected {
+    [self onImputMethodChanged:YES];
 }
 
 - (void)onInputTypeSelected:(id)sender {

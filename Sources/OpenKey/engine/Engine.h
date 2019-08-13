@@ -11,6 +11,8 @@
 
 #include "DataType.h"
 #include "Vietnamese.h"
+#import "Macro.h"
+#import "SmartSwitchKey.h"
 
 #define IS_DEBUG 1
 #define LOBYTE(data) (data & 0xFF)
@@ -106,6 +108,13 @@ extern int vUseMacro;
  * Still use macro if you are in english mode
  */
 extern int vUseMacroInEnglishMode;
+
+/**
+ * auto switch language when switch app
+ * 0: No
+ * 1: Yes
+ */
+extern int vUseSmartSwitchKey;
 
 /**
  * Call this function first to receive data pointer

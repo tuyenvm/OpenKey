@@ -7,10 +7,7 @@
 //
 
 #import "MacroViewController.h"
-#include "Macro.h"
 #include "Engine.h"
-
-
 
 @interface MacroViewController ()
 
@@ -39,7 +36,7 @@
     [self.tableView reloadData];
     
     vector<Byte> macroData;
-    getSaveData(macroData);
+    getMacroSaveData(macroData);
     NSData* _data = [NSData dataWithBytes:macroData.data() length:macroData.size()];
     NSUserDefaults *prefs = [NSUserDefaults standardUserDefaults];
     [prefs setObject:_data forKey:@"macroData"];

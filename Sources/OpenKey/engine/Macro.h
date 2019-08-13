@@ -30,7 +30,7 @@ void initMacroMap(const Byte* pData, const int& size);
 /**
  * convert all macro data to save on disk
  */
-void getSaveData(vector<Byte>& outData);
+void getMacroSaveData(vector<Byte>& outData);
 
 /**
  * Use to find full text by macro

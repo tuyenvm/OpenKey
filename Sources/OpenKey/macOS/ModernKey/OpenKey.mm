@@ -8,9 +8,7 @@
 #import <Cocoa/Cocoa.h>
 #import <Foundation/Foundation.h>
 #import "Engine.h"
-#import "Macro.h"
 #import "AppDelegate.h"
-
 #import "ViewController.h"
 
 #define FRONT_APP [[NSWorkspace sharedWorkspace] frontmostApplication].bundleIdentifier
@@ -55,6 +53,8 @@ extern "C" {
     Uint32 _tempChar;
     
     string macroText, macroContent;
+    int _languageTemp = 0; //use for smart switch key
+    vector<Byte> savedSmartSwitchKeyData; ////use for smart switch key
     
     void OpenKeyInit() {
         memset(&_syncKey, 0, sizeof(_syncKey));
@@ -64,13 +64,32 @@ extern "C" {
         eventBackSpaceDown = CGEventCreateKeyboardEvent (myEventSource, 51, true);
         eventBackSpaceUp = CGEventCreateKeyboardEvent (myEventSource, 51, false);
         
+        //init and load macro data
         NSUserDefaults *prefs = [NSUserDefaults standardUserDefaults];
         NSData *data = [prefs objectForKey:@"macroData"];
         initMacroMap((Byte*)data.bytes, (int)data.length);
+        
+        //init and load smart switch key data
+        data = [prefs objectForKey:@"smartSwitchKey"];
+        initSmartSwitchKey((Byte*)data.bytes, (int)data.length);
+    }
+    
+    void saveSmartSwitchKeyData() {
+        getSmartSwitchKeySaveData(savedSmartSwitchKeyData);
+        NSData* _data = [NSData dataWithBytes:savedSmartSwitchKeyData.data() length:savedSmartSwitchKeyData.size()];
+        NSUserDefaults *prefs = [NSUserDefaults standardUserDefaults];
+        [prefs setObject:_data forKey:@"smartSwitchKey"];
     }
     
     void OnTableCodeChange() {
         onTableCodeChange();
+    }
+    
+    void OnInputMethodChanged() {
+        if (vUseSmartSwitchKey) {
+            setAppInputMethodStatus(string(FRONT_APP.UTF8String), vLanguage);
+            saveSmartSwitchKeyData();
+        }
     }
     
     void InsertKeyLength(const Uint8& len) {
@@ -278,7 +297,7 @@ extern "C" {
             vLanguage = 0;
         if (HAS_BEEP(vSwitchKeyStatus))
             NSBeep();
-        [appDelegate onInputMethodSelected];
+        [appDelegate onImputMethodChanged:YES];
 
         startNewSession();
         return true;
@@ -317,6 +336,7 @@ extern "C" {
      * MAIN Callback.
      */
     CGEventRef OpenKeyCallback(CGEventTapProxy proxy, CGEventType type, CGEventRef event, void *refcon) {
+        //NSLog(@"%@", FRONT_APP);
         //dont handle my event
         if (CGEventGetIntegerValueField(event, kCGEventSourceStateID) == CGEventSourceGetSourceStateID(myEventSource)) {
             return event;
@@ -343,7 +363,23 @@ extern "C" {
                     _lastFlag = 0;
                     return NULL;
                 }
+                
                 _lastFlag = 0;
+            }
+        }
+        
+        //smart switch key: update August 13th, 2019
+        if (vUseSmartSwitchKey &&
+            ((type == kCGEventKeyDown) || (type == kCGEventLeftMouseDown) || (type == kCGEventKeyUp && _keycode == KEY_TAB && _flag & kCGEventFlagMaskCommand))) {
+            _languageTemp = getAppInputMethodStatus(string(FRONT_APP.UTF8String), vLanguage);
+            if (_languageTemp != vLanguage) {
+                if (_languageTemp != -1) {
+                    vLanguage = _languageTemp;
+                    [appDelegate onImputMethodChanged:NO];
+                    startNewSession();
+                } else {
+                    saveSmartSwitchKeyData();
+                }
             }
         }
 

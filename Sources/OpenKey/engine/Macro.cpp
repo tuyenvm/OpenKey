@@ -108,7 +108,7 @@ void initMacroMap(const Byte* pData, const int& size) {
     }
 }
 
-void getSaveData(vector<Byte>& outData) {
+void getMacroSaveData(vector<Byte>& outData) {
     Uint16 totalMacro = macroMap.size();
     outData.push_back((Byte)totalMacro);
     outData.push_back((Byte)(totalMacro>>8));
