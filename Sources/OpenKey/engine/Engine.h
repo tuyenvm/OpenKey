@@ -117,6 +117,13 @@ extern int vUseMacroInEnglishMode;
 extern int vUseSmartSwitchKey;
 
 /**
+ * Auto write upper case character for first letter.
+ * 0: No
+ * 1: Yes
+ */
+extern int vUpperCaseFirstChar;
+
+/**
  * Call this function first to receive data pointer
  */
 void* vKeyInit();

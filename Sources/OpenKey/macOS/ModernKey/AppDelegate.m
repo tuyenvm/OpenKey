@@ -32,6 +32,7 @@ int vUseMacro = 1;
 int vUseMacroInEnglishMode = 1;
 int vSendKeyStepByStep = 0;
 int vUseSmartSwitchKey = 0;
+int vUpperCaseFirstChar = 0;
 
 @interface AppDelegate ()
 
@@ -88,6 +89,7 @@ int vUseSmartSwitchKey = 0;
     vUseMacroInEnglishMode = (int)[[NSUserDefaults standardUserDefaults] integerForKey:@"UseMacroInEnglishMode"];
     vSendKeyStepByStep = (int)[[NSUserDefaults standardUserDefaults] integerForKey:@"SendKeyStepByStep"];
     vUseSmartSwitchKey = (int)[[NSUserDefaults standardUserDefaults] integerForKey:@"UseSmartSwitchKey"];
+    vUpperCaseFirstChar = (int)[[NSUserDefaults standardUserDefaults] integerForKey:@"UpperCaseFirstChar"];
     
     //init
     dispatch_async(dispatch_get_main_queue(), ^{
@@ -173,6 +175,7 @@ int vUseSmartSwitchKey = 0;
     vUseMacroInEnglishMode = 0; [[NSUserDefaults standardUserDefaults] setInteger:vUseMacroInEnglishMode forKey:@"UseMacroInEnglishMode"];
     vSendKeyStepByStep = 0;[[NSUserDefaults standardUserDefaults] setInteger:vUseMacroInEnglishMode forKey:@"SendKeyStepByStep"];
     vUseSmartSwitchKey = 0;[[NSUserDefaults standardUserDefaults] setInteger:vUseSmartSwitchKey forKey:@"UseSmartSwitchKey"];
+    vUpperCaseFirstChar = 0;[[NSUserDefaults standardUserDefaults] setInteger:vUpperCaseFirstChar forKey:@"UpperCaseFirstChar"];
     
     [self fillData];
     [viewController fillData];

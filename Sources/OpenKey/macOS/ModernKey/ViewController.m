@@ -25,6 +25,7 @@ extern int vUseMacro;
 extern int vUseMacroInEnglishMode;
 extern int vSendKeyStepByStep;
 extern int vUseSmartSwitchKey;
+extern int vUpperCaseFirstChar;
 
 @implementation ViewController {
     __weak IBOutlet NSButton *CustomSwitchCommand;
@@ -233,6 +234,10 @@ extern int vUseSmartSwitchKey;
     vUseSmartSwitchKey = (int)val;
 }
 
+- (IBAction)onUpperCaseFirstChar:(NSButton *)sender {
+    NSInteger val = [self setCustomValue:sender keyToSet:@"UpperCaseFirstChar"];
+    vUpperCaseFirstChar = (int)val;
+}
 
 - (IBAction)onTerminateApp:(id)sender {
     [NSApp terminate:0];
@@ -292,6 +297,9 @@ extern int vUseSmartSwitchKey;
     
     NSInteger useSmartSwitchKey = [[NSUserDefaults standardUserDefaults] integerForKey:@"UseSmartSwitchKey"];
     self.AutoRememberSwitchKey.state = useSmartSwitchKey ? NSControlStateValueOn : NSControlStateValueOff;
+    
+    NSInteger upperCaseFirstChar = [[NSUserDefaults standardUserDefaults] integerForKey:@"UpperCaseFirstChar"];
+    self.UpperCaseFirstChar.state = upperCaseFirstChar ? NSControlStateValueOn : NSControlStateValueOff;
     
     CustomSwitchControl.state = (vSwitchKeyStatus & 0x100) ? NSControlStateValueOn : NSControlStateValueOff;
     CustomSwitchOption.state = (vSwitchKeyStatus & 0x200) ? NSControlStateValueOn : NSControlStateValueOff;

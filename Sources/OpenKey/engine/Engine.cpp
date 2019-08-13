@@ -13,7 +13,7 @@
 
 static vector<Uint8> _charKeyCode = {
     50, KEY_1, KEY_2, KEY_3, KEY_4, KEY_5, KEY_6, KEY_7, KEY_8, KEY_9, KEY_0, 25, 29, 27, 24, KEY_LEFT_BRACKET, KEY_RIGHT_BRACKET, 42,
-    41, 39, 43, 47, 44
+    41, 39, 43, KEY_DOT, 44
 };
 
 static vector<Uint8> _breakCode = {
@@ -96,6 +96,7 @@ static bool isCheckedGrammar;
 static bool _isCaps = false;
 static int _spaceCount = 0; //add: July 30th, 2019
 static bool _hasHandledMacro = false; //for macro flag August 9th, 2019
+static Byte _upperCaseStatus = 0; //for Write upper case for the first letter; 2: will upper case
 
 //function prototype
 void findAndCalculateVowel(const bool& forGrammar=false);
@@ -638,6 +639,7 @@ void insertD(const Uint16& data, const bool& isCaps) {
             if (TypingWord[ii] & TONE_MASK) {
                 //restore and disable temporary
                 hCode = vRestore;
+                TypingWord[ii] &= ~TONE_MASK;
                 hData[_index - 1 - ii] = TypingWord[ii];
                 tempDisableKey = true;
                 break;
@@ -855,6 +857,17 @@ void checkForStandaloneChar(const Uint16& data, const bool& isCaps, const Uint32
     }
     
     insertKey(data, isCaps);
+}
+
+void upperCaseFirstCharacter() {
+    if (!(TypingWord[0] & CAPS_MASK)) {
+        hCode = vWillProcess;
+        hBPC = 0;
+        hNCC = 1;
+        TypingWord[0] |= CAPS_MASK;
+        hData[0] = GET(TypingWord[0]);
+        _upperCaseStatus = 0;
+    }
 }
 
 void handleMainKey(const Uint16& data, const bool& isCaps) {
@@ -1087,6 +1100,14 @@ void vKeyHandleEvent(const vKeyEvent& event,
             }
         }
         
+        if (vUpperCaseFirstChar) {
+            if (data == KEY_DOT)
+                _upperCaseStatus = 1;
+            else if (data == KEY_ENTER || data == KEY_RETURN)
+                _upperCaseStatus = 2;
+            else
+                _upperCaseStatus = 0;
+        }
     } else if (data == KEY_SPACE) {
         if (!tempDisableKey && vCheckSpelling) {
             checkSpelling(true); //force check spelling
@@ -1107,6 +1128,9 @@ void vKeyHandleEvent(const vKeyEvent& event,
         }
         if (vUseMacro) {
             hMacroKey.clear();
+        }
+        if (vUpperCaseFirstChar && _upperCaseStatus == 1) {
+            _upperCaseStatus = 2;
         }
     } else if (data == KEY_DELETE) {
         hCode = vDoNothing;
@@ -1187,6 +1211,13 @@ void vKeyHandleEvent(const vKeyEvent& event,
                     hMacroKey.push_back(TypingWord[i]);
                 }
             }
+        }
+        
+        if (vUpperCaseFirstChar) {
+            if (_index == 1 && _upperCaseStatus == 2) {
+                upperCaseFirstCharacter();
+            }
+            _upperCaseStatus = 0;
         }
     }
     

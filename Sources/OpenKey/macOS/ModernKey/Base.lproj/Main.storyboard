@@ -1090,14 +1090,25 @@
                                             </connections>
                                         </button>
                                         <button verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="YGb-a8-1Lb">
-                                            <rect key="frame" x="9" y="82" width="386" height="18"/>
+                                            <rect key="frame" x="9" y="82" width="198" height="18"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                                            <buttonCell key="cell" type="check" title="Tự động ghi nhớ và chuyển chế độ gõ cho từng ứng dụng" bezelStyle="regularSquare" imagePosition="left" state="on" inset="2" id="OF9-V8-caS">
+                                            <buttonCell key="cell" type="check" title="Chuyển chế độ thông minh" bezelStyle="regularSquare" imagePosition="left" state="on" inset="2" id="OF9-V8-caS">
                                                 <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
                                                 <font key="font" metaFont="system"/>
                                             </buttonCell>
                                             <connections>
                                                 <action selector="onAutoRememberSwitchKey:" target="XfG-lQ-9wD" id="Ghi-2i-Y6n"/>
+                                            </connections>
+                                        </button>
+                                        <button verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="Adl-fG-XEu">
+                                            <rect key="frame" x="266" y="82" width="198" height="18"/>
+                                            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                            <buttonCell key="cell" type="check" title="Viết Hoa chữ cái đầu câu" bezelStyle="regularSquare" imagePosition="left" state="on" inset="2" id="2Gh-Ll-jA8">
+                                                <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
+                                                <font key="font" metaFont="system"/>
+                                            </buttonCell>
+                                            <connections>
+                                                <action selector="onUpperCaseFirstChar:" target="XfG-lQ-9wD" id="QFl-JY-GEA"/>
                                             </connections>
                                         </button>
                                     </subviews>
@@ -1249,6 +1260,7 @@
                         <outlet property="RunOnStartupButton" destination="Leg-Yg-XFR" id="oRL-up-vyq"/>
                         <outlet property="SendKeyStepByStep" destination="C8z-Sp-sdZ" id="eSj-4I-pDf"/>
                         <outlet property="ShowUIButton" destination="Xle-7k-yIf" id="dbk-Zf-T4j"/>
+                        <outlet property="UpperCaseFirstChar" destination="Adl-fG-XEu" id="b4x-Cc-Trs"/>
                         <outlet property="UseGrayIcon" destination="HEa-Qp-9qT" id="ApG-gR-H4l"/>
                         <outlet property="UseMacro" destination="eCY-Z0-cgW" id="0z8-vh-VlK"/>
                         <outlet property="UseMacroInEnglishMode" destination="0oj-fd-y0l" id="rD2-9a-ehn"/>

@@ -134,6 +134,7 @@ struct vKeyHookState {
 
 #define KEY_LEFT_SHIFT                          57
 #define KEY_RIGHT_SHIFT                         60
+#define KEY_DOT                                 47
 
 //internal engine data
 #define CAPS_MASK                               0x10000

@@ -38,6 +38,7 @@
 
 @property (weak) IBOutlet NSButton *SendKeyStepByStep;
 @property (weak) IBOutlet NSButton *AutoRememberSwitchKey;
+@property (weak) IBOutlet NSButton *UpperCaseFirstChar;
 
 @property (weak) IBOutlet NSImageView *cursorImage;
 
