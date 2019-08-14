@@ -1059,7 +1059,7 @@ void vEnglishMode(const vKeyEventState& state, const Uint16& data, const bool& i
             std::find(_charKeyCode.begin(), _charKeyCode.end(), data) == _charKeyCode.end()) {
             hMacroKey.clear();
         } else {
-            hMacroKey.push_back(data | (_isCaps ? CAPS_MASK : 0));
+            hMacroKey.push_back(data | (isCaps ? CAPS_MASK : 0));
         }
     }
 }
