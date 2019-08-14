@@ -451,6 +451,23 @@ void removeMark() {
     }
 }
 
+bool canHasEndConsonant() {
+    vector<vector<Uint32>>& vo = _vowelCombine[CHR(VSI)];
+    for (ii = 0; ii < vo.size(); ii++) {
+        kk = VSI;
+        for (iii = 1; iii < vo[ii].size(); iii++) {
+            if (kk > VEI || ((CHR(kk) | (TypingWord[kk] & TONE_MASK) | (TypingWord[kk] & TONEW_MASK)) != vo[ii][iii])) {
+                break;
+            }
+            kk++;
+        }
+        if (iii >= vo[ii].size()) {
+            return vo[ii][0] == 1;
+        }
+    }
+    return false;
+}
+
 void handleModernMark() {
     //default
     VWSM = VEI;
@@ -472,18 +489,16 @@ void handleModernMark() {
     } else if (CHR(VEI-1) == KEY_A && CHR(VEI) == KEY_Y) {
         VWSM = VEI - 1;
         hBPC = (_index - VEI) + 1;
-    } else if ((CHR(VSI) == KEY_U && CHR(VSI+1) == KEY_O) /*||
-                                                           (CHR(VSI) == KEY_U && CHR(VSI+1) == KEY_A)*/) {
-                                                               VWSM = VSI + 1;
-                                                               hBPC = _index - VWSM;
-                                                               
-                                                           } else if (CHR(VSI+1) == KEY_O || CHR(VSI+1) == KEY_U) {
-                                                               VWSM = VEI - 1;
-                                                               hBPC = (_index - VEI) + 1;
-                                                           } else if (CHR(VSI) == KEY_O || CHR(VSI) == KEY_U) {
-                                                               VWSM = VEI;
-                                                               hBPC = (_index - VEI);
-                                                           }
+    } else if (CHR(VSI) == KEY_U && CHR(VSI+1) == KEY_O) {
+        VWSM = VSI + 1;
+        hBPC = _index - VWSM;
+    } else if (CHR(VSI+1) == KEY_O || CHR(VSI+1) == KEY_U) {
+        VWSM = VEI - 1;
+        hBPC = (_index - VEI) + 1;
+    } else if (CHR(VSI) == KEY_O || CHR(VSI) == KEY_U) {
+        VWSM = VEI;
+        hBPC = (_index - VEI);
+    }
     
     //rule 3.1
     if ((CHR(VSI) == KEY_I && (TypingWord[VSI+1] & (KEY_E | TONE_MASK))) ||
@@ -536,7 +551,7 @@ void handleModernMark() {
             }
         } else if ((CHR(VSI) == KEY_U) && (CHR(VSI+1) == KEY_A)) {
             if (VSI == 0 || (CHR(VSI-1) != KEY_Q)) { //dont have Q
-                if (VEI + 1 >= _index) {
+                if (VEI + 1 >= _index || !canHasEndConsonant()) {
                     VWSM = VSI;
                     hBPC = _index - VWSM;
                 }
@@ -560,7 +575,7 @@ void handleOldMark() {
     hBPC = (_index - VWSM);
     
     //rule 2
-    if (vowelCount == 3 || (VEI + 1 < _index && IS_CONSONANT(CHR(VEI + 1)))) {
+    if (vowelCount == 3 || (VEI + 1 < _index && IS_CONSONANT(CHR(VEI + 1)) && canHasEndConsonant())) {
         VWSM = VSI + 1;
         hBPC = _index - VWSM;
     }
@@ -1183,7 +1198,7 @@ void vKeyHandleEvent(const vKeyEvent& event,
             hExt = 3; //normal key
             handleMainKey(data, _isCaps);
         }
-        
+
         if (!vFreeMark && !IS_KEY_D(data)) {
             if (hCode == vDoNothing) {
                 checkGrammar(-1);
