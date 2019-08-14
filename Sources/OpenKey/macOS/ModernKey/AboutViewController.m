@@ -7,6 +7,7 @@
 //
 
 #import "AboutViewController.h"
+#import "OpenKeyManager.h"
 
 @interface AboutViewController ()
 
@@ -17,6 +18,11 @@
 - (void)viewDidLoad {
     [super viewDidLoad];
     // Do view setup here.
+    
+    self.VersionInfo.stringValue = [NSString stringWithFormat:@"Phiên bản %@ (build %@) - Ngày cập nhật %@",
+                                    [[NSBundle mainBundle] objectForInfoDictionaryKey: @"CFBundleShortVersionString"],
+                                    [[NSBundle mainBundle] objectForInfoDictionaryKey: @"CFBundleVersion"],
+                                    [OpenKeyManager getBuildDate]] ;
 }
 
 - (IBAction)onHomePage:(id)sender {

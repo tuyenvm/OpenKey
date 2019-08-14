@@ -80,4 +80,7 @@ static CFRunLoopSourceRef runLoopSource;
     return YES;
 }
 
++(NSString*)getBuildDate {
+    return [NSString stringWithUTF8String:__DATE__];
+}
 @end

@@ -14,6 +14,7 @@
 @interface OpenKeyManager : NSObject
 +(BOOL)isInited;
 +(BOOL)initEventTap;
++(NSString*)getBuildDate;
 @end
 
 #endif /* OpenKeyManager_h */
