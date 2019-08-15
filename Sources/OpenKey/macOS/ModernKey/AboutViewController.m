@@ -29,4 +29,12 @@
     [[NSWorkspace sharedWorkspace] openURL: [NSURL URLWithString:@"https://github.com/tuyenvm/OpenKey"]];
 }
 
+- (IBAction)onFanPage:(id)sender {
+    [[NSWorkspace sharedWorkspace] openURL: [NSURL URLWithString:@"https://www.facebook.com/OpenKeyVN"]];
+}
+
+- (IBAction)onLatestReleaseVersion:(id)sender {
+    [[NSWorkspace sharedWorkspace] openURL: [NSURL URLWithString:@"https://github.com/tuyenvm/OpenKey/releases"]];
+}
+
 @end

@@ -106,11 +106,11 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "../engine/Engine.cpp"
-            timestampString = "572957765.012252"
+            timestampString = "587480407.705002"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "857"
-            endingLineNumber = "857"
+            startingLineNumber = "1018"
+            endingLineNumber = "1018"
             landmarkName = "handleMainKey(const Uint16&amp; data, const bool&amp; isCaps)"
             landmarkType = "9">
          </BreakpointContent>
@@ -122,11 +122,11 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "../engine/Engine.cpp"
-            timestampString = "572957765.012313"
+            timestampString = "587480407.705117"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "855"
-            endingLineNumber = "855"
+            startingLineNumber = "1016"
+            endingLineNumber = "1016"
             landmarkName = "handleMainKey(const Uint16&amp; data, const bool&amp; isCaps)"
             landmarkType = "9">
          </BreakpointContent>
@@ -138,11 +138,11 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "../engine/Engine.cpp"
-            timestampString = "572957765.012355"
+            timestampString = "587480407.705215"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "848"
-            endingLineNumber = "848"
+            startingLineNumber = "999"
+            endingLineNumber = "999"
             landmarkName = "handleMainKey(const Uint16&amp; data, const bool&amp; isCaps)"
             landmarkType = "9">
          </BreakpointContent>
@@ -154,11 +154,11 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "../engine/Engine.cpp"
-            timestampString = "572957765.012395"
+            timestampString = "587480407.705291"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "844"
-            endingLineNumber = "844"
+            startingLineNumber = "995"
+            endingLineNumber = "995"
             landmarkName = "handleMainKey(const Uint16&amp; data, const bool&amp; isCaps)"
             landmarkType = "9">
          </BreakpointContent>
@@ -170,11 +170,11 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "../engine/Engine.cpp"
-            timestampString = "572957765.012448"
+            timestampString = "587480407.705406"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "356"
-            endingLineNumber = "356"
+            startingLineNumber = "434"
+            endingLineNumber = "434"
             landmarkName = "removeMark()"
             landmarkType = "9">
          </BreakpointContent>
@@ -186,11 +186,11 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "../engine/Engine.cpp"
-            timestampString = "572957765.012527"
+            timestampString = "587480407.705503"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "753"
-            endingLineNumber = "753"
+            startingLineNumber = "897"
+            endingLineNumber = "897"
             landmarkName = "handleMainKey(const Uint16&amp; data, const bool&amp; isCaps)"
             landmarkType = "9">
          </BreakpointContent>
@@ -202,11 +202,11 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "../engine/Engine.cpp"
-            timestampString = "572957765.012607"
+            timestampString = "587480407.705617"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "754"
-            endingLineNumber = "754"
+            startingLineNumber = "898"
+            endingLineNumber = "898"
             landmarkName = "handleMainKey(const Uint16&amp; data, const bool&amp; isCaps)"
             landmarkType = "9">
          </BreakpointContent>
@@ -218,11 +218,11 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "../engine/Engine.cpp"
-            timestampString = "572957765.012646"
+            timestampString = "587480407.705716"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "840"
-            endingLineNumber = "840"
+            startingLineNumber = "991"
+            endingLineNumber = "991"
             landmarkName = "handleMainKey(const Uint16&amp; data, const bool&amp; isCaps)"
             landmarkType = "9">
          </BreakpointContent>
@@ -234,11 +234,11 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "../engine/Engine.cpp"
-            timestampString = "572957765.0126849"
+            timestampString = "587480407.70584"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "851"
-            endingLineNumber = "851"
+            startingLineNumber = "1002"
+            endingLineNumber = "1002"
             landmarkName = "handleMainKey(const Uint16&amp; data, const bool&amp; isCaps)"
             landmarkType = "9">
          </BreakpointContent>
@@ -250,11 +250,11 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "../engine/Engine.cpp"
-            timestampString = "572957765.012725"
+            timestampString = "587480407.705956"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "549"
-            endingLineNumber = "549"
+            startingLineNumber = "677"
+            endingLineNumber = "677"
             landmarkName = "insertAOE(const Uint16&amp; data, const bool&amp; isCaps)"
             landmarkType = "9">
          </BreakpointContent>
@@ -266,11 +266,11 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "../engine/Engine.cpp"
-            timestampString = "572957765.012764"
+            timestampString = "587480407.706068"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "559"
-            endingLineNumber = "559"
+            startingLineNumber = "687"
+            endingLineNumber = "687"
             landmarkName = "insertAOE(const Uint16&amp; data, const bool&amp; isCaps)"
             landmarkType = "9">
          </BreakpointContent>
@@ -282,11 +282,11 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "../engine/Engine.cpp"
-            timestampString = "572957765.0128061"
+            timestampString = "587480407.706153"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "358"
-            endingLineNumber = "358"
+            startingLineNumber = "436"
+            endingLineNumber = "436"
             landmarkName = "removeMark()"
             landmarkType = "9">
          </BreakpointContent>
@@ -298,11 +298,11 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "../engine/Engine.cpp"
-            timestampString = "572957765.012846"
+            timestampString = "587480407.706264"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "703"
-            endingLineNumber = "703"
+            startingLineNumber = "837"
+            endingLineNumber = "837"
             landmarkName = "checkForStandaloneChar(const Uint16&amp; data, const bool&amp; isCaps, const Uint32&amp; keyWillReverse)"
             landmarkType = "9">
          </BreakpointContent>
@@ -313,46 +313,14 @@
             shouldBeEnabled = "No"
             ignoreCount = "0"
             continueAfterRunningActions = "No"
-            filePath = "../engine/Engine.cpp"
-            timestampString = "572957765.012885"
-            startingColumnNumber = "9223372036854775807"
-            endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "404"
-            endingLineNumber = "404"
-            landmarkName = "insertMark(const Uint32&amp; markMask, const bool&amp; canModifyFlag)"
-            landmarkType = "9">
-         </BreakpointContent>
-      </BreakpointProxy>
-      <BreakpointProxy
-         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
-         <BreakpointContent
-            shouldBeEnabled = "No"
-            ignoreCount = "0"
-            continueAfterRunningActions = "No"
-            filePath = "../engine/Engine.cpp"
-            timestampString = "572957765.012936"
-            startingColumnNumber = "9223372036854775807"
-            endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "395"
-            endingLineNumber = "395"
-            landmarkName = "insertMark(const Uint32&amp; markMask, const bool&amp; canModifyFlag)"
-            landmarkType = "9">
-         </BreakpointContent>
-      </BreakpointProxy>
-      <BreakpointProxy
-         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
-         <BreakpointContent
-            shouldBeEnabled = "No"
-            ignoreCount = "0"
-            continueAfterRunningActions = "No"
             filePath = "ModernKey/AppDelegate.m"
-            timestampString = "571727922.276842"
+            timestampString = "587389912.795897"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "232"
-            endingLineNumber = "232"
-            landmarkName = "AppDelegate"
-            landmarkType = "3">
+            startingLineNumber = "297"
+            endingLineNumber = "297"
+            landmarkName = "-onInputMethodSelected"
+            landmarkType = "7">
          </BreakpointContent>
       </BreakpointProxy>
       <BreakpointProxy
@@ -378,11 +346,11 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "../engine/Engine.cpp"
-            timestampString = "572957765.012998"
+            timestampString = "587480407.706426"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "586"
-            endingLineNumber = "586"
+            startingLineNumber = "715"
+            endingLineNumber = "715"
             landmarkName = "insertW(const Uint16&amp; data, const bool&amp; isCaps)"
             landmarkType = "9">
          </BreakpointContent>
@@ -394,11 +362,11 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "../engine/Engine.cpp"
-            timestampString = "572957765.0130531"
+            timestampString = "587480407.7065361"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "746"
-            endingLineNumber = "746"
+            startingLineNumber = "890"
+            endingLineNumber = "890"
             landmarkName = "handleMainKey(const Uint16&amp; data, const bool&amp; isCaps)"
             landmarkType = "9">
          </BreakpointContent>
@@ -410,12 +378,12 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "../engine/Engine.cpp"
-            timestampString = "572957765.013103"
+            timestampString = "587480407.7066309"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "869"
-            endingLineNumber = "869"
-            landmarkName = "handleMainKey(const Uint16&amp; data, const bool&amp; isCaps)"
+            startingLineNumber = "1030"
+            endingLineNumber = "1030"
+            landmarkName = "handleQuickTelex(const Uint16&amp; data, const bool&amp; isCaps)"
             landmarkType = "9">
          </BreakpointContent>
       </BreakpointProxy>
@@ -426,11 +394,11 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "ModernKey/ViewController.m"
-            timestampString = "571897380.3597521"
+            timestampString = "587480064.896069"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "133"
-            endingLineNumber = "133"
+            startingLineNumber = "134"
+            endingLineNumber = "134"
             landmarkName = "-onRunOnStartup:"
             landmarkType = "7">
          </BreakpointContent>
@@ -442,11 +410,11 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "ModernKey/ViewController.m"
-            timestampString = "571897380.360052"
+            timestampString = "587480064.896433"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "28"
-            endingLineNumber = "28"
+            startingLineNumber = "45"
+            endingLineNumber = "45"
             landmarkName = "-viewDidLoad"
             landmarkType = "7">
          </BreakpointContent>
@@ -458,156 +426,12 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "ModernKey/AppDelegate.m"
-            timestampString = "571727922.277904"
+            timestampString = "587389912.797681"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "275"
-            endingLineNumber = "275"
-            landmarkName = "-onCodeSelected:"
-            landmarkType = "7">
-         </BreakpointContent>
-      </BreakpointProxy>
-      <BreakpointProxy
-         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
-         <BreakpointContent
-            shouldBeEnabled = "No"
-            ignoreCount = "0"
-            continueAfterRunningActions = "No"
-            filePath = "ModernKey/OpenKey.mm"
-            timestampString = "571914685.539125"
-            startingColumnNumber = "9223372036854775807"
-            endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "61"
-            endingLineNumber = "61"
-            landmarkName = "SendKeyCode(Uint32 data)"
-            landmarkType = "9">
-         </BreakpointContent>
-      </BreakpointProxy>
-      <BreakpointProxy
-         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
-         <BreakpointContent
-            shouldBeEnabled = "No"
-            ignoreCount = "0"
-            continueAfterRunningActions = "No"
-            filePath = "ModernKey/OpenKey.mm"
-            timestampString = "571914685.539169"
-            startingColumnNumber = "9223372036854775807"
-            endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "193"
-            endingLineNumber = "193"
-            landmarkName = "OpenKeyCallback(CGEventTapProxy proxy, CGEventType type, CGEventRef event, void *refcon)"
-            landmarkType = "9">
-         </BreakpointContent>
-      </BreakpointProxy>
-      <BreakpointProxy
-         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
-         <BreakpointContent
-            shouldBeEnabled = "No"
-            ignoreCount = "0"
-            continueAfterRunningActions = "No"
-            filePath = "ModernKey/OpenKey.mm"
-            timestampString = "571914685.539206"
-            startingColumnNumber = "9223372036854775807"
-            endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "194"
-            endingLineNumber = "194"
-            landmarkName = "OpenKeyCallback(CGEventTapProxy proxy, CGEventType type, CGEventRef event, void *refcon)"
-            landmarkType = "9">
-         </BreakpointContent>
-      </BreakpointProxy>
-      <BreakpointProxy
-         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
-         <BreakpointContent
-            shouldBeEnabled = "No"
-            ignoreCount = "0"
-            continueAfterRunningActions = "No"
-            filePath = "ModernKey/OpenKey.mm"
-            timestampString = "571914685.539241"
-            startingColumnNumber = "9223372036854775807"
-            endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "153"
-            endingLineNumber = "153"
-            landmarkName = "OpenKeyCallback(CGEventTapProxy proxy, CGEventType type, CGEventRef event, void *refcon)"
-            landmarkType = "9">
-         </BreakpointContent>
-      </BreakpointProxy>
-      <BreakpointProxy
-         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
-         <BreakpointContent
-            shouldBeEnabled = "No"
-            ignoreCount = "0"
-            continueAfterRunningActions = "No"
-            filePath = "ModernKey/ViewController.m"
-            timestampString = "571897380.360392"
-            startingColumnNumber = "9223372036854775807"
-            endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "185"
-            endingLineNumber = "185"
-            landmarkName = "-fillData"
-            landmarkType = "7">
-         </BreakpointContent>
-      </BreakpointProxy>
-      <BreakpointProxy
-         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
-         <BreakpointContent
-            shouldBeEnabled = "No"
-            ignoreCount = "0"
-            continueAfterRunningActions = "No"
-            filePath = "ModernKey/AppDelegate.m"
-            timestampString = "571727922.2780041"
-            startingColumnNumber = "9223372036854775807"
-            endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "259"
-            endingLineNumber = "259"
-            landmarkName = "-onCodeTableChanged:"
-            landmarkType = "7">
-         </BreakpointContent>
-      </BreakpointProxy>
-      <BreakpointProxy
-         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
-         <BreakpointContent
-            shouldBeEnabled = "No"
-            ignoreCount = "0"
-            continueAfterRunningActions = "No"
-            filePath = "ModernKey/ViewController.m"
-            timestampString = "571897380.360621"
-            startingColumnNumber = "9223372036854775807"
-            endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "81"
-            endingLineNumber = "81"
-            landmarkName = "-onCodeTableChanged:"
-            landmarkType = "7">
-         </BreakpointContent>
-      </BreakpointProxy>
-      <BreakpointProxy
-         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
-         <BreakpointContent
-            shouldBeEnabled = "No"
-            ignoreCount = "0"
-            continueAfterRunningActions = "No"
-            filePath = "ModernKey/OpenKey.mm"
-            timestampString = "571914685.539302"
-            startingColumnNumber = "9223372036854775807"
-            endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "84"
-            endingLineNumber = "84"
-            landmarkName = "SendKeyCode(Uint32 data)"
-            landmarkType = "9">
-         </BreakpointContent>
-      </BreakpointProxy>
-      <BreakpointProxy
-         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
-         <BreakpointContent
-            shouldBeEnabled = "No"
-            ignoreCount = "0"
-            continueAfterRunningActions = "No"
-            filePath = "ModernKey/AppDelegate.m"
-            timestampString = "571727922.278113"
-            startingColumnNumber = "9223372036854775807"
-            endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "245"
-            endingLineNumber = "245"
-            landmarkName = "AppDelegate"
+            startingLineNumber = "325"
+            endingLineNumber = "325"
+            landmarkName = "@implementation AppDelegate"
             landmarkType = "3">
          </BreakpointContent>
       </BreakpointProxy>
@@ -617,12 +441,124 @@
             shouldBeEnabled = "No"
             ignoreCount = "0"
             continueAfterRunningActions = "No"
-            filePath = "../engine/Engine.cpp"
-            timestampString = "572957765.013225"
+            filePath = "ModernKey/OpenKey.mm"
+            timestampString = "587389912.79773"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "380"
-            endingLineNumber = "380"
+            startingLineNumber = "116"
+            endingLineNumber = "116"
+            landmarkName = "SendKeyCode(Uint32 data)"
+            landmarkType = "9">
+         </BreakpointContent>
+      </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            shouldBeEnabled = "No"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "ModernKey/OpenKey.mm"
+            timestampString = "587389912.797798"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "442"
+            endingLineNumber = "442"
+            landmarkName = "OpenKeyCallback(CGEventTapProxy proxy, CGEventType type, CGEventRef event, void *refcon)"
+            landmarkType = "9">
+         </BreakpointContent>
+      </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            shouldBeEnabled = "No"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "ModernKey/OpenKey.mm"
+            timestampString = "587389912.797858"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "443"
+            endingLineNumber = "443"
+            landmarkName = "OpenKeyCallback(CGEventTapProxy proxy, CGEventType type, CGEventRef event, void *refcon)"
+            landmarkType = "9">
+         </BreakpointContent>
+      </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            shouldBeEnabled = "No"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "ModernKey/AppDelegate.m"
+            timestampString = "587389912.797919"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "315"
+            endingLineNumber = "315"
+            landmarkName = "-onCodeTableChanged:"
+            landmarkType = "7">
+         </BreakpointContent>
+      </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            shouldBeEnabled = "No"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "ModernKey/ViewController.m"
+            timestampString = "587480064.896697"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "98"
+            endingLineNumber = "98"
+            landmarkName = "-onCodeTableChanged:"
+            landmarkType = "7">
+         </BreakpointContent>
+      </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            shouldBeEnabled = "No"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "ModernKey/OpenKey.mm"
+            timestampString = "587389912.798216"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "141"
+            endingLineNumber = "141"
+            landmarkName = "SendKeyCode(Uint32 data)"
+            landmarkType = "9">
+         </BreakpointContent>
+      </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            shouldBeEnabled = "No"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "ModernKey/AppDelegate.m"
+            timestampString = "587389912.798304"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "301"
+            endingLineNumber = "301"
+            landmarkName = "-onInputTypeSelected:"
+            landmarkType = "7">
+         </BreakpointContent>
+      </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            shouldBeEnabled = "No"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "../engine/Engine.cpp"
+            timestampString = "587480407.706864"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "599"
+            endingLineNumber = "599"
             landmarkName = "insertMark(const Uint32&amp; markMask, const bool&amp; canModifyFlag)"
             landmarkType = "9">
          </BreakpointContent>
@@ -634,11 +570,11 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "../engine/Engine.cpp"
-            timestampString = "572957765.013265"
+            timestampString = "587480407.706924"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "824"
-            endingLineNumber = "824"
+            startingLineNumber = "972"
+            endingLineNumber = "972"
             landmarkName = "handleMainKey(const Uint16&amp; data, const bool&amp; isCaps)"
             landmarkType = "9">
          </BreakpointContent>
@@ -649,13 +585,13 @@
             shouldBeEnabled = "No"
             ignoreCount = "0"
             continueAfterRunningActions = "No"
-            filePath = "ModernKey/OpenKey.mm"
-            timestampString = "571914685.539916"
+            filePath = "../engine/Engine.cpp"
+            timestampString = "587480407.7069809"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "47"
-            endingLineNumber = "47"
-            landmarkName = "InsertKeyLength(const Uint8&amp; len)"
+            startingLineNumber = "139"
+            endingLineNumber = "139"
+            landmarkName = "checkSpelling(const bool&amp; forceCheckVowel=false)"
             landmarkType = "9">
          </BreakpointContent>
       </BreakpointProxy>
@@ -666,12 +602,12 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "../engine/Engine.cpp"
-            timestampString = "572957765.013314"
+            timestampString = "587480407.707037"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "110"
-            endingLineNumber = "110"
-            landmarkName = "checkSpelling()"
+            startingLineNumber = "157"
+            endingLineNumber = "157"
+            landmarkName = "checkSpelling(const bool&amp; forceCheckVowel=false)"
             landmarkType = "9">
          </BreakpointContent>
       </BreakpointProxy>
@@ -682,12 +618,12 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "../engine/Engine.cpp"
-            timestampString = "572957765.0133539"
+            timestampString = "587480407.707094"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "128"
-            endingLineNumber = "128"
-            landmarkName = "checkSpelling()"
+            startingLineNumber = "167"
+            endingLineNumber = "167"
+            landmarkName = "checkSpelling(const bool&amp; forceCheckVowel=false)"
             landmarkType = "9">
          </BreakpointContent>
       </BreakpointProxy>
@@ -698,27 +634,11 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "../engine/Engine.cpp"
-            timestampString = "572957765.013392"
+            timestampString = "587480407.707149"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "137"
-            endingLineNumber = "137"
-            landmarkName = "checkSpelling()"
-            landmarkType = "9">
-         </BreakpointContent>
-      </BreakpointProxy>
-      <BreakpointProxy
-         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
-         <BreakpointContent
-            shouldBeEnabled = "No"
-            ignoreCount = "0"
-            continueAfterRunningActions = "No"
-            filePath = "../engine/Engine.cpp"
-            timestampString = "572957765.013446"
-            startingColumnNumber = "9223372036854775807"
-            endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "716"
-            endingLineNumber = "716"
+            startingLineNumber = "850"
+            endingLineNumber = "850"
             landmarkName = "checkForStandaloneChar(const Uint16&amp; data, const bool&amp; isCaps, const Uint32&amp; keyWillReverse)"
             landmarkType = "9">
          </BreakpointContent>
@@ -730,11 +650,11 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "../engine/Engine.cpp"
-            timestampString = "572957765.013485"
+            timestampString = "587480407.707211"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "714"
-            endingLineNumber = "714"
+            startingLineNumber = "848"
+            endingLineNumber = "848"
             landmarkName = "checkForStandaloneChar(const Uint16&amp; data, const bool&amp; isCaps, const Uint32&amp; keyWillReverse)"
             landmarkType = "9">
          </BreakpointContent>
@@ -746,11 +666,11 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "../engine/Engine.cpp"
-            timestampString = "572957765.013526"
+            timestampString = "587480407.70727"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "721"
-            endingLineNumber = "721"
+            startingLineNumber = "855"
+            endingLineNumber = "855"
             landmarkName = "checkForStandaloneChar(const Uint16&amp; data, const bool&amp; isCaps, const Uint32&amp; keyWillReverse)"
             landmarkType = "9">
          </BreakpointContent>
@@ -762,11 +682,11 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "../engine/Engine.cpp"
-            timestampString = "572957765.013566"
+            timestampString = "587480407.707327"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "715"
-            endingLineNumber = "715"
+            startingLineNumber = "849"
+            endingLineNumber = "849"
             landmarkName = "checkForStandaloneChar(const Uint16&amp; data, const bool&amp; isCaps, const Uint32&amp; keyWillReverse)"
             landmarkType = "9">
          </BreakpointContent>
@@ -778,11 +698,11 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "../engine/Engine.cpp"
-            timestampString = "572957765.013605"
+            timestampString = "587480407.707394"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "707"
-            endingLineNumber = "707"
+            startingLineNumber = "841"
+            endingLineNumber = "841"
             landmarkName = "checkForStandaloneChar(const Uint16&amp; data, const bool&amp; isCaps, const Uint32&amp; keyWillReverse)"
             landmarkType = "9">
          </BreakpointContent>
@@ -794,28 +714,12 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "../engine/Engine.cpp"
-            timestampString = "572957765.013643"
+            timestampString = "587480407.707461"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "690"
-            endingLineNumber = "690"
-            landmarkName = "unknown"
-            landmarkType = "0">
-         </BreakpointContent>
-      </BreakpointProxy>
-      <BreakpointProxy
-         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
-         <BreakpointContent
-            shouldBeEnabled = "No"
-            ignoreCount = "0"
-            continueAfterRunningActions = "No"
-            filePath = "../engine/Engine.cpp"
-            timestampString = "572957765.013683"
-            startingColumnNumber = "9223372036854775807"
-            endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "929"
-            endingLineNumber = "929"
-            landmarkName = "vKeyHandleEvent(const vKeyEvent&amp; event, const vKeyEventState&amp; state, const Uint16&amp; data, const bool&amp; isCaps, const bool&amp; otherControlKey)"
+            startingLineNumber = "824"
+            endingLineNumber = "824"
+            landmarkName = "reverseLastStandaloneChar(const Uint32&amp; keyCode, const bool&amp; isCaps)"
             landmarkType = "9">
          </BreakpointContent>
       </BreakpointProxy>
@@ -826,12 +730,28 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "../engine/Engine.cpp"
-            timestampString = "572957765.013724"
+            timestampString = "587480407.707528"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "935"
-            endingLineNumber = "935"
-            landmarkName = "vKeyHandleEvent(const vKeyEvent&amp; event, const vKeyEventState&amp; state, const Uint16&amp; data, const bool&amp; isCaps, const bool&amp; otherControlKey)"
+            startingLineNumber = "1213"
+            endingLineNumber = "1213"
+            landmarkName = "vKeyHandleEvent(const vKeyEvent&amp; event, const vKeyEventState&amp; state, const Uint16&amp; data, const Uint8&amp; capsStatus, const bool&amp; otherControlKey)"
+            landmarkType = "9">
+         </BreakpointContent>
+      </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            shouldBeEnabled = "No"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "../engine/Engine.cpp"
+            timestampString = "587480407.707595"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "1242"
+            endingLineNumber = "1242"
+            landmarkName = "vKeyHandleEvent(const vKeyEvent&amp; event, const vKeyEventState&amp; state, const Uint16&amp; data, const Uint8&amp; capsStatus, const bool&amp; otherControlKey)"
             landmarkType = "9">
          </BreakpointContent>
       </BreakpointProxy>
@@ -842,11 +762,11 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "ModernKey/OpenKey.mm"
-            timestampString = "571914685.542963"
+            timestampString = "587389912.803025"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "99"
-            endingLineNumber = "99"
+            startingLineNumber = "156"
+            endingLineNumber = "156"
             landmarkName = "SendKeyCode(Uint32 data)"
             landmarkType = "9">
          </BreakpointContent>
@@ -858,11 +778,11 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "ModernKey/OpenKey.mm"
-            timestampString = "571914685.543003"
+            timestampString = "587389912.803115"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "100"
-            endingLineNumber = "100"
+            startingLineNumber = "157"
+            endingLineNumber = "157"
             landmarkName = "SendKeyCode(Uint32 data)"
             landmarkType = "9">
          </BreakpointContent>
@@ -922,11 +842,11 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "../engine/Engine.cpp"
-            timestampString = "572957765.013815"
+            timestampString = "587480407.707707"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "596"
-            endingLineNumber = "596"
+            startingLineNumber = "725"
+            endingLineNumber = "725"
             landmarkName = "insertW(const Uint16&amp; data, const bool&amp; isCaps)"
             landmarkType = "9">
          </BreakpointContent>
@@ -938,11 +858,11 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "../engine/Engine.cpp"
-            timestampString = "572957765.013854"
+            timestampString = "587480407.707775"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "616"
-            endingLineNumber = "616"
+            startingLineNumber = "745"
+            endingLineNumber = "745"
             landmarkName = "insertW(const Uint16&amp; data, const bool&amp; isCaps)"
             landmarkType = "9">
          </BreakpointContent>
@@ -954,11 +874,11 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "../engine/Engine.cpp"
-            timestampString = "572957765.0138921"
+            timestampString = "587480407.707842"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "657"
-            endingLineNumber = "657"
+            startingLineNumber = "791"
+            endingLineNumber = "791"
             landmarkName = "insertW(const Uint16&amp; data, const bool&amp; isCaps)"
             landmarkType = "9">
          </BreakpointContent>
@@ -970,11 +890,11 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "../engine/Engine.cpp"
-            timestampString = "572957765.01393"
+            timestampString = "587480407.7079099"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "603"
-            endingLineNumber = "603"
+            startingLineNumber = "732"
+            endingLineNumber = "732"
             landmarkName = "insertW(const Uint16&amp; data, const bool&amp; isCaps)"
             landmarkType = "9">
          </BreakpointContent>
@@ -986,11 +906,11 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "ModernKey/OpenKey.mm"
-            timestampString = "571914685.544048"
+            timestampString = "587389912.8048691"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "147"
-            endingLineNumber = "147"
+            startingLineNumber = "364"
+            endingLineNumber = "364"
             landmarkName = "OpenKeyCallback(CGEventTapProxy proxy, CGEventType type, CGEventRef event, void *refcon)"
             landmarkType = "9">
          </BreakpointContent>
@@ -1002,11 +922,11 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "ModernKey/OpenKeyManager.m"
-            timestampString = "571400479.003127"
+            timestampString = "587480407.707992"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "66"
-            endingLineNumber = "66"
+            startingLineNumber = "67"
+            endingLineNumber = "67"
             landmarkName = "+initEventTap"
             landmarkType = "7">
          </BreakpointContent>
@@ -1018,28 +938,12 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "../engine/Engine.cpp"
-            timestampString = "572957765.0140001"
+            timestampString = "587480407.708042"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "887"
-            endingLineNumber = "887"
-            landmarkName = "vKeyHandleEvent(const vKeyEvent&amp; event, const vKeyEventState&amp; state, const Uint16&amp; data, const bool&amp; isCaps, const bool&amp; otherControlKey)"
-            landmarkType = "9">
-         </BreakpointContent>
-      </BreakpointProxy>
-      <BreakpointProxy
-         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
-         <BreakpointContent
-            shouldBeEnabled = "No"
-            ignoreCount = "0"
-            continueAfterRunningActions = "No"
-            filePath = "ModernKey/OpenKey.mm"
-            timestampString = "571914685.5443701"
-            startingColumnNumber = "9223372036854775807"
-            endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "116"
-            endingLineNumber = "116"
-            landmarkName = "SendEmptyCharacter()"
+            startingLineNumber = "1094"
+            endingLineNumber = "1094"
+            landmarkName = "vKeyHandleEvent(const vKeyEvent&amp; event, const vKeyEventState&amp; state, const Uint16&amp; data, const Uint8&amp; capsStatus, const bool&amp; otherControlKey)"
             landmarkType = "9">
          </BreakpointContent>
       </BreakpointProxy>
@@ -1050,11 +954,11 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "../engine/Engine.cpp"
-            timestampString = "572957765.01405"
+            timestampString = "587480407.708109"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "852"
-            endingLineNumber = "852"
+            startingLineNumber = "1003"
+            endingLineNumber = "1003"
             landmarkName = "handleMainKey(const Uint16&amp; data, const bool&amp; isCaps)"
             landmarkType = "9">
          </BreakpointContent>
@@ -1066,12 +970,12 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "../engine/Engine.cpp"
-            timestampString = "572957765.014089"
+            timestampString = "587480407.708177"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "908"
-            endingLineNumber = "908"
-            landmarkName = "vKeyHandleEvent(const vKeyEvent&amp; event, const vKeyEventState&amp; state, const Uint16&amp; data, const bool&amp; isCaps, const bool&amp; otherControlKey)"
+            startingLineNumber = "1191"
+            endingLineNumber = "1191"
+            landmarkName = "vKeyHandleEvent(const vKeyEvent&amp; event, const vKeyEventState&amp; state, const Uint16&amp; data, const Uint8&amp; capsStatus, const bool&amp; otherControlKey)"
             landmarkType = "9">
          </BreakpointContent>
       </BreakpointProxy>
@@ -1082,12 +986,12 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "../engine/Engine.cpp"
-            timestampString = "572957765.0141259"
+            timestampString = "587480407.708243"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "115"
-            endingLineNumber = "115"
-            landmarkName = "checkSpelling()"
+            startingLineNumber = "144"
+            endingLineNumber = "144"
+            landmarkName = "checkSpelling(const bool&amp; forceCheckVowel=false)"
             landmarkType = "9">
          </BreakpointContent>
       </BreakpointProxy>
@@ -1098,12 +1002,12 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "../engine/Engine.cpp"
-            timestampString = "572957765.014164"
+            timestampString = "587480407.7083091"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "933"
-            endingLineNumber = "933"
-            landmarkName = "vKeyHandleEvent(const vKeyEvent&amp; event, const vKeyEventState&amp; state, const Uint16&amp; data, const bool&amp; isCaps, const bool&amp; otherControlKey)"
+            startingLineNumber = "1240"
+            endingLineNumber = "1240"
+            landmarkName = "vKeyHandleEvent(const vKeyEvent&amp; event, const vKeyEventState&amp; state, const Uint16&amp; data, const Uint8&amp; capsStatus, const bool&amp; otherControlKey)"
             landmarkType = "9">
          </BreakpointContent>
       </BreakpointProxy>
@@ -1113,13 +1017,141 @@
             shouldBeEnabled = "No"
             ignoreCount = "0"
             continueAfterRunningActions = "No"
-            filePath = "ModernKey/ViewController.m"
-            timestampString = "571897380.3617671"
+            filePath = "../engine/Engine.cpp"
+            timestampString = "587480407.708376"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "27"
-            endingLineNumber = "27"
-            landmarkName = "-viewDidLoad"
+            startingLineNumber = "652"
+            endingLineNumber = "652"
+            landmarkName = "insertD(const Uint16&amp; data, const bool&amp; isCaps)"
+            landmarkType = "9">
+         </BreakpointContent>
+      </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            shouldBeEnabled = "No"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "../engine/Engine.cpp"
+            timestampString = "587480407.708442"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "673"
+            endingLineNumber = "673"
+            landmarkName = "insertAOE(const Uint16&amp; data, const bool&amp; isCaps)"
+            landmarkType = "9">
+         </BreakpointContent>
+      </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            shouldBeEnabled = "No"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "../engine/Engine.cpp"
+            timestampString = "587480407.7085119"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "335"
+            endingLineNumber = "335"
+            landmarkName = "checkCorrectVowel(vector&lt;vector&lt;Uint16&gt;&gt;&amp; charset, int&amp; i, int&amp; k, const Uint16&amp; markKey)"
+            landmarkType = "9">
+         </BreakpointContent>
+      </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            shouldBeEnabled = "No"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "../engine/Engine.cpp"
+            timestampString = "587480407.708578"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "939"
+            endingLineNumber = "939"
+            landmarkName = "handleMainKey(const Uint16&amp; data, const bool&amp; isCaps)"
+            landmarkType = "9">
+         </BreakpointContent>
+      </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            shouldBeEnabled = "No"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "../engine/Engine.cpp"
+            timestampString = "587480407.708645"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "1091"
+            endingLineNumber = "1091"
+            landmarkName = "vKeyHandleEvent(const vKeyEvent&amp; event, const vKeyEventState&amp; state, const Uint16&amp; data, const Uint8&amp; capsStatus, const bool&amp; otherControlKey)"
+            landmarkType = "9">
+         </BreakpointContent>
+      </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            shouldBeEnabled = "No"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "../engine/Engine.cpp"
+            timestampString = "587480407.708711"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "1092"
+            endingLineNumber = "1092"
+            landmarkName = "vKeyHandleEvent(const vKeyEvent&amp; event, const vKeyEventState&amp; state, const Uint16&amp; data, const Uint8&amp; capsStatus, const bool&amp; otherControlKey)"
+            landmarkType = "9">
+         </BreakpointContent>
+      </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            shouldBeEnabled = "No"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "../engine/Engine.cpp"
+            timestampString = "587480407.708777"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "585"
+            endingLineNumber = "585"
+            landmarkName = "handleOldMark()"
+            landmarkType = "9">
+         </BreakpointContent>
+      </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            shouldBeEnabled = "No"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "ModernKey/AppDelegate.m"
+            timestampString = "587389912.808998"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "308"
+            endingLineNumber = "308"
+            landmarkName = "-onInputTypeSelectedIndex:"
+            landmarkType = "7">
+         </BreakpointContent>
+      </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            shouldBeEnabled = "No"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "ModernKey/AppDelegate.m"
+            timestampString = "587389912.809042"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "246"
+            endingLineNumber = "246"
+            landmarkName = "-fillData"
             landmarkType = "7">
          </BreakpointContent>
       </BreakpointProxy>
@@ -1130,11 +1162,91 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "../engine/Engine.cpp"
-            timestampString = "572957765.014213"
+            timestampString = "587480407.708866"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "770"
-            endingLineNumber = "770"
+            startingLineNumber = "1184"
+            endingLineNumber = "1184"
+            landmarkName = "vKeyHandleEvent(const vKeyEvent&amp; event, const vKeyEventState&amp; state, const Uint16&amp; data, const Uint8&amp; capsStatus, const bool&amp; otherControlKey)"
+            landmarkType = "9">
+         </BreakpointContent>
+      </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            shouldBeEnabled = "No"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "../engine/Engine.cpp"
+            timestampString = "587480407.7089339"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "1196"
+            endingLineNumber = "1196"
+            landmarkName = "vKeyHandleEvent(const vKeyEvent&amp; event, const vKeyEventState&amp; state, const Uint16&amp; data, const Uint8&amp; capsStatus, const bool&amp; otherControlKey)"
+            landmarkType = "9">
+         </BreakpointContent>
+      </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            shouldBeEnabled = "No"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "ModernKey/MyTextField.m"
+            timestampString = "587288633.600421"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "17"
+            endingLineNumber = "17"
+            landmarkName = "-drawRect:"
+            landmarkType = "7">
+         </BreakpointContent>
+      </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            shouldBeEnabled = "No"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "ModernKey/ViewController.m"
+            timestampString = "587480064.898553"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "187"
+            endingLineNumber = "187"
+            landmarkName = "-onSwitchKeyChange:character:"
+            landmarkType = "7">
+         </BreakpointContent>
+      </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            shouldBeEnabled = "No"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "ModernKey/MyTextField.m"
+            timestampString = "587288633.600484"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "59"
+            endingLineNumber = "59"
+            landmarkName = "-setTextByChar:"
+            landmarkType = "7">
+         </BreakpointContent>
+      </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            shouldBeEnabled = "No"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "../engine/Engine.cpp"
+            timestampString = "587480407.709031"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "1022"
+            endingLineNumber = "1022"
             landmarkName = "handleMainKey(const Uint16&amp; data, const bool&amp; isCaps)"
             landmarkType = "9">
          </BreakpointContent>
@@ -1146,12 +1258,76 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "../engine/Engine.cpp"
-            timestampString = "572957765.0142649"
+            timestampString = "587480407.7090991"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "525"
-            endingLineNumber = "525"
-            landmarkName = "insertD(const Uint16&amp; data, const bool&amp; isCaps)"
+            startingLineNumber = "1020"
+            endingLineNumber = "1020"
+            landmarkName = "handleMainKey(const Uint16&amp; data, const bool&amp; isCaps)"
+            landmarkType = "9">
+         </BreakpointContent>
+      </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            shouldBeEnabled = "No"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "ModernKey/ViewController.m"
+            timestampString = "587480064.898944"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "188"
+            endingLineNumber = "188"
+            landmarkName = "-onSwitchKeyChange:character:"
+            landmarkType = "7">
+         </BreakpointContent>
+      </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            shouldBeEnabled = "No"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "ModernKey/ViewController.m"
+            timestampString = "587480064.8991621"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "190"
+            endingLineNumber = "190"
+            landmarkName = "-onSwitchKeyChange:character:"
+            landmarkType = "7">
+         </BreakpointContent>
+      </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            shouldBeEnabled = "No"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "ModernKey/ViewController.m"
+            timestampString = "587480064.899372"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "195"
+            endingLineNumber = "195"
+            landmarkName = "-onBeepSound:"
+            landmarkType = "7">
+         </BreakpointContent>
+      </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            shouldBeEnabled = "No"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "../engine/Engine.cpp"
+            timestampString = "587480407.7092"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "1089"
+            endingLineNumber = "1089"
+            landmarkName = "vKeyHandleEvent(const vKeyEvent&amp; event, const vKeyEventState&amp; state, const Uint16&amp; data, const Uint8&amp; capsStatus, const bool&amp; otherControlKey)"
             landmarkType = "9">
          </BreakpointContent>
       </BreakpointProxy>
@@ -1162,12 +1338,1036 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "../engine/Engine.cpp"
-            timestampString = "572957765.014316"
+            timestampString = "587480407.709271"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "545"
-            endingLineNumber = "545"
-            landmarkName = "insertD(const Uint16&amp; data, const bool&amp; isCaps)"
+            startingLineNumber = "574"
+            endingLineNumber = "574"
+            landmarkName = "handleOldMark()"
+            landmarkType = "9">
+         </BreakpointContent>
+      </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            shouldBeEnabled = "No"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "../engine/Engine.cpp"
+            timestampString = "587480407.7093379"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "606"
+            endingLineNumber = "606"
+            landmarkName = "insertMark(const Uint32&amp; markMask, const bool&amp; canModifyFlag)"
+            landmarkType = "9">
+         </BreakpointContent>
+      </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            shouldBeEnabled = "No"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "../engine/Engine.cpp"
+            timestampString = "587480407.7094049"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "571"
+            endingLineNumber = "571"
+            landmarkName = "handleOldMark()"
+            landmarkType = "9">
+         </BreakpointContent>
+      </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            shouldBeEnabled = "No"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "../engine/Engine.cpp"
+            timestampString = "587480407.7094719"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "596"
+            endingLineNumber = "596"
+            landmarkName = "insertMark(const Uint32&amp; markMask, const bool&amp; canModifyFlag)"
+            landmarkType = "9">
+         </BreakpointContent>
+      </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            shouldBeEnabled = "No"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "../engine/Engine.cpp"
+            timestampString = "587480407.709538"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "694"
+            endingLineNumber = "694"
+            landmarkName = "insertAOE(const Uint16&amp; data, const bool&amp; isCaps)"
+            landmarkType = "9">
+         </BreakpointContent>
+      </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            shouldBeEnabled = "No"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "ModernKey/MacroViewController.m"
+            timestampString = "586626761.8989"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "38"
+            endingLineNumber = "38"
+            landmarkName = "-numberOfRowsInTableView:"
+            landmarkType = "7">
+         </BreakpointContent>
+      </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            shouldBeEnabled = "No"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "ModernKey/MacroViewController.m"
+            timestampString = "586626761.899302"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "42"
+            endingLineNumber = "42"
+            landmarkName = "-tableView:viewForTableColumn:row:"
+            landmarkType = "7">
+         </BreakpointContent>
+      </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            shouldBeEnabled = "No"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "ModernKey/MacroViewController.m"
+            timestampString = "586626761.899495"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "49"
+            endingLineNumber = "49"
+            landmarkName = "-tableView:viewForTableColumn:row:"
+            landmarkType = "7">
+         </BreakpointContent>
+      </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            shouldBeEnabled = "No"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "OpenKeyTest/main.mm"
+            timestampString = "586974120.774164"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "20"
+            endingLineNumber = "20"
+            landmarkName = "main(int argc, const char * argv[])"
+            landmarkType = "9">
+         </BreakpointContent>
+      </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            shouldBeEnabled = "No"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "../engine/Engine.cpp"
+            timestampString = "587480407.7096421"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "982"
+            endingLineNumber = "982"
+            landmarkName = "handleMainKey(const Uint16&amp; data, const bool&amp; isCaps)"
+            landmarkType = "9">
+         </BreakpointContent>
+      </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            shouldBeEnabled = "No"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "../engine/Engine.cpp"
+            timestampString = "587480407.70971"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "1000"
+            endingLineNumber = "1000"
+            landmarkName = "handleMainKey(const Uint16&amp; data, const bool&amp; isCaps)"
+            landmarkType = "9">
+         </BreakpointContent>
+      </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            shouldBeEnabled = "No"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "../engine/Engine.cpp"
+            timestampString = "587480407.709777"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "712"
+            endingLineNumber = "712"
+            landmarkName = "insertW(const Uint16&amp; data, const bool&amp; isCaps)"
+            landmarkType = "9">
+         </BreakpointContent>
+      </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            shouldBeEnabled = "No"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "../engine/Macro.cpp"
+            timestampString = "587465262.386089"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "81"
+            endingLineNumber = "81"
+            landmarkName = "initMacroMap(const Byte* pData, const int&amp; size)"
+            landmarkType = "9">
+         </BreakpointContent>
+      </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            shouldBeEnabled = "No"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "../engine/Macro.cpp"
+            timestampString = "587465262.386126"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "108"
+            endingLineNumber = "108"
+            landmarkName = "initMacroMap(const Byte* pData, const int&amp; size)"
+            landmarkType = "9">
+         </BreakpointContent>
+      </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            shouldBeEnabled = "No"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "../engine/Engine.cpp"
+            timestampString = "587480407.709865"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "1130"
+            endingLineNumber = "1130"
+            landmarkName = "vKeyHandleEvent(const vKeyEvent&amp; event, const vKeyEventState&amp; state, const Uint16&amp; data, const Uint8&amp; capsStatus, const bool&amp; otherControlKey)"
+            landmarkType = "9">
+         </BreakpointContent>
+      </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            shouldBeEnabled = "No"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "../engine/Engine.cpp"
+            timestampString = "587480407.709932"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "1087"
+            endingLineNumber = "1087"
+            landmarkName = "vKeyHandleEvent(const vKeyEvent&amp; event, const vKeyEventState&amp; state, const Uint16&amp; data, const Uint8&amp; capsStatus, const bool&amp; otherControlKey)"
+            landmarkType = "9">
+         </BreakpointContent>
+      </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            shouldBeEnabled = "No"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "ModernKey/OpenKey.mm"
+            timestampString = "587389912.8154041"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "447"
+            endingLineNumber = "447"
+            landmarkName = "OpenKeyCallback(CGEventTapProxy proxy, CGEventType type, CGEventRef event, void *refcon)"
+            landmarkType = "9">
+         </BreakpointContent>
+      </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            shouldBeEnabled = "No"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "../engine/Engine.cpp"
+            timestampString = "587480407.710011"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "713"
+            endingLineNumber = "713"
+            landmarkName = "insertW(const Uint16&amp; data, const bool&amp; isCaps)"
+            landmarkType = "9">
+         </BreakpointContent>
+      </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            shouldBeEnabled = "No"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "../engine/Engine.cpp"
+            timestampString = "587480407.710079"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "714"
+            endingLineNumber = "714"
+            landmarkName = "insertW(const Uint16&amp; data, const bool&amp; isCaps)"
+            landmarkType = "9">
+         </BreakpointContent>
+      </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            shouldBeEnabled = "No"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "../engine/Engine.cpp"
+            timestampString = "587480407.710145"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "1043"
+            endingLineNumber = "1043"
+            landmarkName = "checkRestoreIfWrongSpelling(const int&amp; handleCode)"
+            landmarkType = "9">
+         </BreakpointContent>
+      </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            shouldBeEnabled = "No"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "../engine/Engine.cpp"
+            timestampString = "587480407.710211"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "135"
+            endingLineNumber = "135"
+            landmarkName = "checkSpelling(const bool&amp; forceCheckVowel=false)"
+            landmarkType = "9">
+         </BreakpointContent>
+      </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            shouldBeEnabled = "No"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "../engine/Engine.cpp"
+            timestampString = "587480407.710279"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "172"
+            endingLineNumber = "172"
+            landmarkName = "checkSpelling(const bool&amp; forceCheckVowel=false)"
+            landmarkType = "9">
+         </BreakpointContent>
+      </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            shouldBeEnabled = "No"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "../engine/Engine.cpp"
+            timestampString = "587480407.7103471"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "188"
+            endingLineNumber = "188"
+            landmarkName = "checkSpelling(const bool&amp; forceCheckVowel=false)"
+            landmarkType = "9">
+         </BreakpointContent>
+      </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            shouldBeEnabled = "No"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "../engine/Engine.cpp"
+            timestampString = "587480407.7104191"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "181"
+            endingLineNumber = "181"
+            landmarkName = "checkSpelling(const bool&amp; forceCheckVowel=false)"
+            landmarkType = "9">
+         </BreakpointContent>
+      </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            shouldBeEnabled = "No"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "../engine/Engine.cpp"
+            timestampString = "587480407.71049"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "1153"
+            endingLineNumber = "1153"
+            landmarkName = "vKeyHandleEvent(const vKeyEvent&amp; event, const vKeyEventState&amp; state, const Uint16&amp; data, const Uint8&amp; capsStatus, const bool&amp; otherControlKey)"
+            landmarkType = "9">
+         </BreakpointContent>
+      </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            shouldBeEnabled = "No"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "ModernKey/MacroViewController.mm"
+            timestampString = "587389912.8182451"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "57"
+            endingLineNumber = "57"
+            landmarkName = "-onAddMacro:"
+            landmarkType = "7">
+         </BreakpointContent>
+      </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            shouldBeEnabled = "No"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "ModernKey/MacroViewController.mm"
+            timestampString = "587389912.818323"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "74"
+            endingLineNumber = "74"
+            landmarkName = "-showMessage:"
+            landmarkType = "7">
+         </BreakpointContent>
+      </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            shouldBeEnabled = "No"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "ModernKey/MacroViewController.mm"
+            timestampString = "587389912.818361"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "58"
+            endingLineNumber = "58"
+            landmarkName = "-onAddMacro:"
+            landmarkType = "7">
+         </BreakpointContent>
+      </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            shouldBeEnabled = "No"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "../engine/Macro.cpp"
+            timestampString = "587465262.388966"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "158"
+            endingLineNumber = "158"
+            landmarkName = "addMacro(const string&amp; macroText, const string&amp; macroContent)"
+            landmarkType = "9">
+         </BreakpointContent>
+      </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            shouldBeEnabled = "No"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "../engine/Engine.cpp"
+            timestampString = "587480407.710596"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "1131"
+            endingLineNumber = "1131"
+            landmarkName = "vKeyHandleEvent(const vKeyEvent&amp; event, const vKeyEventState&amp; state, const Uint16&amp; data, const Uint8&amp; capsStatus, const bool&amp; otherControlKey)"
+            landmarkType = "9">
+         </BreakpointContent>
+      </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            shouldBeEnabled = "No"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "../engine/Macro.cpp"
+            timestampString = "587465262.389271"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "162"
+            endingLineNumber = "162"
+            landmarkName = "addMacro(const string&amp; macroText, const string&amp; macroContent)"
+            landmarkType = "9">
+         </BreakpointContent>
+      </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            shouldBeEnabled = "No"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "../engine/Macro.cpp"
+            timestampString = "587465262.389309"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "135"
+            endingLineNumber = "135"
+            landmarkName = "findMacro(vector&lt;Uint32&gt;&amp; key, vector&lt;Uint32&gt;&amp; macroContentCode)"
+            landmarkType = "9">
+         </BreakpointContent>
+      </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            shouldBeEnabled = "No"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "../engine/Macro.cpp"
+            timestampString = "587465262.389338"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "132"
+            endingLineNumber = "132"
+            landmarkName = "findMacro(vector&lt;Uint32&gt;&amp; key, vector&lt;Uint32&gt;&amp; macroContentCode)"
+            landmarkType = "9">
+         </BreakpointContent>
+      </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            shouldBeEnabled = "No"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "../engine/Engine.cpp"
+            timestampString = "587480407.710692"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "1218"
+            endingLineNumber = "1218"
+            landmarkName = "vKeyHandleEvent(const vKeyEvent&amp; event, const vKeyEventState&amp; state, const Uint16&amp; data, const Uint8&amp; capsStatus, const bool&amp; otherControlKey)"
+            landmarkType = "9">
+         </BreakpointContent>
+      </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            shouldBeEnabled = "No"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "../engine/Engine.cpp"
+            timestampString = "587480407.710761"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "1112"
+            endingLineNumber = "1112"
+            landmarkName = "vKeyHandleEvent(const vKeyEvent&amp; event, const vKeyEventState&amp; state, const Uint16&amp; data, const Uint8&amp; capsStatus, const bool&amp; otherControlKey)"
+            landmarkType = "9">
+         </BreakpointContent>
+      </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            shouldBeEnabled = "No"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "../engine/Engine.cpp"
+            timestampString = "587480407.710829"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "1180"
+            endingLineNumber = "1180"
+            landmarkName = "vKeyHandleEvent(const vKeyEvent&amp; event, const vKeyEventState&amp; state, const Uint16&amp; data, const Uint8&amp; capsStatus, const bool&amp; otherControlKey)"
+            landmarkType = "9">
+         </BreakpointContent>
+      </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            shouldBeEnabled = "No"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "../engine/Engine.cpp"
+            timestampString = "587480407.7108949"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "1090"
+            endingLineNumber = "1090"
+            landmarkName = "vKeyHandleEvent(const vKeyEvent&amp; event, const vKeyEventState&amp; state, const Uint16&amp; data, const Uint8&amp; capsStatus, const bool&amp; otherControlKey)"
+            landmarkType = "9">
+         </BreakpointContent>
+      </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            shouldBeEnabled = "No"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "ModernKey/AppDelegate.m"
+            timestampString = "587389912.820389"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "83"
+            endingLineNumber = "83"
+            landmarkName = "-applicationDidFinishLaunching:"
+            landmarkType = "7">
+         </BreakpointContent>
+      </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            shouldBeEnabled = "No"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "../engine/Macro.cpp"
+            timestampString = "587465262.3904279"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "30"
+            endingLineNumber = "30"
+            landmarkName = "convert(const string&amp; str, vector&lt;Uint32&gt;&amp; outData)"
+            landmarkType = "9">
+         </BreakpointContent>
+      </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            shouldBeEnabled = "No"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "../engine/Engine.cpp"
+            timestampString = "587480407.710984"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "1063"
+            endingLineNumber = "1063"
+            landmarkName = "vEnglishMode(const vKeyEventState&amp; state, const Uint16&amp; data, const bool&amp; isCaps, const bool&amp; otherControlKey)"
+            landmarkType = "9">
+         </BreakpointContent>
+      </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            shouldBeEnabled = "No"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "../engine/Engine.cpp"
+            timestampString = "587480407.711053"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "1059"
+            endingLineNumber = "1059"
+            landmarkName = "vEnglishMode(const vKeyEventState&amp; state, const Uint16&amp; data, const bool&amp; isCaps, const bool&amp; otherControlKey)"
+            landmarkType = "9">
+         </BreakpointContent>
+      </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            shouldBeEnabled = "No"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "ModernKey/OpenKey.mm"
+            timestampString = "587389912.821115"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "418"
+            endingLineNumber = "418"
+            landmarkName = "OpenKeyCallback(CGEventTapProxy proxy, CGEventType type, CGEventRef event, void *refcon)"
+            landmarkType = "9">
+         </BreakpointContent>
+      </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            shouldBeEnabled = "No"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "ModernKey/OpenKey.mm"
+            timestampString = "587389912.821183"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "419"
+            endingLineNumber = "419"
+            landmarkName = "OpenKeyCallback(CGEventTapProxy proxy, CGEventType type, CGEventRef event, void *refcon)"
+            landmarkType = "9">
+         </BreakpointContent>
+      </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            shouldBeEnabled = "No"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "ModernKey/OpenKey.mm"
+            timestampString = "587389912.821274"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "325"
+            endingLineNumber = "325"
+            landmarkName = "handleMacro()"
+            landmarkType = "9">
+         </BreakpointContent>
+      </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            shouldBeEnabled = "No"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "../engine/Engine.cpp"
+            timestampString = "587480407.7111501"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "175"
+            endingLineNumber = "175"
+            landmarkName = "checkSpelling(const bool&amp; forceCheckVowel=false)"
+            landmarkType = "9">
+         </BreakpointContent>
+      </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            shouldBeEnabled = "No"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "../engine/Engine.cpp"
+            timestampString = "587480407.711219"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "171"
+            endingLineNumber = "171"
+            landmarkName = "checkSpelling(const bool&amp; forceCheckVowel=false)"
+            landmarkType = "9">
+         </BreakpointContent>
+      </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            shouldBeEnabled = "No"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "ModernKey/OpenKey.mm"
+            timestampString = "587389912.822003"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "220"
+            endingLineNumber = "220"
+            landmarkName = "SendNewCharString(const bool&amp; dataFromMacro=false, const Uint16&amp; offset=0)"
+            landmarkType = "9">
+         </BreakpointContent>
+      </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            shouldBeEnabled = "No"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "ModernKey/OpenKey.mm"
+            timestampString = "587389912.82207"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "285"
+            endingLineNumber = "285"
+            landmarkName = "SendNewCharString(const bool&amp; dataFromMacro=false, const Uint16&amp; offset=0)"
+            landmarkType = "9">
+         </BreakpointContent>
+      </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            shouldBeEnabled = "No"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "ModernKey/OpenKey.mm"
+            timestampString = "587389912.822131"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "224"
+            endingLineNumber = "224"
+            landmarkName = "SendNewCharString(const bool&amp; dataFromMacro=false, const Uint16&amp; offset=0)"
+            landmarkType = "9">
+         </BreakpointContent>
+      </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            shouldBeEnabled = "No"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "ModernKey/OpenKey.mm"
+            timestampString = "587389912.82219"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "265"
+            endingLineNumber = "265"
+            landmarkName = "SendNewCharString(const bool&amp; dataFromMacro=false, const Uint16&amp; offset=0)"
+            landmarkType = "9">
+         </BreakpointContent>
+      </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            shouldBeEnabled = "No"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "ModernKey/OpenKey.mm"
+            timestampString = "587389912.82228"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "284"
+            endingLineNumber = "284"
+            landmarkName = "SendNewCharString(const bool&amp; dataFromMacro=false, const Uint16&amp; offset=0)"
+            landmarkType = "9">
+         </BreakpointContent>
+      </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            shouldBeEnabled = "No"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "../engine/SmartSwitchKey.cpp"
+            timestampString = "587389912.822345"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "20"
+            endingLineNumber = "20"
+            landmarkName = "initSmartSwitchKey(const Byte* pData, const int&amp; size)"
+            landmarkType = "9">
+         </BreakpointContent>
+      </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            shouldBeEnabled = "No"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "../engine/SmartSwitchKey.cpp"
+            timestampString = "587389912.822385"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "68"
+            endingLineNumber = "68"
+            landmarkName = "setAppInputMethodStatus(const string&amp; bundleId, const int&amp; language)"
+            landmarkType = "9">
+         </BreakpointContent>
+      </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            shouldBeEnabled = "No"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "ModernKey/OpenKey.mm"
+            timestampString = "587389912.822422"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "486"
+            endingLineNumber = "486"
+            landmarkName = "OpenKeyCallback(CGEventTapProxy proxy, CGEventType type, CGEventRef event, void *refcon)"
+            landmarkType = "9">
+         </BreakpointContent>
+      </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            shouldBeEnabled = "No"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "ModernKey/OpenKey.mm"
+            timestampString = "587389912.822464"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "485"
+            endingLineNumber = "485"
+            landmarkName = "OpenKeyCallback(CGEventTapProxy proxy, CGEventType type, CGEventRef event, void *refcon)"
+            landmarkType = "9">
+         </BreakpointContent>
+      </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            shouldBeEnabled = "No"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "ModernKey/OpenKey.mm"
+            timestampString = "587389912.822511"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "115"
+            endingLineNumber = "115"
+            landmarkName = "SendKeyCode(Uint32 data)"
+            landmarkType = "9">
+         </BreakpointContent>
+      </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            shouldBeEnabled = "No"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "../engine/Engine.cpp"
+            timestampString = "587480407.711368"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "1064"
+            endingLineNumber = "1064"
+            landmarkName = "vEnglishMode(const vKeyEventState&amp; state, const Uint16&amp; data, const bool&amp; isCaps, const bool&amp; otherControlKey)"
+            landmarkType = "9">
+         </BreakpointContent>
+      </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            shouldBeEnabled = "No"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "../engine/Engine.cpp"
+            timestampString = "587480407.711439"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "1077"
+            endingLineNumber = "1077"
+            landmarkName = "vEnglishMode(const vKeyEventState&amp; state, const Uint16&amp; data, const bool&amp; isCaps, const bool&amp; otherControlKey)"
+            landmarkType = "9">
+         </BreakpointContent>
+      </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            shouldBeEnabled = "No"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "../engine/Engine.cpp"
+            timestampString = "587480407.711507"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "225"
+            endingLineNumber = "225"
+            landmarkName = "checkGrammar(const int&amp; deltaBackSpace)"
+            landmarkType = "9">
+         </BreakpointContent>
+      </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            shouldBeEnabled = "No"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "../engine/Engine.cpp"
+            timestampString = "587480407.711575"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "465"
+            endingLineNumber = "465"
+            landmarkName = "canHasEndConsonant()"
+            landmarkType = "9">
+         </BreakpointContent>
+      </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            shouldBeEnabled = "No"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "../engine/Engine.cpp"
+            timestampString = "587480407.711637"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "455"
+            endingLineNumber = "455"
+            landmarkName = "canHasEndConsonant()"
+            landmarkType = "9">
+         </BreakpointContent>
+      </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            shouldBeEnabled = "No"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "../engine/Engine.cpp"
+            timestampString = "587480407.711766"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "464"
+            endingLineNumber = "464"
+            landmarkName = "canHasEndConsonant()"
+            landmarkType = "9">
+         </BreakpointContent>
+      </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            shouldBeEnabled = "No"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "../engine/Engine.cpp"
+            timestampString = "587480407.71183"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "460"
+            endingLineNumber = "460"
+            landmarkName = "canHasEndConsonant()"
+            landmarkType = "9">
+         </BreakpointContent>
+      </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            shouldBeEnabled = "No"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "../engine/Engine.cpp"
+            timestampString = "587480407.711886"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "473"
+            endingLineNumber = "473"
+            landmarkName = "handleModernMark()"
+            landmarkType = "9">
+         </BreakpointContent>
+      </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            shouldBeEnabled = "No"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "../engine/Engine.cpp"
+            timestampString = "587480407.711947"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "554"
+            endingLineNumber = "554"
+            landmarkName = "handleModernMark()"
             landmarkType = "9">
          </BreakpointContent>
       </BreakpointProxy>
