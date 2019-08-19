@@ -49,7 +49,7 @@ Bộ gõ tiếng Việt mới cho macOS, sử dụng kỹ thuật backkey. Loạ
 **Cài đặt thủ công:**
 Tải bản OpenKey mới nhất từ [đây](https://github.com/tuyenvm/OpenKey/releases), mở file `dmg` ra rồi kéo thả `OpenKey.app` vào thư mục `Application`.
 
-**Cài bằng Homebrew:** (by @nhymxu)
+**Cài bằng Homebrew:** (by nhymxu)  
 Nếu chưa cài Homebrew, mở terminal, nhập:
 ```
 $ /usr/bin/ruby -e "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install)"
