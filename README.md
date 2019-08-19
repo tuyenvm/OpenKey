@@ -64,9 +64,9 @@ Gõ lệnh sau để homebrew tự cài OpenKey cho bạn:
 $ brew cask install openkey
 ```
 
-Để update phiên bản mới nhất của OpenKey, bạn chỉ cần thêm tham số `--force`
+Để update phiên bản mới nhất của OpenKey
 ```
-$ brew cask install openkey --force
+$ brew cask upgrade openkey
 ```
 
 ## Note - Lưu ý:
