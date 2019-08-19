@@ -1,3 +1,5 @@
+
+
 # OpenKey
 ### [Download bản mới nhất](https://github.com/tuyenvm/OpenKey/releases)
 ### Open source Vietnamese Input App for macOS - Bộ gõ tiếng Việt nguồn mở cho macOS.
@@ -10,12 +12,12 @@ Bộ gõ tiếng Việt mới cho macOS, sử dụng kỹ thuật backkey. Loạ
 ![Menu](https://github.com/tuyenvm/OpenKey/raw/master/Images/screenshot2.1.png "Menu bar")
 ![Gõ tắt](https://github.com/tuyenvm/OpenKey/raw/master/Images/screenshot4.png "Macro")
 
-##### Input Type - Hỗ trợ kiểu gõ
+## Input Type - Hỗ trợ kiểu gõ
 - Telex
 - VNI
 - Simple Telex
 
-##### Code - Bảng mã:
+## Code - Bảng mã:
 - Unicode (Unicode dựng sẵn).
 - TCVN3 (ABC).
 - VNI Windows.
@@ -23,7 +25,7 @@ Bộ gõ tiếng Việt mới cho macOS, sử dụng kỹ thuật backkey. Loạ
 - Vietnamese Locale CP 1258.
 - ...
 
-##### Feature - Tính năng:
+## Feature - Tính năng:
 - **Modern orthography** (On/Off) - Đặt dấu oà, uý thay vì òa, úy.
 - **Quick Telex** (On/Off) - Gõ nhanh (cc=ch, gg=gi, kk=kh, nn=ng, qq=qu, pp=ph, tt=th).
 - **Grammar check** (On/Off) - Kiểm tra ngữ pháp.
@@ -43,16 +45,40 @@ Bộ gõ tiếng Việt mới cho macOS, sử dụng kỹ thuật backkey. Loạ
 
 [Changelog](https://github.com/tuyenvm/OpenKey/blob/master/CHANGELOG.md)
 
-### Note - Lưu ý:
+## Cài đặt:
+**Cài đặt thủ công:**
+Tải bản OpenKey mới nhất từ [đây](https://github.com/tuyenvm/OpenKey/releases), mở file `dmg` ra rồi kéo thả `OpenKey.app` vào thư mục `Application`.
+
+**Cài bằng Homebrew:** (by @nhymxu)
+Nếu chưa cài Homebrew, mở terminal, nhập:
+```
+$ /usr/bin/ruby -e "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install)"
+```
+
+Kiểm tra phiên bản OpenKey:
+```
+$ brew cask info openkey
+```
+Gõ lệnh sau để homebrew tự cài OpenKey cho bạn:
+```
+$ brew cask install openkey
+```
+
+Để update phiên bản mới nhất của OpenKey, bạn chỉ cần thêm tham số `--force`
+```
+$ brew cask install openkey --force
+```
+
+## Note - Lưu ý:
 OpenKey needs Accessibility permission, go to System Preferences -> Security & Privacy -> Accessibility, enable OpenKey.app. Don't turn off while using.
 ![Guide](https://github.com/tuyenvm/OpenKey/raw/master/Images/screenshot3.png "Accessibility").
 
-### Author
+## Author
 Mai Vũ Tuyên.
 Any ideas, please send me via (maivutuyen.91@gmail.com)  
 Fanpage: [https://www.facebook.com/OpenKeyVN](https://www.facebook.com/OpenKeyVN)
 
-### One more thing
+## One more thing
 [Buy me a coffee ^^](https://tuyenvm.github.io)  
 [Or Redbull is also Ok ^^](https://paypal.me/tuyenmai)  
 Thank you very much.
