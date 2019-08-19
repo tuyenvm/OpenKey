@@ -46,7 +46,7 @@ Bộ gõ tiếng Việt mới cho macOS, sử dụng kỹ thuật backkey. Loạ
 [Changelog](https://github.com/tuyenvm/OpenKey/blob/master/CHANGELOG.md)
 
 ## Cài đặt:
-**Cài đặt thủ công:**
+**Cài đặt thủ công:**  
 Tải bản OpenKey mới nhất từ [đây](https://github.com/tuyenvm/OpenKey/releases), mở file `dmg` ra rồi kéo thả `OpenKey.app` vào thư mục `Application`.
 
 **Cài bằng Homebrew:** (by nhymxu)  
