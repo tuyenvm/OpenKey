@@ -12,6 +12,7 @@
 #include <iostream>
 #include <locale>
 #include <codecvt>
+#include <memory.h>
 
 using namespace std;
 

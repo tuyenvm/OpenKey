@@ -11,8 +11,8 @@
 
 #include "DataType.h"
 #include "Vietnamese.h"
-#import "Macro.h"
-#import "SmartSwitchKey.h"
+#include "Macro.h"
+#include "SmartSwitchKey.h"
 
 #define IS_DEBUG 1
 #define LOBYTE(data) (data & 0xFF)

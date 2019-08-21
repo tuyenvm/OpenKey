@@ -6,7 +6,7 @@
 //  Copyright © 2019 Tuyen Mai. All rights reserved.
 //
 #include <iostream>
-
+#include <algorithm>
 #include "Engine.h"
 #include <string.h>
 #include "Macro.h"
