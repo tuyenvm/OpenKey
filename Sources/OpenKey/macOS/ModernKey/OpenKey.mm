@@ -207,6 +207,30 @@ extern "C" {
         }
     }
     
+    void SendShiftAndLeftArrow() {
+        CGEventRef eventVkeyDown = CGEventCreateKeyboardEvent (myEventSource, KEY_LEFT, true);
+        CGEventRef eventVkeyUp = CGEventCreateKeyboardEvent (myEventSource, KEY_LEFT, false);
+        _privateFlag = CGEventGetFlags(eventVkeyDown);
+        _privateFlag |= kCGEventFlagMaskShift;
+        CGEventSetFlags(eventVkeyDown, _privateFlag);
+        CGEventSetFlags(eventVkeyUp, _privateFlag);
+        
+        CGEventTapPostEvent(_proxy, eventVkeyDown);
+        CGEventTapPostEvent(_proxy, eventVkeyUp);
+        
+        if (IS_DOUBLE_CODE(vCodeTable)) { //VNI or Unicode Compound
+            _syncIndex--;
+            if (_syncKey[_syncIndex] > 1) {
+                if (!(vCodeTable == 3 && [_unicodeCompoundApp containsObject:FRONT_APP])) {
+                    CGEventTapPostEvent(_proxy, eventVkeyDown);
+                    CGEventTapPostEvent(_proxy, eventVkeyUp);
+                }
+            }
+        }
+        CFRelease(eventVkeyDown);
+        CFRelease(eventVkeyUp);
+    }
+    
     void SendNewCharString(const bool& dataFromMacro=false, const Uint16& offset=0) {
         _j = 0;
         _newCharSize = dataFromMacro ? pData->macroData.size() : pData->newCharCount;
@@ -445,7 +469,13 @@ extern "C" {
                     if (pData->extCode == 1) {
                         _syncIndex = 0;
                     } else if (pData->extCode == 2) {
-                        if (_syncIndex > 0) _syncIndex--;
+                        if (_syncIndex > 0) {
+                            if (_syncKey[_syncIndex-1] > 1) {
+                                _syncKey[_syncIndex-1]--;
+                            } else {
+                                _syncIndex--;
+                            }
+                        }
                     } else if (pData->extCode == 3) {
                         InsertKeyLength(1);
                     }
@@ -454,7 +484,7 @@ extern "C" {
             } else if (pData->code == vWillProcess || pData->code == vRestore || pData->code == vRestoreAndStartNewSession) { //handle result signal
                 
                 //fix autocomplete
-                if (vFixRecommendBrowser) {
+                if (vFixRecommendBrowser && pData->extCode != 4) {
                     SendEmptyCharacter();
                     pData->backspaceCount++;
                 }

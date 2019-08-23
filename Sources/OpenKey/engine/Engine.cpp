@@ -12,13 +12,14 @@
 #include "Macro.h"
 
 static vector<Uint8> _charKeyCode = {
-    50, KEY_1, KEY_2, KEY_3, KEY_4, KEY_5, KEY_6, KEY_7, KEY_8, KEY_9, KEY_0, 25, 29, 27, 24, KEY_LEFT_BRACKET, KEY_RIGHT_BRACKET, 42,
-    41, 39, 43, KEY_DOT, 44
+    KEY_BACKQUOTE, KEY_1, KEY_2, KEY_3, KEY_4, KEY_5, KEY_6, KEY_7, KEY_8, KEY_9, KEY_0, KEY_MINUS, KEY_EQUALS,
+    KEY_LEFT_BRACKET, KEY_RIGHT_BRACKET, KEY_BACK_SLASH,
+    KEY_SEMICOLON, KEY_QUOTE, KEY_COMMA, KEY_DOT, KEY_SLASH
 };
 
 static vector<Uint8> _breakCode = {
-    KEY_ESC, KEY_TAB, KEY_ENTER, KEY_RETURN, KEY_LEFT, KEY_RIGHT, KEY_DOWN, KEY_UP,
-    43, 47, 44, 41, 39, 42, 27, 24, 50, 48
+    KEY_ESC, KEY_TAB, KEY_ENTER, KEY_RETURN, KEY_LEFT, KEY_RIGHT, KEY_DOWN, KEY_UP, KEY_COMMA, KEY_DOT,
+    KEY_SLASH, KEY_SEMICOLON, KEY_QUOTE, KEY_BACK_SLASH, KEY_MINUS, KEY_EQUALS, KEY_BACKQUOTE, KEY_TAB
 };
 
 static Uint16 ProcessingChar[][11] = {
@@ -162,13 +163,18 @@ void checkSpelling(const bool& forceCheckVowel=false) {
         //check next vowel
         k = j;
         VSI = k;
+        //August 23rd, 2019: fix case "que't"
+        if (CHR(VSI) == KEY_U && k > 0 && k < _index-1 && CHR(VSI-1) == KEY_Q) {
+            k = k + 1;
+            j = k;
+            VSI = k;
+        }
         for (l = 0; l < 3; l++) {
             if (k < _index && !IS_CONSONANT(CHR(k))) {
                 k++;
                 VEI = k;
             }
         }
-        
         if (k > j) { //has vowel,
             _spellingVowelOK = false;
             //check correct combined vowel
@@ -233,6 +239,23 @@ void checkGrammar(const int& deltaBackSpace) {
     
     l = VSI;
     
+    //if N key for case: "thuơn", "ưoi", "ưom", "ưoc"
+    if (_index >= 3) {
+        for (i = _index-1; i >= 0; i--) {
+            if (CHR(i) == KEY_N || CHR(i) == KEY_C || CHR(i) == KEY_I ||
+                CHR(i) == KEY_M || CHR(i) == KEY_P || CHR(i) == KEY_T) {
+                if (i - 2 >= 0 && CHR(i - 1) == KEY_O && CHR(i - 2) == KEY_U) {
+                    if ((TypingWord[i-1] & TONEW_MASK) ^ (TypingWord[i-2] & TONEW_MASK)) {
+                        TypingWord[i - 2] |= TONEW_MASK;
+                        TypingWord[i - 1] |= TONEW_MASK;
+                        isCheckedGrammar = true;
+                        break;
+                    }
+                }
+            }
+        }
+    }
+    
     //check mark
     if (_index >= 2) {
         for (i = l; i <= VEI; i++) {
@@ -240,25 +263,9 @@ void checkGrammar(const int& deltaBackSpace) {
                 Uint32 mark = TypingWord[i] & MARK_MASK;
                 TypingWord[i] &= ~MARK_MASK;
                 insertMark(mark, false);
-                isCheckedGrammar = true;
+                if (i != vowelWillSetMark)
+                    isCheckedGrammar = true;
                 break;
-            }
-        }
-    }
-    
-    //if N key for case: "thuơn", "ưoi", "ưom", "ưoc"
-    if (_index >= 3) {
-        for (i = _index-1; i >= 0; i--) {
-            if (CHR(i) == KEY_N || CHR(i) == KEY_C || CHR(i) == KEY_I ||
-                CHR(i) == KEY_M || CHR(i) == KEY_P || CHR(i) == KEY_T) {
-                if (i - 2 >= 0 && CHR(i - 1) == KEY_O && CHR(i - 2) == KEY_U) {
-                    if ((TypingWord[i-1] & TONEW_MASK) || (TypingWord[i-2] & TONEW_MASK)) {
-                        TypingWord[i - 2] |= TONEW_MASK;
-                        TypingWord[i - 1] |= TONEW_MASK;
-                        isCheckedGrammar = true;
-                        break;
-                    }
-                }
             }
         }
     }
@@ -275,6 +282,7 @@ void checkGrammar(const int& deltaBackSpace) {
         }
         hNCC = hBPC;
         hBPC += deltaBackSpace;
+        hExt = 4;
     }
 }
 
@@ -319,11 +327,16 @@ void startNewSession() {
 }
 
 void checkCorrectVowel(vector<vector<Uint16>>& charset, int& i, int& k, const Uint16& markKey) {
+    //ignore "qu" case
+    if (_index >= 2 && CHR(_index-1) == KEY_U && CHR(_index-2) == KEY_Q) {
+        isCorect = false;
+        return;
+    }
     k = _index - 1;
     for (j = (int)charset[i].size() - 1; j >= 0; j--) {
         if (charset[i][j] != CHR(k)) {
             isCorect = false;
-            break;
+            return;
         }
         k--;
         if (k < 0)
@@ -611,6 +624,8 @@ void insertMark(const Uint32& markMask, const bool& canModifyFlag) {
             handleOldMark();
         else
             handleModernMark();
+        if (TypingWord[VEI] & TONE_MASK || TypingWord[VEI] & TONEW_MASK)
+            vowelWillSetMark = VEI;
     }
     
     //send data
@@ -823,6 +838,7 @@ void reverseLastStandaloneChar(const Uint32& keyCode, const bool& isCaps) {
     hCode = vWillProcess;
     hBPC = 0;
     hNCC = 1;
+    hExt = 4;
     TypingWord[_index - 1] = (keyCode | TONEW_MASK | STANDALONE_MASK | (isCaps ? CAPS_MASK : 0));
     hData[0] = GET(TypingWord[_index - 1]);
 }
@@ -1156,7 +1172,10 @@ void vKeyHandleEvent(const vKeyEvent& event,
                 _stateIndex--;
             }
             if (_index > 0){
-                _index--;
+                if (IS_DOUBLE_CODE(vCodeTable) && TypingWord[_index-1] & MARK_MASK) { //VNI and Unicode compound
+                    TypingWord[_index-1] &= ~MARK_MASK;
+                } else
+                    _index--;
                 if (vCheckSpelling)
                     checkSpelling();
             }
@@ -1169,6 +1188,9 @@ void vKeyHandleEvent(const vKeyEvent& event,
             hExt = 2; //delete key
             if (_index == 0)
                 startNewSession();
+            else { //August 23rd continue check grammar
+                checkGrammar(1);
+            }
         }
     } else { //START AND CHECK KEY
         if (_spaceCount > 0) {

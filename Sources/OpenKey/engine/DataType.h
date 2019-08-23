@@ -69,6 +69,7 @@ struct vKeyHookState {
      * 1: Word Break
      * 2: Delete key
      * 3: Normal key
+     * 4: Should not send empty character
      */
     Byte extCode;
     
@@ -135,6 +136,15 @@ struct vKeyHookState {
 #define KEY_LEFT_SHIFT                          57
 #define KEY_RIGHT_SHIFT                         60
 #define KEY_DOT                                 47
+
+#define KEY_BACKQUOTE                           50
+#define KEY_MINUS                               27
+#define KEY_EQUALS                              24
+#define KEY_BACK_SLASH                          42
+#define KEY_SEMICOLON                           41
+#define KEY_QUOTE                               39
+#define KEY_COMMA                               43
+#define KEY_SLASH                               44
 
 //internal engine data
 #define CAPS_MASK                               0x10000
