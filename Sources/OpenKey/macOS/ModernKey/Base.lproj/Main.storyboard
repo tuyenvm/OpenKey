@@ -1527,6 +1527,7 @@
                         </subviews>
                     </view>
                     <connections>
+                        <outlet property="buttonAdd" destination="BJd-R9-7bL" id="fb4-JF-Jqo"/>
                         <outlet property="macroContent" destination="e48-Ve-MTZ" id="46P-f6-xbt"/>
                         <outlet property="macroName" destination="Vlj-ox-8lT" id="Dsy-hH-ZpE"/>
                         <outlet property="tableView" destination="LJ6-nV-dwY" id="aY4-Ak-dgV"/>

@@ -9,6 +9,9 @@
 #import "MacroViewController.h"
 #include "Engine.h"
 
+#define MACRO_ADD_TEXT @"Thêm"
+#define MACRO_EDIT_TEXT @"Sửa"
+
 @interface MacroViewController ()
 
 @end
@@ -40,6 +43,7 @@
     NSData* _data = [NSData dataWithBytes:macroData.data() length:macroData.size()];
     NSUserDefaults *prefs = [NSUserDefaults standardUserDefaults];
     [prefs setObject:_data forKey:@"macroData"];
+    [self.buttonAdd setTitle:MACRO_ADD_TEXT];
 }
 
 - (IBAction)onDeleteMacro:(id)sender {
@@ -50,6 +54,9 @@
     string text = [[self.macroName stringValue] UTF8String];
     if (deleteMacro(text)) {
         [self saveAndReload];
+        self.macroName.stringValue = @"";
+        self.macroContent.stringValue = @"";
+        [self.macroName becomeFirstResponder];
     }
 }
 
@@ -61,13 +68,12 @@
     
     string text = [[self.macroName stringValue] UTF8String];
     string content = [[self.macroContent stringValue] UTF8String];
-    if (addMacro(text, content)) {
-        self.macroName.stringValue = @"";
-        self.macroContent.stringValue = @"";
-        [self saveAndReload];
-    } else {
-        [self showMessage:@"Bạn đã thêm từ này rồi!"];
-    }
+
+    addMacro(text, content);
+    self.macroName.stringValue = @"";
+    self.macroContent.stringValue = @"";
+    [self.macroName becomeFirstResponder];
+    [self saveAndReload];
 }
 
 - (void)showMessage:(NSString*)msg {
@@ -79,6 +85,18 @@
     [alert beginSheetModalForWindow:self.view.window completionHandler:^(NSModalResponse returnCode) {
         
     }];
+}
+
+- (void)controlTextDidChange:(NSNotification *)notification {
+    NSTextField *textField = [notification object];
+    if (textField == self.macroName) {
+        string text = [[self.macroName stringValue] UTF8String];
+        if (hasMacro(text)) {
+            [self.buttonAdd setTitle:MACRO_EDIT_TEXT];
+        } else {
+            [self.buttonAdd setTitle:MACRO_ADD_TEXT];
+        }
+    }
 }
 
 #pragma mark TableView
@@ -104,6 +122,7 @@
 - (BOOL)tableView:(NSTableView *)tableView shouldSelectRow:(NSInteger)row {
     [self.macroName setStringValue:[NSString stringWithUTF8String:macroText[row].c_str()]];
     [self.macroContent setStringValue:[NSString stringWithUTF8String:macroContent[row].c_str()]];
+    [self.buttonAdd setTitle:MACRO_EDIT_TEXT];
     return YES;
 }
 

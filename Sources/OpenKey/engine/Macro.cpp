@@ -142,6 +142,12 @@ bool findMacro(vector<Uint32>& key, vector<Uint32>& macroContentCode) {
     return false;
 }
 
+bool hasMacro(const string& macroName) {
+    vector<Uint32> key;
+    convert(macroName, key);
+    return (macroMap.find(key) != macroMap.end());
+}
+
 void getAllMacro(vector<vector<Uint32>>& keys, vector<string>& macroTexts, vector<string>& macroContents) {
     keys.clear();
     macroTexts.clear();
@@ -156,16 +162,16 @@ void getAllMacro(vector<vector<Uint32>>& keys, vector<string>& macroTexts, vecto
 bool addMacro(const string& macroText, const string& macroContent) {
     vector<Uint32> key;
     convert(macroText, key);
-    if (macroMap.find(key) == macroMap.end()) {
+    if (macroMap.find(key) == macroMap.end()) { //add new macro
         MacroData data;
         data.macroText = macroText;
         data.macroContent = macroContent;
         convert(macroContent, data.macroContentCode);
-        
         macroMap[key] = data;
-        return true;
+    } else { //edit this macro
+        macroMap[key].macroContent = macroContent;
     }
-    return false;
+    return true;
 }
 
 bool deleteMacro(const string& macroText) {

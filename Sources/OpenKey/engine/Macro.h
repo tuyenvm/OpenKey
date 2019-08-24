@@ -38,6 +38,11 @@ void getMacroSaveData(vector<Byte>& outData);
 bool findMacro(vector<Uint32>& key, vector<Uint32>& macroContentCode);
 
 /**
+ * check has this macro or not
+ */
+bool hasMacro(const string& macroName);
+
+/**
  * Get all macro to show on macro table
  */
 void getAllMacro(vector<vector<Uint32>>& keys, vector<string>& macroTexts, vector<string>& macroContents);
