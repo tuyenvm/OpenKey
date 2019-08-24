@@ -170,6 +170,7 @@ bool addMacro(const string& macroText, const string& macroContent) {
         macroMap[key] = data;
     } else { //edit this macro
         macroMap[key].macroContent = macroContent;
+        convert(macroContent, macroMap[key].macroContentCode);
     }
     return true;
 }
