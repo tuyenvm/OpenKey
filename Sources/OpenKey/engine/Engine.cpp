@@ -42,6 +42,7 @@ static Uint16 ProcessingChar[][11] = {
 
 #define IS_MARK_KEY(keyCode) (((vInputType == vTelex || vInputType == vSimpleTelex) && (keyCode == KEY_S || keyCode == KEY_F || keyCode == KEY_R || keyCode == KEY_J || keyCode == KEY_X)) || \
                                         (vInputType == vVNI && (keyCode == KEY_1 || keyCode == KEY_2 || keyCode == KEY_3 || keyCode == KEY_5 || keyCode == KEY_4)))
+#define IS_BRACKET_KEY(key) (key == KEY_LEFT_BRACKET || key == KEY_RIGHT_BRACKET)
 
 #define VSI vowelStartIndex
 #define VEI vowelEndIndex
@@ -131,20 +132,27 @@ void setKeyData(const Byte& index, const Uint16& keyCode, const bool& isCaps) {
 bool _spellingOK = false;
 bool _spellingFlag = false;
 bool _spellingVowelOK = false;
+Byte _spellingEndIndex = 0;
 
 void checkSpelling(const bool& forceCheckVowel=false) {
     _spellingOK = false;
     _spellingVowelOK = true;
-    if (_index > 0) {
+    _spellingEndIndex = _index;
+    
+    if (_index > 0 && CHR(_index-1) == KEY_RIGHT_BRACKET) {
+        _spellingEndIndex = _index-1;
+    }
+    
+    if (_spellingEndIndex > 0) {
         j = 0;
         //Check first consonant
         if (IS_CONSONANT(CHR(0))) {
             for (i = 0; i < _consonantTable.size(); i++) {
                 _spellingFlag = false;
-                if (_index < _consonantTable[i].size())
+                if (_spellingEndIndex < _consonantTable[i].size())
                     _spellingFlag = true;
                 for (j = 0; j < _consonantTable[i].size(); j++) {
-                    if (_index > j && _consonantTable[i][j] != CHR(j)) {
+                    if (_spellingEndIndex > j && _consonantTable[i][j] != CHR(j)) {
                         _spellingFlag = true;
                         break;
                     }
@@ -156,7 +164,7 @@ void checkSpelling(const bool& forceCheckVowel=false) {
             }
         }
         
-        if (j == _index){ //for "d" case
+        if (j == _spellingEndIndex){ //for "d" case
             _spellingOK = true;
         }
         
@@ -164,13 +172,13 @@ void checkSpelling(const bool& forceCheckVowel=false) {
         k = j;
         VSI = k;
         //August 23rd, 2019: fix case "que't"
-        if (CHR(VSI) == KEY_U && k > 0 && k < _index-1 && CHR(VSI-1) == KEY_Q) {
+        if (CHR(VSI) == KEY_U && k > 0 && k < _spellingEndIndex-1 && CHR(VSI-1) == KEY_Q) {
             k = k + 1;
             j = k;
             VSI = k;
         }
         for (l = 0; l < 3; l++) {
-            if (k < _index && !IS_CONSONANT(CHR(k))) {
+            if (k < _spellingEndIndex && !IS_CONSONANT(CHR(k))) {
                 k++;
                 VEI = k;
             }
@@ -183,12 +191,12 @@ void checkSpelling(const bool& forceCheckVowel=false) {
                 for (l = 0; l < vowelSet.size(); l++) {
                     _spellingFlag = false;
                     for (ii = 1; ii < vowelSet[l].size(); ii++) {
-                        if (j + ii - 1 < _index && vowelSet[l][ii] != ((CHR(j + ii - 1) | (TypingWord[j + ii - 1] & TONEW_MASK) | (TypingWord[j + ii - 1] & TONE_MASK)))) {
+                        if (j + ii - 1 < _spellingEndIndex && vowelSet[l][ii] != ((CHR(j + ii - 1) | (TypingWord[j + ii - 1] & TONEW_MASK) | (TypingWord[j + ii - 1] & TONE_MASK)))) {
                             _spellingFlag = true;
                             break;
                         }
                     }
-                    if (_spellingFlag || (k < _index && !vowelSet[l][0]) || (j + ii - 1 < _index && !IS_CONSONANT(CHR(j + ii - 1))))
+                    if (_spellingFlag || (k < _spellingEndIndex && !vowelSet[l][0]) || (j + ii - 1 < _spellingEndIndex && !IS_CONSONANT(CHR(j + ii - 1))))
                         continue;
                     
                     _spellingVowelOK = true;
@@ -199,11 +207,12 @@ void checkSpelling(const bool& forceCheckVowel=false) {
             }
             
             //continue check last consonant
+            
             for (ii = 0; ii < _endConsonantTable.size(); ii++) {
                 _spellingFlag = false;
    
                 for (j = 0; j < _endConsonantTable[ii].size(); j++) {
-                    if (_index > k+j && _endConsonantTable[ii][j] != CHR(k + j)) {
+                    if (_spellingEndIndex > k+j && _endConsonantTable[ii][j] != CHR(k + j)) {
                         _spellingFlag = true;
                         break;
                     }
@@ -211,7 +220,7 @@ void checkSpelling(const bool& forceCheckVowel=false) {
                 if (_spellingFlag)
                     continue;
                 
-                if (k + j >= _index) {
+                if (k + j >= _spellingEndIndex) {
                     _spellingOK = true;
                     break;
                 }
@@ -437,6 +446,11 @@ void findAndCalculateVowel(const bool& forGrammar) {
             VSI = iii;
             vowelCount++;
         }
+    }
+    //August 26th, 2019: don't count "u" at "q u" as a vowel
+    if (VSI - 1 >= 0 && CHR(VSI) == KEY_U && CHR(VSI-1) == KEY_Q) {
+        VSI++;
+        vowelCount--;
     }
 }
 
@@ -745,7 +759,7 @@ void insertW(const Uint16& data, const bool& isCaps) {
             
             for (ii = VSI; ii < _index; ii++) {
                 TypingWord[ii] &= ~TONEW_MASK;
-                hData[_index - 1 - ii] = GET(TypingWord[ii]);
+                hData[_index - 1 - ii] = GET(TypingWord[ii]) & ~STANDALONE_MASK;
             }
             isRestoredW = true;
             tempDisableKey = true;
@@ -802,8 +816,12 @@ void insertW(const Uint16& data, const bool& isCaps) {
                     //restore and disable temporary
                     if (TypingWord[ii] & STANDALONE_MASK) {
                         hCode = vWillProcess;
-                        if ((TypingWord[ii] & CHAR_MASK) == KEY_U){
+                        if (CHR(ii) == KEY_U){
                             TypingWord[ii] = KEY_W | ((TypingWord[ii] & CAPS_MASK) ? CAPS_MASK : 0);
+                        } else if (CHR(ii) == KEY_O) {
+                            hCode = vRestore;
+                            TypingWord[ii] = KEY_O | ((TypingWord[ii] & CAPS_MASK) ? CAPS_MASK : 0);
+                            isRestoredW = true;
                         }
                         hData[_index - 1 - ii] = TypingWord[ii];
                     } else {
@@ -856,7 +874,7 @@ void checkForStandaloneChar(const Uint16& data, const bool& isCaps, const Uint32
     //check standalone w -> ư
     
     if (_index > 0 && CHR(_index-1) == KEY_U && keyWillReverse == KEY_O) {
-        insertKey(data, isCaps);
+        insertKey(keyWillReverse, isCaps);
         reverseLastStandaloneChar(keyWillReverse, isCaps);
         return;
     }
@@ -1255,6 +1273,13 @@ void vKeyHandleEvent(const vKeyEvent& event,
                 upperCaseFirstCharacter();
             }
             _upperCaseStatus = 0;
+        }
+        
+        //case [ ]
+        if (IS_BRACKET_KEY(data) && _index == 1 && ((hCode == vWillProcess && IS_BRACKET_KEY((Uint16)hData[0])) || vInputType == vSimpleTelex)) {
+            _index = 0;
+            tempDisableKey = false;
+            _stateIndex = 0;
         }
     }
     
