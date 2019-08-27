@@ -12,6 +12,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 @interface AboutViewController : NSViewController
 @property (weak) IBOutlet NSTextField *VersionInfo;
+@property (weak) IBOutlet NSButton *CheckNewVersionButton;
 
 @end
 

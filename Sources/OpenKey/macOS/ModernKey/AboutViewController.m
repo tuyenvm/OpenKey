@@ -37,4 +37,15 @@
     [[NSWorkspace sharedWorkspace] openURL: [NSURL URLWithString:@"https://github.com/tuyenvm/OpenKey/releases"]];
 }
 
+- (IBAction)onCheckNewVersion:(id)sender {
+    
+    self.CheckNewVersionButton.title = @"Đang kiểm tra...";
+    self.CheckNewVersionButton.enabled = false;
+    
+    [OpenKeyManager checkNewVersion:^{
+        self.CheckNewVersionButton.enabled = true;
+        self.CheckNewVersionButton.title = @"Kiểm tra bản mới...";
+    }];
+}
+
 @end

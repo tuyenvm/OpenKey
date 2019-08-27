@@ -11,10 +11,13 @@
 
 #import <Cocoa/Cocoa.h>
 
+typedef void (^CheckNewVersionCallback)(void);
+
 @interface OpenKeyManager : NSObject
 +(BOOL)isInited;
 +(BOOL)initEventTap;
 +(NSString*)getBuildDate;
++(void)checkNewVersion:(CheckNewVersionCallback) callback;
 @end
 
 #endif /* OpenKeyManager_h */

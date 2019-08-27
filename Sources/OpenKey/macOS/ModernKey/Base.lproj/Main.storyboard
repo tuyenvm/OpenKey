@@ -731,7 +731,7 @@
                             <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="Olz-Hc-wyN">
                                 <rect key="frame" x="160" y="217" width="277" height="48"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                                <textFieldCell key="cell" lineBreakMode="clipping" alignment="left" title="Open Key" id="nbR-li-HBd">
+                                <textFieldCell key="cell" lineBreakMode="clipping" alignment="left" title="OpenKey" id="nbR-li-HBd">
                                     <font key="font" metaFont="systemThin" size="40"/>
                                     <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
                                     <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
@@ -818,17 +818,29 @@
                                 </textFieldCell>
                             </textField>
                             <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="USx-Nt-l0Y">
-                                <rect key="frame" x="225" y="20" width="132" height="17"/>
+                                <rect key="frame" x="225" y="7" width="123" height="16"/>
                                 <autoresizingMask key="autoresizingMask"/>
                                 <textFieldCell key="cell" lineBreakMode="clipping" title="Mai Vũ Tuyên © 2019" id="630-DT-XcR">
-                                    <font key="font" metaFont="systemThin" size="13"/>
+                                    <font key="font" metaFont="systemThin" size="12"/>
                                     <color key="textColor" name="secondaryLabelColor" catalog="System" colorSpace="catalog"/>
                                     <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
                                 </textFieldCell>
                             </textField>
+                            <button verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="tvC-7v-OW8">
+                                <rect key="frame" x="156" y="35" width="154" height="32"/>
+                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                <buttonCell key="cell" type="push" title="Kiểm tra bản mới..." bezelStyle="rounded" alignment="center" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="Nhb-MP-s0Y">
+                                    <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
+                                    <font key="font" metaFont="system"/>
+                                </buttonCell>
+                                <connections>
+                                    <action selector="onCheckNewVersion:" target="SDG-I4-o9t" id="tfs-Fv-jfi"/>
+                                </connections>
+                            </button>
                         </subviews>
                     </view>
                     <connections>
+                        <outlet property="CheckNewVersionButton" destination="tvC-7v-OW8" id="8Ou-a0-9mM"/>
                         <outlet property="VersionInfo" destination="AeG-WX-JbZ" id="sEO-BZ-DBo"/>
                     </connections>
                 </viewController>

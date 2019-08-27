@@ -108,6 +108,8 @@ int vUpperCaseFirstChar = 0;
         [self loadDefaultConfig];
     }
     [[NSUserDefaults standardUserDefaults] setInteger:1 forKey:@"NonFirstTime"];
+    
+    [OpenKeyManager checkNewVersion:nil];
 }
 
 
