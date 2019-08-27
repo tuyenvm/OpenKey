@@ -177,8 +177,7 @@ static CFRunLoopSourceRef runLoopSource;
 }
 
 +(NSString*)getUpdateBundlePath {
-    NSFileManager *filemgr = [[NSFileManager alloc] init];
-    NSString *currentpath = [filemgr currentDirectoryPath];
-    return [NSString stringWithFormat:@"%@/OpenKey.app/Contents/Library/LoginItems/OpenKeyUpdate.app", currentpath];
+    NSString *currentpath = [[NSBundle mainBundle] bundlePath];
+    return [NSString stringWithFormat:@"%@/Contents/Library/LoginItems/OpenKeyUpdate.app", currentpath];
 }
 @end
