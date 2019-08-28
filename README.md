@@ -1,7 +1,6 @@
-
-
-# OpenKey
+# [OpenKey](https://tuyenvm.github.io/index.html)
 ### [Download bản mới nhất](https://github.com/tuyenvm/OpenKey/releases)
+
 ### Open source Vietnamese Input App for macOS - Bộ gõ tiếng Việt nguồn mở cho macOS.
 New Vietnamese input for macOS. Annoying underline issue fixed. Intelligent engine. Free and open source.  
 Bộ gõ tiếng Việt mới cho macOS, sử dụng kỹ thuật backkey. Loại bỏ lỗi gạch chân khó chịu ở bộ gõ mặc định. Hoàn toàn miễn phí và là nguồn mở, luôn cập nhật và phát triển.
@@ -80,6 +79,6 @@ Any ideas, please send me via (maivutuyen.91@gmail.com)
 Fanpage: [https://www.facebook.com/OpenKeyVN](https://www.facebook.com/OpenKeyVN)
 
 ## One more thing
-[Buy me a coffee ^^](https://tuyenvm.github.io)  
+[Buy me a coffee ^^](https://tuyenvm.github.io/donate.html)  
 [Or Redbull is also Ok ^^](https://paypal.me/tuyenmai)  
 Thank you very much.
