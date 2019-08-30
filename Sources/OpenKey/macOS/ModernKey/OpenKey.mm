@@ -30,7 +30,8 @@ extern "C" {
                              ];
     
     //app which error with unicode Compound
-    NSArray* _unicodeCompoundApp = @[@"com.apple.Stickies"];
+    NSArray* _unicodeCompoundApp = @[@"com.apple.",
+                                     @"com.google.Chrome", @"com.brave.Browser", @"com.microsoft.Edge.Dev", @"com.microsoft.Edge"];
     
     CGEventSourceRef myEventSource = NULL;
     vKeyHookState* pData;
@@ -47,8 +48,8 @@ extern "C" {
     bool _willContinuteSending = false;
     bool _willSendControlKey = false;
     
-    Uint16 _syncKey[MAX_BUFF];
-    Uint8 _syncIndex = 0;
+    vector<Uint16> _syncKey;
+    
     Uint16 _uniChar[2];
     int _i, _j, _k;
     Uint32 _tempChar;
@@ -58,7 +59,6 @@ extern "C" {
     vector<Byte> savedSmartSwitchKeyData; ////use for smart switch key
     
     void OpenKeyInit() {
-        memset(&_syncKey, 0, sizeof(_syncKey));
         myEventSource = CGEventSourceCreate(kCGEventSourceStatePrivate);
         pData = (vKeyHookState*)vKeyInit();
 
@@ -73,6 +73,14 @@ extern "C" {
         //init and load smart switch key data
         data = [prefs objectForKey:@"smartSwitchKey"];
         initSmartSwitchKey((Byte*)data.bytes, (int)data.length);
+    }
+    
+    BOOL containUnicodeCompoundApp(NSString* topApp) {
+        for (_j = 0; _j < [_unicodeCompoundApp count]; _j++) {
+            if ([topApp hasPrefix:[_unicodeCompoundApp objectAtIndex:_j]] || [[_unicodeCompoundApp objectAtIndex:_j] isEqualToString:topApp])
+                return true;
+        }
+        return false;
     }
     
     void saveSmartSwitchKeyData() {
@@ -94,14 +102,7 @@ extern "C" {
     }
     
     void InsertKeyLength(const Uint8& len) {
-        if (_syncIndex >= MAX_BUFF) {
-            for (_i = 1; _i < MAX_BUFF; _i++) {
-                _syncKey[_i-1] = _syncKey[_i];
-            }
-            _syncKey[_syncIndex-1] = len;
-        } else {
-            _syncKey[_syncIndex++] = len;
-        }
+        _syncKey.push_back(len);
     }
     
     void SendPureCharacter(const Uint16& ch) {
@@ -109,6 +110,9 @@ extern "C" {
         CGEventKeyboardSetUnicodeString(_newEventDown, 1, &ch);
         CGEventTapPostEvent(_proxy, _newEventDown);
         CFRelease(_newEventDown);
+        if (IS_DOUBLE_CODE(vCodeTable)) {
+            InsertKeyLength(1);
+        }
     }
     
     void SendKeyCode(Uint32 data) {
@@ -197,13 +201,13 @@ extern "C" {
         CGEventTapPostEvent(_proxy, eventBackSpaceUp);
         
         if (IS_DOUBLE_CODE(vCodeTable)) { //VNI or Unicode Compound
-            _syncIndex--;
-            if (_syncKey[_syncIndex] > 1) {
-                if (!(vCodeTable == 3 && [_unicodeCompoundApp containsObject:FRONT_APP])) {
+            if (_syncKey.back() > 1) {
+                if (!(vCodeTable == 3 && containUnicodeCompoundApp(FRONT_APP))) {
                     CGEventTapPostEvent(_proxy, eventBackSpaceDown);
                     CGEventTapPostEvent(_proxy, eventBackSpaceUp);
                 }
             }
+            _syncKey.pop_back();
         }
     }
     
@@ -219,13 +223,13 @@ extern "C" {
         CGEventTapPostEvent(_proxy, eventVkeyUp);
         
         if (IS_DOUBLE_CODE(vCodeTable)) { //VNI or Unicode Compound
-            _syncIndex--;
-            if (_syncKey[_syncIndex] > 1) {
-                if (!(vCodeTable == 3 && [_unicodeCompoundApp containsObject:FRONT_APP])) {
+            if (_syncKey.back() > 1) {
+                if (!(vCodeTable == 3 && containUnicodeCompoundApp(FRONT_APP))) {
                     CGEventTapPostEvent(_proxy, eventVkeyDown);
                     CGEventTapPostEvent(_proxy, eventVkeyUp);
                 }
             }
+            _syncKey.pop_back();
         }
         CFRelease(eventVkeyDown);
         CFRelease(eventVkeyUp);
@@ -238,13 +242,21 @@ extern "C" {
         _willSendControlKey = false;
         
         if (_newCharSize > 0) {
-            for (_k = dataFromMacro ? offset : pData->newCharCount - 1;
+            for (_k = dataFromMacro ? offset : pData->newCharCount - 1 - offset;
                  dataFromMacro ? _k < pData->macroData.size() : _k >= 0;
                  dataFromMacro ? _k++ : _k--) {
+                
+                if (_j >= 16) {
+                    _willContinuteSending = true;
+                    break;
+                }
                 
                 _tempChar = DYNA_DATA(dataFromMacro, _k);
                 if (_tempChar & PURE_CHARACTER_MASK) {
                     _newCharString[_j++] = _tempChar;
+                    if (IS_DOUBLE_CODE(vCodeTable)) {
+                        InsertKeyLength(1);
+                    }
                 } else if (_tempChar < 128 || ((Uint16)_tempChar < 128 && (_tempChar & CAPS_MASK))) {
                     if (IS_DOUBLE_CODE(vCodeTable)) //VNI
                         InsertKeyLength(1);
@@ -281,11 +293,6 @@ extern "C" {
                         
                     }
                 }
-                
-                if (_j > 16) {
-                    _willContinuteSending = true;
-                    break;
-                }
             }//end for
         }
         
@@ -297,7 +304,7 @@ extern "C" {
                 _willSendControlKey = true;
             }
         }
-        if (pData->code == vRestoreAndStartNewSession) {
+        if (!_willContinuteSending && pData->code == vRestoreAndStartNewSession) {
             startNewSession();
         }
         
@@ -307,7 +314,7 @@ extern "C" {
         CFRelease(_newEventDown);
 
         if (_willContinuteSending) {
-            SendNewCharString(dataFromMacro, _k);
+            SendNewCharString(dataFromMacro, dataFromMacro ? _k : 16);
         }
         
         //the case when hCode is vRestore or vRestoreAndStartNewSession, the word is invalid and last key is control key such as TAB, LEFT ARROW, RIGHT ARROW,...
@@ -450,7 +457,7 @@ extern "C" {
             vKeyHandleEvent(vKeyEvent::Mouse, vKeyEventState::MouseDown, 0);
             
             if (IS_DOUBLE_CODE(vCodeTable)) { //VNI
-                _syncIndex = 0;
+                _syncKey.clear();
             }
             return event;
         }
@@ -466,17 +473,19 @@ extern "C" {
 
             if (pData->code == vDoNothing) { //do nothing
                 if (IS_DOUBLE_CODE(vCodeTable)) { //VNI
-                    if (pData->extCode == 1) {
-                        _syncIndex = 0;
-                    } else if (pData->extCode == 2) {
-                        if (_syncIndex > 0) {
-                            if (_syncKey[_syncIndex-1] > 1) {
-                                _syncKey[_syncIndex-1]--;
-                            } else {
-                                _syncIndex--;
+                    if (pData->extCode == 1) { //break key
+                        _syncKey.clear();
+                    } else if (pData->extCode == 2) { //delete key
+                        if (_syncKey.size() > 0) {
+                            if (_syncKey.back() > 1 && (vCodeTable == 2 || !containUnicodeCompoundApp(FRONT_APP))) {
+                                //send one more backspace
+                                CGEventTapPostEvent(_proxy, eventBackSpaceDown);
+                                CGEventTapPostEvent(_proxy, eventBackSpaceUp);
                             }
+                            _syncKey.pop_back();
                         }
-                    } else if (pData->extCode == 3) {
+                       
+                    } else if (pData->extCode == 3) { //normal key
                         InsertKeyLength(1);
                     }
                 }
