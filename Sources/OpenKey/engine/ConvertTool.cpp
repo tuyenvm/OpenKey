@@ -13,7 +13,7 @@
 #include <memory.h>
 
 //option
-bool convertToolAlertWhenCompleted = false;
+bool convertToolDontAlertWhenCompleted = false;
 bool convertToolToAllCaps = false;
 bool convertToolToAllNonCaps = false;
 bool convertToolToCapsFirstLetter = false;

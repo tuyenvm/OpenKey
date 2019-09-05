@@ -13,7 +13,7 @@
 #include <string>
 using namespace std;
 
-extern bool convertToolAlertWhenCompleted;
+extern bool convertToolDontAlertWhenCompleted;
 extern bool convertToolToAllCaps;
 extern bool convertToolToAllNonCaps;
 extern bool convertToolToCapsFirstLetter;

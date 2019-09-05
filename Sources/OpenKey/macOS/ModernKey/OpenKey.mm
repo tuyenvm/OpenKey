@@ -75,7 +75,7 @@ extern "C" {
         initSmartSwitchKey((Byte*)data.bytes, (int)data.length);
         
         //init convert tool
-        convertToolAlertWhenCompleted = [prefs boolForKey:@"convertToolAlertWhenCompleted"];
+        convertToolDontAlertWhenCompleted = [prefs boolForKey:@"convertToolDontAlertWhenCompleted"];
         convertToolToAllCaps = [prefs boolForKey:@"convertToolToAllCaps"];
         convertToolToAllNonCaps = [prefs boolForKey:@"convertToolToAllNonCaps"];
         convertToolToCapsFirstLetter = [prefs boolForKey:@"convertToolToCapsFirstLetter"];
@@ -84,6 +84,9 @@ extern "C" {
         convertToolFromCode = [prefs integerForKey:@"convertToolFromCode"];
         convertToolToCode = [prefs integerForKey:@"convertToolToCode"];
         convertToolHotKey = (int)[prefs integerForKey:@"convertToolHotKey"];
+        if (convertToolHotKey == 0) {
+            convertToolHotKey = 0xFE0000FE; //default value: no hot key
+        }
     }
     
     NSString* ConvertUtil(NSString* str) {

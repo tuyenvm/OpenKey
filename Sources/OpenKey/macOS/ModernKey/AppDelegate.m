@@ -37,7 +37,7 @@ int vUseSmartSwitchKey = 1;
 int vUpperCaseFirstChar = 0;
 
 extern int convertToolHotKey;
-extern bool convertToolAlertWhenCompleted;
+extern bool convertToolDontAlertWhenCompleted;
 
 @interface AppDelegate ()
 
@@ -391,7 +391,7 @@ extern bool convertToolAlertWhenCompleted;
 
 -(void)onQuickConvert {
     if ([OpenKeyManager quickConvert]) {
-        if (convertToolAlertWhenCompleted) {
+        if (!convertToolDontAlertWhenCompleted) {
             [OpenKeyManager showMessage: nil message:@"Chuyển mã thành công!" subMsg:@"Kết quả đã được lưu trong clipboard."];
         }
     } else {

@@ -33,7 +33,7 @@ extern AppDelegate* appDelegate;
     [self.ToCode removeAllItems];
     [self.ToCode addItemsWithTitles:codeData];
     
-    self.AlertWhenComplete.state = convertToolAlertWhenCompleted ? NSControlStateValueOn : NSControlStateValueOff;
+    self.AlertWhenComplete.state = !convertToolDontAlertWhenCompleted ? NSControlStateValueOn : NSControlStateValueOff;
     
     self.ToAllCaps.state = convertToolToAllCaps ? NSControlStateValueOn : NSControlStateValueOff;
     self.ToNonCaps.state = convertToolToAllNonCaps ? NSControlStateValueOn : NSControlStateValueOff;
@@ -64,8 +64,8 @@ extern AppDelegate* appDelegate;
 }
 
 - (IBAction)onAlertWhenCompleted:(NSButton *)sender {
-    NSInteger val = [self setCustomValue:sender keyToSet:@"convertToolAlertWhenCompleted"];
-    convertToolAlertWhenCompleted = (int)val;
+    NSInteger val = [self setCustomValue:sender keyToSet:@"convertToolDontAlertWhenCompleted"];
+    convertToolDontAlertWhenCompleted = (int)!val;
 }
 
 - (IBAction)onToAllCaps:(NSButton *)sender {
@@ -174,7 +174,7 @@ extern AppDelegate* appDelegate;
 
 - (IBAction)onConvertButton:(id)sender {
     if ([OpenKeyManager quickConvert]) {
-        if (convertToolAlertWhenCompleted) {
+        if (!convertToolDontAlertWhenCompleted) {
             [OpenKeyManager showMessage: self.view.window message:@"Chuyển mã thành công!" subMsg:@"Kết quả đã được lưu trong clipboard."];
         }
     } else {
