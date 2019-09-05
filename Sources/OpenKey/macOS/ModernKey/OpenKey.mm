@@ -73,6 +73,21 @@ extern "C" {
         //init and load smart switch key data
         data = [prefs objectForKey:@"smartSwitchKey"];
         initSmartSwitchKey((Byte*)data.bytes, (int)data.length);
+        
+        //init convert tool
+        convertToolAlertWhenCompleted = [prefs boolForKey:@"convertToolAlertWhenCompleted"];
+        convertToolToAllCaps = [prefs boolForKey:@"convertToolToAllCaps"];
+        convertToolToAllNonCaps = [prefs boolForKey:@"convertToolToAllNonCaps"];
+        convertToolToCapsFirstLetter = [prefs boolForKey:@"convertToolToCapsFirstLetter"];
+        convertToolToCapsEachWord = [prefs boolForKey:@"convertToolToCapsEachWord"];
+        convertToolRemoveMark = [prefs boolForKey:@"convertToolRemoveMark"];
+        convertToolFromCode = [prefs integerForKey:@"convertToolFromCode"];
+        convertToolToCode = [prefs integerForKey:@"convertToolToCode"];
+        convertToolHotKey = (int)[prefs integerForKey:@"convertToolHotKey"];
+    }
+    
+    NSString* ConvertUtil(NSString* str) {
+        return [NSString stringWithUTF8String:convertUtil([str UTF8String]).c_str()];
     }
     
     BOOL containUnicodeCompoundApp(NSString* topApp) {
@@ -323,19 +338,23 @@ extern "C" {
         }
     }
             
-    bool handleSwitchKey(bool checkKeyCode=true) {
-        if (HAS_CONTROL(vSwitchKeyStatus) ^ GET_BOOL(_lastFlag & kCGEventFlagMaskControl))
+    bool checkHotKey(int hotKeyData, bool checkKeyCode=true) {
+        if (HAS_CONTROL(hotKeyData) ^ GET_BOOL(_lastFlag & kCGEventFlagMaskControl))
             return false;
-        if (HAS_OPTION(vSwitchKeyStatus) ^ GET_BOOL(_lastFlag & kCGEventFlagMaskAlternate))
+        if (HAS_OPTION(hotKeyData) ^ GET_BOOL(_lastFlag & kCGEventFlagMaskAlternate))
             return false;
-        if (HAS_COMMAND(vSwitchKeyStatus) ^ GET_BOOL(_lastFlag & kCGEventFlagMaskCommand))
+        if (HAS_COMMAND(hotKeyData) ^ GET_BOOL(_lastFlag & kCGEventFlagMaskCommand))
             return false;
-        if (HAS_SHIFT(vSwitchKeyStatus) ^ GET_BOOL(_lastFlag & kCGEventFlagMaskShift))
+        if (HAS_SHIFT(hotKeyData) ^ GET_BOOL(_lastFlag & kCGEventFlagMaskShift))
             return false;
         if (checkKeyCode) {
-            if (GET_SWITCH_KEY(vSwitchKeyStatus) != _keycode)
+            if (GET_SWITCH_KEY(hotKeyData) != _keycode)
                 return false;
         }
+        return true;
+    }
+    
+    void switchLanguage() {
         if (vLanguage == 0)
             vLanguage = 1;
         else
@@ -343,9 +362,7 @@ extern "C" {
         if (HAS_BEEP(vSwitchKeyStatus))
             NSBeep();
         [appDelegate onImputMethodChanged:YES];
-
         startNewSession();
-        return true;
     }
     
     void handleMacro() {
@@ -389,12 +406,19 @@ extern "C" {
         _flag = CGEventGetFlags(event);
         _keycode = (CGKeyCode)CGEventGetIntegerValueField(event, kCGKeyboardEventKeycode);
         
-        //switch language shortcut
+        //switch language shortcut; convert hotkey
         if (type == kCGEventKeyDown) {
-            if (GET_SWITCH_KEY(vSwitchKeyStatus) != _keycode) {
+            if (GET_SWITCH_KEY(vSwitchKeyStatus) != _keycode && GET_SWITCH_KEY(convertToolHotKey) != _keycode) {
                 _lastFlag = 0;
             } else {
-                if (handleSwitchKey(GET_SWITCH_KEY(vSwitchKeyStatus) != 0xFE)){
+                if (GET_SWITCH_KEY(vSwitchKeyStatus) == _keycode && checkHotKey(vSwitchKeyStatus, GET_SWITCH_KEY(vSwitchKeyStatus) != 0xFE)){
+                    switchLanguage();
+                    _lastFlag = 0;
+                    return NULL;
+                }
+                if (GET_SWITCH_KEY(convertToolHotKey) == _keycode && checkHotKey(convertToolHotKey, GET_SWITCH_KEY(convertToolHotKey) != 0xFE)){
+                    [appDelegate onQuickConvert];
+                    _lastFlag = 0;
                     return NULL;
                 }
             }
@@ -402,12 +426,17 @@ extern "C" {
             if (_lastFlag == 0 || _lastFlag < _flag) {
                 _lastFlag = _flag;
             } else if (_lastFlag > _flag)  {
-                //check swith
-                if (handleSwitchKey(GET_SWITCH_KEY(vSwitchKeyStatus) != 0xFE)) {
+                //check switch
+                if (checkHotKey(vSwitchKeyStatus, GET_SWITCH_KEY(vSwitchKeyStatus) != 0xFE)) {
                     _lastFlag = 0;
+                    switchLanguage();
                     return NULL;
                 }
-                
+                if (checkHotKey(convertToolHotKey, GET_SWITCH_KEY(convertToolHotKey) != 0xFE)) {
+                    _lastFlag = 0;
+                    [appDelegate onQuickConvert];
+                    return NULL;
+                }
                 _lastFlag = 0;
             }
         }

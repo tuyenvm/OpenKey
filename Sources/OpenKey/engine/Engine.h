@@ -9,10 +9,14 @@
 #ifndef Engine_h
 #define Engine_h
 
+#include <locale>
+#include <codecvt>
+
 #include "DataType.h"
 #include "Vietnamese.h"
 #include "Macro.h"
 #include "SmartSwitchKey.h"
+#include "ConvertTool.h"
 
 #define IS_DEBUG 1
 #define LOBYTE(data) (data & 0xFF)
@@ -156,5 +160,11 @@ void startNewSession();
  * do some task in english mode (use for macro)
  */
 void vEnglishMode(const vKeyEventState& state, const Uint16& data, const bool& isCaps, const bool& otherControlKey);
+
+/**
+ * some utils function
+ */
+wstring utf8ToWideString(const string& str);
+string wideStringToUtf8(const wstring& str);
 
 #endif /* Engine_h */

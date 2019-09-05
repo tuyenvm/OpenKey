@@ -10,8 +10,6 @@
 #include "Vietnamese.h"
 #include "Engine.h"
 #include <iostream>
-#include <locale>
-#include <codecvt>
 #include <memory.h>
 
 using namespace std;
@@ -20,12 +18,6 @@ using namespace std;
 map<vector<Uint32>, MacroData> macroMap;
 
 extern int vCodeTable;
-
-static std::wstring_convert<std::codecvt_utf8_utf16<wchar_t>> converter;
-
-static wstring utf8ToWideString(const string& str) {
-    return converter.from_bytes(str.c_str());
-}
 
 static void convert(const string& str, vector<Uint32>& outData) {
     outData.clear();
@@ -79,6 +71,7 @@ static void convert(const string& str, vector<Uint32>& outData) {
  * next macro
  */
 void initMacroMap(const Byte* pData, const int& size) {
+    macroMap.clear();
     Uint16 macroCount = 0;
     Uint32 cursor = 0;
     if (size >= 2) {

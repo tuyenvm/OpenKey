@@ -38,7 +38,6 @@ extern int vUpperCaseFirstChar;
 
 - (void)viewDidLoad {
     [super viewDidLoad];
-    CustomSwitchKey.delegate = CustomSwitchKey;
     viewController = self;
     CustomSwitchKey.Parent = self;
     
@@ -47,12 +46,7 @@ extern int vUpperCaseFirstChar;
     self.retryButton.enabled = NO;
  
     NSArray* inputTypeData = [[NSArray alloc] initWithObjects:@"Telex", @"VNI", @"Simple Telex", nil];
-    NSArray* codeData = [[NSArray alloc] initWithObjects:
-                         @"Unicode",
-                         @"TCVN3 (ABC)",
-                         @"VNI Windows",
-                         @"Unicode tổ hợp",
-                         @"Vietnamese Locale CP 1258", nil];
+    NSArray* codeData = [OpenKeyManager getTableCodes];
     
     //preset data
     [_popupInputType removeAllItems];
@@ -70,6 +64,10 @@ extern int vUpperCaseFirstChar;
     [super viewDidAppear];
     NSString* str = @"OpenKey %@ - Bộ gõ Tiếng Việt";
     self.view.window.title = [NSString stringWithFormat:str, [[NSBundle mainBundle] objectForInfoDictionaryKey: @"CFBundleShortVersionString"]];
+}
+
+- (void)viewWillAppear {
+    [self initKey];
 }
 
 -(void)initKey {
@@ -183,11 +181,11 @@ extern int vUpperCaseFirstChar;
     [[NSUserDefaults standardUserDefaults] setInteger:vSwitchKeyStatus forKey:@"SwitchKeyStatus"];
 }
 
--(void)onSwitchKeyChange:(unsigned short)keyCode character:(unsigned short)ch {
+-(void)onMyTextFieldKeyChange:(unsigned short)keyCode character:(unsigned short)character {
     vSwitchKeyStatus &= 0xFFFFFF00;
     vSwitchKeyStatus |= keyCode;
     vSwitchKeyStatus &= 0x00FFFFFF;
-    vSwitchKeyStatus |= ((unsigned int)ch<<24);
+    vSwitchKeyStatus |= ((unsigned int)character<<24);
     [[NSUserDefaults standardUserDefaults] setInteger:vSwitchKeyStatus forKey:@"SwitchKeyStatus"];
 }
 

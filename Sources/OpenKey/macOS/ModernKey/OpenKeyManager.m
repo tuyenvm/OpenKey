@@ -15,6 +15,8 @@ extern CGEventRef OpenKeyCallback(CGEventTapProxy proxy,
                                   CGEventRef event,
                                   void *refcon);
 
+extern NSString* ConvertUtil(NSString* str);
+
 @interface OpenKeyManager ()
 
 @end
@@ -64,12 +66,10 @@ static CFRunLoopSourceRef runLoopSource;
     _isInited = YES;
     
     // Create a run loop source.
-    runLoopSource = CFMachPortCreateRunLoopSource(
-                                                  kCFAllocatorDefault, eventTap, 0);
+    runLoopSource = CFMachPortCreateRunLoopSource(kCFAllocatorDefault, eventTap, 0);
     
     // Add to the current run loop.
-    CFRunLoopAddSource(CFRunLoopGetCurrent(), runLoopSource,
-                       kCFRunLoopCommonModes);
+    CFRunLoopAddSource(CFRunLoopGetCurrent(), runLoopSource, kCFRunLoopCommonModes);
     
     // Enable the event tap.
     CGEventTapEnable(eventTap, true);
@@ -80,9 +80,76 @@ static CFRunLoopSourceRef runLoopSource;
     return YES;
 }
 
++(BOOL)stopEventTap {
+    if (_isInited) { //release all object
+        CFRunLoopStop(CFRunLoopGetCurrent());
+        
+        CFRunLoopRemoveSource(CFRunLoopGetCurrent(), runLoopSource, kCFRunLoopDefaultMode);
+        CFRelease(runLoopSource);
+        runLoopSource = nil;
+        
+        CFMachPortInvalidate(eventTap);
+        CFRelease(eventTap);
+        eventTap = nil;
+        
+        _isInited = false;
+    }
+    return YES;
+}
+
++(NSArray*)getTableCodes {
+    return [[NSArray alloc] initWithObjects:
+            @"Unicode",
+            @"TCVN3 (ABC)",
+            @"VNI Windows",
+            @"Unicode tổ hợp",
+            @"Vietnamese Locale CP 1258", nil];
+}
+
 +(NSString*)getBuildDate {
     return [NSString stringWithUTF8String:__DATE__];
 }
+
+#pragma mark -Convert feature
++(BOOL)quickConvert {
+    NSPasteboard *pasteboard = [NSPasteboard generalPasteboard];
+    NSString *htmlString = [pasteboard stringForType:NSPasteboardTypeHTML];
+    NSString *rawString = [pasteboard stringForType:NSPasteboardTypeString];
+    bool converted = false;
+    if (htmlString != nil) {
+        htmlString = ConvertUtil(htmlString);
+        converted = true;
+    }
+    if (rawString != nil) {
+        rawString = ConvertUtil(rawString);
+        converted = true;
+    }
+    if (converted) {
+        [pasteboard clearContents];
+        if (htmlString != nil)
+            [pasteboard setString:htmlString forType:NSPasteboardTypeHTML];
+        if (rawString != nil)
+            [pasteboard setString:rawString forType:NSPasteboardTypeString];
+        
+        return YES;
+    }
+    return NO;
+}
+
++(void)showMessage:(NSWindow*)window message:(NSString*)msg subMsg:(NSString*)subMsg {
+    NSAlert *alert = [[NSAlert alloc] init];
+    [alert setMessageText:msg];
+    [alert setInformativeText:subMsg];
+    [alert addButtonWithTitle:@"OK"];
+    if (window) {
+        [alert beginSheetModalForWindow:window completionHandler:^(NSModalResponse returnCode) {
+        }];
+    } else {
+        [alert runModal];
+    }
+}
+
+#pragma mark -AutoUpdate feature
 
 +(void)checkNewVersion:(CheckNewVersionCallback) callback {
     //load new version config

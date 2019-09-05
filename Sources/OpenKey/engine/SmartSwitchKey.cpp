@@ -17,6 +17,7 @@ static string _cacheKey = ""; //use cache for faster
 static Int8 _cacheData = 0; //use cache for faster
 
 void initSmartSwitchKey(const Byte* pData, const int& size) {
+    _smartSwitchKeyData.clear();
     if (pData == NULL) return;
     Uint16 count = 0;
     Uint32 cursor = 0;

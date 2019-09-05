@@ -7,8 +7,9 @@
 //
 
 #import <Cocoa/Cocoa.h>
+#import "MyTextField.h"
 
-@interface ViewController : NSViewController
+@interface ViewController : NSViewController<MyTextFieldDelegate>
 
 @property (weak) IBOutlet NSPopUpButton *popupInputType;
 @property (weak) IBOutlet NSPopUpButton *popupCode;
@@ -43,6 +44,5 @@
 @property (weak) IBOutlet NSImageView *cursorImage;
 
 -(void)fillData;
--(void)onSwitchKeyChange:(unsigned short)keyCode character:(unsigned short)ch;
 @end
 

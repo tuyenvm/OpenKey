@@ -7,10 +7,14 @@
 //
 
 #import <Cocoa/Cocoa.h>
-#import "ViewController.h"
+
+@protocol MyTextFieldDelegate
+@optional
+-(void)onMyTextFieldKeyChange:(unsigned short)keyCode character:(unsigned short)character;
+@end
 
 @interface MyTextField : NSTextField<NSTextDelegate>
-@property (weak, nonatomic) ViewController* Parent;
+@property (weak, nonatomic) id<MyTextFieldDelegate> Parent;
 @property unsigned short LastKeyCode;
 @property unsigned short LastKeyChar;
 

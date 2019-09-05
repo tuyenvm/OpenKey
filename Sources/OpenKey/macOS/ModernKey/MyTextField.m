@@ -44,13 +44,13 @@
 - (void)textDidChange:(NSNotification *)notification {
     if (self.LastKeyCode == kVK_Space) {
         [self setStringValue:@"Space"];
-        [self.Parent onSwitchKeyChange:kVK_Space character:kVK_Space];
+        [self.Parent onMyTextFieldKeyChange:kVK_Space character:kVK_Space];
     } else if (self.LastKeyCode == kVK_Delete || self.LastKeyCode == kVK_ForwardDelete) {
         [self setStringValue:@""];
-        [self.Parent onSwitchKeyChange:0xFE character:0xFE];
+        [self.Parent onMyTextFieldKeyChange:0xFE character:0xFE];
     } else {
         [self setStringValue:@""];
-        [self.Parent onSwitchKeyChange:self.LastKeyCode character:self.LastKeyChar];
+        [self.Parent onMyTextFieldKeyChange:self.LastKeyCode character:self.LastKeyChar];
         [self setStringValue:[NSString stringWithFormat:@"%c", self.LastKeyChar]];
     }
 }

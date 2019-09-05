@@ -6,10 +6,12 @@
 //  Copyright © 2019 Tuyen Mai. All rights reserved.
 //
 
+#import <AppKit/AppKit.h>
+#import <Carbon/Carbon.h>
+#import <ServiceManagement/ServiceManagement.h>
 #import "AppDelegate.h"
 #import "ViewController.h"
 #import "OpenKeyManager.h"
-#import <ServiceManagement/ServiceManagement.h>
 
 AppDelegate* appDelegate;
 extern ViewController* viewController;
@@ -31,8 +33,11 @@ int vFixRecommendBrowser = 1;
 int vUseMacro = 1;
 int vUseMacroInEnglishMode = 1;
 int vSendKeyStepByStep = 0;
-int vUseSmartSwitchKey = 0;
+int vUseSmartSwitchKey = 1;
 int vUpperCaseFirstChar = 0;
+
+extern int convertToolHotKey;
+extern bool convertToolAlertWhenCompleted;
 
 @interface AppDelegate ()
 
@@ -41,6 +46,7 @@ int vUpperCaseFirstChar = 0;
 @implementation AppDelegate {
     NSWindowController *_mainWC;
     NSWindowController *_macroWC;
+    NSWindowController *_convertWC;
     NSWindowController *_aboutWC;
     
     NSStatusItem *statusItem;
@@ -58,10 +64,14 @@ int vUpperCaseFirstChar = 0;
     
     NSMenuItem* mnuUnicodeComposite;
     NSMenuItem* mnuVietnameseLocaleCP1258;
+    
+    NSMenuItem* mnuQuickConvert;
 }
 
 - (void)applicationDidFinishLaunching:(NSNotification *)aNotification {
     appDelegate = self;
+    
+    [self registerAwakeNotification];
     
     //check weather this app has been launched before that or not
     NSArray* runningApp = [[NSWorkspace sharedWorkspace] runningApplications];
@@ -101,6 +111,7 @@ int vUpperCaseFirstChar = 0;
                 [self onControlPanelSelected];
             }
         }
+        [self setQuickConvertString];
     });
     
     //load default config if is first launch
@@ -144,6 +155,12 @@ int vUpperCaseFirstChar = 0;
     NSMenuItem* menuCode = [theMenu addItemWithTitle:@"Bảng mã khác" action:nil keyEquivalent:@""];
     
     [theMenu addItem:[NSMenuItem separatorItem]];
+    
+    [theMenu addItemWithTitle:@"Công cụ chuyển mã..." action:@selector(onConvertTool) keyEquivalent:@""];
+    mnuQuickConvert = [theMenu addItemWithTitle:@"Chuyển mã nhanh" action:@selector(onQuickConvert) keyEquivalent:@""];
+    
+    [theMenu addItem:[NSMenuItem separatorItem]];
+    
     [theMenu addItemWithTitle:@"Bảng điều khiển" action:@selector(onControlPanelSelected) keyEquivalent:@""];
     [theMenu addItemWithTitle:@"Gõ tắt" action:@selector(onMacroSelected) keyEquivalent:@""];
     [theMenu addItemWithTitle:@"Giới thiệu" action:@selector(onAboutSelected) keyEquivalent:@""];
@@ -161,8 +178,45 @@ int vUpperCaseFirstChar = 0;
     [self fillData];
 }
 
--(void)loadDefaultConfig {
+-(void)setQuickConvertString {
+    NSMutableString* hotKey = [NSMutableString stringWithString:@""];
+    bool hasAdd = false;
+    if (convertToolHotKey & 0x100) {
+        [hotKey appendString:@"⌃"];
+        hasAdd = true;
+    }
+    if (convertToolHotKey & 0x200) {
+        if (hasAdd)
+            [hotKey appendString:@" + "];
+        [hotKey appendString:@"⌥"];
+        hasAdd = true;
+    }
+    if (convertToolHotKey & 0x400) {
+        if (hasAdd)
+            [hotKey appendString:@" + "];
+        [hotKey appendString:@"⌘"];
+        hasAdd = true;
+    }
+    if (convertToolHotKey & 0x800) {
+        if (hasAdd)
+            [hotKey appendString:@" + "];
+        [hotKey appendString:@"⇧"];
+        hasAdd = true;
+    }
+    
+    unsigned short k = ((convertToolHotKey>>24) & 0xFF);
+    if (k != 0xFE) {
+        if (hasAdd)
+            [hotKey appendString:@" + "];
+        if (k == kVK_Space)
+            [hotKey appendFormat:@"%@", @"␣ "];
+        else
+            [hotKey appendFormat:@"%c", k];
+    }
+    [mnuQuickConvert setTitle: hasAdd ? [NSString stringWithFormat:@"Chuyển mã nhanh - [%@]", [hotKey uppercaseString]] : @"Chuyển mã nhanh"];
+}
 
+-(void)loadDefaultConfig {
     vLanguage = 1; [[NSUserDefaults standardUserDefaults] setInteger:vLanguage forKey:@"InputMethod"];
     vInputType = 0; [[NSUserDefaults standardUserDefaults] setInteger:vInputType forKey:@"InputType"];
     vFreeMark = 0; [[NSUserDefaults standardUserDefaults] setInteger:vFreeMark forKey:@"FreeMark"];
@@ -176,7 +230,7 @@ int vUpperCaseFirstChar = 0;
     vUseMacro = 1; [[NSUserDefaults standardUserDefaults] setInteger:vUseMacro forKey:@"UseMacro"];
     vUseMacroInEnglishMode = 0; [[NSUserDefaults standardUserDefaults] setInteger:vUseMacroInEnglishMode forKey:@"UseMacroInEnglishMode"];
     vSendKeyStepByStep = 0;[[NSUserDefaults standardUserDefaults] setInteger:vUseMacroInEnglishMode forKey:@"SendKeyStepByStep"];
-    vUseSmartSwitchKey = 0;[[NSUserDefaults standardUserDefaults] setInteger:vUseSmartSwitchKey forKey:@"UseSmartSwitchKey"];
+    vUseSmartSwitchKey = 1;[[NSUserDefaults standardUserDefaults] setInteger:vUseSmartSwitchKey forKey:@"UseSmartSwitchKey"];
     vUpperCaseFirstChar = 0;[[NSUserDefaults standardUserDefaults] setInteger:vUpperCaseFirstChar forKey:@"UpperCaseFirstChar"];
     
     [self fillData];
@@ -325,6 +379,26 @@ int vUpperCaseFirstChar = 0;
     [self onCodeTableChanged:(int)menuItem.tag];
 }
 
+-(void)onConvertTool {
+    if (_convertWC == nil) {
+        _convertWC = [[NSStoryboard storyboardWithName:@"Main" bundle:nil] instantiateControllerWithIdentifier:@"ConvertWindow"];
+    }
+    if ([_convertWC.window isVisible])
+        return;
+    [_convertWC.window makeKeyAndOrderFront:nil];
+    [_convertWC.window setLevel:NSStatusWindowLevel];
+}
+
+-(void)onQuickConvert {
+    if ([OpenKeyManager quickConvert]) {
+        if (convertToolAlertWhenCompleted) {
+            [OpenKeyManager showMessage: nil message:@"Chuyển mã thành công!" subMsg:@"Kết quả đã được lưu trong clipboard."];
+        }
+    } else {
+        [OpenKeyManager showMessage: nil message:@"Không có dữ liệu trong clipboard!" subMsg:@"Hãy sao chép một đoạn text để chuyển đổi!"];
+    }
+}
+
 -(void) onControlPanelSelected {
     if (_mainWC == nil) {
         _mainWC = [[NSStoryboard storyboardWithName:@"Main" bundle:nil] instantiateControllerWithIdentifier:@"OpenKey"];
@@ -359,5 +433,24 @@ int vUpperCaseFirstChar = 0;
 -(void)onSwitchLanguage {
     [self onInputMethodSelected];
     [viewController fillData];
+}
+
+#pragma mark Reset OpenKey after mac computer awake
+-(void)receiveWakeNote: (NSNotification*)note {
+    [OpenKeyManager initEventTap];
+}
+
+-(void)receiveSleepNote: (NSNotification*)note {
+    [OpenKeyManager stopEventTap];
+}
+
+-(void)registerAwakeNotification {
+    [[[NSWorkspace sharedWorkspace] notificationCenter] addObserver: self
+                                                           selector: @selector(receiveWakeNote:)
+                                                               name: NSWorkspaceDidWakeNotification object: NULL];
+    
+    [[[NSWorkspace sharedWorkspace] notificationCenter] addObserver: self
+                                                           selector: @selector(receiveSleepNote:)
+                                                               name: NSWorkspaceWillSleepNotification object: NULL];
 }
 @end
