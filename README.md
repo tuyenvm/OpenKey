@@ -73,7 +73,7 @@ $ brew cask upgrade openkey
 
 ## Note - Lưu ý:
 OpenKey needs Accessibility permission, go to System Preferences -> Security & Privacy -> Accessibility, enable OpenKey.app. Don't turn off while using.
-![Guide](https://github.com/tuyenvm/OpenKey/raw/master/Images/screenshot3.png "Accessibility").
+![Guide](https://raw.githubusercontent.com/tuyenvm/tuyenvm.github.io/master/images/openkey-guide.png "Accessibility").
 
 ## Author
 Mai Vũ Tuyên.
