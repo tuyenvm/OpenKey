@@ -343,7 +343,7 @@ extern "C" {
     }
             
     bool checkHotKey(int hotKeyData, bool checkKeyCode=true) {
-        if (hotKeyData == EMPTY_HOTKEY)
+        if ((hotKeyData & (~0x8000)) == EMPTY_HOTKEY)
             return false;
         if (HAS_CONTROL(hotKeyData) ^ GET_BOOL(_lastFlag & kCGEventFlagMaskControl))
             return false;
