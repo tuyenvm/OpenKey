@@ -18,6 +18,7 @@
 
 #define DYNA_DATA(macro, pos) (macro ? pData->macroData[pos] : pData->charData[pos])
 #define MAX_UNICODE_STRING  20
+#define EMPTY_HOTKEY 0xFE0000FE
 
 extern ViewController* viewController;
 
@@ -75,7 +76,7 @@ extern "C" {
         initSmartSwitchKey((Byte*)data.bytes, (int)data.length);
         
         //init convert tool
-        convertToolDontAlertWhenCompleted = [prefs boolForKey:@"convertToolDontAlertWhenCompleted"];
+        convertToolDontAlertWhenCompleted = ![prefs boolForKey:@"convertToolDontAlertWhenCompleted"];
         convertToolToAllCaps = [prefs boolForKey:@"convertToolToAllCaps"];
         convertToolToAllNonCaps = [prefs boolForKey:@"convertToolToAllNonCaps"];
         convertToolToCapsFirstLetter = [prefs boolForKey:@"convertToolToCapsFirstLetter"];
@@ -85,7 +86,7 @@ extern "C" {
         convertToolToCode = [prefs integerForKey:@"convertToolToCode"];
         convertToolHotKey = (int)[prefs integerForKey:@"convertToolHotKey"];
         if (convertToolHotKey == 0) {
-            convertToolHotKey = 0xFE0000FE; //default value: no hot key
+            convertToolHotKey = EMPTY_HOTKEY;
         }
     }
     
@@ -342,6 +343,8 @@ extern "C" {
     }
             
     bool checkHotKey(int hotKeyData, bool checkKeyCode=true) {
+        if (hotKeyData == EMPTY_HOTKEY)
+            return false;
         if (HAS_CONTROL(hotKeyData) ^ GET_BOOL(_lastFlag & kCGEventFlagMaskControl))
             return false;
         if (HAS_OPTION(hotKeyData) ^ GET_BOOL(_lastFlag & kCGEventFlagMaskAlternate))

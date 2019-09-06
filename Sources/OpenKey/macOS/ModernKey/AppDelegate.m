@@ -340,8 +340,7 @@ extern bool convertToolDontAlertWhenCompleted;
         intInputMethod = 0;
     vLanguage = (int)intInputMethod;
     [[NSUserDefaults standardUserDefaults] setInteger:intInputMethod forKey:@"InputMethod"];
-    if (vSwitchKeyStatus & 0x8000)
-        NSBeep();
+
     [self fillData];
     [viewController fillData];
     
