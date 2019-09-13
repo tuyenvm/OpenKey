@@ -411,7 +411,7 @@ void restoreLastTypingState() {
                 for (i = 0; i < _typingStatesData.size(); i++) {
                     TypingWord[i] = _typingStatesData[i];
                 }
-                _index = _typingStatesData.size();
+                _index = (Byte)_typingStatesData.size();
             }
         }
     }
@@ -1156,8 +1156,8 @@ void handleQuickTelex(const Uint16& data, const bool& isCaps) {
     hCode = vWillProcess;
     hBPC = 1;
     hNCC = 2;
-    hData[1] = _quickTelex[data][0] | isCaps;
-    hData[0] = _quickTelex[data][1] | isCaps;
+    hData[1] = _quickTelex[data][0] | (isCaps ? CAPS_MASK : 0);
+    hData[0] = _quickTelex[data][1] | (isCaps ? CAPS_MASK : 0);
     insertKey(_quickTelex[data][1], isCaps, false);
 }
 
@@ -1188,7 +1188,7 @@ void vEnglishMode(const vKeyEventState& state, const Uint16& data, const bool& i
     } else if (data == KEY_SPACE) {
         if (!_hasHandledMacro && findMacro(hMacroKey, hMacroData)) {
             hCode = vReplaceMaro;
-            hBPC = hMacroKey.size();
+            hBPC = (Byte)hMacroKey.size();
         }
         hMacroKey.clear();
     } else if (data == KEY_DELETE) {
@@ -1271,7 +1271,7 @@ void vKeyHandleEvent(const vKeyEvent& event,
         }
         if (vUseMacro && !_hasHandledMacro && findMacro(hMacroKey, hMacroData)) { //macro
             hCode = vReplaceMaro;
-            hBPC = hMacroKey.size();
+            hBPC = (Byte)hMacroKey.size();
             _spaceCount++;
             _hasHandledMacro = true;
         } else if (vRestoreIfWrongSpelling && tempDisableKey && !_hasHandledMacro) { //restore key if wrong spelling

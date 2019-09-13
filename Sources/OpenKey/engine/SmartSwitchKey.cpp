@@ -38,12 +38,12 @@ void initSmartSwitchKey(const Byte* pData, const int& size) {
 
 void getSmartSwitchKeySaveData(vector<Byte>& outData) {
     outData.clear();
-    Uint16 count = _smartSwitchKeyData.size();
+    Uint16 count = (Uint16)_smartSwitchKeyData.size();
     outData.push_back((Byte)count);
     outData.push_back((Byte)(count>>8));
     
     for (std::map<string, Int8>::iterator it = _smartSwitchKeyData.begin(); it != _smartSwitchKeyData.end(); ++it) {
-        outData.push_back(it->first.length());
+        outData.push_back((Byte)it->first.length());
         for (int j = 0; j < it->first.length(); j++) {
             outData.push_back(it->first[j]);
         }

@@ -19,8 +19,13 @@
 #include "ConvertTool.h"
 
 #define IS_DEBUG 1
+
+#ifndef LOBYTE
 #define LOBYTE(data) (data & 0xFF)
+#endif // !LOBYTE
+#ifndef HIBYTE
 #define HIBYTE(data) ((data>>8) & 0xFF)
+#endif // !HIBYTE
 
 #define GET_SWITCH_KEY(data) (data & 0xFF)
 #define HAS_CONTROL(data) ((data & 0x100) ? 1 : 0)

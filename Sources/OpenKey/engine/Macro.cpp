@@ -103,18 +103,18 @@ void initMacroMap(const Byte* pData, const int& size) {
 }
 
 void getMacroSaveData(vector<Byte>& outData) {
-    Uint16 totalMacro = macroMap.size();
+    Uint16 totalMacro = (Uint16)macroMap.size();
     outData.push_back((Byte)totalMacro);
     outData.push_back((Byte)(totalMacro>>8));
     
     for (std::map<vector<Uint32>, MacroData>::iterator it = macroMap.begin(); it != macroMap.end(); ++it) {
-        outData.push_back(it->second.macroText.size());
+        outData.push_back((Byte)it->second.macroText.size());
         for (int j = 0; j < it->second.macroText.size(); j++) {
             outData.push_back(it->second.macroText[j]);
         }
         
-        Uint16 macroContentSize = it->second.macroContent.size();
-        outData.push_back(macroContentSize);
+        Uint16 macroContentSize = (Uint16)it->second.macroContent.size();
+        outData.push_back((Byte)macroContentSize);
         outData.push_back(macroContentSize>>8);
         for (int j = 0; j < macroContentSize; j++) {
             outData.push_back(it->second.macroContent[j]);
