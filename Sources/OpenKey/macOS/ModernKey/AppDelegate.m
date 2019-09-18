@@ -8,10 +8,12 @@
 
 #import <AppKit/AppKit.h>
 #import <Carbon/Carbon.h>
+#import <Cocoa/Cocoa.h>
 #import <ServiceManagement/ServiceManagement.h>
 #import "AppDelegate.h"
 #import "ViewController.h"
 #import "OpenKeyManager.h"
+#import "MJAccessibilityUtils.h"
 
 AppDelegate* appDelegate;
 extern ViewController* viewController;
@@ -45,6 +47,7 @@ extern bool convertToolDontAlertWhenCompleted;
 
 @end
 
+
 @implementation AppDelegate {
     NSWindowController *_mainWC;
     NSWindowController *_macroWC;
@@ -70,18 +73,44 @@ extern bool convertToolDontAlertWhenCompleted;
     NSMenuItem* mnuQuickConvert;
 }
 
+-(void)askPermission {
+    NSAlert *alert = [[NSAlert alloc] init];
+    [alert setMessageText: [NSString stringWithFormat:@"OpenKey cần bạn cấp quyền để có thể hoạt động!"]];
+    [alert setInformativeText:@"Vui lòng chạy lại ứng dụng sau khi cấp quyền."];
+
+    [alert addButtonWithTitle:@"Không"];
+    [alert addButtonWithTitle:@"Cấp quyền"];
+
+    [alert.window makeKeyAndOrderFront:nil];
+    [alert.window setLevel:NSStatusWindowLevel];
+
+    NSModalResponse res = [alert runModal];
+
+    if (res == 1001) {
+        MJAccessibilityOpenPanel();
+    }
+
+    [NSApp terminate:0];
+}
+
 - (void)applicationDidFinishLaunching:(NSNotification *)aNotification {
     appDelegate = self;
     
     [self registerAwakeNotification];
     
-    //check weather this app has been launched before that or not
+    //check whether this app has been launched before that or not
     NSArray* runningApp = [[NSWorkspace sharedWorkspace] runningApplications];
     if ([runningApp containsObject:@"com.tuyenmai.openkey"]) { //if already running -> exit
         [NSApp terminate:nil];
         return;
     }
     
+    // check if user granted Accessabilty permission
+    if (!MJAccessibilityIsEnabled()) {
+        [self askPermission];
+        return;
+    }
+
     //[NSApp setActivationPolicy: NSApplicationActivationPolicyProhibited];
     
     if (vSwitchKeyStatus & 0x8000)

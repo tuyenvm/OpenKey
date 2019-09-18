@@ -45,6 +45,7 @@
 		29CBBE6A23325D8600740F8A /* MyTextField.m in Sources */ = {isa = PBXBuildFile; fileRef = 29CBBE6423325D8600740F8A /* MyTextField.m */; };
 		29CBBE6B23325D8600740F8A /* ConvertToolViewController.mm in Sources */ = {isa = PBXBuildFile; fileRef = 29CBBE6723325D8600740F8A /* ConvertToolViewController.mm */; };
 		29CBBE6C23325D8600740F8A /* MacroViewController.mm in Sources */ = {isa = PBXBuildFile; fileRef = 29CBBE6823325D8600740F8A /* MacroViewController.mm */; };
+		29CBBE6E2332634700740F8A /* MJAccessibilityUtils.m in Sources */ = {isa = PBXBuildFile; fileRef = 29CBBE6D2332634700740F8A /* MJAccessibilityUtils.m */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -120,6 +121,8 @@
 		29CBBE6723325D8600740F8A /* ConvertToolViewController.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = ConvertToolViewController.mm; sourceTree = "<group>"; };
 		29CBBE6823325D8600740F8A /* MacroViewController.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = MacroViewController.mm; sourceTree = "<group>"; };
 		29CBBE6923325D8600740F8A /* MyTextField.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MyTextField.h; sourceTree = "<group>"; };
+		29CBBE6D2332634700740F8A /* MJAccessibilityUtils.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = MJAccessibilityUtils.m; sourceTree = "<group>"; };
+		29CBBE6F233263F900740F8A /* MJAccessibilityUtils.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = MJAccessibilityUtils.h; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -208,6 +211,8 @@
 				2389467E21FDDC3F0030A13B /* OpenKeyManager.h */,
 				2389467C21FDDB920030A13B /* OpenKeyManager.m */,
 				238519F421F1B9B900E79A41 /* OpenKey.mm */,
+				29CBBE6D2332634700740F8A /* MJAccessibilityUtils.m */,
+				29CBBE6F233263F900740F8A /* MJAccessibilityUtils.h */,
 			);
 			path = ModernKey;
 			sourceTree = "<group>";
@@ -379,6 +384,7 @@
 				29CBBE6323325C3C00740F8A /* SmartSwitchKey.cpp in Sources */,
 				232EDA5C21F1B33E0085D362 /* ViewController.m in Sources */,
 				2389467D21FDDB920030A13B /* OpenKeyManager.m in Sources */,
+				29CBBE6E2332634700740F8A /* MJAccessibilityUtils.m in Sources */,
 				29CBBE6223325C3C00740F8A /* Macro.cpp in Sources */,
 				2374A1302216720E005B0375 /* AboutViewController.m in Sources */,
 				238519F021F1B70E00E79A41 /* Engine.cpp in Sources */,
