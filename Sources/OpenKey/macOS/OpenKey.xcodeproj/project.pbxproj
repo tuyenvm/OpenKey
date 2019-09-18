@@ -39,6 +39,12 @@
 		238AF96922042E2500AEFA17 /* ThumbUp@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 238AF96822042E2500AEFA17 /* ThumbUp@2x.png */; };
 		238AF97122042EC600AEFA17 /* Icon.icns in Resources */ = {isa = PBXBuildFile; fileRef = 238AF97022042EC600AEFA17 /* Icon.icns */; };
 		23963B5022040C720097189E /* ServiceManagement.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 23963B4F22040C720097189E /* ServiceManagement.framework */; };
+		29CBBE6123325C3C00740F8A /* ConvertTool.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 29CBBE5C23325C3C00740F8A /* ConvertTool.cpp */; };
+		29CBBE6223325C3C00740F8A /* Macro.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 29CBBE5D23325C3C00740F8A /* Macro.cpp */; };
+		29CBBE6323325C3C00740F8A /* SmartSwitchKey.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 29CBBE5F23325C3C00740F8A /* SmartSwitchKey.cpp */; };
+		29CBBE6A23325D8600740F8A /* MyTextField.m in Sources */ = {isa = PBXBuildFile; fileRef = 29CBBE6423325D8600740F8A /* MyTextField.m */; };
+		29CBBE6B23325D8600740F8A /* ConvertToolViewController.mm in Sources */ = {isa = PBXBuildFile; fileRef = 29CBBE6723325D8600740F8A /* ConvertToolViewController.mm */; };
+		29CBBE6C23325D8600740F8A /* MacroViewController.mm in Sources */ = {isa = PBXBuildFile; fileRef = 29CBBE6823325D8600740F8A /* MacroViewController.mm */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -102,6 +108,18 @@
 		238AF97022042EC600AEFA17 /* Icon.icns */ = {isa = PBXFileReference; lastKnownFileType = image.icns; path = Icon.icns; sourceTree = "<group>"; };
 		23963B4F22040C720097189E /* ServiceManagement.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = ServiceManagement.framework; path = System/Library/Frameworks/ServiceManagement.framework; sourceTree = SDKROOT; };
 		23A984BE220ED07E000914A2 /* IOKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = IOKit.framework; path = System/Library/Frameworks/IOKit.framework; sourceTree = SDKROOT; };
+		29CBBE5B23325C3C00740F8A /* ConvertTool.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ConvertTool.h; sourceTree = "<group>"; };
+		29CBBE5C23325C3C00740F8A /* ConvertTool.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = ConvertTool.cpp; sourceTree = "<group>"; };
+		29CBBE5D23325C3C00740F8A /* Macro.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Macro.cpp; sourceTree = "<group>"; };
+		29CBBE5E23325C3C00740F8A /* Macro.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Macro.h; sourceTree = "<group>"; };
+		29CBBE5F23325C3C00740F8A /* SmartSwitchKey.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = SmartSwitchKey.cpp; sourceTree = "<group>"; };
+		29CBBE6023325C3C00740F8A /* SmartSwitchKey.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SmartSwitchKey.h; sourceTree = "<group>"; };
+		29CBBE6423325D8600740F8A /* MyTextField.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MyTextField.m; sourceTree = "<group>"; };
+		29CBBE6523325D8600740F8A /* MacroViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MacroViewController.h; sourceTree = "<group>"; };
+		29CBBE6623325D8600740F8A /* ConvertToolViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ConvertToolViewController.h; sourceTree = "<group>"; };
+		29CBBE6723325D8600740F8A /* ConvertToolViewController.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = ConvertToolViewController.mm; sourceTree = "<group>"; };
+		29CBBE6823325D8600740F8A /* MacroViewController.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = MacroViewController.mm; sourceTree = "<group>"; };
+		29CBBE6923325D8600740F8A /* MyTextField.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MyTextField.h; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -169,6 +187,12 @@
 		232EDA5621F1B33E0085D362 /* ModernKey */ = {
 			isa = PBXGroup;
 			children = (
+				29CBBE6623325D8600740F8A /* ConvertToolViewController.h */,
+				29CBBE6723325D8600740F8A /* ConvertToolViewController.mm */,
+				29CBBE6523325D8600740F8A /* MacroViewController.h */,
+				29CBBE6823325D8600740F8A /* MacroViewController.mm */,
+				29CBBE6923325D8600740F8A /* MyTextField.h */,
+				29CBBE6423325D8600740F8A /* MyTextField.m */,
 				232DB1DF21FAED280049A0B5 /* Resources */,
 				232EDA5721F1B33E0085D362 /* AppDelegate.h */,
 				232EDA5821F1B33E0085D362 /* AppDelegate.m */,
@@ -205,6 +229,12 @@
 		238519ED21F1B70E00E79A41 /* engine */ = {
 			isa = PBXGroup;
 			children = (
+				29CBBE5C23325C3C00740F8A /* ConvertTool.cpp */,
+				29CBBE5B23325C3C00740F8A /* ConvertTool.h */,
+				29CBBE5D23325C3C00740F8A /* Macro.cpp */,
+				29CBBE5E23325C3C00740F8A /* Macro.h */,
+				29CBBE5F23325C3C00740F8A /* SmartSwitchKey.cpp */,
+				29CBBE6023325C3C00740F8A /* SmartSwitchKey.h */,
 				234584A721F1E96C00DE1DEC /* DataType.h */,
 				23355FD621F2D31D00625798 /* Vietnamese.cpp */,
 				23355FD721F2D31D00625798 /* Vietnamese.h */,
@@ -346,14 +376,20 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				29CBBE6323325C3C00740F8A /* SmartSwitchKey.cpp in Sources */,
 				232EDA5C21F1B33E0085D362 /* ViewController.m in Sources */,
 				2389467D21FDDB920030A13B /* OpenKeyManager.m in Sources */,
+				29CBBE6223325C3C00740F8A /* Macro.cpp in Sources */,
 				2374A1302216720E005B0375 /* AboutViewController.m in Sources */,
 				238519F021F1B70E00E79A41 /* Engine.cpp in Sources */,
+				29CBBE6123325C3C00740F8A /* ConvertTool.cpp in Sources */,
 				238519F521F1B9B900E79A41 /* OpenKey.mm in Sources */,
 				232EDA6421F1B33F0085D362 /* main.m in Sources */,
 				23355FD821F2D31D00625798 /* Vietnamese.cpp in Sources */,
 				232EDA5921F1B33E0085D362 /* AppDelegate.m in Sources */,
+				29CBBE6B23325D8600740F8A /* ConvertToolViewController.mm in Sources */,
+				29CBBE6A23325D8600740F8A /* MyTextField.m in Sources */,
+				29CBBE6C23325D8600740F8A /* MacroViewController.mm in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
