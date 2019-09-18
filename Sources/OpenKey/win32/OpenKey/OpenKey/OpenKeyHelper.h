@@ -35,6 +35,8 @@ public:
 	static string& getFrontMostAppExecuteName();
 	static string& getLastAppExecuteName();
 
+	static wstring getFullPath();
+
 	static wstring getClipboardText(const int& type);
 	static void setClipboardText(LPCTSTR data, const int& len, const int& type);
 

@@ -87,12 +87,12 @@ BYTE * OpenKeyHelper::getRegBinary(LPCTSTR key, DWORD& outSize) {
 
 void OpenKeyHelper::registerRunOnStartup(const int& val) {
 	if (val) {
-		LPTSTR path = getExecutePath();
-		RegCreateKey(HKEY_CURRENT_USER, _runOnStartupKeyPath, &hKey);
-		RegSetValueEx(hKey, _T("OpenKey"), 0, REG_SZ, (BYTE*)path, (lstrlen(path) + 1) * 2);
-		RegCloseKey(hKey);
+		string path = wideStringToUtf8(getFullPath());
+		char buff[MAX_PATH];
+		sprintf_s(buff, "schtasks /create /sc onlogon /tn OpenKey /rl highest /tr \"%s\"", path.c_str());
+		WinExec(buff, SW_HIDE);
 	} else {
-		RegDeleteKeyValue(HKEY_CURRENT_USER, _runOnStartupKeyPath, _T("OpenKey"));
+		WinExec("schtasks /delete  /tn OpenKey /f", SW_HIDE);
 	}
 }
 
@@ -128,6 +128,14 @@ string& OpenKeyHelper::getFrontMostAppExecuteName() {
 
 string & OpenKeyHelper::getLastAppExecuteName() {
 	return _exeNameUtf8;
+}
+
+wstring OpenKeyHelper::getFullPath() {
+	HMODULE hModule = GetModuleHandle(NULL);
+	TCHAR path[MAX_PATH];
+	GetModuleFileName(hModule, path, MAX_PATH);
+	wstring rs(path);
+	return rs;
 }
 
 wstring OpenKeyHelper::getClipboardText(const int& type) {

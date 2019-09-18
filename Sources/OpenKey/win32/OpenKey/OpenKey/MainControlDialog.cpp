@@ -66,6 +66,8 @@ void MainControlDialog::initDialog() {
 	checkRestoreIfWrongSpelling = GetDlgItem(hDlg, IDC_CHECK_RESTORE_IF_WRONG_SPELLING); 
 	checkUseClipboard = GetDlgItem(hDlg, IDC_CHECK_USE_CLIPBOARD);
 	checkModernIcon = GetDlgItem(hDlg, IDC_CHECK_MODERN_ICON);
+	checkAllowZWJF = GetDlgItem(hDlg, IDC_CHECK_ALLOW_ZJWF);
+	checkTempOffSpelling = GetDlgItem(hDlg, IDC_CHECK_TEMP_OFF_SPELLING);
 
 	checkSmartSwitchKey = GetDlgItem(hDlg, IDC_CHECK_SMART_SWITCH_KEY);
 	checkCapsFirstChar = GetDlgItem(hDlg, IDC_CHECK_CAPS_FIRST_CHAR); 
@@ -142,15 +144,20 @@ void MainControlDialog::fillData() {
 	SendMessage(checkRunWithWindows, BM_SETCHECK, vRunWithWindows ? 1 : 0, 0);
 	SendMessage(checkSpelling, BM_SETCHECK, vCheckSpelling ? 1 : 0, 0);
 	SendMessage(checkRestoreIfWrongSpelling, BM_SETCHECK, vRestoreIfWrongSpelling ? 1 : 0, 0);
-	EnableWindow(checkRestoreIfWrongSpelling, vCheckSpelling);
 	SendMessage(checkUseClipboard, BM_SETCHECK, vSendKeyStepByStep ? 0 : 1, 0);
 	SendMessage(checkModernIcon, BM_SETCHECK, vUseGrayIcon ? 1 : 0, 0);
+	SendMessage(checkAllowZWJF, BM_SETCHECK, vAllowConsonantZFWJ ? 1 : 0, 0);
+	SendMessage(checkTempOffSpelling, BM_SETCHECK, vTempOffSpelling ? 1 : 0, 0);
 	
 	SendMessage(checkSmartSwitchKey, BM_SETCHECK, vUseSmartSwitchKey ? 1 : 0, 0);
 	SendMessage(checkCapsFirstChar, BM_SETCHECK, vUpperCaseFirstChar ? 1 : 0, 0);
 	SendMessage(checkQuickTelex, BM_SETCHECK, vQuickTelex ? 1 : 0, 0);
 	SendMessage(checkUseMacro, BM_SETCHECK, vUseMacro ? 1 : 0, 0);
 	SendMessage(checkUseMacroInEnglish, BM_SETCHECK, vUseMacroInEnglishMode ? 1 : 0, 0);
+
+	EnableWindow(checkRestoreIfWrongSpelling, vCheckSpelling);
+	EnableWindow(checkAllowZWJF, vCheckSpelling);
+	EnableWindow(checkTempOffSpelling, vCheckSpelling);
 }
 
 void MainControlDialog::setSwitchKey(const unsigned short& code) {
@@ -223,7 +230,10 @@ void MainControlDialog::onCheckboxClicked(const HWND & hWnd) {
 	} else if (hWnd == checkSpelling) {
 		val = (int)SendMessage(hWnd, BM_GETCHECK, 0, 0);
 		APP_SET_DATA(vCheckSpelling, val ? 1 : 0);
+		vSetCheckSpelling();
 		EnableWindow(checkRestoreIfWrongSpelling, vCheckSpelling);
+		EnableWindow(checkAllowZWJF, vCheckSpelling);
+		EnableWindow(checkTempOffSpelling, vCheckSpelling);
 	} else if (hWnd == checkRestoreIfWrongSpelling) {
 		val = (int)SendMessage(hWnd, BM_GETCHECK, 0, 0);
 		APP_SET_DATA(vRestoreIfWrongSpelling, val ? 1 : 0);
@@ -248,6 +258,12 @@ void MainControlDialog::onCheckboxClicked(const HWND & hWnd) {
 	} else if (hWnd == checkModernIcon) {
 		val = (int)SendMessage(hWnd, BM_GETCHECK, 0, 0);
 		APP_SET_DATA(vUseGrayIcon, val ? 1 : 0);
+	} else if (hWnd == checkAllowZWJF) {
+		val = (int)SendMessage(hWnd, BM_GETCHECK, 0, 0);
+		APP_SET_DATA(vAllowConsonantZFWJ, val ? 1 : 0);
+	} else if (hWnd == checkTempOffSpelling) {
+		val = (int)SendMessage(hWnd, BM_GETCHECK, 0, 0);
+		APP_SET_DATA(vTempOffSpelling, val ? 1 : 0);
 	}
 	SystemTrayHelper::updateData();
 }

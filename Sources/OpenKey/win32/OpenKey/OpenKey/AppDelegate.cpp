@@ -23,7 +23,7 @@ int vCodeTable = 0;
 int vCheckSpelling = 1;
 int vUseModernOrthography = 1;
 int vQuickTelex = 0;
-#define DEFAULT_SWITCH_STATUS 0x7A000206 //default option + z
+#define DEFAULT_SWITCH_STATUS 0x5A00025A //default option + z
 int vSwitchKeyStatus = DEFAULT_SWITCH_STATUS;
 int vRestoreIfWrongSpelling = 1;
 int vFixRecommendBrowser = 0;
@@ -32,6 +32,8 @@ int vUseMacroInEnglishMode = 1;
 int vSendKeyStepByStep = 1;
 int vUseSmartSwitchKey = 1;
 int vUpperCaseFirstChar = 0;
+int vTempOffSpelling = 0;
+int vAllowConsonantZFWJ = 0;
 
 int vUseGrayIcon = 0;
 int vShowOnStartUp = 0;
@@ -138,6 +140,8 @@ void AppDelegate::onDefaultConfig() {
 	APP_SET_DATA(vSendKeyStepByStep, 1);
 	APP_SET_DATA(vUseSmartSwitchKey, 1);
 	APP_SET_DATA(vUpperCaseFirstChar, 0);
+	APP_SET_DATA(vAllowConsonantZFWJ, 0);
+	APP_SET_DATA(vTempOffSpelling, 0);
 
 	APP_SET_DATA(vUseGrayIcon, 0);
 	APP_SET_DATA(vShowOnStartUp, 1);
@@ -167,6 +171,7 @@ void AppDelegate::onToggleCheckSpelling() {
 	if (mainDialog) {
 		mainDialog->fillData();
 	}
+	vSetCheckSpelling();
 }
 
 void AppDelegate::onToggleUseSmartSwitchKey() {

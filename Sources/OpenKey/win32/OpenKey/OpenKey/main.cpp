@@ -13,6 +13,7 @@ redistribute your new version, it MUST be open source.
 -----------------------------------------------------------*/
 #include "stdafx.h"
 #include "AppDelegate.h"
+#include <Shlobj.h>
 
 int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 						_In_opt_ HINSTANCE hPrevInstance,
@@ -22,6 +23,14 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 	UNREFERENCED_PARAMETER(hPrevInstance);
 	UNREFERENCED_PARAMETER(lpCmdLine);
 
+#if NDEBUG
+	//check the program is run as administrator mode
+	if (!IsUserAnAdmin()) {
+		//create admin process
+		ShellExecute(0, L"runas", OpenKeyHelper::getFullPath().c_str(), 0, 0, SW_SHOWNORMAL);
+		return 1;
+	}
+#endif
 	AppDelegate app;
 	return app.run(hInstance);
 }
