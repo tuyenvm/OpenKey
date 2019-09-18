@@ -19,6 +19,7 @@
 #define DYNA_DATA(macro, pos) (macro ? pData->macroData[pos] : pData->charData[pos])
 #define MAX_UNICODE_STRING  20
 #define EMPTY_HOTKEY 0xFE0000FE
+#define LOAD_DATA(VAR, KEY) VAR = (int)[[NSUserDefaults standardUserDefaults] integerForKey:@#KEY]
 
 extern ViewController* viewController;
 
@@ -60,6 +61,23 @@ extern "C" {
     vector<Byte> savedSmartSwitchKeyData; ////use for smart switch key
     
     void OpenKeyInit() {
+        //load saved data
+        vFreeMark = 0;//(int)[[NSUserDefaults standardUserDefaults] integerForKey:@"FreeMark"];
+        LOAD_DATA(vCodeTable, CodeTable);
+        LOAD_DATA(vCheckSpelling, Spelling);
+        LOAD_DATA(vQuickTelex, QuickTelex);
+        LOAD_DATA(vUseModernOrthography, ModernOrthography);
+        LOAD_DATA(vRestoreIfWrongSpelling, RestoreIfInvalidWord);
+        LOAD_DATA(vFixRecommendBrowser, FixRecommendBrowser);
+        LOAD_DATA(vUseMacro, UseMacro);
+        LOAD_DATA(vUseMacroInEnglishMode, UseMacroInEnglishMode);
+        LOAD_DATA(vSendKeyStepByStep, SendKeyStepByStep);
+        LOAD_DATA(vUseSmartSwitchKey, UseSmartSwitchKey);
+        LOAD_DATA(vUpperCaseFirstChar, UpperCaseFirstChar);
+        
+        LOAD_DATA(vTempOffSpelling, vTempOffSpelling);
+        LOAD_DATA(vAllowConsonantZFWJ, vAllowConsonantZFWJ);
+        
         myEventSource = CGEventSourceCreate(kCGEventSourceStatePrivate);
         pData = (vKeyHookState*)vKeyInit();
 
@@ -118,6 +136,10 @@ extern "C" {
             setAppInputMethodStatus(string(FRONT_APP.UTF8String), vLanguage);
             saveSmartSwitchKeyData();
         }
+    }
+    
+    void OnSpellCheckingChanged() {
+        vSetCheckSpelling();
     }
     
     void InsertKeyLength(const Uint8& len) {
@@ -396,7 +418,7 @@ extern "C" {
                 }
             }
         }
-        SendPureCharacter(' ');
+        SendKeyCode(_keycode | (_flag & kCGEventFlagMaskShift ? CAPS_MASK : 0));
     }
 
     /**
@@ -432,6 +454,10 @@ extern "C" {
             if (_lastFlag == 0 || _lastFlag < _flag) {
                 _lastFlag = _flag;
             } else if (_lastFlag > _flag)  {
+                //check temporarily turn off spell checking
+                if (vTempOffSpelling && _lastFlag & kCGEventFlagMaskControl) {
+                    vTempOffSpellChecking();
+                }
                 //check switch
                 if (checkHotKey(vSwitchKeyStatus, GET_SWITCH_KEY(vSwitchKeyStatus) != 0xFE)) {
                     _lastFlag = 0;
@@ -505,7 +531,6 @@ extern "C" {
                             _keycode,
                             _flag & kCGEventFlagMaskShift ? 1 : (_flag & kCGEventFlagMaskAlphaShift ? 2 : 0),
                             OTHER_CONTROL_KEY);
-
             if (pData->code == vDoNothing) { //do nothing
                 if (IS_DOUBLE_CODE(vCodeTable)) { //VNI
                     if (pData->extCode == 1) { //break key

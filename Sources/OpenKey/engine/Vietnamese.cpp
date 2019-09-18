@@ -357,6 +357,10 @@ vector<vector<Uint16>> _consonantTable = {
     { KEY_P },
     { KEY_S },
     { KEY_D },
+    { KEY_F | 0x8000},
+    { KEY_W | 0x8000},
+    { KEY_Z | 0x8000},
+    { KEY_J | 0x8000},
 };
 
 vector<vector<Uint16>> _endConsonantTable = {

@@ -12,6 +12,7 @@
 #import "MyTextField.h"
 
 extern AppDelegate* appDelegate;
+extern void OnSpellCheckingChanged(void);
 
 ViewController* viewController;
 extern int vFreeMark;
@@ -26,6 +27,8 @@ extern int vUseMacroInEnglishMode;
 extern int vSendKeyStepByStep;
 extern int vUseSmartSwitchKey;
 extern int vUpperCaseFirstChar;
+extern int vTempOffSpelling;
+extern int vAllowConsonantZFWJ;
 
 @implementation ViewController {
     __weak IBOutlet NSButton *CustomSwitchCommand;
@@ -122,6 +125,9 @@ extern int vUpperCaseFirstChar;
     NSInteger val = [self setCustomValue:sender keyToSet:@"Spelling"];
     vCheckSpelling = (int)val;
     [self.RestoreIfInvalidWord setEnabled:val];
+    [self.AllowZWJF setEnabled:val];
+    [self.TempOffSpellChecking setEnabled:val];
+    OnSpellCheckingChanged();
 }
 
 - (IBAction)onShowUIOnStartup:(NSButton *)sender {
@@ -146,6 +152,16 @@ extern int vUpperCaseFirstChar;
 - (IBAction)onRestoreIfInvalidWord:(id)sender {
     NSInteger val = [self setCustomValue:sender keyToSet:@"RestoreIfInvalidWord"];
     vRestoreIfWrongSpelling = (int)val;
+}
+
+- (IBAction)omTempOffSpellChecking:(id)sender {
+    NSInteger val = [self setCustomValue:sender keyToSet:@"vTempOffSpelling"];
+    vTempOffSpelling = (int)val;
+}
+
+- (IBAction)onAllowZFWJ:(id)sender {
+    NSInteger val = [self setCustomValue:sender keyToSet:@"vAllowConsonantZFWJ"];
+    vAllowConsonantZFWJ = (int)val;
 }
 
 - (IBAction)onFixRecommendBrowser:(id)sender {
@@ -280,6 +296,14 @@ extern int vUpperCaseFirstChar;
     NSInteger restoreIfInvalidWord = [[NSUserDefaults standardUserDefaults] integerForKey:@"RestoreIfInvalidWord"];
     self.RestoreIfInvalidWord.state = restoreIfInvalidWord ? NSControlStateValueOn : NSControlStateValueOff;
     [self.RestoreIfInvalidWord setEnabled:spelling];
+    
+    NSInteger tempOffSpelling = [[NSUserDefaults standardUserDefaults] integerForKey:@"vTempOffSpelling"];
+    self.TempOffSpellChecking.state = tempOffSpelling ? NSControlStateValueOn : NSControlStateValueOff;
+    [self.TempOffSpellChecking setEnabled:spelling];
+    
+    NSInteger allowZFWJ = [[NSUserDefaults standardUserDefaults] integerForKey:@"vAllowConsonantZFWJ"];
+    self.AllowZWJF.state = allowZFWJ ? NSControlStateValueOn : NSControlStateValueOff;
+    [self.AllowZWJF setEnabled:spelling];
     
     NSInteger fixRecommendBrowser = [[NSUserDefaults standardUserDefaults] integerForKey:@"FixRecommendBrowser"];
     self.FixRecommendBrowser.state = fixRecommendBrowser ? NSControlStateValueOn : NSControlStateValueOff;

@@ -23,6 +23,10 @@ static vector<Uint8> _breakCode = {
     KEY_SLASH, KEY_SEMICOLON, KEY_QUOTE, KEY_BACK_SLASH, KEY_MINUS, KEY_EQUALS, KEY_BACKQUOTE, KEY_TAB
 };
 
+static vector<Uint8> _macroBreakCode = {
+    KEY_RETURN, KEY_COMMA, KEY_DOT, KEY_SLASH, KEY_SEMICOLON, KEY_QUOTE, KEY_BACK_SLASH, KEY_MINUS, KEY_EQUALS
+};
+
 static Uint16 ProcessingChar[][11] = {
     {KEY_S, KEY_F, KEY_R, KEY_X, KEY_J, KEY_A, KEY_O, KEY_E, KEY_W, KEY_D, KEY_Z}, //Telex
     {KEY_1, KEY_2, KEY_3, KEY_4, KEY_5, KEY_6, KEY_6, KEY_7, KEY_8, KEY_9, KEY_0}, //VNI
@@ -105,6 +109,7 @@ static bool _hasHandledMacro = false; //for macro flag August 9th, 2019
 static Byte _upperCaseStatus = 0; //for Write upper case for the first letter; 2: will upper case
 static bool _isCharKeyCode;
 static vector<Uint32> _specialChar;
+static bool _useSpellCheckingBefore;
 
 //function prototype
 void findAndCalculateVowel(const bool& forGrammar=false);
@@ -122,7 +127,10 @@ string wideStringToUtf8(const wstring& str) {
 void* vKeyInit() {
     _index = 0;
     _stateIndex = 0;
-    //memset(&HookState, 0, sizeof(vKeyEventState));
+    _useSpellCheckingBefore = vCheckSpelling;
+    _typingStatesData.clear();
+    _typingStates.clear();
+    _longWordHelper.clear();
     return &HookState;
 }
 
@@ -131,6 +139,15 @@ bool isWordBreak(const vKeyEvent& event, const vKeyEventState& state, const Uint
         return true;
     for (i = 0; i < _breakCode.size(); i++) {
         if (_breakCode[i] == data) {
+            return true;
+        }
+    }
+    return false;
+}
+
+bool isMacroBreakCode(const int& data) {
+    for (i = 0; i < _macroBreakCode.size(); i++) {
+        if (_macroBreakCode[i] == data) {
             return true;
         }
     }
@@ -166,7 +183,7 @@ void checkSpelling(const bool& forceCheckVowel=false) {
                 if (_spellingEndIndex < _consonantTable[i].size())
                     _spellingFlag = true;
                 for (j = 0; j < _consonantTable[i].size(); j++) {
-                    if (_spellingEndIndex > j && _consonantTable[i][j] != CHR(j)) {
+                    if (_spellingEndIndex > j && (_consonantTable[i][j] & ~(vAllowConsonantZFWJ ? 0x8000 : 0)) != CHR(j)) {
                         _spellingFlag = true;
                         break;
                     }
@@ -1015,7 +1032,6 @@ void handleMainKey(const Uint16& data, const bool& isCaps) {
     //if is Z key, remove mark
     if (IS_KEY_Z(data)) {
         removeMark();
-        
         if (!isChanged) {
             insertKey(data, isCaps);
         }
@@ -1179,6 +1195,16 @@ bool checkRestoreIfWrongSpelling(const int& handleCode) {
     }
     return false;
 }
+
+void vTempOffSpellChecking() {
+    if (_useSpellCheckingBefore) {
+        vCheckSpelling = vCheckSpelling ? 0 : 1;
+    }
+}
+
+void vSetCheckSpelling() {
+    _useSpellCheckingBefore = vCheckSpelling;
+}
 /*==========================================================================================================*/
 
 void vEnglishMode(const vKeyEventState& state, const Uint16& data, const bool& isCaps, const bool& otherControlKey) {
@@ -1219,8 +1245,13 @@ void vKeyHandleEvent(const vKeyEvent& event,
         hNCC = 0;
         hExt = 1; //word break
         
-        //restore key if wrong spelling with break-key
-        if (vRestoreIfWrongSpelling && isWordBreak(event, state, data)) {
+        //check macro feature
+        if (vUseMacro && isMacroBreakCode(data) && !_hasHandledMacro && findMacro(hMacroKey, hMacroData)) {
+            hCode = vReplaceMaro;
+            hBPC = (Byte)hMacroKey.size();
+            _spaceCount++;
+            _hasHandledMacro = true;
+        } else if (vRestoreIfWrongSpelling && isWordBreak(event, state, data)) { //restore key if wrong spelling with break-key
             if (!tempDisableKey && vCheckSpelling) {
                 checkSpelling(true); //force check spelling
             }
@@ -1246,6 +1277,7 @@ void vKeyHandleEvent(const vKeyEvent& event,
         
         if (hCode == vDoNothing) {
             startNewSession();
+            vCheckSpelling = _useSpellCheckingBefore;
         }
         
         //insert key for macro function
@@ -1297,6 +1329,7 @@ void vKeyHandleEvent(const vKeyEvent& event,
                 saveWord();
             }
         }
+        vCheckSpelling = _useSpellCheckingBefore;
     } else if (data == KEY_DELETE) {
         hCode = vDoNothing;
         hExt = 2; //delete

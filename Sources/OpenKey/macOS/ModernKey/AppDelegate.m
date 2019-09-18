@@ -35,6 +35,8 @@ int vUseMacroInEnglishMode = 1;
 int vSendKeyStepByStep = 0;
 int vUseSmartSwitchKey = 1;
 int vUpperCaseFirstChar = 0;
+int vTempOffSpelling = 0;
+int vAllowConsonantZFWJ = 0;
 
 extern int convertToolHotKey;
 extern bool convertToolDontAlertWhenCompleted;
@@ -87,20 +89,6 @@ extern bool convertToolDontAlertWhenCompleted;
 
     [self createStatusBarMenu];
     
-    //load saved data
-    vFreeMark = 0;//(int)[[NSUserDefaults standardUserDefaults] integerForKey:@"FreeMark"];
-    vCodeTable = (int)[[NSUserDefaults standardUserDefaults] integerForKey:@"CodeTable"];
-    vCheckSpelling = (int)[[NSUserDefaults standardUserDefaults] integerForKey:@"Spelling"];
-    vQuickTelex = (int)[[NSUserDefaults standardUserDefaults] integerForKey:@"QuickTelex"];
-    vUseModernOrthography = (int)[[NSUserDefaults standardUserDefaults] integerForKey:@"ModernOrthography"];
-    vRestoreIfWrongSpelling = (int)[[NSUserDefaults standardUserDefaults] integerForKey:@"RestoreIfInvalidWord"];
-    vFixRecommendBrowser = (int)[[NSUserDefaults standardUserDefaults] integerForKey:@"FixRecommendBrowser"];
-    vUseMacro = (int)[[NSUserDefaults standardUserDefaults] integerForKey:@"UseMacro"];
-    vUseMacroInEnglishMode = (int)[[NSUserDefaults standardUserDefaults] integerForKey:@"UseMacroInEnglishMode"];
-    vSendKeyStepByStep = (int)[[NSUserDefaults standardUserDefaults] integerForKey:@"SendKeyStepByStep"];
-    vUseSmartSwitchKey = (int)[[NSUserDefaults standardUserDefaults] integerForKey:@"UseSmartSwitchKey"];
-    vUpperCaseFirstChar = (int)[[NSUserDefaults standardUserDefaults] integerForKey:@"UpperCaseFirstChar"];
-    
     //init
     dispatch_async(dispatch_get_main_queue(), ^{
         if (![OpenKeyManager initEventTap]) {
@@ -129,7 +117,6 @@ extern bool convertToolDontAlertWhenCompleted;
 }
 
 -(void) createStatusBarMenu {
-    
     NSStatusBar *statusBar = [NSStatusBar systemStatusBar];
     statusItem = [statusBar statusItemWithLength:NSVariableStatusItemLength];
     statusItem.button.image = [NSImage imageNamed:@"Status"];
@@ -232,7 +219,8 @@ extern bool convertToolDontAlertWhenCompleted;
     vSendKeyStepByStep = 0;[[NSUserDefaults standardUserDefaults] setInteger:vUseMacroInEnglishMode forKey:@"SendKeyStepByStep"];
     vUseSmartSwitchKey = 1;[[NSUserDefaults standardUserDefaults] setInteger:vUseSmartSwitchKey forKey:@"UseSmartSwitchKey"];
     vUpperCaseFirstChar = 0;[[NSUserDefaults standardUserDefaults] setInteger:vUpperCaseFirstChar forKey:@"UpperCaseFirstChar"];
-    
+    vTempOffSpelling = 0;[[NSUserDefaults standardUserDefaults] setInteger:vTempOffSpelling forKey:@"vTempOffSpelling"];
+    vAllowConsonantZFWJ = 0;[[NSUserDefaults standardUserDefaults] setInteger:vAllowConsonantZFWJ forKey:@"vAllowConsonantZFWJ"];
     [self fillData];
     [viewController fillData];
 }

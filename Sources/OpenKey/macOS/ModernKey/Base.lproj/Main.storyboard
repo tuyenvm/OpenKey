@@ -1316,18 +1316,18 @@
                                     <action selector="onFreeMark:" target="XfG-lQ-9wD" id="3dQ-ya-AB9"/>
                                 </connections>
                             </button>
-                            <button toolTip="Vẫn cho phép gõ các chữ z w j z làm phụ âm đầu khi bật tính năng kiểm tra chính tả" verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="uOQ-qL-V9O">
+                            <button toolTip="Vẫn cho phép gõ các chữ z w j f làm phụ âm đầu khi bật tính năng kiểm tra chính tả" verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="uOQ-qL-V9O">
                                 <rect key="frame" x="275" y="268" width="216" height="18"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                                <buttonCell key="cell" type="check" title="Cho phép &quot;z w j z&quot; làm phụ âm" bezelStyle="regularSquare" imagePosition="left" state="on" inset="2" id="4sa-Bm-mTc">
+                                <buttonCell key="cell" type="check" title="Cho phép &quot;z w j f&quot; làm phụ âm" bezelStyle="regularSquare" imagePosition="left" state="on" inset="2" id="4sa-Bm-mTc">
                                     <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
                                     <font key="font" metaFont="system"/>
                                 </buttonCell>
                                 <connections>
-                                    <action selector="onUpperCaseFirstChar:" target="XfG-lQ-9wD" id="Eaf-aC-QQy"/>
+                                    <action selector="onAllowZFWJ:" target="XfG-lQ-9wD" id="opa-mL-f7X"/>
                                 </connections>
                             </button>
-                            <button toolTip="Thay thế cc=ch, gg=gi, kk=kh, nn=ng, qq=qu, pp=ph, tt=th" verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="Fld-P4-C8F">
+                            <button toolTip="Tạm tắt kiểm tra chính tả khi gõ một từ nào đó như từ Đắk Lắk, Krông,... Kiểm tra chính tả sẽ phục hồi trở lại cho từ tiếp theo" verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="Fld-P4-C8F">
                                 <rect key="frame" x="275" y="300" width="219" height="18"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                 <buttonCell key="cell" type="check" title="Tạm tắt chính tả bằng phím Ctrl" bezelStyle="regularSquare" imagePosition="left" state="on" inset="2" id="7Vf-II-Y50">
@@ -1335,12 +1335,13 @@
                                     <font key="font" metaFont="system"/>
                                 </buttonCell>
                                 <connections>
-                                    <action selector="onQuickTelex:" target="XfG-lQ-9wD" id="NjR-2L-ZTl"/>
+                                    <action selector="omTempOffSpellChecking:" target="XfG-lQ-9wD" id="JiV-3O-0fj"/>
                                 </connections>
                             </button>
                         </subviews>
                     </view>
                     <connections>
+                        <outlet property="AllowZWJF" destination="uOQ-qL-V9O" id="Jqs-5h-yVt"/>
                         <outlet property="AutoRememberSwitchKey" destination="YGb-a8-1Lb" id="uux-4i-1Hw"/>
                         <outlet property="CheckSpellingButton" destination="6Ko-dG-wVl" id="GZc-qh-LkA"/>
                         <outlet property="CustomBeepSound" destination="bJy-t3-bzy" id="AyJ-En-XLs"/>
@@ -1357,6 +1358,7 @@
                         <outlet property="RunOnStartupButton" destination="Leg-Yg-XFR" id="oRL-up-vyq"/>
                         <outlet property="SendKeyStepByStep" destination="C8z-Sp-sdZ" id="eSj-4I-pDf"/>
                         <outlet property="ShowUIButton" destination="Xle-7k-yIf" id="dbk-Zf-T4j"/>
+                        <outlet property="TempOffSpellChecking" destination="Fld-P4-C8F" id="dmu-8Y-on5"/>
                         <outlet property="UpperCaseFirstChar" destination="Adl-fG-XEu" id="b4x-Cc-Trs"/>
                         <outlet property="UseGrayIcon" destination="HEa-Qp-9qT" id="ApG-gR-H4l"/>
                         <outlet property="UseMacro" destination="eCY-Z0-cgW" id="0z8-vh-VlK"/>
