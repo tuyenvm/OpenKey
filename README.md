@@ -86,8 +86,8 @@ OpenKey cần cấp quyền, vào *System Preferences -> Security & Privacy -> A
 - Fanpage: [https://www.facebook.com/OpenKeyVN](https://www.facebook.com/OpenKeyVN)
 
 ## Liên kết
-- [OpenKey cho Windows, xem chi tiết tại đây]([https://github.com/tuyenvm/OpenKey/tree/master/Sources/OpenKey/win32](https://github.com/tuyenvm/OpenKey/tree/master/Sources/OpenKey/win32))
-- [OpenKey cho Linux (đang phát triển)]([https://github.com/tuyenvm/OpenKey/tree/master/Sources/OpenKey/linux](https://github.com/tuyenvm/OpenKey/tree/master/Sources/OpenKey/linux))
+- [OpenKey cho Windows, xem chi tiết tại đây](https://github.com/tuyenvm/OpenKey/tree/master/Sources/OpenKey/win32)
+- [OpenKey cho Linux (đang phát triển)](https://github.com/tuyenvm/OpenKey/tree/master/Sources/OpenKey/linux)
 ## Một điều nhỏ nhoi
 Đừng quên ủng hộ tác giả bằng cách mua ly cafe cho tác giả tỉnh ngủ nhé:  
 [Buy me a coffee ^^](https://tuyenvm.github.io/donate.html)  
