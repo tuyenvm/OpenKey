@@ -56,9 +56,10 @@ extern "C" {
     int _i, _j, _k;
     Uint32 _tempChar;
     
-    string macroText, macroContent;
     int _languageTemp = 0; //use for smart switch key
     vector<Byte> savedSmartSwitchKeyData; ////use for smart switch key
+    
+    NSString* _frontMostApp = @"UnknownApp";
     
     void OpenKeyInit() {
         //load saved data
@@ -108,11 +109,19 @@ extern "C" {
         }
     }
     
+    void queryFrontMostApp() {
+        _frontMostApp = [[NSWorkspace sharedWorkspace] frontmostApplication].bundleIdentifier;
+        if (_frontMostApp == nil)
+            _frontMostApp = [[NSWorkspace sharedWorkspace] frontmostApplication].localizedName != nil ?
+            [[NSWorkspace sharedWorkspace] frontmostApplication].localizedName : @"UnknownApp";
+    }
+    
     NSString* ConvertUtil(NSString* str) {
         return [NSString stringWithUTF8String:convertUtil([str UTF8String]).c_str()];
     }
     
     BOOL containUnicodeCompoundApp(NSString* topApp) {
+        if (topApp == nil) return false;
         for (_j = 0; _j < [_unicodeCompoundApp count]; _j++) {
             if ([topApp hasPrefix:[_unicodeCompoundApp objectAtIndex:_j]] || [[_unicodeCompoundApp objectAtIndex:_j] isEqualToString:topApp])
                 return true;
@@ -133,7 +142,8 @@ extern "C" {
     
     void OnInputMethodChanged() {
         if (vUseSmartSwitchKey) {
-            setAppInputMethodStatus(string(FRONT_APP.UTF8String), vLanguage);
+            queryFrontMostApp();
+            setAppInputMethodStatus(string(_frontMostApp.UTF8String), vLanguage);
             saveSmartSwitchKeyData();
         }
     }
@@ -476,7 +486,8 @@ extern "C" {
         //smart switch key: update August 13th, 2019
         if (vUseSmartSwitchKey &&
             ((type == kCGEventKeyDown) || (type == kCGEventLeftMouseDown) || (type == kCGEventKeyUp && _keycode == KEY_TAB && _flag & kCGEventFlagMaskCommand))) {
-            _languageTemp = getAppInputMethodStatus(string(FRONT_APP.UTF8String), vLanguage);
+            queryFrontMostApp();
+            _languageTemp = getAppInputMethodStatus(string(_frontMostApp.UTF8String), vLanguage);
             if (_languageTemp != vLanguage) {
                 if (_languageTemp != -1) {
                     vLanguage = _languageTemp;
