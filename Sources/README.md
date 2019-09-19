@@ -1,4 +1,4 @@
 # OpenKey
 ### Open source Vietnamese Input App for macOS
-Check out source for macOS and engine.   
-I will start Linux version soon, b/c no one need for Windows :((  
+Check out source for macOS, Windows and engine.   
+Linux version is under construction. 
