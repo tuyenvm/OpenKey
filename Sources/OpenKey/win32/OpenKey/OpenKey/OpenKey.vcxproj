@@ -148,6 +148,7 @@
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
+      <UACExecutionLevel>AsInvoker</UACExecutionLevel>
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>

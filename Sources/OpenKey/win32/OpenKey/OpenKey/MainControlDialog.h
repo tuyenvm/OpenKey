@@ -21,7 +21,8 @@ private:
 	HWND checkCtrl, checkAlt, checkWin, checkShift, textSwitchKey, checkBeep;
 	HWND checkVietnamese, checkEnglish;
 	HWND checkModernOrthorgraphy, checkFixRecommendBrowser, checkShowOnStartup, checkRunWithWindows,
-		checkSpelling, checkRestoreIfWrongSpelling, checkUseClipboard, checkModernIcon;
+		checkSpelling, checkRestoreIfWrongSpelling, checkUseClipboard, checkModernIcon,
+		checkAllowZWJF, checkTempOffSpelling;
 	HWND checkSmartSwitchKey, checkCapsFirstChar, checkQuickTelex, checkUseMacro, checkUseMacroInEnglish;
 private:
 	void initDialog();

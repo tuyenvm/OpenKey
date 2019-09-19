@@ -122,6 +122,8 @@ void OpenKeyInit() {
 	OpenKeyHelper::registerRunOnStartup(vRunWithWindows);
 	APP_GET_DATA(vUseSmartSwitchKey, 1);
 	APP_GET_DATA(vUpperCaseFirstChar, 0);
+	APP_GET_DATA(vAllowConsonantZFWJ, 0);
+	APP_GET_DATA(vTempOffSpelling, 0);
 
 	//init convert tool
 	APP_GET_DATA(convertToolDontAlertWhenCompleted, 0);
@@ -492,6 +494,10 @@ LRESULT CALLBACK keyboardHookProcess(int nCode, WPARAM wParam, LPARAM lParam) {
 		if (_lastFlag == 0 || _lastFlag < _flag)
 			_lastFlag = _flag;
 		else if (_lastFlag > _flag) {
+			//check temporarily turn off spell checking
+			if (vTempOffSpelling && _lastFlag & MASK_CONTROL) {
+				vTempOffSpellChecking();
+			}
 			//check switch
 			if (checkHotKey(vSwitchKeyStatus, GET_SWITCH_KEY(vSwitchKeyStatus) != 0xFE)) {
 				switchLanguage();

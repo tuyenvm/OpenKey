@@ -228,7 +228,7 @@ void SystemTrayHelper::createPopupMenu() {
 	SetMenuDefaultItem(popupMenu, POPUP_CONTROL_PANEL, false);
 }
 
-void SystemTrayHelper::updateData() {
+static void loadTrayIcon() {
 	int icon = 0;
 	if (vLanguage) {
 		icon = vUseGrayIcon ? IDI_ICON_STATUS_VIET_10 : IDI_ICON_STATUS_VIET;
@@ -239,6 +239,10 @@ void SystemTrayHelper::updateData() {
 		LoadString(GetModuleHandle(0), IDS_TRAY_TITLE, nid.szTip, 128);
 	}
 	nid.hIcon = LoadIcon(GetModuleHandle(0), MAKEINTRESOURCE(icon));
+}
+
+void SystemTrayHelper::updateData() {
+	loadTrayIcon();
 	Shell_NotifyIcon(NIM_MODIFY, &nid);
 
 	MODIFY_MENU(popupMenu, POPUP_VIET_ON_OFF, vLanguage);
@@ -308,7 +312,7 @@ void SystemTrayHelper::createSystemTrayIcon(const HINSTANCE& hIns) {
 	nid.uID = TRAY_ICONUID;
 	nid.uVersion = NOTIFYICON_VERSION;
 	nid.uCallbackMessage = WM_TRAYMESSAGE;
-	nid.hIcon = LoadIcon(hIns, MAKEINTRESOURCE(IDI_ICON_STATUS_VIET));
+	loadTrayIcon();
 	LoadString(hIns, IDS_APP_TITLE, nid.szTip, 128);
 	nid.uFlags = NIF_MESSAGE | NIF_ICON | NIF_TIP;
 	Shell_NotifyIcon(NIM_ADD, &nid);
