@@ -1,10 +1,10 @@
+
 # [OpenKey](https://tuyenvm.github.io/index.html)
 ### [Download bản mới nhất](https://github.com/tuyenvm/OpenKey/releases)
 [![GitHub release](https://img.shields.io/github/v/release/tuyenvm/OpenKey.svg)](https://github.com/tuyenvm/OpenKey/releases/latest)
 
 ### Open source Vietnamese Input App for macOS - Bộ gõ tiếng Việt nguồn mở cho macOS.
-New Vietnamese input for macOS. Annoying underline issue fixed. Intelligent engine. Free and open source.  
-Bộ gõ tiếng Việt mới cho macOS, sử dụng kỹ thuật backkey. Loại bỏ lỗi gạch chân khó chịu ở bộ gõ mặc định. Hoàn toàn miễn phí và là nguồn mở, luôn cập nhật và phát triển.
+Bộ gõ tiếng Việt mới cho macOS, sử dụng kỹ thuật `Backspace`. Loại bỏ lỗi gạch chân khó chịu ở bộ gõ mặc định. Hoàn toàn miễn phí và là nguồn mở, luôn cập nhật và phát triển.
 
 ### Mã nguồn của ứng dụng được mở công khai, minh bạch dưới giấy phép GPL. Điều này nghĩa là bạn hoàn toàn có thể tải mã nguồn về tự build, cải tiến theo mục đích của bạn. Nếu bạn tái phân phối bản cải tiến của bạn, thì nó cũng phải là mã nguồn mở và thông báo bản gốc là OpenKey.
 
@@ -15,12 +15,12 @@ Bộ gõ tiếng Việt mới cho macOS, sử dụng kỹ thuật backkey. Loạ
 ![Gõ tắt](https://raw.githubusercontent.com/tuyenvm/tuyenvm.github.io/master/images/openkey-macro.png "Macro")
 ![Chuyển mã](https://raw.githubusercontent.com/tuyenvm/tuyenvm.github.io/master/images/openkey-convert-tool.png "ConvertTool")
 
-## Input Type - Hỗ trợ kiểu gõ
+## Hỗ trợ kiểu gõ
 - Telex
 - VNI
 - Simple Telex
 
-## Code - Bảng mã:
+## Bảng mã thông dụng:
 - Unicode (Unicode dựng sẵn).
 - TCVN3 (ABC).
 - VNI Windows.
@@ -28,7 +28,7 @@ Bộ gõ tiếng Việt mới cho macOS, sử dụng kỹ thuật backkey. Loạ
 - Vietnamese Locale CP 1258.
 - ...
 
-## Feature - Tính năng:
+## Tính năng:
 - **Modern orthography** (On/Off) - Đặt dấu oà, uý thay vì òa, úy.
 - **Quick Telex** (On/Off) - Gõ nhanh (cc=ch, gg=gi, kk=kh, nn=ng, qq=qu, pp=ph, tt=th).
 - **Grammar check** (On/Off) - Kiểm tra ngữ pháp.
@@ -54,7 +54,7 @@ Bộ gõ tiếng Việt mới cho macOS, sử dụng kỹ thuật backkey. Loạ
 
 ## Cài đặt:
 **Cài đặt thủ công:**  
-Tải bản OpenKey mới nhất từ [đây](https://github.com/tuyenvm/OpenKey/releases), mở file `dmg` ra rồi kéo thả `OpenKey.app` vào thư mục `Application`.
+Tải bản OpenKey mới nhất từ [đây](https://github.com/tuyenvm/OpenKey/releases/latest), mở file `dmg` ra rồi kéo thả `OpenKey.app` vào thư mục `Application`.
 
 **Cài bằng Homebrew:** (by nhymxu)  
 Nếu chưa cài Homebrew, mở terminal, nhập:
@@ -77,15 +77,19 @@ $ brew cask upgrade openkey
 ```
 
 ## Note - Lưu ý:
-OpenKey needs Accessibility permission, go to System Preferences -> Security & Privacy -> Accessibility, enable OpenKey.app. Don't turn off while using.
+OpenKey cần cấp quyền, vào *System Preferences -> Security & Privacy -> Accessibility*, kích hoạt `OpenKey.app`. **Không tắt nó khi đang dùng OpenKey**.
 ![Guide](https://raw.githubusercontent.com/tuyenvm/tuyenvm.github.io/master/images/openkey-guide.png "Accessibility").
 
-## Author
-Mai Vũ Tuyên.
-Any ideas, please send me via (maivutuyen.91@gmail.com)  
-Fanpage: [https://www.facebook.com/OpenKeyVN](https://www.facebook.com/OpenKeyVN)
+## Tác giả
+- Mai Vũ Tuyên.
+- Mọi góp ý, gửi cho mình qua maivutuyen.91@gmail.com  
+- Fanpage: [https://www.facebook.com/OpenKeyVN](https://www.facebook.com/OpenKeyVN)
 
-## One more thing
+## Liên kết
+- [OpenKey cho Windows, xem chi tiết tại đây]([https://github.com/tuyenvm/OpenKey/tree/master/Sources/OpenKey/win32](https://github.com/tuyenvm/OpenKey/tree/master/Sources/OpenKey/win32))
+- [OpenKey cho Linux (đang phát triển)]([https://github.com/tuyenvm/OpenKey/tree/master/Sources/OpenKey/linux](https://github.com/tuyenvm/OpenKey/tree/master/Sources/OpenKey/linux))
+## Một điều nhỏ nhoi
+Đừng quên ủng hộ tác giả bằng cách mua ly cafe cho tác giả tỉnh ngủ nhé:  
 [Buy me a coffee ^^](https://tuyenvm.github.io/donate.html)  
-[Or Redbull is also Ok ^^](https://paypal.me/tuyenmai)  
-Thank you very much.
+[hoặc Redbull cũng được ^^](https://paypal.me/tuyenmai)  
+Cảm ơn các bạn rất nhiều.
