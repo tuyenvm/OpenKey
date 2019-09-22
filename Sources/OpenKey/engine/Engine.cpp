@@ -566,11 +566,12 @@ void findAndCalculateVowel(const bool& forGrammar) {
 void removeMark() {
     findAndCalculateVowel(true);
     isChanged = false;
-
-    for (i = VSI; i <= VEI; i++) {
-        if (TypingWord[i] & MARK_MASK) {
-            TypingWord[i] &= ~MARK_MASK;
-            isChanged = true;
+    if (_index > 0) {
+        for (i = VSI; i <= VEI; i++) {
+            if (TypingWord[i] & MARK_MASK) {
+                TypingWord[i] &= ~MARK_MASK;
+                isChanged = true;
+            }
         }
     }
     if (isChanged) {
