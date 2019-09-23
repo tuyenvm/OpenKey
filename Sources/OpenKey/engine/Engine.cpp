@@ -73,6 +73,7 @@ vKeyHookState HookState;
  * bit 18: has tone w or not
  * bit 19 - > 23: has mark or not (Sắc, huyền, hỏi, ngã, nặng)
  * bit 24: is standalone key? (w, [, ])
+ * bit 25: is character code or keyboard code; 1: character code; 0: keycode
  */
 static Uint32 TypingWord[MAX_BUFF];
 static Byte _index = 0;
@@ -517,19 +518,19 @@ Uint32 getCharacterCode(const Uint32& data) {
             key |= TONEW_MASK;
         }
         if (_codeTable[vCodeTable].find(key) == _codeTable[vCodeTable].end())
-            return data;
+            return data; //not found
         
-        return _codeTable[vCodeTable][key][markElem];
+        return _codeTable[vCodeTable][key][markElem] | CHAR_CODE_MASK;
     } else { //doesn't has mark
         if (_codeTable[vCodeTable].find(key) == _codeTable[vCodeTable].end())
-            return data;
+            return data; //not found
         
         if (data & TONE_MASK) {
-            return _codeTable[vCodeTable][key][capsElem];
+            return _codeTable[vCodeTable][key][capsElem] | CHAR_CODE_MASK;
         } else if (data & TONEW_MASK) {
-            return _codeTable[vCodeTable][key][capsElem + 2];
+            return _codeTable[vCodeTable][key][capsElem + 2] | CHAR_CODE_MASK;
         } else {
-            return data;
+            return data; //not found
         }
     }
     

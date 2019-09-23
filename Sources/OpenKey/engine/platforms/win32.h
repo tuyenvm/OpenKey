@@ -61,7 +61,7 @@
 #define KEY_0                                   0x30
 
 #define KEY_LEFT_BRACKET                        0xDB //note
-#define KEY_RIGHT_BRACKET                       0xDC
+#define KEY_RIGHT_BRACKET                       0xDD
 
 #define KEY_LEFT_SHIFT                          160
 #define KEY_RIGHT_SHIFT                         161

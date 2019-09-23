@@ -41,7 +41,7 @@ static void convert(const string& str, vector<Uint32>& outData) {
             for (int j = 0; j < it->second.size(); j++) {
                 if ((Uint16)t == it->second[j]) {
                     kSign = 0;
-                    outData.push_back(_codeTable[vCodeTable][it->first][k]);
+                    outData.push_back(_codeTable[vCodeTable][it->first][k] | CHAR_CODE_MASK);
                     break;
                 }//end if
                 k++;

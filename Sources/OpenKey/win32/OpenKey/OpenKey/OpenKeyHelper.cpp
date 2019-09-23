@@ -217,13 +217,13 @@ bool OpenKeyHelper::quickConvert() {
 	OpenClipboard(0);
 	EmptyClipboard();
 
-	HGLOBAL hMem = GlobalAlloc(GMEM_MOVEABLE, (int)dataHTML.size() * sizeof(char));
-	memcpy(GlobalLock(hMem), dataHTML.c_str(), (int)dataHTML.size() * sizeof(char));
+	HGLOBAL hMem = GlobalAlloc(GMEM_MOVEABLE, (int)(dataHTML.size() + 1) * sizeof(char));
+	memcpy(GlobalLock(hMem), dataHTML.c_str(), (int)(dataHTML.size() + 1) * sizeof(char));
 	GlobalUnlock(hMem);
 	SetClipboardData(CF_HTML, hMem);
 
-	hMem = GlobalAlloc(GMEM_MOVEABLE, (int)dataUnicode.size() * sizeof(wchar_t));
-	memcpy(GlobalLock(hMem), dataUnicode.c_str(), (int)dataUnicode.size() * sizeof(wchar_t));
+	hMem = GlobalAlloc(GMEM_MOVEABLE, (int)(dataUnicode.size() + 1) * sizeof(wchar_t));
+	memcpy(GlobalLock(hMem), dataUnicode.c_str(), (int)(dataUnicode.size() + 1) * sizeof(wchar_t));
 	GlobalUnlock(hMem);
 	SetClipboardData(CF_UNICODETEXT, hMem);
 

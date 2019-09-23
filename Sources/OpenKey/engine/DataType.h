@@ -115,6 +115,9 @@ struct vKeyHookState {
 //Check whether the data is create by standalone key or not (W)
 #define STANDALONE_MASK                         0x1000000
 
+//Chec whether the data is keyboard code or character code
+#define CHAR_CODE_MASK                          0x2000000
+
 #define PURE_CHARACTER_MASK                     0x80000000
 
 //Utilities macro

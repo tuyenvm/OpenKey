@@ -154,9 +154,9 @@ static void InsertKeyLength(const Uint8& len) {
 	_syncKey.push_back(len);
 }
 
-static inline void prepareKeyEvent(INPUT& input, const Uint16& keycode, const bool& isPress) {
+static inline void prepareKeyEvent(INPUT& input, const Uint16& keycode, const bool& isPress, const DWORD& flag=0) {
 	input.type = INPUT_KEYBOARD;
-	input.ki.dwFlags = isPress ? 0 : KEYEVENTF_KEYUP;
+	input.ki.dwFlags = isPress ? flag : flag|KEYEVENTF_KEYUP;
 	input.ki.wVk = keycode;
 	input.ki.wScan = 0;
 	input.ki.time = 0;
@@ -172,21 +172,21 @@ static inline void prepareUnicodeEvent(INPUT& input, const Uint16& unicode, cons
 	input.ki.dwExtraInfo = 1;
 }
 
-static void SendCombineKey(const Uint16& key1, const Uint16& key2) {
-	prepareKeyEvent(keyEvent[0], key1, true);
+static void SendCombineKey(const Uint16& key1, const Uint16& key2, const DWORD& flagKey1=0, const DWORD& flagKey2 = 0) {
+	prepareKeyEvent(keyEvent[0], key1, true, flagKey1);
 	SendInput(1, keyEvent, sizeof(INPUT));
 
-	prepareKeyEvent(keyEvent[0], key2, true);
-	prepareKeyEvent(keyEvent[1], key2, false);
+	prepareKeyEvent(keyEvent[0], key2, true, flagKey2);
+	prepareKeyEvent(keyEvent[1], key2, false, flagKey2);
 	SendInput(2, keyEvent, sizeof(INPUT));
 
-	prepareKeyEvent(keyEvent[0], key1, false);
+	prepareKeyEvent(keyEvent[0], key1, false, flagKey1);
 	SendInput(1, keyEvent, sizeof(INPUT));
 }
 
 static void SendKeyCode(Uint32 data) {
 	_newChar = (Uint16)data;
-	if (_newChar < 128 || keyCodeToCharacter(data) != 0){
+	if (!(data & CHAR_CODE_MASK)) {
 		if (IS_DOUBLE_CODE(vCodeTable)) //VNI
 			InsertKeyLength(1);
 
@@ -287,15 +287,15 @@ static void SendNewCharString(const bool& dataFromMacro = false) {
 				if (IS_DOUBLE_CODE(vCodeTable)) {
 					InsertKeyLength(1);
 				}
-			} else if (_tempChar < 128 || keyCodeToCharacter(_tempChar) != 0 || ((Uint16)_tempChar < 128 && (_tempChar & CAPS_MASK))) {
+			} else if (!(_tempChar & CHAR_CODE_MASK)) {
 				if (IS_DOUBLE_CODE(vCodeTable)) //VNI
 					InsertKeyLength(1);
 				_newCharString[_j++] = keyCodeToCharacter(_tempChar);
 			} else {
+				_newChar = _tempChar;
 				if (vCodeTable == 0) {  //unicode 2 bytes code
-					_newCharString[_j++] = _tempChar;
+					_newCharString[_j++] = _newChar;
 				} else if (vCodeTable == 1 || vCodeTable == 2 || vCodeTable == 4) { //others such as VNI Windows, TCVN3: 1 byte code
-					_newChar = _tempChar;
 					_newCharHi = HIBYTE(_newChar);
 					_newChar = LOBYTE(_newChar);
 					_newCharString[_j++] = _newChar;
@@ -311,7 +311,6 @@ static void SendNewCharString(const bool& dataFromMacro = false) {
 							InsertKeyLength(1);
 					}
 				} else if (vCodeTable == 3) { //Unicode Compound
-					_newChar = _tempChar;
 					_newCharHi = (_newChar >> 13);
 					_newChar &= 0x1FFF;
 
@@ -340,8 +339,10 @@ static void SendNewCharString(const bool& dataFromMacro = false) {
 	}
 
 	OpenKeyHelper::setClipboardText((LPCTSTR)_newCharString.data(), _newCharSize + 1, CF_UNICODETEXT);
-	SendCombineKey(VK_LCONTROL, KEY_V);
 
+	//Send shift + insert
+	SendCombineKey(KEY_LEFT_SHIFT, VK_INSERT, 0, KEYEVENTF_EXTENDEDKEY);
+	
 	//the case when hCode is vRestore or vRestoreAndStartNewSession,
 	//the word is invalid and last key is control key such as TAB, LEFT ARROW, RIGHT ARROW,...
 	if (_willSendControlKey) {
@@ -420,7 +421,7 @@ static void handleMacro() {
 			}
 		}
 	}
-	SendPureCharacter(' ');
+	SendKeyCode(_keycode | (_flag & MASK_SHIFT ? CAPS_MASK : 0));
 }
 
 static bool SetModifierMask(const Uint16& vkCode) {
