@@ -168,7 +168,7 @@ extern "C" {
     
     void SendKeyCode(Uint32 data) {
         _newChar = (Uint16)data;
-        if (_newChar < 128) {
+        if (!(data & CHAR_CODE_MASK)) {
             if (IS_DOUBLE_CODE(vCodeTable)) //VNI
                 InsertKeyLength(1);
             
@@ -308,7 +308,7 @@ extern "C" {
                     if (IS_DOUBLE_CODE(vCodeTable)) {
                         InsertKeyLength(1);
                     }
-                } else if (_tempChar < 128 || ((Uint16)_tempChar < 128 && (_tempChar & CAPS_MASK))) {
+                } else if (!(_tempChar & CHAR_CODE_MASK)) {
                     if (IS_DOUBLE_CODE(vCodeTable)) //VNI
                         InsertKeyLength(1);
                     _newCharString[_j++] = keyCodeToCharacter(_tempChar);
