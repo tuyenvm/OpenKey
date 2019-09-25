@@ -125,7 +125,7 @@ void OpenKeyInit() {
 	APP_GET_DATA(vAllowConsonantZFWJ, 0);
 	APP_GET_DATA(vTempOffSpelling, 0);
 	APP_GET_DATA(vQuickStartConsonant, 0);
-	APP_GET_DATA(vQuickStartConsonant, 0);
+	APP_GET_DATA(vQuickEndConsonant, 0);
 
 	//init convert tool
 	APP_GET_DATA(convertToolDontAlertWhenCompleted, 0);
