@@ -14,6 +14,7 @@ redistribute your new version, it MUST be open source.
 #include "MacroDialog.h"
 #include "stdafx.h"
 #include "AppDelegate.h"
+#include <commdlg.h>
 
 #define MAX_MACRO_BUFFER 4096
 #define BTN_ADD_TEXT _T("+ Thêm")
@@ -44,6 +45,12 @@ INT_PTR MacroDialog::eventProc(HWND hDlg, UINT uMsg, WPARAM wParam, LPARAM lPara
 			break;
 		case IDC_BUTTON_DELETE:
 			onDeleteMacroButton();
+			break;
+		case IDC_BUTTON_IMPORT_MACRO:
+			onImportMacroButton();
+			break;
+		case IDC_BUTTON_EXPORT_MACRO:
+			onExportMacrobutton();
 			break;
 		default:
 			if (HIWORD(wParam) == EN_CHANGE) {
@@ -182,4 +189,54 @@ void MacroDialog::onDeleteMacroButton() {
 		SetFocus(hMacroName);
 	}
 	SetWindowText(hAddButton, BTN_ADD_TEXT);
+}
+
+void MacroDialog::onImportMacroButton() {
+	OPENFILENAME ofn;
+	TCHAR szFile[MAX_PATH] = { 0 };
+	ZeroMemory(&ofn, sizeof(ofn));
+	ofn.lStructSize = sizeof(ofn);
+	ofn.hwndOwner = hDlg;
+	ofn.lpstrFile = szFile;
+	ofn.nMaxFile = sizeof(szFile);
+	ofn.lpstrFilter = _T("Text file (*.txt)\0*.txt\0All (*.*)\0*.*\0");
+	ofn.nFilterIndex = 1;
+	ofn.lpstrFileTitle = NULL;
+	ofn.nMaxFileTitle = 0;
+	ofn.lpstrInitialDir = NULL;
+	ofn.Flags = OFN_PATHMUSTEXIST | OFN_FILEMUSTEXIST;
+
+	if (GetOpenFileName(&ofn) == TRUE) {
+		int msgboxID = MessageBox(
+			hDlg,
+			_T("Bạn có muốn giữ lại dữ liệu hiện tại không?"),
+			_T("Dữ liệu gõ tắt"),
+			MB_ICONEXCLAMATION | MB_YESNO
+		);
+		wstring path = ofn.lpstrFile;
+		readFromFile(wideStringToUtf8(path), msgboxID == IDYES);
+		saveAndReload();
+	}
+}
+
+void MacroDialog::onExportMacrobutton() {
+	OPENFILENAME ofn;
+	TCHAR szFile[MAX_PATH] = { 'O', 'p', 'e', 'n', 'K', 'e', 'y', 'M', 'a', 'c', 'r', 'o' };
+	ZeroMemory(&ofn, sizeof(ofn));
+	ofn.lStructSize = sizeof(ofn);
+	ofn.hwndOwner = hDlg;
+	ofn.lpstrFile = szFile;
+	ofn.nMaxFile = sizeof(szFile);
+	ofn.lpstrFilter = _T("Text file (*.txt)\0*.txt\0");
+	ofn.lpstrFileTitle = (LPTSTR)_T("lpstrFile");
+	ofn.nFilterIndex = 1;
+	ofn.lpstrFileTitle = NULL;
+	ofn.nMaxFileTitle = 0;
+	ofn.lpstrInitialDir = NULL;
+	ofn.lpstrDefExt = (LPCWSTR)L"txt";
+	ofn.Flags = OFN_PATHMUSTEXIST | OFN_FILEMUSTEXIST;
+	if (GetSaveFileName(&ofn) == TRUE) {
+		wstring path = ofn.lpstrFile;
+		saveToFile(wideStringToUtf8(path));
+	}
 }

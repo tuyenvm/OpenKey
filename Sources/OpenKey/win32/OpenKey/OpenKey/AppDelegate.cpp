@@ -34,6 +34,8 @@ int vUseSmartSwitchKey = 1;
 int vUpperCaseFirstChar = 0;
 int vTempOffSpelling = 0;
 int vAllowConsonantZFWJ = 0;
+int vQuickStartConsonant = 0;
+int vQuickEndConsonant = 0;
 
 int vUseGrayIcon = 0;
 int vShowOnStartUp = 0;

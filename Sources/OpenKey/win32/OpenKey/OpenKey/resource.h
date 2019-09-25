@@ -99,12 +99,13 @@
 #define IDC_CHECK_MODERN_ICON           1024
 #define IDC_STATIC_APP_TITLE            1024
 #define IDC_STATIC_APP_SUB_TITLE        1025
-#define IDC_CHECK_MODERN_ICON2          1025
 #define IDC_CHECK_TEMP_OFF_SPELLING     1025
 #define IDC_STATIC_APP_VERSION          1026
 #define IDC_CHECK_ALLOW_ZJWF            1026
 #define IDC_SYSLINK_HOME_PAGE           1027
+#define IDC_CHECK_QUICK_START_CONSONANT 1027
 #define IDC_STATIC_APP_SUB_TITLE2       1028
+#define IDC_CHECK_QUICK_END_CONSONANT   1028
 #define IDC_STATIC_APP_SUB_TITLE3       1029
 #define IDC_STATIC_APP_SUB_TITLE4       1030
 #define IDC_SYSLINK_NEW_VERSION         1031
@@ -118,6 +119,9 @@
 #define IDC_COMBO_TABLE_CODE_SRC        1041
 #define IDC_EDIT_MACRO_CONTENT          1042
 #define IDC_BUTTON_DELETE               1043
+#define IDC_BUTTON_IMPORT_MACRO         1044
+#define IDC_BUTTON3                     1045
+#define IDC_BUTTON_EXPORT_MACRO         1045
 #define IDC_STATIC                      -1
 
 // Next default values for new objects
@@ -127,7 +131,7 @@
 #define _APS_NO_MFC                     1
 #define _APS_NEXT_RESOURCE_VALUE        145
 #define _APS_NEXT_COMMAND_VALUE         32771
-#define _APS_NEXT_CONTROL_VALUE         1044
+#define _APS_NEXT_CONTROL_VALUE         1046
 #define _APS_NEXT_SYMED_VALUE           110
 #endif
 #endif

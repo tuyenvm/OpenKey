@@ -36,5 +36,8 @@ private:
 	void onSelectItem(const int& index);
 	void onAddMacroButton();
 	void onDeleteMacroButton();
+
+	void onImportMacroButton();
+	void onExportMacrobutton();
 };
 

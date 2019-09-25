@@ -68,6 +68,8 @@ void MainControlDialog::initDialog() {
 	checkModernIcon = GetDlgItem(hDlg, IDC_CHECK_MODERN_ICON);
 	checkAllowZWJF = GetDlgItem(hDlg, IDC_CHECK_ALLOW_ZJWF);
 	checkTempOffSpelling = GetDlgItem(hDlg, IDC_CHECK_TEMP_OFF_SPELLING);
+	checkQuickStartConsonant = GetDlgItem(hDlg, IDC_CHECK_QUICK_START_CONSONANT);
+	checkQuickEndConsonant = GetDlgItem(hDlg, IDC_CHECK_QUICK_END_CONSONANT);
 
 	checkSmartSwitchKey = GetDlgItem(hDlg, IDC_CHECK_SMART_SWITCH_KEY);
 	checkCapsFirstChar = GetDlgItem(hDlg, IDC_CHECK_CAPS_FIRST_CHAR); 
@@ -148,6 +150,8 @@ void MainControlDialog::fillData() {
 	SendMessage(checkModernIcon, BM_SETCHECK, vUseGrayIcon ? 1 : 0, 0);
 	SendMessage(checkAllowZWJF, BM_SETCHECK, vAllowConsonantZFWJ ? 1 : 0, 0);
 	SendMessage(checkTempOffSpelling, BM_SETCHECK, vTempOffSpelling ? 1 : 0, 0);
+	SendMessage(checkQuickStartConsonant, BM_SETCHECK, vQuickStartConsonant ? 1 : 0, 0);
+	SendMessage(checkQuickEndConsonant, BM_SETCHECK, vQuickEndConsonant ? 1 : 0, 0);
 	
 	SendMessage(checkSmartSwitchKey, BM_SETCHECK, vUseSmartSwitchKey ? 1 : 0, 0);
 	SendMessage(checkCapsFirstChar, BM_SETCHECK, vUpperCaseFirstChar ? 1 : 0, 0);
@@ -264,6 +268,12 @@ void MainControlDialog::onCheckboxClicked(const HWND & hWnd) {
 	} else if (hWnd == checkTempOffSpelling) {
 		val = (int)SendMessage(hWnd, BM_GETCHECK, 0, 0);
 		APP_SET_DATA(vTempOffSpelling, val ? 1 : 0);
+	} else if (hWnd == checkQuickStartConsonant) {
+		val = (int)SendMessage(hWnd, BM_GETCHECK, 0, 0);
+		APP_SET_DATA(vQuickStartConsonant, val ? 1 : 0);
+	} else if (hWnd == checkQuickEndConsonant) {
+		val = (int)SendMessage(hWnd, BM_GETCHECK, 0, 0);
+		APP_SET_DATA(vQuickEndConsonant, val ? 1 : 0);
 	}
 	SystemTrayHelper::updateData();
 }

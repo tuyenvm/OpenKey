@@ -24,7 +24,7 @@ static vector<LPCTSTR> _tableCode = {
 	_T("TCVN3 (ABC)"),
 	_T("VNI Windows"),
 	_T("Unicode Tổ hợp"),
-	_T("VN Locale CP 1285")
+	_T("Vietnamese Locale CP 1258")
 };
 
 /*-----------------------------------------------------------------------*/

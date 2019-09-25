@@ -22,7 +22,7 @@ private:
 	HWND checkVietnamese, checkEnglish;
 	HWND checkModernOrthorgraphy, checkFixRecommendBrowser, checkShowOnStartup, checkRunWithWindows,
 		checkSpelling, checkRestoreIfWrongSpelling, checkUseClipboard, checkModernIcon,
-		checkAllowZWJF, checkTempOffSpelling;
+		checkAllowZWJF, checkTempOffSpelling, checkQuickStartConsonant, checkQuickEndConsonant;
 	HWND checkSmartSwitchKey, checkCapsFirstChar, checkQuickTelex, checkUseMacro, checkUseMacroInEnglish;
 private:
 	void initDialog();

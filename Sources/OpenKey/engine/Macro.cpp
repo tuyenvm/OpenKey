@@ -209,10 +209,21 @@ void readFromFile(const string& path, const bool& append) {
             k++;
             if (k == 1) continue;
             pos = line.find(":");
-            if (string::npos != line.find(":")) {
+            if (string::npos != pos) {
                 name = line.substr(0, pos);
                 content = line.substr(pos + 1, line.length() - pos - 1);
-                if (!hasMacro(name)) {
+				while (name.compare("") == 0 && content.compare("") != 0) {
+					pos = content.find(":");
+					if (string::npos != pos) {
+						name += ":";
+						name += content.substr(0, pos);
+						content = content.substr(pos + 1, line.length() - pos - 1);
+					} else {
+						break;
+					}
+				}
+
+                if (name.compare("") != 0 && !hasMacro(name)) {
                     addMacro(name, content);
                 }
             }
