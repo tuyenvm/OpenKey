@@ -111,6 +111,7 @@ static Byte _upperCaseStatus = 0; //for Write upper case for the first letter; 2
 static bool _isCharKeyCode;
 static vector<Uint32> _specialChar;
 static bool _useSpellCheckingBefore;
+static bool _hasHandleQuickConsonant;
 
 //function prototype
 void findAndCalculateVowel(const bool& forGrammar=false);
@@ -184,7 +185,9 @@ void checkSpelling(const bool& forceCheckVowel=false) {
                 if (_spellingEndIndex < _consonantTable[i].size())
                     _spellingFlag = true;
                 for (j = 0; j < _consonantTable[i].size(); j++) {
-                    if (_spellingEndIndex > j && (_consonantTable[i][j] & ~(vAllowConsonantZFWJ ? 0x8000 : 0)) != CHR(j)) {
+                    if (_spellingEndIndex > j &&
+                        (_consonantTable[i][j] & ~(vQuickStartConsonant ? END_CONSONANT_MASK : 0)) != CHR(j) &&
+                        (_consonantTable[i][j] & ~(vAllowConsonantZFWJ ? CONSONANT_ALLOW_MASK : 0)) != CHR(j)) {
                         _spellingFlag = true;
                         break;
                     }
@@ -244,7 +247,8 @@ void checkSpelling(const bool& forceCheckVowel=false) {
                 _spellingFlag = false;
    
                 for (j = 0; j < _endConsonantTable[ii].size(); j++) {
-                    if (_spellingEndIndex > k+j && _endConsonantTable[ii][j] != CHR(k + j)) {
+                    if (_spellingEndIndex > k+j &&
+                        (_endConsonantTable[ii][j] & ~(vQuickEndConsonant ? 0x4000 : 0)) != CHR(k + j)) {
                         _spellingFlag = true;
                         break;
                     }
@@ -442,6 +446,7 @@ void startNewSession() {
     tempDisableKey = false;
     _stateIndex = 0;
     _hasHandledMacro = false;
+    _hasHandleQuickConsonant = false;
     _longWordHelper.clear();
 }
 
@@ -453,7 +458,7 @@ void checkCorrectVowel(vector<vector<Uint16>>& charset, int& i, int& k, const Ui
     }
     k = _index - 1;
     for (j = (int)charset[i].size() - 1; j >= 0; j--) {
-        if (charset[i][j] != CHR(k)) {
+        if ((charset[i][j] & ~(vQuickEndConsonant ? END_CONSONANT_MASK : 0)) != CHR(k)) {
             isCorect = false;
             return;
         }
@@ -1207,6 +1212,52 @@ void vTempOffSpellChecking() {
 void vSetCheckSpelling() {
     _useSpellCheckingBefore = vCheckSpelling;
 }
+
+bool checkQuickConsonant() {
+    if (_index <= 1) return false;
+    l = 0;
+    if (_index > 0) {
+        if (vQuickStartConsonant && _quickStartConsonant.find(CHR(0)) != _quickStartConsonant.end()) {
+            hCode = vRestore;
+            hBPC = _index;
+            hNCC = _index + 1;
+            if (_index < MAX_BUFF-1)
+                _index++;
+            //right shift
+            for (i = _index-1; i >= 2; i--) {
+                TypingWord[i] = TypingWord[i-1];
+            }
+            TypingWord[1] = _quickStartConsonant[CHR(0)][1] | ((TypingWord[0] & CAPS_MASK) && (TypingWord[2] & CAPS_MASK) ? CAPS_MASK : 0);
+            TypingWord[0] = _quickStartConsonant[CHR(0)][0] | (TypingWord[0] & CAPS_MASK ? CAPS_MASK : 0);
+            l = 1;;
+        }
+        if (vQuickEndConsonant &&
+            (_index-2 >= 0 && !IS_CONSONANT(CHR(_index-2))) &&
+            _quickEndConsonant.find(CHR(_index-1)) != _quickEndConsonant.end()) {
+            hCode = vRestore;
+            if (l == 1) {
+                hNCC++;
+            } else {
+                hBPC = 1;
+                hNCC = 2;
+            }
+            if (_index < MAX_BUFF-1)
+                _index++;
+            TypingWord[_index-1] = _quickEndConsonant[CHR(_index-2)][1] | (TypingWord[_index-2] & CAPS_MASK ? CAPS_MASK : 0);
+            TypingWord[_index-2] = _quickEndConsonant[CHR(_index-2)][0] | (TypingWord[_index-2] & CAPS_MASK ? CAPS_MASK : 0);
+            
+            l = 1;
+        }
+        if (l == 1) {
+            _hasHandleQuickConsonant = true;
+            for (i = _index - 1; i >= 0; i--) {
+                hData[_index - 1 - i] = GET(TypingWord[i]);
+            }
+            return true;
+        }
+    }
+    return false;
+}
 /*==========================================================================================================*/
 
 void vEnglishMode(const vKeyEventState& state, const Uint16& data, const bool& isCaps, const bool& otherControlKey) {
@@ -1251,8 +1302,9 @@ void vKeyHandleEvent(const vKeyEvent& event,
         if (vUseMacro && isMacroBreakCode(data) && !_hasHandledMacro && findMacro(hMacroKey, hMacroData)) {
             hCode = vReplaceMaro;
             hBPC = (Byte)hMacroKey.size();
-            _spaceCount++;
             _hasHandledMacro = true;
+        } else if ((vQuickStartConsonant || vQuickEndConsonant) && !tempDisableKey && isMacroBreakCode(data)) {
+            checkQuickConsonant();
         } else if (vRestoreIfWrongSpelling && isWordBreak(event, state, data)) { //restore key if wrong spelling with break-key
             if (!tempDisableKey && vCheckSpelling) {
                 checkSpelling(true); //force check spelling
@@ -1280,6 +1332,8 @@ void vKeyHandleEvent(const vKeyEvent& event,
         if (hCode == vDoNothing) {
             startNewSession();
             vCheckSpelling = _useSpellCheckingBefore;
+        } else if (hCode == vReplaceMaro || _hasHandleQuickConsonant) {
+            _index = 0;
         }
         
         //insert key for macro function
@@ -1308,6 +1362,8 @@ void vKeyHandleEvent(const vKeyEvent& event,
             hBPC = (Byte)hMacroKey.size();
             _spaceCount++;
             _hasHandledMacro = true;
+        } else if ((vQuickStartConsonant || vQuickEndConsonant) && !tempDisableKey && checkQuickConsonant()) {
+            _spaceCount++;
         } else if (vRestoreIfWrongSpelling && tempDisableKey && !_hasHandledMacro) { //restore key if wrong spelling
             if (!checkRestoreIfWrongSpelling(vRestore)) {
                 hCode = vDoNothing;

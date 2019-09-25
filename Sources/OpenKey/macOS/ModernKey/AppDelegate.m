@@ -19,6 +19,7 @@ AppDelegate* appDelegate;
 extern ViewController* viewController;
 extern void OnTableCodeChange(void);
 extern void OnInputMethodChanged(void);
+extern void RequestNewSession(void);
 
 //see document in Engine.h
 int vLanguage = 1;
@@ -39,6 +40,8 @@ int vUseSmartSwitchKey = 1;
 int vUpperCaseFirstChar = 0;
 int vTempOffSpelling = 0;
 int vAllowConsonantZFWJ = 0;
+int vQuickStartConsonant = 0;
+int vQuickEndConsonant = 0;
 
 extern int convertToolHotKey;
 extern bool convertToolDontAlertWhenCompleted;
@@ -177,8 +180,8 @@ extern bool convertToolDontAlertWhenCompleted;
     
     [theMenu addItem:[NSMenuItem separatorItem]];
     
-    [theMenu addItemWithTitle:@"Bảng điều khiển" action:@selector(onControlPanelSelected) keyEquivalent:@""];
-    [theMenu addItemWithTitle:@"Gõ tắt" action:@selector(onMacroSelected) keyEquivalent:@""];
+    [theMenu addItemWithTitle:@"Bảng điều khiển..." action:@selector(onControlPanelSelected) keyEquivalent:@""];
+    [theMenu addItemWithTitle:@"Gõ tắt..." action:@selector(onMacroSelected) keyEquivalent:@""];
     [theMenu addItemWithTitle:@"Giới thiệu" action:@selector(onAboutSelected) keyEquivalent:@""];
     [theMenu addItem:[NSMenuItem separatorItem]];
     
@@ -250,6 +253,9 @@ extern bool convertToolDontAlertWhenCompleted;
     vUpperCaseFirstChar = 0;[[NSUserDefaults standardUserDefaults] setInteger:vUpperCaseFirstChar forKey:@"UpperCaseFirstChar"];
     vTempOffSpelling = 0;[[NSUserDefaults standardUserDefaults] setInteger:vTempOffSpelling forKey:@"vTempOffSpelling"];
     vAllowConsonantZFWJ = 0;[[NSUserDefaults standardUserDefaults] setInteger:vAllowConsonantZFWJ forKey:@"vAllowConsonantZFWJ"];
+    vQuickStartConsonant = 0;[[NSUserDefaults standardUserDefaults] setInteger:vQuickStartConsonant forKey:@"vQuickStartConsonant"];
+    vQuickEndConsonant = 0;[[NSUserDefaults standardUserDefaults] setInteger:vQuickEndConsonant forKey:@"vQuickEndConsonant"];
+    
     [self fillData];
     [viewController fillData];
 }
@@ -399,10 +405,11 @@ extern bool convertToolDontAlertWhenCompleted;
     if (_convertWC == nil) {
         _convertWC = [[NSStoryboard storyboardWithName:@"Main" bundle:nil] instantiateControllerWithIdentifier:@"ConvertWindow"];
     }
+    //[OpenKeyManager showDockIcon:YES];
     if ([_convertWC.window isVisible])
         return;
     [_convertWC.window makeKeyAndOrderFront:nil];
-    [_convertWC.window setLevel:NSStatusWindowLevel];
+    [_convertWC.window setLevel:NSFloatingWindowLevel];
 }
 
 -(void)onQuickConvert {
@@ -419,30 +426,36 @@ extern bool convertToolDontAlertWhenCompleted;
     if (_mainWC == nil) {
         _mainWC = [[NSStoryboard storyboardWithName:@"Main" bundle:nil] instantiateControllerWithIdentifier:@"OpenKey"];
     }
-    if ([_mainWC.window isVisible])
+    //[OpenKeyManager showDockIcon:YES];
+    if ([_mainWC.window isVisible]) {
         return;
+    }
     [_mainWC.window makeKeyAndOrderFront:nil];
-    [_mainWC.window setLevel:NSStatusWindowLevel];
+    [_mainWC.window setLevel:NSFloatingWindowLevel];
 }
 
 -(void) onMacroSelected {
     if (_macroWC == nil) {
         _macroWC = [[NSStoryboard storyboardWithName:@"Main" bundle:nil] instantiateControllerWithIdentifier:@"MacroWindow"];
     }
+    //[OpenKeyManager showDockIcon:YES];
     if ([_macroWC.window isVisible])
         return;
+    
     [_macroWC.window makeKeyAndOrderFront:nil];
-    [_macroWC.window setLevel:NSStatusWindowLevel];
+    [_macroWC.window setLevel:NSFloatingWindowLevel];
 }
 
 -(void) onAboutSelected {
     if (_aboutWC == nil) {
         _aboutWC = [[NSStoryboard storyboardWithName:@"Main" bundle:nil] instantiateControllerWithIdentifier:@"AboutWindow"];
     }
+    //[OpenKeyManager showDockIcon:YES];
     if ([_aboutWC.window isVisible])
         return;
+
     [_aboutWC.window makeKeyAndOrderFront:nil];
-    [_aboutWC.window setLevel:NSStatusWindowLevel];
+    [_aboutWC.window setLevel:NSFloatingWindowLevel];
 }
 
 #pragma mark -Short key event
@@ -460,6 +473,10 @@ extern bool convertToolDontAlertWhenCompleted;
     [OpenKeyManager stopEventTap];
 }
 
+-(void)receiveActiveSpaceChanged: (NSNotification*)note {
+    RequestNewSession();
+}
+
 -(void)registerAwakeNotification {
     [[[NSWorkspace sharedWorkspace] notificationCenter] addObserver: self
                                                            selector: @selector(receiveWakeNote:)
@@ -468,5 +485,9 @@ extern bool convertToolDontAlertWhenCompleted;
     [[[NSWorkspace sharedWorkspace] notificationCenter] addObserver: self
                                                            selector: @selector(receiveSleepNote:)
                                                                name: NSWorkspaceWillSleepNotification object: NULL];
+    
+    [[[NSWorkspace sharedWorkspace] notificationCenter] addObserver: self
+                                                           selector: @selector(receiveActiveSpaceChanged:)
+                                                               name: NSWorkspaceActiveSpaceDidChangeNotification object: NULL];
 }
 @end

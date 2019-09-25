@@ -62,4 +62,14 @@ bool deleteMacro(const string& macroText);
  */
 void onTableCodeChange();
 
+/**
+ * Save all macro data to disk
+ */
+void saveToFile(const string& path);
+
+/**
+ * Load macro data from disk
+ */
+void readFromFile(const string& path, const bool& append=true);
+
 #endif /* Macro_h */

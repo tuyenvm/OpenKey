@@ -120,6 +120,11 @@ struct vKeyHookState {
 
 #define PURE_CHARACTER_MASK                     0x80000000
 
+//for special feature
+#define END_CONSONANT_MASK                      0x4000
+#define CONSONANT_ALLOW_MASK                    0x8000
+
+
 //Utilities macro
 #define IS_CONSONANT(keyCode) !(keyCode == KEY_A || keyCode == KEY_E || keyCode == KEY_U || keyCode == KEY_Y || keyCode == KEY_I || keyCode == KEY_O)
 //#define IS_MARK_KEY(keyCode) (keyCode == KEY_S || keyCode == KEY_F || keyCode == KEY_R || keyCode == KEY_J || keyCode == KEY_X)

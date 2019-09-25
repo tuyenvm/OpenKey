@@ -29,6 +29,8 @@ extern map<Uint32, vector<Uint16>> _codeTable[];
 extern Uint16 _unicodeCompoundMark[];
 
 extern map<Uint32, vector<Uint16>> _quickTelex;
+extern map<Uint16, vector<Uint16>> _quickStartConsonant;
+extern map<Uint16, vector<Uint16>> _quickEndConsonant;
 extern map<Uint32, Uint32> _characterMap;
 
 extern Uint16 keyCodeToCharacter(const Uint32& keyCode);

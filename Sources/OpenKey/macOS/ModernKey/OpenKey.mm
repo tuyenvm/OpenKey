@@ -78,6 +78,8 @@ extern "C" {
         
         LOAD_DATA(vTempOffSpelling, vTempOffSpelling);
         LOAD_DATA(vAllowConsonantZFWJ, vAllowConsonantZFWJ);
+        LOAD_DATA(vQuickEndConsonant, vQuickEndConsonant);
+        LOAD_DATA(vQuickStartConsonant, vQuickStartConsonant);
         
         myEventSource = CGEventSourceCreate(kCGEventSourceStatePrivate);
         pData = (vKeyHookState*)vKeyInit();
@@ -109,6 +111,14 @@ extern "C" {
         }
     }
     
+    void RequestNewSession() {
+        //send event signal to Engine
+        vKeyHandleEvent(vKeyEvent::Mouse, vKeyEventState::MouseDown, 0);
+        
+        if (IS_DOUBLE_CODE(vCodeTable)) { //VNI
+            _syncKey.clear();
+        }
+    }
     void queryFrontMostApp() {
         _frontMostApp = [[NSWorkspace sharedWorkspace] frontmostApplication].bundleIdentifier;
         if (_frontMostApp == nil)
@@ -525,12 +535,7 @@ extern "C" {
         
         //handle mouse
         if (type == kCGEventLeftMouseDown || type == kCGEventRightMouseDown || type == kCGEventLeftMouseDragged || type == kCGEventRightMouseDragged) {
-            //send event signal to Engine
-            vKeyHandleEvent(vKeyEvent::Mouse, vKeyEventState::MouseDown, 0);
-            
-            if (IS_DOUBLE_CODE(vCodeTable)) { //VNI
-                _syncKey.clear();
-            }
+            RequestNewSession();
             return event;
         }
 

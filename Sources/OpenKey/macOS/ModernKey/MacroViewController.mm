@@ -76,6 +76,44 @@
     [self saveAndReload];
 }
 
+- (IBAction)onLoadFromFile:(id)sender {
+    NSOpenPanel* openPanel = [NSOpenPanel openPanel];
+    [openPanel setMessage:@"Chọn file dữ liệu gõ tắt"];
+    [openPanel setCanChooseFiles:YES];
+    [openPanel setAllowsMultipleSelection:NO];
+    [openPanel setCanChooseDirectories:NO];
+    [openPanel setAllowedFileTypes:[NSArray arrayWithObjects:@"txt", nil]];
+    [openPanel setExtensionHidden:NO];
+    [openPanel setNameFieldStringValue:@"OpenKeyMacro"];
+    [openPanel makeKeyAndOrderFront:nil];
+    [openPanel setLevel:NSStatusWindowLevel];
+    if ([openPanel runModal] == NSModalResponseOK ) {
+        NSAlert* alert = [[NSAlert alloc] init];
+        [alert setInformativeText:@"Bạn có muốn giữ lại các dữ liệu hiện tại không?"];
+        [alert addButtonWithTitle:@"Có"];
+        [alert addButtonWithTitle:@"Không"];
+        [alert setMessageText:@"Dữ liệu gõ tắt"];
+        [alert setAlertStyle:NSCriticalAlertStyle];
+        [alert beginSheetModalForWindow:self.view.window completionHandler:^(NSModalResponse returnCode) {
+            readFromFile(openPanel.URL.path.UTF8String, returnCode == 1000);
+            [self saveAndReload];
+        }];
+    }
+}
+
+- (IBAction)onExportToFile:(id)sender {
+    NSSavePanel* savePanel = [NSSavePanel savePanel];
+    savePanel.canCreateDirectories = YES;
+    [savePanel setMessage:@"Chọn nơi lưu dữ liệu gõ tắt"];
+    [savePanel setTitle:@"Chọn nơi lưu dữ liệu gõ tắt"];
+    [savePanel setAllowedFileTypes:[NSArray arrayWithObjects:@"txt", nil]];
+    [savePanel setExtensionHidden:NO];
+    [savePanel setNameFieldStringValue:@"OpenKeyMacro"];
+    if ([savePanel runModal] == NSModalResponseOK) {
+        saveToFile(savePanel.URL.path.UTF8String);
+    }
+}
+
 - (void)showMessage:(NSString*)msg {
     NSAlert* alert = [[NSAlert alloc] init];
     [alert setInformativeText:msg];

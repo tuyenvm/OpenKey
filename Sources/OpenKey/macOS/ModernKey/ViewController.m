@@ -29,6 +29,8 @@ extern int vUseSmartSwitchKey;
 extern int vUpperCaseFirstChar;
 extern int vTempOffSpelling;
 extern int vAllowConsonantZFWJ;
+extern int vQuickStartConsonant;
+extern int vQuickEndConsonant;
 
 @implementation ViewController {
     __weak IBOutlet NSButton *CustomSwitchCommand;
@@ -252,6 +254,15 @@ extern int vAllowConsonantZFWJ;
     NSInteger val = [self setCustomValue:sender keyToSet:@"UpperCaseFirstChar"];
     vUpperCaseFirstChar = (int)val;
 }
+- (IBAction)onQuickStartConsonant:(id)sender {
+    NSInteger val = [self setCustomValue:sender keyToSet:@"vQuickStartConsonant"];
+    vQuickStartConsonant = (int)val;
+}
+
+- (IBAction)onQuickEndConsonant:(id)sender {
+    NSInteger val = [self setCustomValue:sender keyToSet:@"vQuickEndConsonant"];
+    vQuickEndConsonant = (int)val;
+}
 
 - (IBAction)onTerminateApp:(id)sender {
     [NSApp terminate:0];
@@ -322,6 +333,12 @@ extern int vAllowConsonantZFWJ;
     
     NSInteger upperCaseFirstChar = [[NSUserDefaults standardUserDefaults] integerForKey:@"UpperCaseFirstChar"];
     self.UpperCaseFirstChar.state = upperCaseFirstChar ? NSControlStateValueOn : NSControlStateValueOff;
+    
+    NSInteger quickStartConsonant = [[NSUserDefaults standardUserDefaults] integerForKey:@"vQuickStartConsonant"];
+    self.QuickStartConsonant.state = quickStartConsonant ? NSControlStateValueOn : NSControlStateValueOff;
+    
+    NSInteger quickEndConsonant = [[NSUserDefaults standardUserDefaults] integerForKey:@"vQuickEndConsonant"];
+    self.QuickEndConsonant.state = quickEndConsonant ? NSControlStateValueOn : NSControlStateValueOff;
     
     CustomSwitchControl.state = (vSwitchKeyStatus & 0x100) ? NSControlStateValueOn : NSControlStateValueOff;
     CustomSwitchOption.state = (vSwitchKeyStatus & 0x200) ? NSControlStateValueOn : NSControlStateValueOff;

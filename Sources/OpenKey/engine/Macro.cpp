@@ -11,6 +11,7 @@
 #include "Engine.h"
 #include <iostream>
 #include <memory.h>
+#include <fstream>
 
 using namespace std;
 
@@ -181,5 +182,41 @@ bool deleteMacro(const string& macroText) {
 void onTableCodeChange() {
     for (std::map<vector<Uint32>, MacroData>::iterator it = macroMap.begin(); it != macroMap.end(); ++it) {
         convert(it->second.macroContent, it->second.macroContentCode);
+    }
+}
+
+void saveToFile(const string& path) {
+    ofstream myfile;
+    myfile.open(path.c_str());
+    myfile << ";Compatible OpenKey Macro Data file for UniKey*** version=1 ***\n";
+    for (std::map<vector<Uint32>, MacroData>::iterator it = macroMap.begin(); it != macroMap.end(); ++it) {
+        myfile <<it->second.macroText << ":" << it->second.macroContent<<"\n";
+    }
+    myfile.close();
+}
+
+void readFromFile(const string& path, const bool& append) {
+    ifstream myfile(path.c_str());
+    string line;
+    int k = 0;
+    size_t pos = 0;
+    string name, content;
+    if (myfile.is_open()) {
+        if (!append) {
+            macroMap.clear();
+        }
+        while (getline (myfile,line) ) {
+            k++;
+            if (k == 1) continue;
+            pos = line.find(":");
+            if (string::npos != line.find(":")) {
+                name = line.substr(0, pos);
+                content = line.substr(pos + 1, line.length() - pos - 1);
+                if (!hasMacro(name)) {
+                    addMacro(name, content);
+                }
+            }
+        }
+        myfile.close();
     }
 }

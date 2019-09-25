@@ -147,6 +147,22 @@ extern int vTempOffSpelling;
 extern int vAllowConsonantZFWJ;
 
 /**
+ * 0: No; 1: Yes
+ * f -> ph: fanh -> phanh,...
+ * j ->gi: jang -> giang,...
+ * w ->qu: wen -> quen,...
+ */
+extern int vQuickStartConsonant;
+
+/*
+ * 0: No; 1: Yes
+ * g -> ng: hag -> hang,...
+ * h -> nh: vih -> vinh,...
+ * k -> ch: bak -> bach,...
+ */
+extern int vQuickEndConsonant;
+
+/**
  * Call this function first to receive data pointer
  */
 void* vKeyInit();
