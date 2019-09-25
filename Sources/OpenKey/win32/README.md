@@ -38,6 +38,8 @@ Mặc định, OpenKey cho phép gõ với chế độ bỏ dấu tự do, khôn
 	* Gõ nhanh (cc=ch, gg=gi, kk=kh, nn=ng, qq=qu, pp=ph, tt=th)
 	* Gõ tắt và công cụ soạn gõ tắt.
 	* Chuyển mã với nhiều tùy chọn.
+	* Gõ tắt phụ âm đầu: f->ph, j->gi, w->qu
+	* Gõ tắt phụ âm cuối: g->ng, h->nh, k->ch
 
 ## Cài đặt
 - Vào [đây](https://github.com/tuyenvm/OpenKey/releases/latest) tải file `.zip` phiên bản mới nhất về máy, giải nén vào nơi bất kỳ.
