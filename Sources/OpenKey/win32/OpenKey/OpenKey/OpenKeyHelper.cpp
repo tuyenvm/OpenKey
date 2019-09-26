@@ -127,6 +127,8 @@ string& OpenKeyHelper::getFrontMostAppExecuteName() {
 }
 
 string & OpenKeyHelper::getLastAppExecuteName() {
+	if (!vUseSmartSwitchKey)
+		return getFrontMostAppExecuteName();
 	return _exeNameUtf8;
 }
 

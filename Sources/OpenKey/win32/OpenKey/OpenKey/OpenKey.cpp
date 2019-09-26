@@ -248,6 +248,8 @@ static void SendKeyCode(Uint32 data) {
 
 static void SendBackspace() {
 	SendInput(2, backspaceEvent, sizeof(INPUT));
+	if (OpenKeyHelper::getLastAppExecuteName().compare("ApplicationFrameHost.exe") == 0) //Metro App
+		Sleep(5);
 	if (IS_DOUBLE_CODE(vCodeTable)) { //VNI or Unicode Compound
 		if (_syncKey.back() > 1) {
 			/*if (!(vCodeTable == 3 && containUnicodeCompoundApp(FRONT_APP))) {
