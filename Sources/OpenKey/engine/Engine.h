@@ -119,6 +119,13 @@ extern int vUseMacro;
 extern int vUseMacroInEnglishMode;
 
 /**
+ * Ex: define: btw -> by the way
+ * Type: `Btw` -> `By the way`
+ * Type: `BTW` -> `BY THE WAY`
+ */
+extern int vAutoCapsMacro;
+
+/**
  * auto switch language when switch app
  * 0: No
  * 1: Yes
@@ -161,6 +168,7 @@ extern int vQuickStartConsonant;
  * k -> ch: bak -> bach,...
  */
 extern int vQuickEndConsonant;
+
 
 /**
  * Call this function first to receive data pointer

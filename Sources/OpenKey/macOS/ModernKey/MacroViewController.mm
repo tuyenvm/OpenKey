@@ -30,6 +30,8 @@
     self.macroName.delegate = self;
     self.macroContent.delegate = self;
     
+    self.AutoCapsMacro.state = vAutoCapsMacro ? NSControlStateValueOn : NSControlStateValueOff;
+    
     //load data
     getAllMacro(keys, macroText, macroContent);
 }
@@ -135,6 +137,12 @@
             [self.buttonAdd setTitle:MACRO_ADD_TEXT];
         }
     }
+}
+
+- (IBAction)onAutoCapButton:(NSButton *)sender {
+    NSInteger val = sender.state == NSControlStateValueOn ? 1 : 0;
+    vAutoCapsMacro = (int)val;
+    [[NSUserDefaults standardUserDefaults] setInteger:vAutoCapsMacro forKey:@"vAutoCapsMacro"];
 }
 
 #pragma mark TableView

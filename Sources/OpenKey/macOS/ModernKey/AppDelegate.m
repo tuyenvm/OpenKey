@@ -35,6 +35,7 @@ int vRestoreIfWrongSpelling = 0;
 int vFixRecommendBrowser = 1;
 int vUseMacro = 1;
 int vUseMacroInEnglishMode = 1;
+int vAutoCapsMacro = 0;
 int vSendKeyStepByStep = 0;
 int vUseSmartSwitchKey = 1;
 int vUpperCaseFirstChar = 0;

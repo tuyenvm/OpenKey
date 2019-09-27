@@ -16,6 +16,8 @@ NS_ASSUME_NONNULL_BEGIN
 @property (weak) IBOutlet NSTextField *macroContent;
 
 @property (weak) IBOutlet NSButton *buttonAdd;
+@property (weak) IBOutlet NSButton *AutoCapsMacro;
+
 @end
 
 NS_ASSUME_NONNULL_END

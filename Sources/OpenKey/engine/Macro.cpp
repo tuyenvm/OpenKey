@@ -19,6 +19,12 @@ using namespace std;
 map<vector<Uint32>, MacroData> macroMap;
 
 extern int vCodeTable;
+//local variable
+static int c = 0;
+static bool _macroFlag = false;
+static Uint16 _kChar = 0;
+static Uint32 _charBuff;
+static int _kMacro;
 
 static void convert(const string& str, vector<Uint32>& outData) {
     outData.clear();
@@ -123,15 +129,69 @@ void getMacroSaveData(vector<Byte>& outData) {
     }
 }
 
+static bool modifyCaseUnicode(Uint32& code, const bool& isUpperCase=true) {
+    _charBuff = code;
+    if (!(code & CHAR_CODE_MASK)) { //for normal char
+        code &= isUpperCase ? CAPS_MASK :  ~CAPS_MASK;
+        return code != _charBuff;
+    }
+    
+    //for unicode character
+    for (map<Uint32, vector<Uint16>>::iterator it = _codeTable[vCodeTable].begin(); it != _codeTable[vCodeTable].end(); ++it) {
+        for (_kMacro = 0; _kMacro < it->second.size(); _kMacro++) {
+            if ((Uint16)code == it->second[_kMacro]) {
+                if (_kMacro % 2 == 0 && !isUpperCase)
+                    _kMacro++;
+                else if (_kMacro % 2 != 0 && isUpperCase)
+                    _kMacro--;
+                code = _codeTable[vCodeTable][it->first][_kMacro] | CHAR_CODE_MASK;
+                return code != _charBuff;;
+            }//end if
+        }
+    }
+    return false;
+}
+
 bool findMacro(vector<Uint32>& key, vector<Uint32>& macroContentCode) {
-    for (int i = 0; i < key.size(); i++) {
-        key[i] = getCharacterCode(key[i]);
+    for (c = 0; c < key.size(); c++) {
+        key[c] = getCharacterCode(key[c]);
     }
     if (macroMap.find(key) != macroMap.end()) {
         macroContentCode.clear();
         MacroData data = macroMap[key];
         macroContentCode = data.macroContentCode;
         return true;
+    }
+    if (vAutoCapsMacro) {
+        _macroFlag = false;
+        if (key.size() > 1 && modifyCaseUnicode(key[1], false)) {
+            _macroFlag = true;
+            for (c = 2; c < key.size(); c++) {
+                modifyCaseUnicode(key[c], false);
+            }
+        }
+        
+        if (key.size() > 0 && modifyCaseUnicode(key[0], false)) {
+            if (macroMap.find(key) != macroMap.end()) {
+                macroContentCode.clear();
+                MacroData data = macroMap[key];
+                macroContentCode = data.macroContentCode;
+                for (c = 0; c < macroContentCode.size(); c++) {
+                    if (c == 0 || _macroFlag) {
+                        _kChar = keyCodeToCharacter(macroContentCode[c]);
+                        if (_kChar != 0) {
+                            _kChar = toupper(_kChar);
+                            macroContentCode[c] = _characterMap[_kChar];
+                            continue;
+                        }
+                        if (macroContentCode[c] & CHAR_CODE_MASK) {
+                            modifyCaseUnicode(macroContentCode[c]);
+                        }
+                    }
+                }
+                return true;
+            }
+        }
     }
     return false;
 }

@@ -1607,9 +1607,21 @@
                                     <action selector="onExportToFile:" target="XIf-Yi-IFu" id="5X6-CE-cPl"/>
                                 </connections>
                             </button>
+                            <button verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="LXc-GH-oYK">
+                                <rect key="frame" x="269" y="9" width="232" height="18"/>
+                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                                <buttonCell key="cell" type="check" title="Tự động đổi chữ hoa theo phím tắt" bezelStyle="regularSquare" imagePosition="left" state="on" inset="2" id="JdD-dm-U8K">
+                                    <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
+                                    <font key="font" metaFont="system"/>
+                                </buttonCell>
+                                <connections>
+                                    <action selector="onAutoCapButton:" target="XIf-Yi-IFu" id="0vN-JT-uLd"/>
+                                </connections>
+                            </button>
                         </subviews>
                     </view>
                     <connections>
+                        <outlet property="AutoCapsMacro" destination="LXc-GH-oYK" id="Jan-Or-2VK"/>
                         <outlet property="buttonAdd" destination="BJd-R9-7bL" id="fb4-JF-Jqo"/>
                         <outlet property="macroContent" destination="e48-Ve-MTZ" id="46P-f6-xbt"/>
                         <outlet property="macroName" destination="Vlj-ox-8lT" id="Dsy-hH-ZpE"/>
