@@ -20,6 +20,7 @@ extern ViewController* viewController;
 extern void OnTableCodeChange(void);
 extern void OnInputMethodChanged(void);
 extern void RequestNewSession(void);
+extern void OnActiveAppChanged(void);
 
 //see document in Engine.h
 int vLanguage = 1;
@@ -100,7 +101,7 @@ extern bool convertToolDontAlertWhenCompleted;
 - (void)applicationDidFinishLaunching:(NSNotification *)aNotification {
     appDelegate = self;
     
-    [self registerAwakeNotification];
+    [self registerSupportedNotification];
     
     //check whether this app has been launched before that or not
     NSArray* runningApp = [[NSWorkspace sharedWorkspace] runningApplications];
@@ -478,7 +479,13 @@ extern bool convertToolDontAlertWhenCompleted;
     RequestNewSession();
 }
 
--(void)registerAwakeNotification {
+-(void)activeAppChanged: (NSNotification*)note {
+    if (vUseSmartSwitchKey) {
+        OnActiveAppChanged();
+    }
+}
+
+-(void)registerSupportedNotification {
     [[[NSWorkspace sharedWorkspace] notificationCenter] addObserver: self
                                                            selector: @selector(receiveWakeNote:)
                                                                name: NSWorkspaceDidWakeNotification object: NULL];
@@ -490,5 +497,9 @@ extern bool convertToolDontAlertWhenCompleted;
     [[[NSWorkspace sharedWorkspace] notificationCenter] addObserver: self
                                                            selector: @selector(receiveActiveSpaceChanged:)
                                                                name: NSWorkspaceActiveSpaceDidChangeNotification object: NULL];
+    
+    [[[NSWorkspace sharedWorkspace] notificationCenter] addObserver: self
+                                                           selector: @selector(activeAppChanged:)
+                                                               name: NSWorkspaceDidActivateApplicationNotification object: NULL];
 }
 @end

@@ -120,6 +120,7 @@ extern "C" {
             _syncKey.clear();
         }
     }
+    
     void queryFrontMostApp() {
         _frontMostApp = [[NSWorkspace sharedWorkspace] frontmostApplication].bundleIdentifier;
         if (_frontMostApp == nil)
@@ -145,6 +146,20 @@ extern "C" {
         NSData* _data = [NSData dataWithBytes:savedSmartSwitchKeyData.data() length:savedSmartSwitchKeyData.size()];
         NSUserDefaults *prefs = [NSUserDefaults standardUserDefaults];
         [prefs setObject:_data forKey:@"smartSwitchKey"];
+    }
+    
+    void OnActiveAppChanged() { //use for smart switch key; improved on Sep 28th, 2019
+        queryFrontMostApp();
+        _languageTemp = getAppInputMethodStatus(string(_frontMostApp.UTF8String), vLanguage);
+        if (_languageTemp != vLanguage) {
+            if (_languageTemp != -1) {
+                vLanguage = _languageTemp;
+                [appDelegate onImputMethodChanged:NO];
+                startNewSession();
+            } else {
+                saveSmartSwitchKeyData();
+            }
+        }
     }
     
     void OnTableCodeChange() {
@@ -491,22 +506,6 @@ extern "C" {
                     return NULL;
                 }
                 _lastFlag = 0;
-            }
-        }
-        
-        //smart switch key: update August 13th, 2019
-        if (vUseSmartSwitchKey &&
-            ((type == kCGEventKeyDown) || (type == kCGEventLeftMouseDown) || (type == kCGEventKeyUp && _keycode == KEY_TAB && _flag & kCGEventFlagMaskCommand))) {
-            queryFrontMostApp();
-            _languageTemp = getAppInputMethodStatus(string(_frontMostApp.UTF8String), vLanguage);
-            if (_languageTemp != vLanguage) {
-                if (_languageTemp != -1) {
-                    vLanguage = _languageTemp;
-                    [appDelegate onImputMethodChanged:NO];
-                    startNewSession();
-                } else {
-                    saveSmartSwitchKeyData();
-                }
             }
         }
 
