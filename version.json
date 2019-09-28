@@ -2,5 +2,9 @@
 	"latestVersion": {
 		"versionName": "1.6.2",
 		"versionCode": 37
+	},
+	"latestWinVersion": {
+		"versionName": "1.6.2",
+		"versionCode": 132609
 	}
 }
