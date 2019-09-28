@@ -25,6 +25,7 @@ private:
 	BaseDialog* mainDialog = NULL, *aboutDialog = NULL, *macroDialog = NULL, *convertDialog = NULL;
 private:
 	bool isDialogMsg(MSG &msg) const;
+	void checkUpdate();
 public:
 	AppDelegate();
 	static AppDelegate* getInstance();

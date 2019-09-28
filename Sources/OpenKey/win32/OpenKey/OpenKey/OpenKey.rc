@@ -105,7 +105,7 @@ BEGIN
     CONTROL         "<a>https://www.facebook.com/OpenKeyVN</a>",IDC_SYSLINK_FANPAGE,
                     "SysLink",WS_TABSTOP,105,104,175,10
     CTEXT           "Mai Vũ Tuyên © 2019",IDC_STATIC_APP_SUB_TITLE5,80,142,130,8
-    PUSHBUTTON      "Kiểm tra bản mới...",IDC_BUTTON_CHECK_VERSION,44,117,75,14,WS_DISABLED
+    PUSHBUTTON      "Kiểm tra bản mới...",IDC_BUTTON_CHECK_VERSION,44,117,75,14
 END
 
 IDD_DIALOG_MAIN DIALOGEX 0, 0, 297, 291
@@ -181,6 +181,8 @@ BEGIN
     PUSHBUTTON      "- Xóa",IDC_BUTTON_DELETE,365,18,43,14
     PUSHBUTTON      "Nạp từ file...",IDC_BUTTON_IMPORT_MACRO,7,232,66,14
     PUSHBUTTON      "Xuất ra file...",IDC_BUTTON_EXPORT_MACRO,82,232,66,14
+    CONTROL         "Tự động đổi chữ hoa theo phím tắt",IDC_CHECK_AUTO_CAPS,
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,167,234,221,10
 END
 
 IDD_DIALOG_CONVERT_TOOL DIALOGEX 0, 0, 283, 194
@@ -295,8 +297,8 @@ END
 //
 
 VS_VERSION_INFO VERSIONINFO
- FILEVERSION 1,6,1,0
- PRODUCTVERSION 1,6,1,0
+ FILEVERSION 1,6,2,0
+ PRODUCTVERSION 1,6,2,0
  FILEFLAGSMASK 0x3fL
 #ifdef _DEBUG
  FILEFLAGS 0x1L
@@ -313,12 +315,12 @@ BEGIN
         BEGIN
             VALUE "CompanyName", "The OpenKey Project"
             VALUE "FileDescription", "OpenKey - Bộ gõ Tiếng Việt nguồn mở"
-            VALUE "FileVersion", "1.6.1.0"
+            VALUE "FileVersion", "1.6.2.0"
             VALUE "InternalName", "OpenKey.exe"
             VALUE "LegalCopyright", "Copyright (C) 2019 - Mai Vũ Tuyên"
             VALUE "OriginalFilename", "OpenKey.exe"
             VALUE "ProductName", "OpenKey"
-            VALUE "ProductVersion", "1.6.1.0"
+            VALUE "ProductVersion", "1.6.2.0"
         END
     END
     BLOCK "VarFileInfo"

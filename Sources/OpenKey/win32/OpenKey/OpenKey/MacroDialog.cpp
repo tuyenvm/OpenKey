@@ -64,6 +64,8 @@ INT_PTR MacroDialog::eventProc(HWND hDlg, UINT uMsg, WPARAM wParam, LPARAM lPara
 						SetWindowText(hAddButton, BTN_ADD_TEXT);
 					}
 				}
+			} else if (HIWORD(wParam) == BN_CLICKED) {
+				this->onCheckboxClicked((HWND)lParam);
 			}
 			break;
 		}
@@ -92,6 +94,7 @@ void MacroDialog::initDialog() {
 	hMacroName = GetDlgItem(hDlg, IDC_EDIT_MACRO_NAME);
 	hMacroContent = GetDlgItem(hDlg, IDC_EDIT_MACRO_CONTENT);
 	hAddButton = GetDlgItem(hDlg, IDC_BUTTON_ADD);
+	hAutoCaps = GetDlgItem(hDlg, IDC_CHECK_AUTO_CAPS);
 
 	LVCOLUMN LvCol;
 	memset(&LvCol, 0, sizeof(LvCol));
@@ -110,6 +113,7 @@ void MacroDialog::initDialog() {
 }
 
 void MacroDialog::fillData() {
+	SendMessage(hAutoCaps, BM_SETCHECK, vAutoCapsMacro ? 1 : 0, 0);
 	SendMessage(listMacro, LVM_DELETEALLITEMS, 0, 0);
 	getAllMacro(keys, macroText, macroContent);
 	for (size_t i = 0; i < macroText.size(); i++) {
@@ -238,5 +242,12 @@ void MacroDialog::onExportMacrobutton() {
 	if (GetSaveFileName(&ofn) == TRUE) {
 		wstring path = ofn.lpstrFile;
 		saveToFile(wideStringToUtf8(path));
+	}
+}
+
+void MacroDialog::onCheckboxClicked(const HWND& hWnd) {
+	if (hWnd == hAutoCaps) {
+		int val = (int)SendMessage(hWnd, BM_GETCHECK, 0, 0);
+		APP_SET_DATA(vAutoCapsMacro, val ? 1 : 0);
 	}
 }

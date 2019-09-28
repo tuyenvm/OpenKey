@@ -18,7 +18,7 @@ class MacroDialog :	public BaseDialog {
 private:
 	HWND listMacro;
 	HWND hMacroName, hMacroContent;
-	HWND hAddButton;
+	HWND hAddButton, hAutoCaps;
 	vector<vector<Uint32>> keys;
 	vector<string> macroText;
 	vector<string> macroContent;
@@ -39,5 +39,7 @@ private:
 
 	void onImportMacroButton();
 	void onExportMacrobutton();
+
+	void onCheckboxClicked(const HWND& hWnd);
 };
 

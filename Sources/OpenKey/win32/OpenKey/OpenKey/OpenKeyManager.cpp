@@ -49,3 +49,28 @@ void OpenKeyManager::initEngine() {
 void OpenKeyManager::freeEngine() {
 	OpenKeyFree();
 }
+
+bool OpenKeyManager::checkUpdate(string& newVersion) {
+	wstring dataW = OpenKeyHelper::getContentOfUrl(L"https://raw.githubusercontent.com/tuyenvm/OpenKey/master/version.json");
+	string data = wideStringToUtf8(dataW);
+
+	//simple parse
+	data = data.substr(data.find("latestWinVersion"));
+	data = data.substr(data.find("\"versionName\":"));
+	data = data.substr(14);
+	data = data.substr(data.find("\""));
+	data = data.substr(1);
+	string versionName = data.substr(0, data.find("\""));
+	newVersion = versionName;
+	data = data.substr(data.find("\"versionCode\":"));
+	data = data.substr(14);
+	string versionCodeString = data.substr(0, data.find("}"));
+	DWORD versionCode = (DWORD)atoi(versionCodeString.c_str());
+	DWORD currentVersion = OpenKeyHelper::getVersionNumber();
+	if ((versionCode & 0xFF) > (currentVersion & 0xFF) ||
+		(versionCode>>8 & 0xFF) > (currentVersion>>8 & 0xFF) ||
+		(versionCode>>16 & 0xFF) > (currentVersion>>16 & 0xFF)) {
+		return true;
+	}
+	return false;
+}

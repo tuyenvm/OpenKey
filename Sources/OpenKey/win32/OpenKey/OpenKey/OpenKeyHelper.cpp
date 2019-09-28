@@ -13,7 +13,12 @@ redistribute your new version, it MUST be open source.
 -----------------------------------------------------------*/
 #include "OpenKeyHelper.h"
 #include <stdarg.h>
+#include <Urlmon.h>
+#include <fstream>
+#include <sstream>
+
 #pragma comment(lib, "version.lib")
+#pragma comment(lib, "Urlmon.lib")
 
 static BYTE* _regData = 0;
 
@@ -233,40 +238,74 @@ bool OpenKeyHelper::quickConvert() {
 	return true;
 }
 
-wstring OpenKeyHelper::getVersionString() {
+DWORD OpenKeyHelper::getVersionNumber() {
 	// get the filename of the executable containing the version resource
 	TCHAR szFilename[MAX_PATH + 1] = { 0 };
-	if (GetModuleFileName(NULL, szFilename, MAX_PATH) == 0) { 
-		return _T("");
+	if (GetModuleFileName(NULL, szFilename, MAX_PATH) == 0) {
+		return 0;
 	}
 
 	// allocate a block of memory for the version info
 	DWORD dummy;
 	UINT dwSize = GetFileVersionInfoSize(szFilename, &dummy);
 	if (dwSize == 0) {
-		return _T("");
+		return 0;
 	}
 	std::vector<BYTE> data(dwSize);
 
 	// load the version info
 	if (!GetFileVersionInfo(szFilename, NULL, dwSize, &data[0])) {
-		return _T("");
+		return 0;
 	}
 
 	LPBYTE lpBuffer = NULL;
 
-	if (VerQueryValue(&data[0], _T("\\"), (VOID FAR* FAR*)&lpBuffer, &dwSize)) {
+	if (VerQueryValue(&data[0], _T("\\"), (VOID FAR * FAR*) & lpBuffer, &dwSize)) {
 		if (dwSize) {
-			VS_FIXEDFILEINFO *verInfo = (VS_FIXEDFILEINFO *)lpBuffer;
+			VS_FIXEDFILEINFO* verInfo = (VS_FIXEDFILEINFO*)lpBuffer;
 			if (verInfo->dwSignature == 0xfeef04bd) {
-				TCHAR versionBuffer[MAX_PATH];
-				wsprintfW(versionBuffer, _T("%d.%d.%d"), (verInfo->dwFileVersionMS >> 16) & 0xffff,
-					(verInfo->dwFileVersionMS >> 0) & 0xffff,
-					(verInfo->dwFileVersionLS >> 16) & 0xffff);
-				return wstring(versionBuffer);
+				return ((verInfo->dwFileVersionMS >> 16) & 0xffff) |
+					(((verInfo->dwFileVersionMS >> 0) & 0xffff) << 8) |
+					(((verInfo->dwFileVersionLS >> 16) & 0xffff) << 16);
 			}
 		}
 	}
 
-	return _T("");
+	return 0;
+}
+
+wstring OpenKeyHelper::getVersionString() {
+	TCHAR versionBuffer[MAX_PATH];
+	DWORD ver = getVersionNumber();
+	wsprintfW(versionBuffer, _T("%d.%d.%d"), ver & 0xFF, (ver>>8) & 0xFF, (ver >> 16) & 0xFF);
+	return wstring(versionBuffer);
+
+	// get the filename of the executable containing the version resource
+	TCHAR szFilename[MAX_PATH + 1] = { 0 };
+	if (GetModuleFileName(NULL, szFilename, MAX_PATH) == 0) { 
+		return _T("");
+	}
+}
+
+wstring OpenKeyHelper::getContentOfUrl(LPCTSTR url){
+	WCHAR path[MAX_PATH];
+	GetCurrentDirectory(MAX_PATH, path);
+	wsprintf(path, TEXT("%s\\_OpenKey.tempf"), path);
+	HRESULT res = URLDownloadToFile(NULL, url, path, 0, NULL);
+	
+	if (res == S_OK) {
+		std::wifstream t(path);
+		std::wstringstream buffer;
+		buffer << t.rdbuf();
+		t.close();
+		DeleteFile(path);
+		return buffer.str();
+	} else if (res == E_OUTOFMEMORY) {
+		
+	} else if (res == INET_E_DOWNLOAD_FAILURE) {
+		
+	} else {
+		
+	}
+	return L"";
 }

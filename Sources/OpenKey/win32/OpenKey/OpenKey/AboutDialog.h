@@ -22,4 +22,7 @@ public:
 	AboutDialog(const HINSTANCE & hInstance, const int & resourceId);
 	~AboutDialog();
 	virtual void fillData() override;
+private:
+	HWND hUpdateButton;
+	void onUpdateButton();
 };

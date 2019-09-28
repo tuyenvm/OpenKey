@@ -1,4 +1,4 @@
-/*----------------------------------------------------------
+﻿/*----------------------------------------------------------
 OpenKey - The Cross platform Open source Vietnamese Keyboard application.
 
 Copyright (C) 2019 Mai Vu Tuyen
@@ -29,6 +29,7 @@ int vRestoreIfWrongSpelling = 1;
 int vFixRecommendBrowser = 0;
 int vUseMacro = 1;
 int vUseMacroInEnglishMode = 1;
+int vAutoCapsMacro = 0;
 int vSendKeyStepByStep = 1;
 int vUseSmartSwitchKey = 1;
 int vUpperCaseFirstChar = 0;
@@ -46,6 +47,32 @@ bool AppDelegate::isDialogMsg(MSG & msg) const {
 		(macroDialog != NULL && IsDialogMessage(macroDialog->getHwnd(), &msg)) || 
 		(convertDialog != NULL && IsDialogMessage(convertDialog->getHwnd(), &msg)) || 
 		(aboutDialog != NULL && IsDialogMessage(aboutDialog->getHwnd(), &msg));
+}
+
+void AppDelegate::checkUpdate() {
+	string newVersion;
+	if (OpenKeyManager::checkUpdate(newVersion)) {
+		WCHAR msg[256];
+		wsprintf(msg,
+			TEXT("OpenKey Có phiên bản mới (%s), bạn có muốn cập nhật không?"),
+			utf8ToWideString(newVersion).c_str());
+
+		int msgboxID = MessageBox(
+			0,
+			msg,
+			_T("OpenKey Update"),
+			MB_ICONEXCLAMATION | MB_YESNO
+		);
+		if (msgboxID == IDYES) {
+			//Call OpenKeyUpdate
+			WCHAR path[MAX_PATH];
+			GetCurrentDirectory(MAX_PATH, path);
+			wsprintf(path, TEXT("%s\\OpenKeyUpdate.exe"), path);
+			ShellExecute(0, L"", path, 0, 0, SW_SHOWNORMAL);
+			AppDelegate::getInstance()->onOpenKeyExit();
+		}
+
+	}
 }
 
 AppDelegate::AppDelegate() {
@@ -77,6 +104,9 @@ int AppDelegate::run(HINSTANCE hInstance) {
 	if (vShowOnStartUp)
 		createMainDialog();
 	MessageBeep(MB_OK);
+
+	//check update
+	checkUpdate();
 
 	MSG msg;
 	// Main message loop:

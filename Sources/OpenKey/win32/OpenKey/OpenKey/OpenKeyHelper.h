@@ -42,6 +42,9 @@ public:
 
 	static bool quickConvert();
 
+	static DWORD getVersionNumber();
 	static wstring getVersionString();
+
+	static wstring getContentOfUrl(LPCTSTR url);
 };
 

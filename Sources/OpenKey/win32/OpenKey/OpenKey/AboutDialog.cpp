@@ -38,6 +38,9 @@ INT_PTR AboutDialog::eventProc(HWND hDlg, UINT uMsg, WPARAM wParam, LPARAM lPara
 		case IDBUTTON_OK:
 			AppDelegate::getInstance()->closeDialog(this);
 			break;
+		case IDC_BUTTON_CHECK_VERSION:
+			onUpdateButton();
+			break;
 		}
 		break;
 	}
@@ -63,6 +66,8 @@ void AboutDialog::initDialog() {
 	//dialog icon
 	SET_DIALOG_ICON(IDI_APP_ICON);
 	
+	hUpdateButton = GetDlgItem(hDlg, IDC_BUTTON_CHECK_VERSION);
+
 	HFONT hFont = CreateFont(48, 0, 0, 0, FW_THIN, FALSE, FALSE, FALSE,
 		ANSI_CHARSET, OUT_DEFAULT_PRECIS, CLIP_DEFAULT_PRECIS, DEFAULT_QUALITY, 
 		DEFAULT_PITCH | FF_SWISS | FF_MODERN, _T("Segoe UI"));
@@ -76,4 +81,35 @@ void AboutDialog::initDialog() {
 		ANSI_CHARSET, OUT_DEFAULT_PRECIS, CLIP_DEFAULT_PRECIS, DEFAULT_QUALITY,
 		DEFAULT_PITCH | FF_SWISS | FF_MODERN, _T("Arial"));
 	SendDlgItemMessage(hDlg, IDC_STATIC_APP_SUB_TITLE, WM_SETFONT, WPARAM(hFont), TRUE);
+}
+
+void AboutDialog::onUpdateButton() {
+	EnableWindow(hUpdateButton, false);
+	string newVersion;
+	if (OpenKeyManager::checkUpdate(newVersion)) {
+		WCHAR msg[256];
+		wsprintf(msg, 
+			TEXT("OpenKey Có phiên bản mới (%s), bạn có muốn cập nhật không?"),
+			utf8ToWideString(newVersion).c_str());
+
+		int msgboxID = MessageBox(
+			hDlg,
+			msg,
+			_T("OpenKey Update"),
+			MB_ICONEXCLAMATION | MB_YESNO
+		);
+		if (msgboxID == IDYES) {
+			//Call OpenKeyUpdate
+			WCHAR path[MAX_PATH];
+			GetCurrentDirectory(MAX_PATH, path);
+			wsprintf(path, TEXT("%s\\OpenKeyUpdate.exe"), path);
+			ShellExecute(0, L"", path, 0, 0, SW_SHOWNORMAL);
+
+			AppDelegate::getInstance()->onOpenKeyExit();
+		}
+		
+	} else {
+		MessageBox(hDlg, _T("Bạn đang dùng phiên bản mới nhất!"), _T("OpenKey Update"), MB_OK);
+	}
+	EnableWindow(hUpdateButton, true);
 }

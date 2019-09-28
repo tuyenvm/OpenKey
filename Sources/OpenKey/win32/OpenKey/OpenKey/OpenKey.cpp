@@ -33,6 +33,7 @@ extern int vRunWithWindows;
 
 static HHOOK hKeyboardHook;
 static HHOOK hMouseHook;
+static HWINEVENTHOOK hSystemEvent;
 static KBDLLHOOKSTRUCT* keyboardData;
 static MSLLHOOKSTRUCT* mouseData;
 static vKeyHookState* pData;
@@ -59,10 +60,12 @@ static INPUT keyEvent[2];
 
 LRESULT CALLBACK keyboardHookProcess(int nCode, WPARAM wParam, LPARAM lParam);
 LRESULT CALLBACK mouseHookProcess(int nCode, WPARAM wParam, LPARAM lParam);
+VOID CALLBACK winEventProcCallback(HWINEVENTHOOK hWinEventHook, DWORD dwEvent, HWND hwnd, LONG idObject, LONG idChild, DWORD dwEventThread, DWORD dwmsEventTime);
 
 void OpenKeyFree() {
 	UnhookWindowsHookEx(hMouseHook);
 	UnhookWindowsHookEx(hKeyboardHook);
+	UnhookWinEvent(hSystemEvent);
 }
 
 void OpenKeyInit() {
@@ -115,6 +118,7 @@ void OpenKeyInit() {
 	APP_GET_DATA(vFixRecommendBrowser, 1);
 	APP_GET_DATA(vUseMacro, 1);
 	APP_GET_DATA(vUseMacroInEnglishMode, 0);
+	APP_GET_DATA(vAutoCapsMacro, 0);
 	APP_GET_DATA(vSendKeyStepByStep, 1);
 	APP_GET_DATA(vUseGrayIcon, 0);
 	APP_GET_DATA(vShowOnStartUp, 1);
@@ -145,6 +149,7 @@ void OpenKeyInit() {
 	HINSTANCE hInstance = GetModuleHandle(NULL);
 	hKeyboardHook = SetWindowsHookEx(WH_KEYBOARD_LL, keyboardHookProcess, hInstance, 0);
 	hMouseHook = SetWindowsHookEx(WH_MOUSE_LL, mouseHookProcess, hInstance, 0);
+	hSystemEvent = SetWinEventHook(EVENT_SYSTEM_FOREGROUND, EVENT_SYSTEM_FOREGROUND, NULL, winEventProcCallback, 0, 0, WINEVENT_OUTOFCONTEXT | WINEVENT_SKIPOWNPROCESS);
 }
 
 void saveSmartSwitchKeyData() {
@@ -516,21 +521,6 @@ LRESULT CALLBACK keyboardHookProcess(int nCode, WPARAM wParam, LPARAM lParam) {
 		return CallNextHookEx(hKeyboardHook, nCode, wParam, lParam);
 	}
 
-	//smart switch key
-	if (vUseSmartSwitchKey && wParam == WM_KEYDOWN) {
-		string& exe = OpenKeyHelper::getFrontMostAppExecuteName();
-		_languageTemp = getAppInputMethodStatus(exe, vLanguage);
-		if (_languageTemp != vLanguage) {
-			if (_languageTemp != -1) {
-				vLanguage = _languageTemp;
-				AppDelegate::getInstance()->onInputMethodChangedFromHotKey();
-				startNewSession();
-			} else {
-				saveSmartSwitchKeyData();
-			}
-		}
-	}
-
 	//if is in english mode
 	if (vLanguage == 0) {
 		if (vUseMacro && vUseMacroInEnglishMode && wParam == WM_KEYDOWN) {
@@ -632,4 +622,22 @@ LRESULT CALLBACK mouseHookProcess(int nCode, WPARAM wParam, LPARAM lParam) {
 		break;
 	}
 	return CallNextHookEx(hMouseHook, nCode, wParam, lParam);
+}
+
+VOID CALLBACK winEventProcCallback(HWINEVENTHOOK hWinEventHook, DWORD dwEvent, HWND hwnd, LONG idObject, LONG idChild, DWORD dwEventThread, DWORD dwmsEventTime) {
+	//smart switch key
+	if (vUseSmartSwitchKey) {
+		string& exe = OpenKeyHelper::getFrontMostAppExecuteName();
+		_languageTemp = getAppInputMethodStatus(exe, vLanguage);
+		if (_languageTemp != vLanguage) {
+			if (_languageTemp != -1) {
+				vLanguage = _languageTemp;
+				AppDelegate::getInstance()->onInputMethodChangedFromHotKey();
+				startNewSession();
+			}
+			else {
+				saveSmartSwitchKeyData();
+			}
+		}
+	}
 }

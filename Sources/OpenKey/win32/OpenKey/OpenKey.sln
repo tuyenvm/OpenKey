@@ -1,9 +1,11 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 15
-VisualStudioVersion = 15.0.28307.779
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.29324.140
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "OpenKey", "OpenKey\OpenKey.vcxproj", "{21E71F9D-859A-4B8B-84F4-F5003E933BB3}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "OpenKeyUpdate", "OpenKeyUpdate\OpenKeyUpdate.vcxproj", "{A63EF692-7EAE-4EDA-8D2B-3686E1A15A19}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -21,6 +23,14 @@ Global
 		{21E71F9D-859A-4B8B-84F4-F5003E933BB3}.Release|x64.Build.0 = Release|x64
 		{21E71F9D-859A-4B8B-84F4-F5003E933BB3}.Release|x86.ActiveCfg = Release|Win32
 		{21E71F9D-859A-4B8B-84F4-F5003E933BB3}.Release|x86.Build.0 = Release|Win32
+		{A63EF692-7EAE-4EDA-8D2B-3686E1A15A19}.Debug|x64.ActiveCfg = Debug|x64
+		{A63EF692-7EAE-4EDA-8D2B-3686E1A15A19}.Debug|x64.Build.0 = Debug|x64
+		{A63EF692-7EAE-4EDA-8D2B-3686E1A15A19}.Debug|x86.ActiveCfg = Debug|Win32
+		{A63EF692-7EAE-4EDA-8D2B-3686E1A15A19}.Debug|x86.Build.0 = Debug|Win32
+		{A63EF692-7EAE-4EDA-8D2B-3686E1A15A19}.Release|x64.ActiveCfg = Release|x64
+		{A63EF692-7EAE-4EDA-8D2B-3686E1A15A19}.Release|x64.Build.0 = Release|x64
+		{A63EF692-7EAE-4EDA-8D2B-3686E1A15A19}.Release|x86.ActiveCfg = Release|Win32
+		{A63EF692-7EAE-4EDA-8D2B-3686E1A15A19}.Release|x86.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

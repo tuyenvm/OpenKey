@@ -40,6 +40,7 @@
 #define IDC_COMBO_INPUT_TYPE            1000
 #define IDC_CHECK1                      1001
 #define IDC_CHECK_SWITCH_KEY_CTRL       1001
+#define IDC_CHECK_AUTO_CAPS             1001
 #define IDC_COMBO2                      1002
 #define IDC_COMBO_TABLE_CODE            1002
 #define IDC_CHECK2                      1003
