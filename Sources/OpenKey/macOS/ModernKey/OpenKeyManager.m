@@ -210,7 +210,7 @@ static CFRunLoopSourceRef runLoopSource;
     
     NSModalResponse res = [alert runModal];
     
-    if (res == 1000) {
+    if (res == 1000 && needUpdating) {
         [self launchUpdateHelper];
     }
 }
