@@ -211,6 +211,8 @@ void checkSpelling(const bool& forceCheckVowel=false) {
             k = k + 1;
             j = k;
             VSI = k;
+        } else if (_index >= 2 && CHR(0) == KEY_G && CHR(1) == KEY_I && IS_CONSONANT(CHR(2))) {
+            VSI = k = j = 1; //Sep 28th: fix gìn
         }
         for (l = 0; l < 3; l++) {
             if (k < _spellingEndIndex && !IS_CONSONANT(CHR(k))) {
@@ -242,13 +244,12 @@ void checkSpelling(const bool& forceCheckVowel=false) {
             }
             
             //continue check last consonant
-            
             for (ii = 0; ii < _endConsonantTable.size(); ii++) {
                 _spellingFlag = false;
    
                 for (j = 0; j < _endConsonantTable[ii].size(); j++) {
                     if (_spellingEndIndex > k+j &&
-                        (_endConsonantTable[ii][j] & ~(vQuickEndConsonant ? 0x4000 : 0)) != CHR(k + j)) {
+                        (_endConsonantTable[ii][j] & ~(vQuickEndConsonant ? END_CONSONANT_MASK : 0)) != CHR(k + j)) {
                         _spellingFlag = true;
                         break;
                     }
@@ -1030,6 +1031,7 @@ void upperCaseFirstCharacter() {
         hBPC = 0;
         hNCC = 1;
         TypingWord[0] |= CAPS_MASK;
+        hMacroKey[0] |= CAPS_MASK;
         hData[0] = GET(TypingWord[0]);
         _upperCaseStatus = 0;
     }

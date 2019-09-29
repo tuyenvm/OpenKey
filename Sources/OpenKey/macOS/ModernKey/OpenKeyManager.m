@@ -201,8 +201,8 @@ static CFRunLoopSourceRef runLoopSource;
     if (!needUpdating) {
         [alert addButtonWithTitle:@"OK"];
     } else {
-        [alert addButtonWithTitle:@"Không"];
         [alert addButtonWithTitle:@"Có"];
+        [alert addButtonWithTitle:@"Không"];
     }
     
     [alert.window makeKeyAndOrderFront:nil];
@@ -210,7 +210,7 @@ static CFRunLoopSourceRef runLoopSource;
     
     NSModalResponse res = [alert runModal];
     
-    if (res == 1001) {
+    if (res == 1000 && needUpdating) {
         [self launchUpdateHelper];
     }
 }

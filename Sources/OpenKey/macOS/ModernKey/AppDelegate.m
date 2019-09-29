@@ -480,7 +480,7 @@ extern bool convertToolDontAlertWhenCompleted;
 }
 
 -(void)activeAppChanged: (NSNotification*)note {
-    if (vUseSmartSwitchKey) {
+    if (vUseSmartSwitchKey && [OpenKeyManager isInited]) {
         OnActiveAppChanged();
     }
 }
