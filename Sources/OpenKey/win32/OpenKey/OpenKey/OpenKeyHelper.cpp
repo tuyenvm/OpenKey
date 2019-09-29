@@ -91,13 +91,12 @@ BYTE * OpenKeyHelper::getRegBinary(LPCTSTR key, DWORD& outSize) {
 }
 
 void OpenKeyHelper::registerRunOnStartup(const int& val) {
+	WinExec("schtasks /delete  /tn OpenKey /f", SW_HIDE);
 	if (val) {
 		string path = wideStringToUtf8(getFullPath());
 		char buff[MAX_PATH];
 		sprintf_s(buff, "schtasks /create /sc onlogon /tn OpenKey /rl highest /tr \"%s\"", path.c_str());
 		WinExec(buff, SW_HIDE);
-	} else {
-		WinExec("schtasks /delete  /tn OpenKey /f", SW_HIDE);
 	}
 }
 
