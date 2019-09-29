@@ -67,4 +67,6 @@ OpenKey for Windows được phát hành dưới giấy phép GPL, điều này 
 
 ## Một điều nữa
 Đừng quên ủng hộ tác giả bằng cách mua ly cafe cho tác giả tỉnh ngủ nhé: [Gửi cafe](https://paypal.me/tuyenmai)  
+Hoặc trực tiếp qua ví momo:   
+![Donate by momo](https://tuyenvm.github.io/images/momo.png "Momo").   
 Cảm ơn các bạn.
