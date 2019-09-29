@@ -1031,9 +1031,10 @@ void upperCaseFirstCharacter() {
         hBPC = 0;
         hNCC = 1;
         TypingWord[0] |= CAPS_MASK;
-        hMacroKey[0] |= CAPS_MASK;
         hData[0] = GET(TypingWord[0]);
         _upperCaseStatus = 0;
+        if (vUseMacro)
+            hMacroKey[0] |= CAPS_MASK;
     }
 }
 
