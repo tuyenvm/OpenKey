@@ -69,43 +69,6 @@ void OpenKeyFree() {
 }
 
 void OpenKeyInit() {
-	pData = (vKeyHookState*)vKeyInit();
-
-	//pre-create back key
-	backspaceEvent[0].type = INPUT_KEYBOARD;
-	backspaceEvent[0].ki.dwFlags = 0;
-	backspaceEvent[0].ki.wVk = VK_BACK;
-	backspaceEvent[0].ki.wScan = 0;
-	backspaceEvent[0].ki.time = 0;
-	backspaceEvent[0].ki.dwExtraInfo = 1;
-
-	backspaceEvent[1].type = INPUT_KEYBOARD;
-	backspaceEvent[1].ki.dwFlags = KEYEVENTF_KEYUP;
-	backspaceEvent[1].ki.wVk = VK_BACK;
-	backspaceEvent[1].ki.wScan = 0;
-	backspaceEvent[1].ki.time = 0;
-	backspaceEvent[1].ki.dwExtraInfo = 1;
-
-	//get key state
-	_flag = 0;
-	if (GetKeyState(VK_LSHIFT) < 0 || GetKeyState(VK_RSHIFT) < 0) _flag |= MASK_SHIFT;
-	if (GetKeyState(VK_LCONTROL) < 0 || GetKeyState(VK_RCONTROL) < 0) _flag |= MASK_CONTROL;
-	if (GetKeyState(VK_LMENU) < 0 || GetKeyState(VK_RMENU) < 0) _flag |= MASK_ALT;
-	if (GetKeyState(VK_LWIN) < 0 || GetKeyState(VK_RWIN) < 0) _flag |= MASK_WIN;
-	if (GetKeyState(VK_NUMLOCK) < 0) _flag |= MASK_NUMLOCK;
-	if (GetKeyState(VK_CAPITAL) == 1) _flag |= MASK_CAPITAL;
-	if (GetKeyState(VK_SCROLL) < 0) _flag |= MASK_SCROLL;
-
-	//init and load macro data
-	DWORD macroDataSize;
-	BYTE* macroData = OpenKeyHelper::getRegBinary(_T("macroData"), macroDataSize);
-	initMacroMap((Byte*)macroData, (int)macroDataSize);
-
-	//init and load smart switch key data
-	DWORD smartSwitchKeySize;
-	BYTE* data = OpenKeyHelper::getRegBinary(_T("smartSwitchKey"), smartSwitchKeySize);
-	initSmartSwitchKey((Byte*)data, (int)smartSwitchKeySize);
-
 	APP_GET_DATA(vLanguage, 1);
 	APP_GET_DATA(vInputType, 0);
 	vFreeMark = 0;
@@ -144,6 +107,43 @@ void OpenKeyInit() {
 	if (convertToolHotKey == 0) {
 		convertToolHotKey = EMPTY_HOTKEY;
 	}
+
+	pData = (vKeyHookState*)vKeyInit();
+
+	//pre-create back key
+	backspaceEvent[0].type = INPUT_KEYBOARD;
+	backspaceEvent[0].ki.dwFlags = 0;
+	backspaceEvent[0].ki.wVk = VK_BACK;
+	backspaceEvent[0].ki.wScan = 0;
+	backspaceEvent[0].ki.time = 0;
+	backspaceEvent[0].ki.dwExtraInfo = 1;
+
+	backspaceEvent[1].type = INPUT_KEYBOARD;
+	backspaceEvent[1].ki.dwFlags = KEYEVENTF_KEYUP;
+	backspaceEvent[1].ki.wVk = VK_BACK;
+	backspaceEvent[1].ki.wScan = 0;
+	backspaceEvent[1].ki.time = 0;
+	backspaceEvent[1].ki.dwExtraInfo = 1;
+
+	//get key state
+	_flag = 0;
+	if (GetKeyState(VK_LSHIFT) < 0 || GetKeyState(VK_RSHIFT) < 0) _flag |= MASK_SHIFT;
+	if (GetKeyState(VK_LCONTROL) < 0 || GetKeyState(VK_RCONTROL) < 0) _flag |= MASK_CONTROL;
+	if (GetKeyState(VK_LMENU) < 0 || GetKeyState(VK_RMENU) < 0) _flag |= MASK_ALT;
+	if (GetKeyState(VK_LWIN) < 0 || GetKeyState(VK_RWIN) < 0) _flag |= MASK_WIN;
+	if (GetKeyState(VK_NUMLOCK) < 0) _flag |= MASK_NUMLOCK;
+	if (GetKeyState(VK_CAPITAL) == 1) _flag |= MASK_CAPITAL;
+	if (GetKeyState(VK_SCROLL) < 0) _flag |= MASK_SCROLL;
+
+	//init and load macro data
+	DWORD macroDataSize;
+	BYTE* macroData = OpenKeyHelper::getRegBinary(_T("macroData"), macroDataSize);
+	initMacroMap((Byte*)macroData, (int)macroDataSize);
+
+	//init and load smart switch key data
+	DWORD smartSwitchKeySize;
+	BYTE* data = OpenKeyHelper::getRegBinary(_T("smartSwitchKey"), smartSwitchKeySize);
+	initSmartSwitchKey((Byte*)data, (int)smartSwitchKeySize);
 
 	//init hook
 	HINSTANCE hInstance = GetModuleHandle(NULL);
