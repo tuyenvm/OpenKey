@@ -40,7 +40,7 @@ extern "C" {
     CGEventRef eventBackSpaceDown;
     CGEventRef eventBackSpaceUp;
     UniChar _newChar, _newCharHi;
-    CGEventRef _newEventDown;
+    CGEventRef _newEventDown, _newEventUp;
     CGKeyCode _keycode;
     CGEventFlags _flag, _lastFlag = 0, _privateFlag;
     CGEventTapProxy _proxy;
@@ -199,6 +199,7 @@ extern "C" {
                 InsertKeyLength(1);
             
             _newEventDown = CGEventCreateKeyboardEvent(myEventSource, _newChar, true);
+            _newEventUp = CGEventCreateKeyboardEvent(myEventSource, _newChar, false);
             _privateFlag = CGEventGetFlags(_newEventDown);
             
             if (data & CAPS_MASK) {
@@ -209,7 +210,10 @@ extern "C" {
             _privateFlag |= kCGEventFlagMaskNonCoalesced;
             
             CGEventSetFlags(_newEventDown, _privateFlag);
+            CGEventSetFlags(_newEventUp, _privateFlag);
             CGEventTapPostEvent(_proxy, _newEventDown);
+            CGEventTapPostEvent(_proxy, _newEventUp);
+            CFRelease(_newEventUp);
         } else {
             if (vCodeTable == 0) { //unicode 2 bytes code
                 _newEventDown = CGEventCreateKeyboardEvent(myEventSource, 0, true);

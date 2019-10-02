@@ -23,6 +23,9 @@
                                     [[NSBundle mainBundle] objectForInfoDictionaryKey: @"CFBundleShortVersionString"],
                                     [[NSBundle mainBundle] objectForInfoDictionaryKey: @"CFBundleVersion"],
                                     [OpenKeyManager getBuildDate]] ;
+    
+    NSInteger dontCheckUpdate = [[NSUserDefaults standardUserDefaults] integerForKey:@"DontCheckUpdate"];
+    self.CheckUpdateOnStatus.state = dontCheckUpdate ? NSControlStateValueOff :NSControlStateValueOn;
 }
 
 - (IBAction)onHomePage:(id)sender {
@@ -35,6 +38,16 @@
 
 - (IBAction)onLatestReleaseVersion:(id)sender {
     [[NSWorkspace sharedWorkspace] openURL: [NSURL URLWithString:@"https://github.com/tuyenvm/OpenKey/releases"]];
+}
+
+- (IBAction)onCheckUpdateOnStartup:(NSButton *)sender {
+    NSInteger val = 0;
+    if (sender.state == NSControlStateValueOn) {
+        val = 0;
+    } else {
+        val = 1;
+    }
+    [[NSUserDefaults standardUserDefaults] setInteger:val forKey:@"DontCheckUpdate"];
 }
 
 - (IBAction)onCheckNewVersion:(id)sender {
