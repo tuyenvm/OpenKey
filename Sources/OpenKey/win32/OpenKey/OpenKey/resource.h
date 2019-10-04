@@ -17,7 +17,24 @@
 #define IDS_TRAY_TITLE_2                105
 #define IDS_STRING_CONVERT_COMPLETED    106
 #define IDS_MAIN_DIALOG_TITLE           107
+#define IDS_STRING_MODERN_ORTHORGRAPHY  108
 #define IDC_OPENKEY                     109
+#define IDS_STRING_MORDEN_ORTHORGRAPHY  110
+#define IDS_STRING_FIX_BROWSER          111
+#define IDS_STRING_SPELLING_CHECK       112
+#define IDS_STRING_RESTORE_IF_WRONG_SPELLING 113
+#define IDS_STRING_USE_CLIPBOARD        114
+#define IDS_STRING_ALLOW_ZWFJ           115
+#define IDS_STRING_TEMP_OFF_SPELLING    116
+#define IDS_STRING_MODERN_ICON          117
+#define IDS_STRING_CAPS_FIRST_CHAR      118
+#define IDS_STRING_SMART_SWITCH_KEY     119
+#define IDS_STRING_SUPPORT_METRO        120
+#define IDS_STRING_RUN_ON_STARTUP       121
+#define IDS_STRING_SHOW_ON_STARTUP      122
+#define IDS_STRING_CREATE_DESKTOP       123
+#define IDS_STRING_RUN_AS_ADMIN         124
+#define IDS_STRING_CHECK_UPDATE         125
 #define IDR_MAINFRAME                   128
 #define IDD_DIALOG_MAIN                 129
 #define IDI_ICON1                       133
@@ -36,6 +53,11 @@
 #define IDD_DIALOG_CONVERT_TOOL         142
 #define IDI_ICON5                       143
 #define IDI_ICON_START_CONVERT          143
+#define IDD_DIALOG_TAB_GENERAL          145
+#define IDD_DIALOG_TAB_MACRO            146
+#define IDD_DIALOG_TAB_SYSTEM           147
+#define IDD_DIALOG_OLD                  148
+#define IDD_DIALOG_TAB_INFO             149
 #define IDC_COMBO1                      1000
 #define IDC_COMBO_INPUT_TYPE            1000
 #define IDC_CHECK1                      1001
@@ -78,7 +100,6 @@
 #define IDC_CHECK11                     1015
 #define IDC_CHECK_RUN_WITH_WINDOWS      1015
 #define IDC_CHECK_ALERT_WHEN_COMPLETED  1015
-#define IDC_CHECK12                     1016
 #define IDC_CHECK_USE_CLIPBOARD         1016
 #define IDC_CHECK_CONVERT_CLIPBOARD     1016
 #define IDC_CHECK13                     1017
@@ -101,17 +122,22 @@
 #define IDC_STATIC_APP_TITLE            1024
 #define IDC_STATIC_APP_SUB_TITLE        1025
 #define IDC_CHECK_TEMP_OFF_SPELLING     1025
+#define IDC_STATIC_APP_TITLE2           1025
 #define IDC_STATIC_APP_VERSION          1026
 #define IDC_CHECK_ALLOW_ZJWF            1026
+#define IDC_STATIC_APP_TITLE3           1026
 #define IDC_SYSLINK_HOME_PAGE           1027
 #define IDC_CHECK_QUICK_START_CONSONANT 1027
 #define IDC_STATIC_APP_SUB_TITLE2       1028
 #define IDC_CHECK_QUICK_END_CONSONANT   1028
 #define IDC_STATIC_APP_SUB_TITLE3       1029
+#define IDC_STATIC_APP_VERSION_INFO     1029
 #define IDC_STATIC_APP_SUB_TITLE4       1030
+#define IDC_SYSLINK_AUTHOR_EMAIL        1030
 #define IDC_SYSLINK_NEW_VERSION         1031
 #define IDC_SYSLINK_FANPAGE             1032
 #define IDC_STATIC_APP_SUB_TITLE5       1033
+#define IDC_STATIC_APP_SUB_TITLE6       1034
 #define IDC_SPLIT1                      1035
 #define IDC_LIST3                       1038
 #define IDC_LIST_MACRO_DATA             1038
@@ -123,6 +149,29 @@
 #define IDC_BUTTON_IMPORT_MACRO         1044
 #define IDC_BUTTON3                     1045
 #define IDC_BUTTON_EXPORT_MACRO         1045
+#define IDC_TAB_CONTROL                 1046
+#define IDC_BUTTON_GO_SOURCE_CODE       1047
+#define IDC_CHECK_RUN_AS_ADMIN          1048
+#define IDC_CHECK_CHECK_UPDATE          1049
+#define IDC_CHECK_SUPPORT_METRO         1050
+#define IDC_CHECK_CHECK_CREATE_SHORTCUT 1050
+#define IDC_BUTTON_CHECK_UPDATE         1051
+#define IDS_STRING_CTRL                 1052
+#define IDS_STRING_ALT                  1053
+#define IDS_STRING_SHIFT                1054
+#define IDS_STRING_WIN                  1055
+#define IDS_STRING_SWITCH_KEY           1056
+#define IDS_STRING_BEEP                 1057
+#define IDS_STRING_VIET                 1058
+#define IDS_STRING_ENG                  1059
+#define IDS_STRING_CODE                 1060
+#define IDS_STRING_INPUT                1061
+#define IDS_STRING_MACRO                1062
+#define IDS_STRING_QUICK_TELEX          1063
+#define IDS_STRING_MACRO_IN_ENG         1064
+#define IDS_STRING_MACRO_AUTO_CAP       1065
+#define IDS_STRING_START_CONSONANT      1066
+#define IDS_STRING_END_CONSONANT        1067
 #define IDC_STATIC                      -1
 
 // Next default values for new objects
@@ -130,9 +179,9 @@
 #ifdef APSTUDIO_INVOKED
 #ifndef APSTUDIO_READONLY_SYMBOLS
 #define _APS_NO_MFC                     1
-#define _APS_NEXT_RESOURCE_VALUE        145
+#define _APS_NEXT_RESOURCE_VALUE        149
 #define _APS_NEXT_COMMAND_VALUE         32771
-#define _APS_NEXT_CONTROL_VALUE         1046
+#define _APS_NEXT_CONTROL_VALUE         1052
 #define _APS_NEXT_SYMED_VALUE           110
 #endif
 #endif

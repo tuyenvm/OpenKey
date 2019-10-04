@@ -93,6 +93,10 @@ void OpenKeyInit() {
 	APP_GET_DATA(vTempOffSpelling, 0);
 	APP_GET_DATA(vQuickStartConsonant, 0);
 	APP_GET_DATA(vQuickEndConsonant, 0);
+	APP_GET_DATA(vSupportMetroApp, 0);
+	APP_GET_DATA(vRunAsAdmin, 0);
+	APP_GET_DATA(vCreateDesktopShortcut, 0);
+	APP_GET_DATA(vCheckNewVersion, 0);
 
 	//init convert tool
 	APP_GET_DATA(convertToolDontAlertWhenCompleted, 0);
@@ -148,7 +152,7 @@ void OpenKeyInit() {
 	//init hook
 	HINSTANCE hInstance = GetModuleHandle(NULL);
 	hKeyboardHook = SetWindowsHookEx(WH_KEYBOARD_LL, keyboardHookProcess, hInstance, 0);
-	hMouseHook = SetWindowsHookEx(WH_MOUSE_LL, mouseHookProcess, hInstance, 0);
+	//hMouseHook = SetWindowsHookEx(WH_MOUSE_LL, mouseHookProcess, hInstance, 0);
 	hSystemEvent = SetWinEventHook(EVENT_SYSTEM_FOREGROUND, EVENT_SYSTEM_FOREGROUND, NULL, winEventProcCallback, 0, 0, WINEVENT_OUTOFCONTEXT | WINEVENT_SKIPOWNPROCESS);
 }
 
@@ -450,12 +454,12 @@ static bool SetModifierMask(const Uint16& vkCode) {
 }
 
 static bool UnsetModifierMask(const Uint16& vkCode) {
-	if (vkCode == VK_LSHIFT || vkCode == VK_RSHIFT) _flag ^= MASK_SHIFT;
-	else if (vkCode == VK_LCONTROL || vkCode == VK_RCONTROL) _flag ^= MASK_CONTROL;
-	else if (vkCode == VK_LMENU || vkCode == VK_RMENU) _flag ^= MASK_ALT;
-	else if (vkCode == VK_LWIN || vkCode == VK_RWIN) _flag ^= MASK_WIN;
-	else if (vkCode == VK_NUMLOCK) _flag ^= MASK_NUMLOCK;
-	else if (vkCode == VK_SCROLL) _flag ^= MASK_SCROLL;
+	if (vkCode == VK_LSHIFT || vkCode == VK_RSHIFT) _flag &= ~MASK_SHIFT;
+	else if (vkCode == VK_LCONTROL || vkCode == VK_RCONTROL) _flag &= ~MASK_CONTROL;
+	else if (vkCode == VK_LMENU || vkCode == VK_RMENU) _flag &= ~MASK_ALT;
+	else if (vkCode == VK_LWIN || vkCode == VK_RWIN) _flag &= ~MASK_WIN;
+	else if (vkCode == VK_NUMLOCK) _flag &= ~MASK_NUMLOCK;
+	else if (vkCode == VK_SCROLL) _flag &= ~MASK_SCROLL;
 	else { 
 		_isFlagKey = false;
 		return false; 

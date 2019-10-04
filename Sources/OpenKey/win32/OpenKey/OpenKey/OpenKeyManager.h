@@ -24,4 +24,6 @@ public:
 	static void freeEngine();
 
 	static bool checkUpdate(string& newVersion);
+
+	static void createDesktopShortcut();
 };

@@ -42,6 +42,11 @@ int vUseGrayIcon = 0;
 int vShowOnStartUp = 0;
 int vRunWithWindows = 1;
 
+int vSupportMetroApp = 1;
+int vCreateDesktopShortcut = 0;
+int vRunAsAdmin = 0;
+int vCheckNewVersion = 0;
+
 bool AppDelegate::isDialogMsg(MSG & msg) const {
 	return (mainDialog != NULL && IsDialogMessage(mainDialog->getHwnd(), &msg)) ||
 		(macroDialog != NULL && IsDialogMessage(macroDialog->getHwnd(), &msg)) || 
@@ -106,7 +111,8 @@ int AppDelegate::run(HINSTANCE hInstance) {
 	MessageBeep(MB_OK);
 
 	//check update
-	checkUpdate();
+	if (vCheckNewVersion)
+		checkUpdate();
 
 	MSG msg;
 	// Main message loop:
@@ -178,6 +184,8 @@ void AppDelegate::onDefaultConfig() {
 	APP_SET_DATA(vUseGrayIcon, 0);
 	APP_SET_DATA(vShowOnStartUp, 1);
 	APP_SET_DATA(vRunWithWindows, 1);
+
+	APP_SET_DATA(vSupportMetroApp, 1);
 
 	if (mainDialog) {
 		mainDialog->fillData();

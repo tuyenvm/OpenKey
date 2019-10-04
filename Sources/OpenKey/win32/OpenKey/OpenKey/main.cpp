@@ -25,7 +25,8 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 	
 #if NDEBUG
 	//check the program is run as administrator mode
-	if (!IsUserAnAdmin()) {
+	APP_GET_DATA(vRunAsAdmin, 0);
+	if (vRunAsAdmin && !IsUserAnAdmin()) {
 		//create admin process
 		ShellExecute(0, L"runas", OpenKeyHelper::getFullPath().c_str(), 0, 0, SW_SHOWNORMAL);
 		return 1;

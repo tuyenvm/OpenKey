@@ -12,6 +12,7 @@ You can fork, modify, improve this program. If you
 redistribute your new version, it MUST be open source.
 -----------------------------------------------------------*/
 #include "OpenKeyManager.h"
+#include <shlobj.h>
 
 static vector<LPCTSTR> _inputType = {
 	_T("Telex"),
@@ -67,10 +68,37 @@ bool OpenKeyManager::checkUpdate(string& newVersion) {
 	string versionCodeString = data.substr(0, data.find("}"));
 	DWORD versionCode = (DWORD)atoi(versionCodeString.c_str());
 	DWORD currentVersion = OpenKeyHelper::getVersionNumber();
-	if ((versionCode & 0xFF) > (currentVersion & 0xFF) ||
-		(versionCode>>8 & 0xFF) > (currentVersion>>8 & 0xFF) ||
-		(versionCode>>16 & 0xFF) > (currentVersion>>16 & 0xFF)) {
+	versionCode = (versionCode << 24) | (versionCode & 0x00FF00) | (versionCode >> 24 & 0xFF);
+	currentVersion = (currentVersion << 24) | (currentVersion & 0x00FF00) | (currentVersion >> 24 & 0xFF);
+	if (versionCode > currentVersion) {
 		return true;
 	}
 	return false;
+}
+
+void OpenKeyManager::createDesktopShortcut() {
+	CoInitialize(NULL);
+	IShellLink* pShellLink = NULL;
+	HRESULT hres;
+	hres = CoCreateInstance(CLSID_ShellLink, NULL, CLSCTX_ALL,
+							IID_IShellLink, (void**)&pShellLink);
+	if (SUCCEEDED(hres)) {
+		wstring path = OpenKeyHelper::getFullPath();
+		pShellLink->SetPath(path.c_str());
+		pShellLink->SetDescription(_T("OpenKey - Bộ gõ Tiếng Việt"));
+		pShellLink->SetIconLocation(path.c_str(), 0);
+
+		IPersistFile* pPersistFile;
+		hres = pShellLink->QueryInterface(IID_IPersistFile, (void**)&pPersistFile);
+
+		if (SUCCEEDED(hres)) {
+			wchar_t desktopPath[MAX_PATH + 1];
+			wchar_t savePath[MAX_PATH + 10];
+			SHGetFolderPath(NULL, CSIDL_DESKTOP, NULL, 0, desktopPath);
+			wsprintf(savePath, _T("%s\\OpenKey.lnk"), desktopPath);
+			hres = pPersistFile->Save(savePath, TRUE);
+			pPersistFile->Release();
+			pShellLink->Release();
+		}
+	}
 }
