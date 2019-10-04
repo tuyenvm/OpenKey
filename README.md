@@ -93,5 +93,8 @@ OpenKey cần cấp quyền, vào *System Preferences -> Security & Privacy -> A
 ## Một điều nhỏ nhoi
 Đừng quên ủng hộ tác giả bằng cách mua ly cafe cho tác giả tỉnh ngủ nhé:  
 [Buy me a coffee ^^](https://tuyenvm.github.io/donate.html)  
-[hoặc Redbull cũng được ^^](https://paypal.me/tuyenmai)  
+[Redbull cũng được ^^](https://paypal.me/tuyenmai)  
+Hoặc trực tiếp qua ví momo:   
+![Donate by momo](https://tuyenvm.github.io/images/momo.png "Momo").   
+
 Cảm ơn các bạn rất nhiều.
