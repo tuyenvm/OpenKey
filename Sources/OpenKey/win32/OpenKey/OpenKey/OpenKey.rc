@@ -269,7 +269,7 @@ BEGIN
                     "SysLink",WS_TABSTOP,81,29,184,10
     LTEXT           "OpenKey cho Windows là phần mềm mã nguồn mở và được phát hành miễn phí. Bạn hoàn toàn có thể đóng góp ý kiến, yêu cầu tính năng mới qua email của tác giả hoặc trên github.",IDC_STATIC_APP_SUB_TITLE5,39,61,234,28
     LTEXT           "Mai Vũ Tuyên © 2019 - ",IDC_STATIC_APP_SUB_TITLE6,39,94,78,8
-    CONTROL         "<a>maivutuyen@gmail.com</a>",IDC_SYSLINK_AUTHOR_EMAIL,
+    CONTROL         "<a>maivutuyen.91@gmail.com</a>",IDC_SYSLINK_AUTHOR_EMAIL,
                     "SysLink",WS_TABSTOP,117,94,101,10
     LTEXT           "Phien ban",IDC_STATIC_APP_VERSION_INFO,39,50,227,8
     PUSHBUTTON      "Mã nguồn...",IDC_BUTTON_GO_SOURCE_CODE,226,91,50,14
