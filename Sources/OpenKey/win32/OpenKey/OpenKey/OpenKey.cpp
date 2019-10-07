@@ -152,7 +152,7 @@ void OpenKeyInit() {
 	//init hook
 	HINSTANCE hInstance = GetModuleHandle(NULL);
 	hKeyboardHook = SetWindowsHookEx(WH_KEYBOARD_LL, keyboardHookProcess, hInstance, 0);
-	//hMouseHook = SetWindowsHookEx(WH_MOUSE_LL, mouseHookProcess, hInstance, 0);
+	hMouseHook = SetWindowsHookEx(WH_MOUSE_LL, mouseHookProcess, hInstance, 0);
 	hSystemEvent = SetWinEventHook(EVENT_SYSTEM_FOREGROUND, EVENT_SYSTEM_FOREGROUND, NULL, winEventProcCallback, 0, 0, WINEVENT_OUTOFCONTEXT | WINEVENT_SKIPOWNPROCESS);
 }
 
@@ -253,11 +253,14 @@ static void SendKeyCode(Uint32 data) {
 			}
 		}
 	}
+
+	if (vSupportMetroApp && OpenKeyHelper::getLastAppExecuteName().compare("ApplicationFrameHost.exe") == 0) //Metro App
+		Sleep(5);
 }
 
 static void SendBackspace() {
 	SendInput(2, backspaceEvent, sizeof(INPUT));
-	if (OpenKeyHelper::getLastAppExecuteName().compare("ApplicationFrameHost.exe") == 0) //Metro App
+	if (vSupportMetroApp && OpenKeyHelper::getLastAppExecuteName().compare("ApplicationFrameHost.exe") == 0) //Metro App
 		Sleep(5);
 	if (IS_DOUBLE_CODE(vCodeTable)) { //VNI or Unicode Compound
 		if (_syncKey.back() > 1) {
@@ -279,6 +282,9 @@ static void SendEmptyCharacter() {
 	prepareUnicodeEvent(keyEvent[0], _newChar, true);
 	prepareUnicodeEvent(keyEvent[1], _newChar, false);
 	SendInput(2, keyEvent, sizeof(INPUT));
+
+	if (vSupportMetroApp && OpenKeyHelper::getLastAppExecuteName().compare("ApplicationFrameHost.exe") == 0) //Metro App
+		Sleep(5);
 }
 
 static void SendNewCharString(const bool& dataFromMacro = false) {

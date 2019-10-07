@@ -64,7 +64,10 @@ void MainControlDialog::initDialog() {
 	TabCtrl_InsertItem(hTab, 2, &tci);
 	tci.pszText = (LPWSTR)_T("Thông tin");
 	TabCtrl_InsertItem(hTab, 3, &tci);
-	TabCtrl_SetItemSize(hTab, 200, 50);
+	RECT r;
+	TabCtrl_GetItemRect(hTab, 0, &r);
+	TabCtrl_SetItemSize(hTab, r.right - r.left, (r.bottom - r.top) * 1.428f);
+	
 	//create tab page
 	hTabPage1 = CreateDialogParam(hIns, MAKEINTRESOURCE(IDD_DIALOG_TAB_GENERAL), hDlg, tabPageEventProc, (LPARAM)this);
 	hTabPage2 = CreateDialogParam(hIns, MAKEINTRESOURCE(IDD_DIALOG_TAB_MACRO), hDlg, tabPageEventProc, (LPARAM)this);
@@ -75,7 +78,7 @@ void MainControlDialog::initDialog() {
 	POINT offset = { 0 };
 	ScreenToClient(hDlg, &offset);
 	OffsetRect(&rc, offset.x, offset.y); //convert to client coordinates
-	rc.top += 50;
+	rc.top += (LONG)((r.bottom - r.top) * 1.428f);
 	SetWindowPos(hTabPage1, 0, rc.left, rc.top, rc.right - rc.left, rc.bottom - rc.top, SWP_HIDEWINDOW);
 	SetWindowPos(hTabPage2, 0, rc.left, rc.top, rc.right - rc.left, rc.bottom - rc.top, SWP_HIDEWINDOW);
 	SetWindowPos(hTabPage3, 0, rc.left, rc.top, rc.right - rc.left, rc.bottom - rc.top, SWP_HIDEWINDOW);
