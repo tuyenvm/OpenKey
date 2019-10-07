@@ -12,6 +12,7 @@ You can fork, modify, improve this program. If you
 redistribute your new version, it MUST be open source.
 -----------------------------------------------------------*/
 #include "BaseDialog.h"
+static TCHAR tooltipBuff[1024];
 
 static INT_PTR CALLBACK DialogProc(HWND hDlg, UINT uMsg, WPARAM wParam, LPARAM lParam) {
 	if (uMsg == WM_INITDIALOG) {
@@ -32,6 +33,35 @@ static INT_PTR CALLBACK DialogProc(HWND hDlg, UINT uMsg, WPARAM wParam, LPARAM l
 		return ((BaseDialog*)attr)->eventProc(hDlg, uMsg, wParam, lParam);
 	}
 	return FALSE;
+}
+
+void BaseDialog::createToolTip(const HWND& control, LPCTSTR toolTipString) {
+	if (!control || !toolTipString)
+		return;
+
+	HWND tip = CreateWindowEx(NULL, TOOLTIPS_CLASS, NULL,
+		WS_POPUP | TTS_ALWAYSTIP  | TTS_BALLOON,
+		CW_USEDEFAULT, CW_USEDEFAULT, CW_USEDEFAULT, CW_USEDEFAULT,
+		hDlg, NULL, hInstance, NULL);
+
+	if (!tip)
+		return;
+
+	TOOLINFO toolInfo = { 0 };
+	toolInfo.cbSize = sizeof(toolInfo);
+	toolInfo.hwnd = hDlg;
+	toolInfo.uFlags = TTF_IDISHWND | TTF_SUBCLASS;
+	toolInfo.uId = (UINT_PTR)control;
+	toolInfo.lpszText = (LPTSTR)toolTipString;
+	if (!SendMessage(tip, TTM_ADDTOOL, 0, (LPARAM)&toolInfo)) {
+		
+	}
+	SendMessage(tip, TTM_SETMAXTIPWIDTH, 0, 300);
+}
+
+void BaseDialog::createToolTip(const HWND& control, const UINT& stringResId) {
+	LoadString(hInstance, stringResId, tooltipBuff, 1024);
+	createToolTip(control, tooltipBuff);
 }
 
 BaseDialog::BaseDialog(const HINSTANCE& hInstance, const int & resourceId) {

@@ -93,6 +93,10 @@ void OpenKeyInit() {
 	APP_GET_DATA(vTempOffSpelling, 0);
 	APP_GET_DATA(vQuickStartConsonant, 0);
 	APP_GET_DATA(vQuickEndConsonant, 0);
+	APP_GET_DATA(vSupportMetroApp, 0);
+	APP_GET_DATA(vRunAsAdmin, 0);
+	APP_GET_DATA(vCreateDesktopShortcut, 0);
+	APP_GET_DATA(vCheckNewVersion, 0);
 
 	//init convert tool
 	APP_GET_DATA(convertToolDontAlertWhenCompleted, 0);
@@ -249,11 +253,14 @@ static void SendKeyCode(Uint32 data) {
 			}
 		}
 	}
+
+	if (vSupportMetroApp && OpenKeyHelper::getLastAppExecuteName().compare("ApplicationFrameHost.exe") == 0) //Metro App
+		Sleep(5);
 }
 
 static void SendBackspace() {
 	SendInput(2, backspaceEvent, sizeof(INPUT));
-	if (OpenKeyHelper::getLastAppExecuteName().compare("ApplicationFrameHost.exe") == 0) //Metro App
+	if (vSupportMetroApp && OpenKeyHelper::getLastAppExecuteName().compare("ApplicationFrameHost.exe") == 0) //Metro App
 		Sleep(5);
 	if (IS_DOUBLE_CODE(vCodeTable)) { //VNI or Unicode Compound
 		if (_syncKey.back() > 1) {
@@ -275,6 +282,9 @@ static void SendEmptyCharacter() {
 	prepareUnicodeEvent(keyEvent[0], _newChar, true);
 	prepareUnicodeEvent(keyEvent[1], _newChar, false);
 	SendInput(2, keyEvent, sizeof(INPUT));
+
+	if (vSupportMetroApp && OpenKeyHelper::getLastAppExecuteName().compare("ApplicationFrameHost.exe") == 0) //Metro App
+		Sleep(5);
 }
 
 static void SendNewCharString(const bool& dataFromMacro = false) {
@@ -450,12 +460,12 @@ static bool SetModifierMask(const Uint16& vkCode) {
 }
 
 static bool UnsetModifierMask(const Uint16& vkCode) {
-	if (vkCode == VK_LSHIFT || vkCode == VK_RSHIFT) _flag ^= MASK_SHIFT;
-	else if (vkCode == VK_LCONTROL || vkCode == VK_RCONTROL) _flag ^= MASK_CONTROL;
-	else if (vkCode == VK_LMENU || vkCode == VK_RMENU) _flag ^= MASK_ALT;
-	else if (vkCode == VK_LWIN || vkCode == VK_RWIN) _flag ^= MASK_WIN;
-	else if (vkCode == VK_NUMLOCK) _flag ^= MASK_NUMLOCK;
-	else if (vkCode == VK_SCROLL) _flag ^= MASK_SCROLL;
+	if (vkCode == VK_LSHIFT || vkCode == VK_RSHIFT) _flag &= ~MASK_SHIFT;
+	else if (vkCode == VK_LCONTROL || vkCode == VK_RCONTROL) _flag &= ~MASK_CONTROL;
+	else if (vkCode == VK_LMENU || vkCode == VK_RMENU) _flag &= ~MASK_ALT;
+	else if (vkCode == VK_LWIN || vkCode == VK_RWIN) _flag &= ~MASK_WIN;
+	else if (vkCode == VK_NUMLOCK) _flag &= ~MASK_NUMLOCK;
+	else if (vkCode == VK_SCROLL) _flag &= ~MASK_SCROLL;
 	else { 
 		_isFlagKey = false;
 		return false; 

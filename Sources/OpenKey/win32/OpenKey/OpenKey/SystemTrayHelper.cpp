@@ -47,7 +47,7 @@ redistribute your new version, it MUST be open source.
 											menuData[COMMAND]);
 
 static HMENU popupMenu;
-static HMENU menuInputType;
+//static HMENU menuInputType;
 static HMENU otherCode;
 
 static NOTIFYICONDATA nid;
@@ -57,9 +57,9 @@ map<UINT, LPCTSTR> menuData = {
 	{POPUP_SPELLING, _T("Bật kiểm tra chính tả")},
 	{POPUP_SMART_SWITCH, _T("Bật loại trừ ứng dụng thông minh")},
 	{POPUP_USE_MACRO, _T("Bật gõ tắt")},
-	{POPUP_TELEX, _T("Telex")},
-	{POPUP_VNI, _T("VNI")},
-	{POPUP_SIMPLE_TELEX, _T("Simple Telex")},
+	{POPUP_TELEX, _T("Kiểu gõ Telex")},
+	{POPUP_VNI, _T("Kiểu gõ VNI")},
+	{POPUP_SIMPLE_TELEX, _T("Kiểu gõ Simple Telex")},
 	{POPUP_UNICODE, _T("Unicode dựng sẵn")},
 	{POPUP_TCVN3, _T("TCVN3 (ABC)")},
 	{POPUP_VNI_WINDOWS, _T("VNI Windows")},
@@ -200,12 +200,12 @@ void SystemTrayHelper::createPopupMenu() {
 	AppendMenu(popupMenu, MF_UNCHECKED, POPUP_QUICK_CONVERT, menuData[POPUP_QUICK_CONVERT]);
 	AppendMenu(popupMenu, MF_SEPARATOR, 0, 0);
 
-	menuInputType = CreatePopupMenu();
-	AppendMenu(menuInputType, MF_CHECKED, POPUP_TELEX, menuData[POPUP_TELEX]);
-	AppendMenu(menuInputType, MF_CHECKED, POPUP_VNI, menuData[POPUP_VNI]);
-	AppendMenu(menuInputType, MF_CHECKED, POPUP_SIMPLE_TELEX, menuData[POPUP_SIMPLE_TELEX]);
+	//menuInputType = CreatePopupMenu();
+	AppendMenu(popupMenu, MF_CHECKED, POPUP_TELEX, menuData[POPUP_TELEX]);
+	AppendMenu(popupMenu, MF_CHECKED, POPUP_VNI, menuData[POPUP_VNI]);
+	AppendMenu(popupMenu, MF_CHECKED, POPUP_SIMPLE_TELEX, menuData[POPUP_SIMPLE_TELEX]);
 
-	AppendMenu(popupMenu, MF_POPUP, (UINT_PTR)menuInputType, _T("Kiểu gõ"));
+	//AppendMenu(popupMenu, MF_POPUP, (UINT_PTR)menuInputType, _T("Kiểu gõ"));
 	AppendMenu(popupMenu, MF_SEPARATOR, 0, 0);
 
 	AppendMenu(popupMenu, MF_UNCHECKED, POPUP_UNICODE, menuData[POPUP_UNICODE]);
@@ -219,7 +219,6 @@ void SystemTrayHelper::createPopupMenu() {
 
 	AppendMenu(popupMenu, MF_SEPARATOR, 0, 0);
 
-	AppendMenu(popupMenu, MF_SEPARATOR, 0, 0);
 	AppendMenu(popupMenu, MF_STRING, POPUP_CONTROL_PANEL, menuData[POPUP_CONTROL_PANEL]);
 	AppendMenu(popupMenu, MF_UNCHECKED, POPUP_ABOUT_OPENKEY, menuData[POPUP_ABOUT_OPENKEY]);
 	AppendMenu(popupMenu, MF_SEPARATOR, 0, 0);
@@ -249,9 +248,9 @@ void SystemTrayHelper::updateData() {
 	MODIFY_MENU(popupMenu, POPUP_SPELLING, vCheckSpelling);
 	MODIFY_MENU(popupMenu, POPUP_SMART_SWITCH, vUseSmartSwitchKey);
 	MODIFY_MENU(popupMenu, POPUP_USE_MACRO, vUseMacro);
-	MODIFY_MENU(menuInputType, POPUP_TELEX, vInputType == 0);
-	MODIFY_MENU(menuInputType, POPUP_VNI, vInputType == 1);
-	MODIFY_MENU(menuInputType, POPUP_SIMPLE_TELEX, vInputType == 2);
+	MODIFY_MENU(popupMenu, POPUP_TELEX, vInputType == 0);
+	MODIFY_MENU(popupMenu, POPUP_VNI, vInputType == 1);
+	MODIFY_MENU(popupMenu, POPUP_SIMPLE_TELEX, vInputType == 2);
 	MODIFY_MENU(popupMenu, POPUP_UNICODE, vCodeTable == 0);
 	MODIFY_MENU(popupMenu, POPUP_TCVN3, vCodeTable == 1);
 	MODIFY_MENU(popupMenu, POPUP_VNI_WINDOWS, vCodeTable == 2);

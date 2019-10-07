@@ -34,6 +34,7 @@ static TCHAR _exePath[1024] = { 0 };
 static LPCTSTR _exeName = _exePath;
 static HANDLE _proc;
 static string _exeNameUtf8 = "TheOpenKeyProject";
+static string _unknownProgram = "UnknownProgram";
 
 int CF_RTF = RegisterClipboardFormat(_T("Rich Text Format"));
 int CF_HTML = RegisterClipboardFormat(_T("HTML Format"));
@@ -92,11 +93,21 @@ BYTE * OpenKeyHelper::getRegBinary(LPCTSTR key, DWORD& outSize) {
 
 void OpenKeyHelper::registerRunOnStartup(const int& val) {
 	if (val) {
-		string path = wideStringToUtf8(getFullPath());
-		char buff[MAX_PATH];
-		sprintf_s(buff, "schtasks /create /sc onlogon /tn OpenKey /rl highest /tr \"%s\" /f", path.c_str());
-		WinExec(buff, SW_HIDE);
+		if (vRunAsAdmin) {
+			string path = wideStringToUtf8(getFullPath());
+			char buff[MAX_PATH];
+			sprintf_s(buff, "schtasks /create /sc onlogon /tn OpenKey /rl highest /tr \"%s\" /f", path.c_str());
+			WinExec(buff, SW_HIDE);
+		} else {
+			RegOpenKeyEx(HKEY_CURRENT_USER, _runOnStartupKeyPath, NULL, KEY_ALL_ACCESS, &hKey);
+			wstring path = getFullPath();
+			RegSetValueEx(hKey, _T("OpenKey"), 0, REG_SZ, (byte*)path.c_str(), ((DWORD)path.size() + 1) * sizeof(TCHAR));
+			RegCloseKey(hKey);
+		}
 	} else {
+		RegOpenKeyEx(HKEY_CURRENT_USER, _runOnStartupKeyPath, NULL, KEY_ALL_ACCESS, &hKey);
+		RegDeleteValue(hKey, _T("OpenKey"));
+		RegCloseKey(hKey);
 		WinExec("schtasks /delete  /tn OpenKey /f", SW_HIDE);
 	}
 }
@@ -120,7 +131,10 @@ string& OpenKeyHelper::getFrontMostAppExecuteName() {
 	_proc = OpenProcess(PROCESS_QUERY_INFORMATION | PROCESS_VM_READ, FALSE, _tempProcessId);
 	GetProcessImageFileName((HMODULE)_proc, _exePath, 1024);
 	CloseHandle(_proc);
-
+	
+	if (wcscmp(_exePath, _T("")) == 0) {
+		return _unknownProgram;
+	}
 	_exeName = _tcsrchr(_exePath, '\\') + 1;
 
 	int size_needed = WideCharToMultiByte(CP_UTF8, 0, _exeName, (int)lstrlen(_exeName), NULL, 0, NULL, NULL);
