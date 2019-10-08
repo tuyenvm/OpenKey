@@ -94,6 +94,8 @@ int AppDelegate::run(HINSTANCE hInstance) {
 	//check app has already run or not
 	HWND previousInstance = FindWindow(APP_CLASS, NULL);
 	if (previousInstance) {
+		MessageBeep(MB_OK);
+		SendMessage(previousInstance, WM_USER + 2019, 0, 0);
 		PostQuitMessage(0);
 		return 0;
 	}

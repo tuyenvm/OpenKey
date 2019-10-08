@@ -75,6 +75,9 @@ map<UINT, LPCTSTR> menuData = {
 
 LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam) {
 	switch (message) {
+	case WM_USER+2019:
+		AppDelegate::getInstance()->onControlPanel();
+		break;
 	case WM_TRAYMESSAGE: {
 		if (lParam == WM_LBUTTONDBLCLK) {
 			AppDelegate::getInstance()->onControlPanel();

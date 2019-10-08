@@ -206,9 +206,18 @@ INT_PTR MainControlDialog::eventProc(HWND hDlg, UINT uMsg, WPARAM wParam, LPARAM
 		case IDBUTTON_EXIT:
 			AppDelegate::getInstance()->onOpenKeyExit();
 			break;
-		case ID_BTN_DEFAULT:
-			AppDelegate::getInstance()->onDefaultConfig();
+		case ID_BTN_DEFAULT: {
+			int msgboxID = MessageBox(
+				hDlg,
+				_T("Bạn có chắc chắn muốn thiết lập lại cài đặt gốc?"),
+				_T("OpenKey"),
+				MB_ICONEXCLAMATION | MB_YESNO
+			);
+			if (msgboxID == IDYES) {
+				AppDelegate::getInstance()->onDefaultConfig();
+			}
 			break;
+		}
 		case IDC_BUTTON_MACRO_TABLE:
 			AppDelegate::getInstance()->onMacroTable();
 			break;

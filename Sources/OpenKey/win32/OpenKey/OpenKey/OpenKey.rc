@@ -113,7 +113,7 @@ STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | DS_CENTER | WS_POPUP | WS_CAPTI
 CAPTION "OpenKey 1.4 - Bộ gõ Tiếng Việt"
 FONT 8, "MS Shell Dlg", 400, 0, 0x1
 BEGIN
-    PUSHBUTTON      "Mặc định",ID_BTN_DEFAULT,113,223,71,20
+    PUSHBUTTON      "Cài đặt gốc",ID_BTN_DEFAULT,113,223,71,20
     GROUPBOX        "Điều khiển",IDC_STATIC,7,7,283,73
     LTEXT           "Kiểu gõ:",IDC_STATIC,14,23,27,8
     COMBOBOX        IDC_COMBO_INPUT_TYPE,64,20,75,30,CBS_DROPDOWNLIST | WS_VSCROLL | WS_TABSTOP
@@ -129,8 +129,8 @@ BEGIN
     LTEXT           "Chế độ gõ:",IDC_STATIC,14,60,36,8
     CONTROL         "Tiếng Việt",IDC_RADIO_METHOD_VIETNAMESE,"Button",BS_AUTORADIOBUTTON,64,59,47,10
     CONTROL         "Tiếng Anh",IDC_RADIO_METHOD_ENGLISH,"Button",BS_AUTORADIOBUTTON,158,59,48,10
-    DEFPUSHBUTTON   "OK",IDBUTTON_OK,200,223,71,20
-    PUSHBUTTON      "Kết thúc",IDBUTTON_EXIT,26,223,71,20
+    DEFPUSHBUTTON   "Đóng",IDBUTTON_OK,200,223,71,20
+    PUSHBUTTON      "Tắt OpenKey",IDBUTTON_EXIT,26,223,71,20
     CONTROL         "",IDC_TAB_CONTROL,"SysTabControl32",TCS_FIXEDWIDTH,7,89,283,127
 END
 
@@ -396,8 +396,8 @@ END
 //
 
 VS_VERSION_INFO VERSIONINFO
- FILEVERSION 2,0,0,0
- PRODUCTVERSION 2,0,0,0
+ FILEVERSION 2,0,1,0
+ PRODUCTVERSION 2,0,1,0
  FILEFLAGSMASK 0x3fL
 #ifdef _DEBUG
  FILEFLAGS 0x1L
@@ -414,12 +414,12 @@ BEGIN
         BEGIN
             VALUE "CompanyName", "The OpenKey Project"
             VALUE "FileDescription", "OpenKey - Bộ gõ Tiếng Việt nguồn mở"
-            VALUE "FileVersion", "2.0.0.0"
+            VALUE "FileVersion", "2.0.1.0"
             VALUE "InternalName", "OpenKey.exe"
             VALUE "LegalCopyright", "Copyright (C) 2019 - Mai Vũ Tuyên"
             VALUE "OriginalFilename", "OpenKey.exe"
             VALUE "ProductName", "OpenKey"
-            VALUE "ProductVersion", "2.0.0.0"
+            VALUE "ProductVersion", "2.0.1.0"
         END
     END
     BLOCK "VarFileInfo"
