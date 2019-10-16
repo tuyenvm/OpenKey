@@ -165,6 +165,10 @@ extern bool convertToolDontAlertWhenCompleted;
     [appDelegate setRunOnStartup:val];
 }
 
+- (BOOL)applicationShouldHandleReopen:(NSApplication *)sender hasVisibleWindows:(BOOL)flag {
+    [self onControlPanelSelected];
+    return YES;
+}
 
 - (void)applicationWillTerminate:(NSNotification *)aNotification {
     // Insert code here to tear down your application
@@ -297,7 +301,7 @@ extern bool convertToolDontAlertWhenCompleted;
 }
 
 -(void)showIconOnDock:(BOOL)val {
-    [NSApp setActivationPolicy: val ? NSApplicationActivationPolicyRegular : NSApplicationActivationPolicyProhibited];
+    [NSApp setActivationPolicy: val ? NSApplicationActivationPolicyRegular : NSApplicationActivationPolicyAccessory];
 }
 
 #pragma mark -StatusBar menu data

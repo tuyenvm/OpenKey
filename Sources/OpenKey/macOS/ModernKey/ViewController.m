@@ -331,6 +331,9 @@ extern int vFixChromiumBrowser;
 - (IBAction)onShowIconOnDock:(id)sender {
     NSInteger val = [self setCustomValue:sender keyToSet:@"vShowIconOnDock"];
     vShowIconOnDock = (int)val;
+    if (!vShowIconOnDock) {
+        [self.view.window close];
+    }
     [appDelegate showIconOnDock:vShowIconOnDock];
 }
 
