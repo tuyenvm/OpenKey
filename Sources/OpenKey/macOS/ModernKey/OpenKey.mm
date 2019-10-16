@@ -25,6 +25,8 @@ extern ViewController* viewController;
 
 extern AppDelegate* appDelegate;
 extern int vSendKeyStepByStep;
+extern int vFixChromiumBrowser;
+
 extern "C" {
     //app which must sent special empty character
     NSArray* _niceSpaceApp = @[@"com.sublimetext.3",
@@ -33,7 +35,7 @@ extern "C" {
     
     //app which error with unicode Compound
     NSArray* _unicodeCompoundApp = @[@"com.apple.",
-                                     @"com.google.Chrome", @"com.brave.Browser", @"com.microsoft.Edge.Dev", @"com.microsoft.Edge"];
+                                     @"com.google.Chrome", @"com.brave.Browser", @"com.microsoft.Edge.Dev", @"com.microsoft.Edge", @"com.microsoft.edgemac.Dev"];
     
     CGEventSourceRef myEventSource = NULL;
     vKeyHookState* pData;
@@ -64,7 +66,7 @@ extern "C" {
     void OpenKeyInit() {
         //load saved data
         vFreeMark = 0;//(int)[[NSUserDefaults standardUserDefaults] integerForKey:@"FreeMark"];
-        LOAD_DATA(vCodeTable, CodeTable);
+        LOAD_DATA(vCodeTable, CodeTable); if (vCodeTable < 0) vCodeTable = 0;
         LOAD_DATA(vCheckSpelling, Spelling);
         LOAD_DATA(vQuickTelex, QuickTelex);
         LOAD_DATA(vUseModernOrthography, ModernOrthography);
@@ -81,6 +83,10 @@ extern "C" {
         LOAD_DATA(vAllowConsonantZFWJ, vAllowConsonantZFWJ);
         LOAD_DATA(vQuickEndConsonant, vQuickEndConsonant);
         LOAD_DATA(vQuickStartConsonant, vQuickStartConsonant);
+        LOAD_DATA(vRememberCode, vRememberCode);
+        LOAD_DATA(vTempOffOpenKey, vTempOffOpenKey);
+        
+        LOAD_DATA(vFixChromiumBrowser, vFixChromiumBrowser);
         
         myEventSource = CGEventSourceCreate(kCGEventSourceStatePrivate);
         pData = (vKeyHookState*)vKeyInit();
@@ -122,10 +128,12 @@ extern "C" {
     }
     
     void queryFrontMostApp() {
-        _frontMostApp = [[NSWorkspace sharedWorkspace] frontmostApplication].bundleIdentifier;
-        if (_frontMostApp == nil)
-            _frontMostApp = [[NSWorkspace sharedWorkspace] frontmostApplication].localizedName != nil ?
-            [[NSWorkspace sharedWorkspace] frontmostApplication].localizedName : @"UnknownApp";
+        if ([[[NSWorkspace sharedWorkspace] frontmostApplication].bundleIdentifier compare:OPENKEY_BUNDLE] != 0) {
+            _frontMostApp = [[NSWorkspace sharedWorkspace] frontmostApplication].bundleIdentifier;
+            if (_frontMostApp == nil)
+                _frontMostApp = [[NSWorkspace sharedWorkspace] frontmostApplication].localizedName != nil ?
+                [[NSWorkspace sharedWorkspace] frontmostApplication].localizedName : @"UnknownApp";
+        }
     }
     
     NSString* ConvertUtil(NSString* str) {
@@ -150,8 +158,8 @@ extern "C" {
     
     void OnActiveAppChanged() { //use for smart switch key; improved on Sep 28th, 2019
         queryFrontMostApp();
-        _languageTemp = getAppInputMethodStatus(string(_frontMostApp.UTF8String), vLanguage);
-        if (_languageTemp != vLanguage) {
+        _languageTemp = getAppInputMethodStatus(string(_frontMostApp.UTF8String), vLanguage | (vCodeTable << 1));
+        if ((_languageTemp & 0x01) != vLanguage) { //for input method
             if (_languageTemp != -1) {
                 vLanguage = _languageTemp;
                 [appDelegate onImputMethodChanged:NO];
@@ -160,16 +168,28 @@ extern "C" {
                 saveSmartSwitchKeyData();
             }
         }
+        if (vRememberCode && (_languageTemp >> 1) != vCodeTable) { //for remember table code feature
+            if (_languageTemp != -1) {
+                [appDelegate onCodeTableChanged:(_languageTemp >> 1)];
+            } else {
+                saveSmartSwitchKeyData();
+            }
+        }
     }
     
     void OnTableCodeChange() {
         onTableCodeChange();
+        if (vRememberCode) {
+            queryFrontMostApp();
+            setAppInputMethodStatus(string(_frontMostApp.UTF8String), vLanguage | (vCodeTable << 1));
+            saveSmartSwitchKeyData();
+        }
     }
     
     void OnInputMethodChanged() {
         if (vUseSmartSwitchKey) {
             queryFrontMostApp();
-            setAppInputMethodStatus(string(_frontMostApp.UTF8String), vLanguage);
+            setAppInputMethodStatus(string(_frontMostApp.UTF8String), vLanguage | (vCodeTable << 1));
             saveSmartSwitchKeyData();
         }
     }
@@ -312,6 +332,21 @@ extern "C" {
             }
             _syncKey.pop_back();
         }
+        CFRelease(eventVkeyDown);
+        CFRelease(eventVkeyUp);
+    }
+    
+    void SendCutKey() {
+        CGEventRef eventVkeyDown = CGEventCreateKeyboardEvent (myEventSource, KEY_X, true);
+        CGEventRef eventVkeyUp = CGEventCreateKeyboardEvent (myEventSource, KEY_X, false);
+        _privateFlag = CGEventGetFlags(eventVkeyDown);
+        _privateFlag |= NX_COMMANDMASK;
+        CGEventSetFlags(eventVkeyDown, _privateFlag);
+        CGEventSetFlags(eventVkeyUp, _privateFlag);
+        
+        CGEventTapPostEvent(_proxy, eventVkeyDown);
+        CGEventTapPostEvent(_proxy, eventVkeyUp);
+        
         CFRelease(eventVkeyDown);
         CFRelease(eventVkeyUp);
     }
@@ -498,6 +533,9 @@ extern "C" {
                 if (vTempOffSpelling && _lastFlag & kCGEventFlagMaskControl) {
                     vTempOffSpellChecking();
                 }
+                if (vTempOffOpenKey && _lastFlag & kCGEventFlagMaskCommand) {
+                    vTempOffEngine();
+                }
                 //check switch
                 if (checkHotKey(vSwitchKeyStatus, GET_SWITCH_KEY(vSwitchKeyStatus) != 0xFE)) {
                     _lastFlag = 0;
@@ -574,8 +612,17 @@ extern "C" {
                 
                 //fix autocomplete
                 if (vFixRecommendBrowser && pData->extCode != 4) {
-                    SendEmptyCharacter();
-                    pData->backspaceCount++;
+                    if (vFixChromiumBrowser && [_unicodeCompoundApp containsObject:FRONT_APP]) {
+                        if (pData->backspaceCount > 0) {
+                            SendShiftAndLeftArrow();
+                            if (pData->backspaceCount == 1)
+                                pData->backspaceCount--;
+                        }
+                    } else {
+                        SendEmptyCharacter();
+                        pData->backspaceCount++;
+                    
+                    }
                 }
                 
                 //send backspace

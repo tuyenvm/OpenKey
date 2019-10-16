@@ -25,7 +25,7 @@ typedef void (^CheckNewVersionCallback)(void);
 
 +(BOOL)quickConvert;
 
-+(void)checkNewVersion:(CheckNewVersionCallback) callback;
++(void)checkNewVersion:(NSWindow*)parent callbackFunc:(CheckNewVersionCallback) callback;
 @end
 
 #endif /* OpenKeyManager_h */

@@ -112,6 +112,7 @@ static bool _isCharKeyCode;
 static vector<Uint32> _specialChar;
 static bool _useSpellCheckingBefore;
 static bool _hasHandleQuickConsonant;
+static bool _willTempOffEngine = false;
 
 //function prototype
 void findAndCalculateVowel(const bool& forGrammar=false);
@@ -1216,6 +1217,10 @@ void vSetCheckSpelling() {
     _useSpellCheckingBefore = vCheckSpelling;
 }
 
+void vTempOffEngine() {
+    _willTempOffEngine = true;
+}
+
 bool checkQuickConsonant() {
     if (_index <= 1) return false;
     l = 0;
@@ -1267,22 +1272,28 @@ void vEnglishMode(const vKeyEventState& state, const Uint16& data, const bool& i
     hCode = vDoNothing;
     if (state == vKeyEventState::MouseDown || (otherControlKey && !isCaps)) {
         hMacroKey.clear();
+        _willTempOffEngine = false;
     } else if (data == KEY_SPACE) {
         if (!_hasHandledMacro && findMacro(hMacroKey, hMacroData)) {
             hCode = vReplaceMaro;
             hBPC = (Byte)hMacroKey.size();
         }
         hMacroKey.clear();
+        _willTempOffEngine = false;
     } else if (data == KEY_DELETE) {
         if (hMacroKey.size() > 0) {
             hMacroKey.pop_back();
+        } else {
+            _willTempOffEngine = false;
         }
     } else {
         if (isWordBreak(vKeyEvent::Keyboard, state, data) &&
             std::find(_charKeyCode.begin(), _charKeyCode.end(), data) == _charKeyCode.end()) {
             hMacroKey.clear();
+            _willTempOffEngine = false;
         } else {
-            hMacroKey.push_back(data | (isCaps ? CAPS_MASK : 0));
+            if (!_willTempOffEngine)
+                hMacroKey.push_back(data | (isCaps ? CAPS_MASK : 0));
         }
     }
 }
@@ -1335,6 +1346,7 @@ void vKeyHandleEvent(const vKeyEvent& event,
         if (hCode == vDoNothing) {
             startNewSession();
             vCheckSpelling = _useSpellCheckingBefore;
+            _willTempOffEngine = false;
         } else if (hCode == vReplaceMaro || _hasHandleQuickConsonant) {
             _index = 0;
         }
@@ -1391,6 +1403,7 @@ void vKeyHandleEvent(const vKeyEvent& event,
             }
         }
         vCheckSpelling = _useSpellCheckingBefore;
+        _willTempOffEngine = false;
     } else if (data == KEY_DELETE) {
         hCode = vDoNothing;
         hExt = 2; //delete
@@ -1438,6 +1451,11 @@ void vKeyHandleEvent(const vKeyEvent& event,
             }
         }
     } else { //START AND CHECK KEY
+        if (_willTempOffEngine) {
+            hCode = vDoNothing;
+            hExt = 3;
+            return;
+        }
         if (_spaceCount > 0) {
             hBPC = 0;
             hNCC = 0;

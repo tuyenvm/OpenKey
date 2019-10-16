@@ -41,12 +41,7 @@
 }
 
 - (IBAction)onCheckUpdateOnStartup:(NSButton *)sender {
-    NSInteger val = 0;
-    if (sender.state == NSControlStateValueOn) {
-        val = 0;
-    } else {
-        val = 1;
-    }
+    NSInteger val = sender.state == NSControlStateValueOn ? 0 : 1;
     [[NSUserDefaults standardUserDefaults] setInteger:val forKey:@"DontCheckUpdate"];
 }
 
@@ -55,7 +50,7 @@
     self.CheckNewVersionButton.title = @"Đang kiểm tra...";
     self.CheckNewVersionButton.enabled = false;
     
-    [OpenKeyManager checkNewVersion:^{
+    [OpenKeyManager checkNewVersion: self.view.window callbackFunc:^{
         self.CheckNewVersionButton.enabled = true;
         self.CheckNewVersionButton.title = @"Kiểm tra bản mới...";
     }];

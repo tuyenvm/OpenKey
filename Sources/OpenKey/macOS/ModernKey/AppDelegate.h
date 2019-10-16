@@ -9,6 +9,8 @@
 #import <Cocoa/Cocoa.h>
 #import "ViewController.h"
 
+#define OPENKEY_BUNDLE @"com.tuyenmai.openkey"
+
 @interface AppDelegate : NSObject <NSApplicationDelegate>
 
 -(void)onImputMethodChanged:(BOOL)willNotify;
@@ -27,5 +29,7 @@
 -(void)onMacroSelected;
 -(void)onQuickConvert;
 -(void)setQuickConvertString;
+
+-(void)showIconOnDock:(BOOL)val;
 @end
 

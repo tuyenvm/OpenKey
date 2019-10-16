@@ -151,7 +151,7 @@ static CFRunLoopSourceRef runLoopSource;
 
 #pragma mark -AutoUpdate feature
 
-+(void)checkNewVersion:(CheckNewVersionCallback) callback {
++(void)checkNewVersion:(NSWindow*)parent callbackFunc:(CheckNewVersionCallback) callback {
     //load new version config
     NSURLSession *aSession = [NSURLSession sessionWithConfiguration:[NSURLSessionConfiguration defaultSessionConfiguration]];
     [[aSession dataTaskWithURL:[NSURL URLWithString:@"https://raw.githubusercontent.com/tuyenvm/OpenKey/master/version.json"] completionHandler:^(NSData *data, NSURLResponse *response, NSError *error) {
@@ -177,7 +177,7 @@ static CFRunLoopSourceRef runLoopSource;
                                 callback();
                             }
                             if (versionCode > currentVersionCode || callback != nil) {
-                                [self showUpdateMessage:versionCode > currentVersionCode newVersion:[ver valueForKey:@"versionName"]];
+                                [self showUpdateMessage:parent needUpdating:versionCode > currentVersionCode newVersion:[ver valueForKey:@"versionName"]];
                             }
                         });
                     }
@@ -193,7 +193,7 @@ static CFRunLoopSourceRef runLoopSource;
     }] resume];
 }
 
-+(void)showUpdateMessage:(BOOL)needUpdating newVersion:(NSString*)versionString {
++(void)showUpdateMessage:(NSWindow*)parent needUpdating:(BOOL)needUpdating newVersion:(NSString*)versionString {
     NSAlert *alert = [[NSAlert alloc] init];
     [alert setMessageText:(needUpdating ? [NSString stringWithFormat:@"OpenKey Có phiên bản mới (%@), bạn có muốn cập nhật không?", versionString] : @"Bạn đang dùng phiên bản mới nhất!")];
     [alert setInformativeText:(needUpdating ? @"Bấm 'Có' để cập nhật OpenKey." : @"")];
@@ -204,14 +204,19 @@ static CFRunLoopSourceRef runLoopSource;
         [alert addButtonWithTitle:@"Có"];
         [alert addButtonWithTitle:@"Không"];
     }
-    
-    [alert.window makeKeyAndOrderFront:nil];
-    [alert.window setLevel:NSStatusWindowLevel];
-    
-    NSModalResponse res = [alert runModal];
-    
-    if (res == 1000 && needUpdating) {
-        [self launchUpdateHelper];
+    if (parent == nil) {
+        [alert.window makeKeyAndOrderFront:nil];
+        [alert.window setLevel:NSStatusWindowLevel];
+        NSModalResponse res = [alert runModal];
+        if (res == 1000 && needUpdating) {
+            [self launchUpdateHelper];
+        }
+    } else {
+        [alert beginSheetModalForWindow:parent completionHandler:^(NSModalResponse returnCode) {
+            if (returnCode == 1000 && needUpdating) {
+                [self launchUpdateHelper];
+            }
+        }];
     }
 }
 

@@ -44,6 +44,13 @@ int vTempOffSpelling = 0;
 int vAllowConsonantZFWJ = 0;
 int vQuickStartConsonant = 0;
 int vQuickEndConsonant = 0;
+int vRememberCode = 1; //new on version 2.0
+int vTempOffOpenKey = 0; //new on version 2.0
+
+int vShowIconOnDock = 0; //new on version 2.0
+
+//beta feature
+int vFixChromiumBrowser = 0; //new on version 2.0
 
 extern int convertToolHotKey;
 extern bool convertToolDontAlertWhenCompleted;
@@ -103,9 +110,13 @@ extern bool convertToolDontAlertWhenCompleted;
     
     [self registerSupportedNotification];
     
+    //set quick tooltip
+    [[NSUserDefaults standardUserDefaults] setObject: [NSNumber numberWithInt: 50]
+                                              forKey: @"NSInitialToolTipDelay"];
+    
     //check whether this app has been launched before that or not
     NSArray* runningApp = [[NSWorkspace sharedWorkspace] runningApplications];
-    if ([runningApp containsObject:@"com.tuyenmai.openkey"]) { //if already running -> exit
+    if ([runningApp containsObject:OPENKEY_BUNDLE]) { //if already running -> exit
         [NSApp terminate:nil];
         return;
     }
@@ -115,8 +126,10 @@ extern bool convertToolDontAlertWhenCompleted;
         [self askPermission];
         return;
     }
-
-    //[NSApp setActivationPolicy: NSApplicationActivationPolicyProhibited];
+    
+    vShowIconOnDock = (int)[[NSUserDefaults standardUserDefaults] integerForKey:@"vShowIconOnDock"];
+    if (vShowIconOnDock)
+        [NSApp setActivationPolicy: NSApplicationActivationPolicyRegular];
     
     if (vSwitchKeyStatus & 0x8000)
         NSBeep();
@@ -145,7 +158,11 @@ extern bool convertToolDontAlertWhenCompleted;
     //check update if enable
     NSInteger dontCheckUpdate = [[NSUserDefaults standardUserDefaults] integerForKey:@"DontCheckUpdate"];
     if (!dontCheckUpdate)
-        [OpenKeyManager checkNewVersion:nil];
+        [OpenKeyManager checkNewVersion:nil callbackFunc:nil];
+    
+    //correct run on startup
+    NSInteger val = [[NSUserDefaults standardUserDefaults] integerForKey:@"RunOnStartup"];
+    [appDelegate setRunOnStartup:val];
 }
 
 
@@ -248,7 +265,7 @@ extern bool convertToolDontAlertWhenCompleted;
     vCodeTable = 0; [[NSUserDefaults standardUserDefaults] setInteger:vCodeTable forKey:@"CodeTable"];
     vSwitchKeyStatus = DEFAULT_SWITCH_STATUS; [[NSUserDefaults standardUserDefaults] setInteger:vCodeTable forKey:@"SwitchKeyStatus"];
     vQuickTelex = 0; [[NSUserDefaults standardUserDefaults] setInteger:vQuickTelex forKey:@"QuickTelex"];
-    vUseModernOrthography = 1; [[NSUserDefaults standardUserDefaults] setInteger:vUseModernOrthography forKey:@"ModernOrthography"];
+    vUseModernOrthography = 0; [[NSUserDefaults standardUserDefaults] setInteger:vUseModernOrthography forKey:@"ModernOrthography"];
     vRestoreIfWrongSpelling = 0; [[NSUserDefaults standardUserDefaults] setInteger:vRestoreIfWrongSpelling forKey:@"RestoreIfInvalidWord"];
     vFixRecommendBrowser = 1; [[NSUserDefaults standardUserDefaults] setInteger:vFixRecommendBrowser forKey:@"FixRecommendBrowser"];
     vUseMacro = 1; [[NSUserDefaults standardUserDefaults] setInteger:vUseMacro forKey:@"UseMacro"];
@@ -260,6 +277,11 @@ extern bool convertToolDontAlertWhenCompleted;
     vAllowConsonantZFWJ = 0;[[NSUserDefaults standardUserDefaults] setInteger:vAllowConsonantZFWJ forKey:@"vAllowConsonantZFWJ"];
     vQuickStartConsonant = 0;[[NSUserDefaults standardUserDefaults] setInteger:vQuickStartConsonant forKey:@"vQuickStartConsonant"];
     vQuickEndConsonant = 0;[[NSUserDefaults standardUserDefaults] setInteger:vQuickEndConsonant forKey:@"vQuickEndConsonant"];
+    vRememberCode = 1;[[NSUserDefaults standardUserDefaults] setInteger:vRememberCode forKey:@"vRememberCode"];
+    vTempOffOpenKey = 0;[[NSUserDefaults standardUserDefaults] setInteger:vTempOffOpenKey forKey:@"vTempOffOpenKey"];
+    vShowIconOnDock = 0;[[NSUserDefaults standardUserDefaults] setInteger:vShowIconOnDock forKey:@"vShowIconOnDock"];
+    vFixChromiumBrowser = 0;[[NSUserDefaults standardUserDefaults] setInteger:vFixChromiumBrowser forKey:@"vFixChromiumBrowser"];
+    [[NSUserDefaults standardUserDefaults] setInteger:1 forKey:@"RunOnStartup"];
     
     [self fillData];
     [viewController fillData];
@@ -273,6 +295,11 @@ extern bool convertToolDontAlertWhenCompleted;
 -(void)setGrayIcon:(BOOL)val {
     [self fillData];
 }
+
+-(void)showIconOnDock:(BOOL)val {
+    [NSApp setActivationPolicy: val ? NSApplicationActivationPolicyRegular : NSApplicationActivationPolicyProhibited];
+}
+
 #pragma mark -StatusBar menu data
 
 - (void)setInputTypeMenu:(NSMenuItem*) parent {

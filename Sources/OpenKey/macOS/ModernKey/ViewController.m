@@ -31,6 +31,11 @@ extern int vTempOffSpelling;
 extern int vAllowConsonantZFWJ;
 extern int vQuickStartConsonant;
 extern int vQuickEndConsonant;
+extern int vRememberCode;
+extern int vTempOffOpenKey;
+extern int vShowIconOnDock;
+extern int vAutoCapsMacro;
+extern int vFixChromiumBrowser;
 
 @implementation ViewController {
     __weak IBOutlet NSButton *CustomSwitchCommand;
@@ -39,6 +44,8 @@ extern int vQuickEndConsonant;
     __weak IBOutlet NSButton *CustomSwitchShift;
     __weak IBOutlet MyTextField *CustomSwitchKey;
     __weak IBOutlet NSButton *CustomBeepSound;
+    NSArray* tabviews, *tabbuttons;
+    NSRect tabViewRect;
 }
 
 - (void)viewDidLoad {
@@ -50,6 +57,20 @@ extern int vQuickEndConsonant;
     self.permissionWarning.hidden = YES;
     self.retryButton.enabled = NO;
  
+    NSRect parentRect = self.viewParent.frame;
+    parentRect.size.height = 490;
+    self.viewParent.frame = parentRect;
+    
+    //set correct tabgroup
+    tabviews = [NSArray arrayWithObjects:self.tabviewPrimary, self.tabviewMacro, self.tabviewSystem, self.tabviewInfo, nil];
+    tabbuttons = [NSArray arrayWithObjects:self.tabbuttonPrimary, self.tabbuttonMacro, self.tabbuttonSystem, self.tabbuttonInfo, nil];
+    tabViewRect = self.tabviewPrimary.frame;
+    for (NSBox* b in tabviews) {
+        b.frame = tabViewRect;
+    }
+    
+    [self showTab:0];
+    
     NSArray* inputTypeData = [[NSArray alloc] initWithObjects:@"Telex", @"VNI", @"Simple Telex", nil];
     NSArray* codeData = [OpenKeyManager getTableCodes];
     
@@ -63,6 +84,12 @@ extern int vQuickEndConsonant;
     [self initKey];
     
     [self fillData];
+    
+    // set version info
+    self.VersionInfo.stringValue = [NSString stringWithFormat:@"Phiên bản %@ (build %@) - Ngày cập nhật %@",
+    [[NSBundle mainBundle] objectForInfoDictionaryKey: @"CFBundleShortVersionString"],
+    [[NSBundle mainBundle] objectForInfoDictionaryKey: @"CFBundleVersion"],
+    [OpenKeyManager getBuildDate]] ;
 }
 
 - (void)viewDidAppear {
@@ -92,6 +119,27 @@ extern int vQuickEndConsonant;
     // Update the view, if already loaded.
 }
 
+-(void)showTab:(NSInteger)index {
+    NSRect tempRect = tabViewRect;
+    tempRect.origin.y = 1000;
+    for (NSBox* b in tabviews) {
+        [b setHidden:YES];
+        b.frame = tempRect;
+    }
+    for (NSButton* b in tabbuttons) {
+        [b setState:NSControlStateValueOff];
+    }
+    NSBox* b = [tabviews objectAtIndex:index];
+    [b setHidden:NO];
+    b.frame = tabViewRect;
+    
+    NSButton* button = [tabbuttons objectAtIndex:index];
+    [button setState:NSControlStateValueOn];
+}
+
+- (IBAction)onTabButton:(NSButton *)sender {
+    [self showTab:sender.tag];
+}
 
 - (IBAction)onInputTypeChanged:(NSPopUpButton *)sender {
     [appDelegate onInputTypeSelectedIndex:(int)[self.popupInputType indexOfSelectedItem]];
@@ -169,6 +217,7 @@ extern int vQuickEndConsonant;
 - (IBAction)onFixRecommendBrowser:(id)sender {
     NSInteger val = [self setCustomValue:sender keyToSet:@"FixRecommendBrowser"];
     vFixRecommendBrowser = (int)val;
+    [self.FixChromiumBrowser setEnabled:val];
 }
 
 - (IBAction)onControlSwitchKey:(NSButton *)sender {
@@ -264,11 +313,44 @@ extern int vQuickEndConsonant;
     vQuickEndConsonant = (int)val;
 }
 
+- (IBAction)onTempOffOpenKeyByHotKey:(id)sender {
+    NSInteger val = [self setCustomValue:sender keyToSet:@"vTempOffOpenKey"];
+    vTempOffOpenKey = (int)val;
+}
+
+- (IBAction)onRememberTableCode:(id)sender {
+    NSInteger val = [self setCustomValue:sender keyToSet:@"vRememberCode"];
+    vRememberCode = (int)val;
+}
+
+- (IBAction)onAutoCapsMacro:(id)sender {
+    NSInteger val = [self setCustomValue:sender keyToSet:@"vAutoCapsMacro"];
+    vAutoCapsMacro = (int)val;
+}
+
+- (IBAction)onShowIconOnDock:(id)sender {
+    NSInteger val = [self setCustomValue:sender keyToSet:@"vShowIconOnDock"];
+    vShowIconOnDock = (int)val;
+    [appDelegate showIconOnDock:vShowIconOnDock];
+}
+
+- (IBAction)onCheckNewVersionOnStartup:(NSButton *)sender {
+    NSInteger val = sender.state == NSControlStateValueOn ? 0 : 1;
+    [[NSUserDefaults standardUserDefaults] setInteger:val forKey:@"DontCheckUpdate"];
+}
+
+- (IBAction)onFixChromiumBrowser:(NSButton *)sender {
+    NSInteger val = [self setCustomValue:sender keyToSet:@"vFixChromiumBrowser"];
+    vFixChromiumBrowser = (int)val;
+}
+
 - (IBAction)onTerminateApp:(id)sender {
     [NSApp terminate:0];
 }
 
 -(void)fillData {
+    NSInteger value;
+    
     NSInteger intInputMethod = [[NSUserDefaults standardUserDefaults] integerForKey:@"InputMethod"];
     if (intInputMethod == 1) {
         self.VietButton.state = NSControlStateValueOn;
@@ -340,6 +422,25 @@ extern int vQuickEndConsonant;
     NSInteger quickEndConsonant = [[NSUserDefaults standardUserDefaults] integerForKey:@"vQuickEndConsonant"];
     self.QuickEndConsonant.state = quickEndConsonant ? NSControlStateValueOn : NSControlStateValueOff;
     
+    value = [[NSUserDefaults standardUserDefaults] integerForKey:@"vRememberCode"];
+    self.RememberTableCode.state = value ? NSControlStateValueOn : NSControlStateValueOff;
+    
+    value = [[NSUserDefaults standardUserDefaults] integerForKey:@"vTempOffOpenKey"];
+    self.TempOffOpenKey.state = value ? NSControlStateValueOn : NSControlStateValueOff;
+    
+    value = [[NSUserDefaults standardUserDefaults] integerForKey:@"vAutoCapsMacro"];
+    self.AutoCapsMacro.state = value ? NSControlStateValueOn : NSControlStateValueOff;
+    
+    value = [[NSUserDefaults standardUserDefaults] integerForKey:@"vShowIconOnDock"];
+    self.ShowIconOnDock.state = value ? NSControlStateValueOn : NSControlStateValueOff;
+    
+    value = [[NSUserDefaults standardUserDefaults] integerForKey:@"DontCheckUpdate"];
+    self.CheckNewVersionOnStartup.state = value ? NSControlStateValueOff :NSControlStateValueOn;
+    
+    value = [[NSUserDefaults standardUserDefaults] integerForKey:@"vFixChromiumBrowser"];
+    self.FixChromiumBrowser.state = value ? NSControlStateValueOn : NSControlStateValueOff;
+    self.FixChromiumBrowser.enabled = fixRecommendBrowser ? YES : NO;
+    
     CustomSwitchControl.state = (vSwitchKeyStatus & 0x100) ? NSControlStateValueOn : NSControlStateValueOff;
     CustomSwitchOption.state = (vSwitchKeyStatus & 0x200) ? NSControlStateValueOn : NSControlStateValueOff;
     CustomSwitchCommand.state = (vSwitchKeyStatus & 0x400) ? NSControlStateValueOn : NSControlStateValueOff;
@@ -354,12 +455,46 @@ extern int vQuickEndConsonant;
 }
 
 - (IBAction)onDefaultConfig:(id)sender {
-    [appDelegate loadDefaultConfig];
-    [[NSUserDefaults standardUserDefaults] setInteger:0 forKey:@"ShowUIOnStartup"];
-    self.ShowUIButton.state = NSControlStateValueOff;
+    NSAlert *alert = [[NSAlert alloc] init];
+    [alert setMessageText:@"Bạn có chắc chắn muốn thiết lập lại cấu hình mặc định?"];
+    [alert addButtonWithTitle:@"Có"];
+    [alert addButtonWithTitle:@"Không"];
+    [alert beginSheetModalForWindow:self.view.window completionHandler:^(NSModalResponse returnCode) {
+        if (returnCode == 1000) {
+            [appDelegate loadDefaultConfig];
+            [[NSUserDefaults standardUserDefaults] setInteger:0 forKey:@"ShowUIOnStartup"];
+            self.ShowUIButton.state = NSControlStateValueOff;
+            
+            [[NSUserDefaults standardUserDefaults] setInteger:1 forKey:@"RunOnStartup"];
+            self.RunOnStartupButton.state = NSControlStateValueOn;
+        }
+    }];
+}
+
+- (IBAction)onHomePageLink:(id)sender {
+    [[NSWorkspace sharedWorkspace] openURL: [NSURL URLWithString:@"https://open-key.org"]];
+}
+
+- (IBAction)onFanpageLink:(id)sender {
+    [[NSWorkspace sharedWorkspace] openURL: [NSURL URLWithString:@"https://www.facebook.com/OpenKeyVN"]];
+}
+
+- (IBAction)onEmailLink:(id)sender {
+    [[NSWorkspace sharedWorkspace] openURL: [NSURL URLWithString:@"mailto:maivutuyen.91@gmail.com"]];
+}
+
+- (IBAction)onSourceCode:(id)sender {
+  [[NSWorkspace sharedWorkspace] openURL: [NSURL URLWithString:@"https://github.com/tuyenvm/OpenKey"]];
+}
+
+- (IBAction)onCheckNewVersionButton:(id)sender {
+    self.CheckNewVersionButton.title = @"Đang kiểm tra...";
+    self.CheckNewVersionButton.enabled = false;
     
-    [[NSUserDefaults standardUserDefaults] setInteger:1 forKey:@"RunOnStartup"];
-    self.RunOnStartupButton.state = NSControlStateValueOn;
+    [OpenKeyManager checkNewVersion:self.view.window callbackFunc:^{
+        self.CheckNewVersionButton.enabled = true;
+        self.CheckNewVersionButton.title = @"Kiểm tra bản mới...";
+    }];
 }
 
 @end

@@ -161,7 +161,7 @@ extern int vAllowConsonantZFWJ;
  */
 extern int vQuickStartConsonant;
 
-/*
+/**
  * 0: No; 1: Yes
  * g -> ng: hag -> hang,...
  * h -> nh: vih -> vinh,...
@@ -169,6 +169,17 @@ extern int vQuickStartConsonant;
  */
 extern int vQuickEndConsonant;
 
+/**
+ * 0: No; 1: Yes
+ * Auto remember table code for each application
+ */
+extern int vRememberCode;
+
+/**
+ * 0: No; 1: Yes
+ * Temporarily turn off OpenKey  by hot key (Command on mac, Alt on Windows and Linux)
+ */
+extern int vTempOffOpenKey;
 
 /**
  * Call this function first to receive data pointer
@@ -213,6 +224,11 @@ void vTempOffSpellChecking();
  * reset spelling value
  */
 void vSetCheckSpelling();
+
+/**
+ * temporarily turn off OpenKey engine
+ */
+void vTempOffEngine();
 
 /**
  * some utils function
