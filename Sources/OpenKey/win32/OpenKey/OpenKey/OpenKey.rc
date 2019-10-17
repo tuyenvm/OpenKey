@@ -199,13 +199,14 @@ BEGIN
                     "Button",BS_AUTOCHECKBOX | WS_TABSTOP,151,50,125,10
     CONTROL         "Tạm tắt chính tả bằng phím Ctrl",IDC_CHECK_TEMP_OFF_SPELLING,
                     "Button",BS_AUTOCHECKBOX | WS_TABSTOP,151,69,123,10
-    CONTROL         "Hỗ trợ ứng dụng Metro",IDC_CHECK_SUPPORT_METRO,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,7,50,119,10
-    CONTROL         "Dùng Clipboard để gửi phím",IDC_CHECK_USE_CLIPBOARD,
-                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,7,69,119,10
     CONTROL         "Loại trừ ứng dụng thông minh",IDC_CHECK_SMART_SWITCH_KEY,
-                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,7,88,111,10
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,7,69,111,10
     CONTROL         "Viết Hoa chữ cái đầu câu",IDC_CHECK_CAPS_FIRST_CHAR,
-                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,151,88,95,10
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,7,50,95,10
+    CONTROL         "Tự ghi nhớ bảng mã theo ứng dụng",IDC_CHECK_SMART_SWITCH_CODE,
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,7,88,130,10
+    CONTROL         "Tạm tắt OpenKey bằng phím Alt",IDC_CHECK_TEMP_OFF_OPEN_KEY,
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,151,88,123,10
 END
 
 IDD_DIALOG_TAB_MACRO DIALOGEX 0, 0, 299, 177
@@ -233,15 +234,21 @@ EXSTYLE WS_EX_TRANSPARENT
 FONT 8, "MS Shell Dlg", 400, 0, 0x1
 BEGIN
     CONTROL         "Bật bảng này khi khởi động",IDC_CHECK_SHOW_ON_STARTUP,
-                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,7,31,122,10
-    CONTROL         "Biểu tượng hiện đại",IDC_CHECK_MODERN_ICON,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,7,50,103,10
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,7,50,122,10
+    CONTROL         "Biểu tượng hiện đại",IDC_CHECK_MODERN_ICON,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,7,69,103,10
     CONTROL         "Khởi động cùng Windows",IDC_CHECK_RUN_WITH_WINDOWS,
-                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,7,70,119,10
-    CONTROL         "Chạy với quyền Admin",IDC_CHECK_RUN_AS_ADMIN,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,151,12,119,10
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,7,89,119,10
+    CONTROL         "Chạy với quyền Admin",IDC_CHECK_RUN_AS_ADMIN,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,151,31,119,10
     CONTROL         "Kiểm tra bản mới lúc khởi động",IDC_CHECK_CHECK_UPDATE,
-                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,151,31,119,10
-    PUSHBUTTON      "Kiểm tra bản mới...",IDC_BUTTON_CHECK_UPDATE,151,49,75,14
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,151,70,119,10
+    PUSHBUTTON      "Kiểm tra bản mới...",IDC_BUTTON_CHECK_UPDATE,151,88,75,14
     CONTROL         "Tạo biểu tượng trên Desktop",IDC_CHECK_CHECK_CREATE_SHORTCUT,
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,7,31,119,10
+    CONTROL         "Sửa lỗi trên Chromium (beta)",IDC_CHECK_FIX_CHROMIUM,
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,151,12,119,10
+    CONTROL         "Dùng Clipboard để gửi phím",IDC_CHECK_USE_CLIPBOARD,
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,151,50,119,10
+    CONTROL         "Hỗ trợ ứng dụng Metro",IDC_CHECK_SUPPORT_METRO_APP,
                     "Button",BS_AUTOCHECKBOX | WS_TABSTOP,7,12,119,10
 END
 
@@ -473,6 +480,10 @@ BEGIN
                             "Tạo biểu tượng OpenKey ở Desktop để có thể tìm thấy nhanh khi cần thiết"
     IDS_STRING_RUN_AS_ADMIN "Khởi động lại OpenKey với quyền Admin để có thể gõ được tiếng Việt trong game, bạn sẽ được yêu cầu khởi động lại chương trình OpenKey"
     IDS_STRING_CHECK_UPDATE "Kiểm tra bản mới mỗi lần khởi động OpenKey"
+    IDS_STRING_REMEMBER_TABLE_CODE 
+                            "OpenKey sẽ tự động ghi nhớ bạn đã dùng bảng mã nào cho ứng dụng nào, để lần sau khi chuyển qua ứng dụng đó, OpenKey sẽ tự động chuyển sang bảng mã đó cho bạn. Rất thích hợp cho các ứng dụng kỹ thuật như Photoshop, CAD,..."
+    IDS_STRING_TEMP_OFF_OPENKEY 
+                            "Bằng cách bấm phím Alt, OpenKey sẽ tạm ngừng hoạt động cho tới khi bạn gõ 1 từ mới."
 END
 
 STRINGTABLE
@@ -500,6 +511,11 @@ BEGIN
                             "Thay thế nhanh các phụ âm đầu như f, j, w bằng ph, gi, qu. Ví dụ: fải→phải, jảng→giảng, wên→quên"
     IDS_STRING_END_CONSONANT 
                             "Thay thế nhanh các phụ âm cuối như g, h, k bằng ng, nh, ch. Ví dụ: trươg→trương, nhah→nhanh, bák→bách"
+END
+
+STRINGTABLE
+BEGIN
+    IDS_STRING_FIX_CHROMIUM "Sửa lỗi bị đúp từ trên các trình duyệt Chromium bao gồm Google Chrome, Brave, Microsoft Edge. Tính năng này đang được thử nghiệm. Cần bật tính năng ""Sửa lỗi gợi ý"" để hỗ trợ tính năng này."
 END
 
 #endif    // English (United States) resources

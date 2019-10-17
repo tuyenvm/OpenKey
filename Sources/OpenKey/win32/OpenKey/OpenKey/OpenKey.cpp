@@ -26,6 +26,10 @@ redistribute your new version, it MUST be open source.
 #define DYNA_DATA(macro, pos) (macro ? pData->macroData[pos] : pData->charData[pos])
 #define EMPTY_HOTKEY 0xFE0000FE
 
+static vector<string> _chromiumBrowser = {
+	"chrome.exe", "brave.exe", "msedge.exe"
+};
+
 extern int vSendKeyStepByStep;
 extern int vUseGrayIcon;
 extern int vShowOnStartUp;
@@ -97,6 +101,9 @@ void OpenKeyInit() {
 	APP_GET_DATA(vRunAsAdmin, 0);
 	APP_GET_DATA(vCreateDesktopShortcut, 0);
 	APP_GET_DATA(vCheckNewVersion, 0);
+	APP_GET_DATA(vRememberCode, 1);
+	APP_GET_DATA(vTempOffOpenKey, 0);
+	APP_GET_DATA(vFixChromiumBrowser, 0);
 
 	//init convert tool
 	APP_GET_DATA(convertToolDontAlertWhenCompleted, 0);
@@ -253,21 +260,22 @@ static void SendKeyCode(Uint32 data) {
 			}
 		}
 	}
-
-	if (vSupportMetroApp && OpenKeyHelper::getLastAppExecuteName().compare("ApplicationFrameHost.exe") == 0) //Metro App
-		Sleep(5);
 }
 
 static void SendBackspace() {
 	SendInput(2, backspaceEvent, sizeof(INPUT));
-	if (vSupportMetroApp && OpenKeyHelper::getLastAppExecuteName().compare("ApplicationFrameHost.exe") == 0) //Metro App
-		Sleep(5);
+	if (vSupportMetroApp && OpenKeyHelper::getLastAppExecuteName().compare("ApplicationFrameHost.exe") == 0) {//Metro App
+		SendMessage(HWND_BROADCAST, WM_CHAR, VK_BACK, 0);
+	}
 	if (IS_DOUBLE_CODE(vCodeTable)) { //VNI or Unicode Compound
 		if (_syncKey.back() > 1) {
 			/*if (!(vCodeTable == 3 && containUnicodeCompoundApp(FRONT_APP))) {
 				SendInput(2, backspaceEvent, sizeof(INPUT));
 			}*/
 			SendInput(2, backspaceEvent, sizeof(INPUT));
+			if (vSupportMetroApp && OpenKeyHelper::getLastAppExecuteName().compare("ApplicationFrameHost.exe") == 0) {//Metro App
+				SendMessage(HWND_BROADCAST, WM_CHAR, VK_BACK, 0);
+			}
 		}
 		_syncKey.pop_back();
 	}
@@ -282,9 +290,6 @@ static void SendEmptyCharacter() {
 	prepareUnicodeEvent(keyEvent[0], _newChar, true);
 	prepareUnicodeEvent(keyEvent[1], _newChar, false);
 	SendInput(2, keyEvent, sizeof(INPUT));
-
-	if (vSupportMetroApp && OpenKeyHelper::getLastAppExecuteName().compare("ApplicationFrameHost.exe") == 0) //Metro App
-		Sleep(5);
 }
 
 static void SendNewCharString(const bool& dataFromMacro = false) {
@@ -397,7 +402,7 @@ void switchLanguage() {
 	AppDelegate::getInstance()->onInputMethodChangedFromHotKey();
 	startNewSession();
 	if (vUseSmartSwitchKey) {
-		setAppInputMethodStatus(OpenKeyHelper::getFrontMostAppExecuteName(), vLanguage);
+		setAppInputMethodStatus(OpenKeyHelper::getFrontMostAppExecuteName(), vLanguage | (vCodeTable << 1));
 		saveSmartSwitchKeyData();
 	}
 }
@@ -518,6 +523,9 @@ LRESULT CALLBACK keyboardHookProcess(int nCode, WPARAM wParam, LPARAM lParam) {
 			if (vTempOffSpelling && _lastFlag & MASK_CONTROL) {
 				vTempOffSpellChecking();
 			}
+			if (vTempOffOpenKey && _lastFlag & MASK_ALT) {
+				vTempOffEngine();
+			}
 			//check switch
 			if (checkHotKey(vSwitchKeyStatus, GET_SWITCH_KEY(vSwitchKeyStatus) != 0xFE)) {
 				switchLanguage();
@@ -575,10 +583,17 @@ LRESULT CALLBACK keyboardHookProcess(int nCode, WPARAM wParam, LPARAM lParam) {
 		} else if (pData->code == vWillProcess || pData->code == vRestore || pData->code == vRestoreAndStartNewSession) { //handle result signal
 			//fix autocomplete
 			if (vFixRecommendBrowser && pData->extCode != 4) {
-				SendEmptyCharacter();
-				pData->backspaceCount++;
+				if (vFixChromiumBrowser && 
+					std::find(_chromiumBrowser.begin(), _chromiumBrowser.end(), OpenKeyHelper::getLastAppExecuteName()) != _chromiumBrowser.end()) {
+					SendCombineKey(KEY_LEFT_SHIFT, KEY_LEFT, 0, KEYEVENTF_EXTENDEDKEY);
+					if (pData->backspaceCount == 1)
+						pData->backspaceCount--;
+				} else {
+					SendEmptyCharacter();
+					pData->backspaceCount++;
+				}
 			}
-
+			
 			//send backspace
 			if (pData->backspaceCount > 0 && pData->backspaceCount < MAX_BUFF) {
 				for (_i = 0; _i < pData->backspaceCount; _i++) {
@@ -636,16 +651,24 @@ LRESULT CALLBACK mouseHookProcess(int nCode, WPARAM wParam, LPARAM lParam) {
 
 VOID CALLBACK winEventProcCallback(HWINEVENTHOOK hWinEventHook, DWORD dwEvent, HWND hwnd, LONG idObject, LONG idChild, DWORD dwEventThread, DWORD dwmsEventTime) {
 	//smart switch key
-	if (vUseSmartSwitchKey) {
+	if (vUseSmartSwitchKey || vRememberCode) {
 		string& exe = OpenKeyHelper::getFrontMostAppExecuteName();
-		_languageTemp = getAppInputMethodStatus(exe, vLanguage);
-		if (_languageTemp != vLanguage) {
+		if (exe.compare("explorer.exe") == 0) //dont apply with windows explorer
+			return;
+		_languageTemp = getAppInputMethodStatus(exe, vLanguage | (vCodeTable << 1));
+		if (vUseSmartSwitchKey && (_languageTemp & 0x01) != vLanguage) {
 			if (_languageTemp != -1) {
 				vLanguage = _languageTemp;
 				AppDelegate::getInstance()->onInputMethodChangedFromHotKey();
 				startNewSession();
+			} else {
+				saveSmartSwitchKeyData();
 			}
-			else {
+		}
+		if (vRememberCode && (_languageTemp >> 1) != vCodeTable) { //for remember table code feature
+			if (_languageTemp != -1) {
+				AppDelegate::getInstance()->onTableCode(_languageTemp >> 1);
+			} else {
 				saveSmartSwitchKeyData();
 			}
 		}

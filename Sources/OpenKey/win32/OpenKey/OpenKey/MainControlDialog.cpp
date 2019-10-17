@@ -123,9 +123,6 @@ void MainControlDialog::initDialog() {
 	checkRestoreIfWrongSpelling = GetDlgItem(hTabPage1, IDC_CHECK_RESTORE_IF_WRONG_SPELLING);
 	createToolTip(checkRestoreIfWrongSpelling, IDS_STRING_RESTORE_IF_WRONG_SPELLING);
 
-	checkUseClipboard = GetDlgItem(hTabPage1, IDC_CHECK_USE_CLIPBOARD);
-	createToolTip(checkUseClipboard, IDS_STRING_USE_CLIPBOARD);
-
 	checkAllowZWJF = GetDlgItem(hTabPage1, IDC_CHECK_ALLOW_ZJWF);
 	createToolTip(checkAllowZWJF, IDS_STRING_ALLOW_ZWFJ);
 
@@ -137,9 +134,12 @@ void MainControlDialog::initDialog() {
 
 	checkCapsFirstChar = GetDlgItem(hTabPage1, IDC_CHECK_CAPS_FIRST_CHAR);
 	createToolTip(checkCapsFirstChar, IDS_STRING_CAPS_FIRST_CHAR);
-	
-	checkSupportMetroApp = GetDlgItem(hTabPage1, IDC_CHECK_SUPPORT_METRO);
-	createToolTip(checkSupportMetroApp, IDS_STRING_SUPPORT_METRO);
+
+	checkRememberTableCode = GetDlgItem(hTabPage1, IDC_CHECK_SMART_SWITCH_CODE);
+	createToolTip(checkRememberTableCode, IDS_STRING_REMEMBER_TABLE_CODE);
+
+	checkTempOffOpenKey = GetDlgItem(hTabPage1, IDC_CHECK_TEMP_OFF_OPEN_KEY);
+	createToolTip(checkTempOffOpenKey, IDS_STRING_TEMP_OFF_OPENKEY);
 
 	/*------------end tab 1----------------*/
 
@@ -182,6 +182,15 @@ void MainControlDialog::initDialog() {
 
 	checkCheckNewVersion = GetDlgItem(hTabPage3, IDC_CHECK_CHECK_UPDATE);
 	createToolTip(checkCheckNewVersion, IDS_STRING_CHECK_UPDATE);
+
+	checkSupportMetroApp = GetDlgItem(hTabPage3, IDC_CHECK_SUPPORT_METRO_APP);
+	createToolTip(checkSupportMetroApp, IDS_STRING_SUPPORT_METRO);
+
+	checkUseClipboard = GetDlgItem(hTabPage3, IDC_CHECK_USE_CLIPBOARD);
+	createToolTip(checkUseClipboard, IDS_STRING_USE_CLIPBOARD);
+
+	checkFixChromium = GetDlgItem(hTabPage3, IDC_CHECK_FIX_CHROMIUM);
+	createToolTip(checkFixChromium, IDS_STRING_FIX_CHROMIUM);
 
 	/*------------end tab 3----------------*/
 
@@ -314,12 +323,13 @@ void MainControlDialog::fillData() {
 	SendMessage(checkRunWithWindows, BM_SETCHECK, vRunWithWindows ? 1 : 0, 0);
 	SendMessage(checkSpelling, BM_SETCHECK, vCheckSpelling ? 1 : 0, 0);
 	SendMessage(checkRestoreIfWrongSpelling, BM_SETCHECK, vRestoreIfWrongSpelling ? 1 : 0, 0);
-	SendMessage(checkUseClipboard, BM_SETCHECK, vSendKeyStepByStep ? 0 : 1, 0);
 	SendMessage(checkModernIcon, BM_SETCHECK, vUseGrayIcon ? 1 : 0, 0);
 	SendMessage(checkAllowZWJF, BM_SETCHECK, vAllowConsonantZFWJ ? 1 : 0, 0);
 	SendMessage(checkTempOffSpelling, BM_SETCHECK, vTempOffSpelling ? 1 : 0, 0);
 	SendMessage(checkQuickStartConsonant, BM_SETCHECK, vQuickStartConsonant ? 1 : 0, 0);
 	SendMessage(checkQuickEndConsonant, BM_SETCHECK, vQuickEndConsonant ? 1 : 0, 0);
+	SendMessage(checkRememberTableCode, BM_SETCHECK, vRememberCode ? 1 : 0, 0);
+	SendMessage(checkTempOffOpenKey, BM_SETCHECK, vTempOffOpenKey ? 1 : 0, 0);
 	
 	SendMessage(checkSmartSwitchKey, BM_SETCHECK, vUseSmartSwitchKey ? 1 : 0, 0);
 	SendMessage(checkCapsFirstChar, BM_SETCHECK, vUpperCaseFirstChar ? 1 : 0, 0);
@@ -332,10 +342,13 @@ void MainControlDialog::fillData() {
 	SendMessage(checkCreateDesktopShortcut, BM_SETCHECK, vCreateDesktopShortcut ? 1 : 0, 0);
 	SendMessage(checkRunAsAdmin, BM_SETCHECK, vRunAsAdmin ? 1 : 0, 0);
 	SendMessage(checkCheckNewVersion, BM_SETCHECK, vCheckNewVersion ? 1 : 0, 0);
+	SendMessage(checkUseClipboard, BM_SETCHECK, vSendKeyStepByStep ? 0 : 1, 0);
+	SendMessage(checkFixChromium, BM_SETCHECK, vFixChromiumBrowser ? 1 : 0, 0);
 
 	EnableWindow(checkRestoreIfWrongSpelling, vCheckSpelling);
 	EnableWindow(checkAllowZWJF, vCheckSpelling);
 	EnableWindow(checkTempOffSpelling, vCheckSpelling);
+	EnableWindow(checkFixChromium, vFixRecommendBrowser);
 
 	//tab info
 	wchar_t buffer[256];
@@ -356,6 +369,10 @@ void MainControlDialog::onComboBoxSelected(const HWND & hCombobox, const int & c
 		APP_SET_DATA(vInputType, (int)SendMessage(hCombobox, CB_GETCURSEL, 0, 0));
 	} else if (hCombobox == comboBoxTableCode) {
 		APP_SET_DATA(vCodeTable, (int)SendMessage(hCombobox, CB_GETCURSEL, 0, 0));
+		if (vRememberCode) {
+			setAppInputMethodStatus(OpenKeyHelper::getFrontMostAppExecuteName(), vLanguage | (vCodeTable << 1));
+			saveSmartSwitchKeyData();
+		}
 	}
 	SystemTrayHelper::updateData();
 }
@@ -390,11 +407,15 @@ void MainControlDialog::onCheckboxClicked(const HWND & hWnd) {
 	} else if (hWnd == checkVietnamese) {
 		val = (int)SendMessage(checkVietnamese, BM_GETCHECK, 0, 0);
 		APP_SET_DATA(vLanguage, val ? 1 : 0);
+		if (vUseSmartSwitchKey) {
+			setAppInputMethodStatus(OpenKeyHelper::getFrontMostAppExecuteName(), vLanguage | (vCodeTable << 1));
+			saveSmartSwitchKeyData();
+		}
 	} else if (hWnd == checkEnglish) {
 		val = (int)SendMessage(checkVietnamese, BM_GETCHECK, 0, 0);
 		APP_SET_DATA(vLanguage, val ? 1 : 0);
 		if (vUseSmartSwitchKey) {
-			setAppInputMethodStatus(OpenKeyHelper::getFrontMostAppExecuteName(), vLanguage);
+			setAppInputMethodStatus(OpenKeyHelper::getFrontMostAppExecuteName(), vLanguage | (vCodeTable << 1));
 			saveSmartSwitchKeyData();
 		}
 	} else if (hWnd == checkModernOrthorgraphy) {
@@ -403,6 +424,7 @@ void MainControlDialog::onCheckboxClicked(const HWND & hWnd) {
 	} else if (hWnd == checkFixRecommendBrowser) {
 		val = (int)SendMessage(hWnd, BM_GETCHECK, 0, 0);
 		APP_SET_DATA(vFixRecommendBrowser, val ? 1 : 0);
+		EnableWindow(checkFixChromium, vFixRecommendBrowser);
 	} else if (hWnd == checkShowOnStartup) {
 		val = (int)SendMessage(hWnd, BM_GETCHECK, 0, 0);
 		APP_SET_DATA(vShowOnStartUp, val ? 1 : 0);
@@ -472,6 +494,15 @@ void MainControlDialog::onCheckboxClicked(const HWND & hWnd) {
 	} else if (hWnd == checkCheckNewVersion) {
 		val = (int)SendMessage(hWnd, BM_GETCHECK, 0, 0);
 		APP_SET_DATA(vCheckNewVersion, val ? 1 : 0);
+	} else if (hWnd == checkRememberTableCode) {
+		val = (int)SendMessage(hWnd, BM_GETCHECK, 0, 0);
+		APP_SET_DATA(vRememberCode, val ? 1 : 0);
+	} else if (hWnd == checkTempOffOpenKey) {
+		val = (int)SendMessage(hWnd, BM_GETCHECK, 0, 0);
+		APP_SET_DATA(vTempOffOpenKey, val ? 1 : 0);
+	} else if (hWnd == checkFixChromium) {
+		val = (int)SendMessage(hWnd, BM_GETCHECK, 0, 0);
+		APP_SET_DATA(vFixChromiumBrowser, val ? 1 : 0);
 	}
 	SystemTrayHelper::updateData();
 }

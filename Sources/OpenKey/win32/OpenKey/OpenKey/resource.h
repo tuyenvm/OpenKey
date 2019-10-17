@@ -35,8 +35,12 @@
 #define IDS_STRING_CREATE_DESKTOP       123
 #define IDS_STRING_RUN_AS_ADMIN         124
 #define IDS_STRING_CHECK_UPDATE         125
+#define IDS_STRING_REMEMBER_TABLE_CODE  126
+#define IDS_STRING_TEMP_OFF_OPENKEY     127
 #define IDR_MAINFRAME                   128
+#define IDS_STRING_FIX_CHROMIUM         128
 #define IDD_DIALOG_MAIN                 129
+#define IDS_STRING129                   129
 #define IDI_ICON1                       133
 #define IDI_ICON_STATUS_VIET            134
 #define IDI_ICON2                       135
@@ -108,6 +112,7 @@
 #define IDC_CHECK_CAPS_FIRST_CHAR       1018
 #define IDC_CHECK15                     1019
 #define IDC_CHECK_QUICK_TELEX           1019
+#define IDC_CHECK_SMART_SWITCH_CODE     1019
 #define IDC_CHECK16                     1020
 #define IDC_CHECK_USE_MACRO             1020
 #define IDC_CHECK17                     1021
@@ -128,6 +133,7 @@
 #define IDC_STATIC_APP_TITLE3           1026
 #define IDC_SYSLINK_HOME_PAGE           1027
 #define IDC_CHECK_QUICK_START_CONSONANT 1027
+#define IDC_CHECK_TEMP_OFF_OPEN_KEY     1027
 #define IDC_STATIC_APP_SUB_TITLE2       1028
 #define IDC_CHECK_QUICK_END_CONSONANT   1028
 #define IDC_STATIC_APP_SUB_TITLE3       1029
@@ -157,7 +163,9 @@
 #define IDC_CHECK_CHECK_CREATE_SHORTCUT 1050
 #define IDC_BUTTON_CHECK_UPDATE         1051
 #define IDS_STRING_CTRL                 1052
+#define IDC_CHECK_FIX_CHROMIUM          1052
 #define IDS_STRING_ALT                  1053
+#define IDC_CHECK_SUPPORT_METRO_APP     1053
 #define IDS_STRING_SHIFT                1054
 #define IDS_STRING_WIN                  1055
 #define IDS_STRING_SWITCH_KEY           1056
