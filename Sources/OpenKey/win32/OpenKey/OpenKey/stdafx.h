@@ -82,3 +82,6 @@ extern int vSupportMetroApp;
 extern int vCreateDesktopShortcut;
 extern int vRunAsAdmin;
 extern int vCheckNewVersion;
+extern int vRememberCode;
+extern int vTempOffOpenKey;
+extern int vFixChromiumBrowser;

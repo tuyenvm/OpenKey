@@ -136,12 +136,16 @@ string& OpenKeyHelper::getFrontMostAppExecuteName() {
 		return _unknownProgram;
 	}
 	_exeName = _tcsrchr(_exePath, '\\') + 1;
-
+	if (wcscmp(_exeName, _T("OpenKey64.exe")) == 0 ||
+		wcscmp(_exeName, _T("OpenKey32.exe")) == 0 || 
+		wcscmp(_exeName, _T("explorer.exe")) == 0) {
+		return _exeNameUtf8;
+	}
 	int size_needed = WideCharToMultiByte(CP_UTF8, 0, _exeName, (int)lstrlen(_exeName), NULL, 0, NULL, NULL);
 	std::string strTo(size_needed, 0);
 	WideCharToMultiByte(CP_UTF8, 0, _exeName, (int)lstrlen(_exeName), &strTo[0], size_needed, NULL, NULL);
 	_exeNameUtf8 = strTo;
-
+	//LOG(L"%s\n", utf8ToWideString(_exeNameUtf8).c_str());
 	return _exeNameUtf8;
 }
 

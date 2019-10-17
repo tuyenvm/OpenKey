@@ -37,6 +37,8 @@ int vTempOffSpelling = 0;
 int vAllowConsonantZFWJ = 0;
 int vQuickStartConsonant = 0;
 int vQuickEndConsonant = 0;
+int vRememberCode = 1;
+int vTempOffOpenKey = 0;
 
 int vUseGrayIcon = 0;
 int vShowOnStartUp = 0;
@@ -46,6 +48,8 @@ int vSupportMetroApp = 1;
 int vCreateDesktopShortcut = 0;
 int vRunAsAdmin = 0;
 int vCheckNewVersion = 0;
+//beta feature
+int vFixChromiumBrowser = 0; //new on version 2.0
 
 bool AppDelegate::isDialogMsg(MSG & msg) const {
 	return (mainDialog != NULL && IsDialogMessage(mainDialog->getHwnd(), &msg)) ||
@@ -188,6 +192,9 @@ void AppDelegate::onDefaultConfig() {
 	APP_SET_DATA(vRunWithWindows, 1);
 
 	APP_SET_DATA(vSupportMetroApp, 1);
+	APP_SET_DATA(vRememberCode, 1);
+	APP_SET_DATA(vTempOffOpenKey, 0);
+	APP_SET_DATA(vFixChromiumBrowser, 0);
 
 	if (mainDialog) {
 		mainDialog->fillData();
@@ -203,7 +210,7 @@ void AppDelegate::onToggleVietnamese() {
 	
 	if (vUseSmartSwitchKey) {
 		string& exe = OpenKeyHelper::getLastAppExecuteName();
-		setAppInputMethodStatus(exe, vLanguage);
+		setAppInputMethodStatus(exe, vLanguage | (vCodeTable << 1));
 		saveSmartSwitchKeyData();
 	}
 }
@@ -270,6 +277,10 @@ void AppDelegate::onTableCode(const int & code) {
 	APP_SET_DATA(vCodeTable, code);
 	if (mainDialog) {
 		mainDialog->fillData();
+	}
+	if (vRememberCode) {
+		setAppInputMethodStatus(OpenKeyHelper::getFrontMostAppExecuteName(), vLanguage | (vCodeTable << 1));
+		saveSmartSwitchKeyData();
 	}
 }
 
