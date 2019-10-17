@@ -25,6 +25,7 @@ Mặc định, OpenKey cho phép gõ với chế độ bỏ dấu tự do, khôn
 	* Tự khôi phục phím với từ sai
 	* Cho phép chữ "z w j f" làm phụ âm đầu
 	* Tạm tắt chính tả bằng phím Ctrl
+	* Tạm tắt OpenKey bằng phím Alt
 * Tùy chọn:
 	* Tự cấu hình phím tắt chuyển Anh - Việt
 	* Bỏ dấu kiểu mới (oà, uý) và kiểu cũ (òa úy)
@@ -32,8 +33,12 @@ Mặc định, OpenKey cho phép gõ với chế độ bỏ dấu tự do, khôn
 	* Hiện bảng điều khiển khi khởi động
 	* Hai loại biểu tượng trên system tray (đồng bộ với Win10)
 	* Khởi động cùng Windows.
+	* Chạy với chế độ Admin.
+	* Sửa lỗi trên các trình duyệt Chromium
+	* Hỗ trợ các ứng dụng metro trên Windows 10
 * Công cụ và tính năng nâng cao:
 	* Loại trừ ứng dụng thông minh
+	* Tự ghi nhớ bảng mã theo ứng dụng
 	* Viết Hoa chữ cái đầu câu
 	* Gõ nhanh (cc=ch, gg=gi, kk=kh, nn=ng, qq=qu, pp=ph, tt=th)
 	* Gõ tắt và công cụ soạn gõ tắt.
