@@ -68,8 +68,8 @@ bool OpenKeyManager::checkUpdate(string& newVersion) {
 	string versionCodeString = data.substr(0, data.find("}"));
 	DWORD versionCode = (DWORD)atoi(versionCodeString.c_str());
 	DWORD currentVersion = OpenKeyHelper::getVersionNumber();
-	versionCode = (versionCode << 24) | (versionCode & 0x00FF00) | (versionCode >> 24 & 0xFF);
-	currentVersion = (currentVersion << 24) | (currentVersion & 0x00FF00) | (currentVersion >> 24 & 0xFF);
+	versionCode = (versionCode << 16) | (versionCode & 0x00FF00) | (versionCode >> 16 & 0xFF);
+	currentVersion = (currentVersion << 16) | (currentVersion & 0x00FF00) | (currentVersion >> 16 & 0xFF);
 	if (versionCode > currentVersion) {
 		return true;
 	}
