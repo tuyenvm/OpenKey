@@ -58,7 +58,7 @@ extern int vFixChromiumBrowser;
     self.retryButton.enabled = NO;
  
     NSRect parentRect = self.viewParent.frame;
-    parentRect.size.height = 490;
+    parentRect.size.height = 460;
     self.viewParent.frame = parentRect;
     
     //set correct tabgroup
@@ -105,10 +105,10 @@ extern int vFixChromiumBrowser;
 -(void)initKey {
     dispatch_async(dispatch_get_main_queue(), ^{
         if (![OpenKeyManager initEventTap]) {
-            self.permissionWarning.hidden = NO;
-            self.retryButton.enabled = YES;
+            //self.permissionWarning.hidden = NO;
+            //self.retryButton.enabled = YES;
         } else {
-            self.appOK.hidden = NO;
+            //self.appOK.hidden = NO;
         }
     });
 }
