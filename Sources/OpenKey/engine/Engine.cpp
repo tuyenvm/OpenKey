@@ -264,6 +264,14 @@ void checkSpelling(const bool& forceCheckVowel=false) {
                 }
             }
             
+            //limit: end consonant "ch", "t" can not use with "~", "`", "?"
+            if (_spellingOK) {
+                if (_index >= 3 && CHR(_index-1) == KEY_H && CHR(_index-2) == KEY_C && !((TypingWord[_index-3] & MARK1_MASK) || (TypingWord[_index-3] & MARK5_MASK) || !(TypingWord[_index-3] & MARK_MASK))) {
+                    _spellingOK = false;
+                } else if (_index >= 2 && CHR(_index-1) == KEY_T && !((TypingWord[_index-2] & MARK1_MASK) || (TypingWord[_index-2] & MARK5_MASK) || !(TypingWord[_index-2] & MARK_MASK))) {
+                    _spellingOK = false;
+                }
+            }
         }
     } else {
         _spellingOK = true;
