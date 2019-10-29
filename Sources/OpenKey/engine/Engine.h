@@ -228,7 +228,7 @@ void vSetCheckSpelling();
 /**
  * temporarily turn off OpenKey engine
  */
-void vTempOffEngine();
+void vTempOffEngine(const bool& off=true);
 
 /**
  * some utils function

@@ -59,6 +59,8 @@ static string macroText, macroContent;
 static int _languageTemp = 0; //use for smart switch key
 static vector<Byte> savedSmartSwitchKeyData; ////use for smart switch key
 
+static bool _hasJustUsedHotKey = false;
+
 static INPUT backspaceEvent[2];
 static INPUT keyEvent[2];
 
@@ -208,18 +210,16 @@ static void SendKeyCode(Uint32 data) {
 		if (IS_DOUBLE_CODE(vCodeTable)) //VNI
 			InsertKeyLength(1);
 
-		if (data & CAPS_MASK && !((_flag & MASK_SHIFT) || (_flag & MASK_CAPITAL))) {
-			prepareKeyEvent(keyEvent[0], KEY_LEFT_SHIFT, true);
-			SendInput(1, keyEvent, sizeof(INPUT));
-		}
-	
-		prepareKeyEvent(keyEvent[0], _newChar, true);
-		prepareKeyEvent(keyEvent[1], _newChar, false);
-		SendInput(2, keyEvent, sizeof(INPUT));
-
-		if (data & CAPS_MASK && !((_flag & MASK_SHIFT) || (_flag & MASK_CAPITAL))) {
-			prepareKeyEvent(keyEvent[0], KEY_LEFT_SHIFT, false);
-			SendInput(1, keyEvent, sizeof(INPUT));
+		_newChar = keyCodeToCharacter(data);
+		if (_newChar == 0) {
+			_newChar = (Uint16)data;
+			prepareKeyEvent(keyEvent[0], _newChar, true);
+			prepareKeyEvent(keyEvent[1], _newChar, false);
+			SendInput(2, keyEvent, sizeof(INPUT));
+		} else {
+			prepareUnicodeEvent(keyEvent[0], _newChar, true);
+			prepareUnicodeEvent(keyEvent[1], _newChar, false);
+			SendInput(2, keyEvent, sizeof(INPUT));
 		}
 	} else {
 		if (vCodeTable == 0) { //unicode 2 bytes code
@@ -265,7 +265,8 @@ static void SendKeyCode(Uint32 data) {
 static void SendBackspace() {
 	SendInput(2, backspaceEvent, sizeof(INPUT));
 	if (vSupportMetroApp && OpenKeyHelper::getLastAppExecuteName().compare("ApplicationFrameHost.exe") == 0) {//Metro App
-		SendMessage(HWND_BROADCAST, WM_CHAR, VK_BACK, 0);
+		SendMessage(HWND_BROADCAST, WM_CHAR, VK_BACK, 0L);
+		SendMessage(HWND_BROADCAST, WM_CHAR, VK_BACK, 0L);
 	}
 	if (IS_DOUBLE_CODE(vCodeTable)) { //VNI or Unicode Compound
 		if (_syncKey.back() > 1) {
@@ -274,7 +275,8 @@ static void SendBackspace() {
 			}*/
 			SendInput(2, backspaceEvent, sizeof(INPUT));
 			if (vSupportMetroApp && OpenKeyHelper::getLastAppExecuteName().compare("ApplicationFrameHost.exe") == 0) {//Metro App
-				SendMessage(HWND_BROADCAST, WM_CHAR, VK_BACK, 0);
+				SendMessage(HWND_BROADCAST, WM_CHAR, VK_BACK, 0L);
+				SendMessage(HWND_BROADCAST, WM_CHAR, VK_BACK, 0L);
 			}
 		}
 		_syncKey.pop_back();
@@ -400,11 +402,11 @@ void switchLanguage() {
 	if (HAS_BEEP(vSwitchKeyStatus))
 		MessageBeep(MB_OK);
 	AppDelegate::getInstance()->onInputMethodChangedFromHotKey();
-	startNewSession();
 	if (vUseSmartSwitchKey) {
 		setAppInputMethodStatus(OpenKeyHelper::getFrontMostAppExecuteName(), vLanguage | (vCodeTable << 1));
 		saveSmartSwitchKeyData();
 	}
+	startNewSession();
 }
 
 static void SendPureCharacter(const Uint16& ch) {
@@ -494,46 +496,50 @@ LRESULT CALLBACK keyboardHookProcess(int nCode, WPARAM wParam, LPARAM lParam) {
 		//LOG(L"Key up: %d\n", keyboardData->vkCode);
 		UnsetModifierMask((Uint16)keyboardData->vkCode);
 	}
-	if (!_isFlagKey)
+	if (!_isFlagKey && wParam != WM_KEYUP && wParam != WM_SYSKEYUP)
 		_keycode = (Uint16)keyboardData->vkCode;
 
 	//switch language shortcut; convert hotkey
-	if (wParam == WM_KEYDOWN && !_isFlagKey && _keycode != 0) {
+	if ((wParam == WM_KEYDOWN || wParam == WM_SYSKEYDOWN) && !_isFlagKey && _keycode != 0) {
 		if (GET_SWITCH_KEY(vSwitchKeyStatus) != _keycode && GET_SWITCH_KEY(convertToolHotKey) != _keycode) {
 			_lastFlag = 0;
 		} else {
 			if (GET_SWITCH_KEY(vSwitchKeyStatus) == _keycode && checkHotKey(vSwitchKeyStatus, GET_SWITCH_KEY(vSwitchKeyStatus) != 0xFE)) {
 				switchLanguage();
-				_lastFlag = 0;
+				_hasJustUsedHotKey = true;
 				_keycode = 0;
 				return -1;
 			}
 			if (GET_SWITCH_KEY(convertToolHotKey) == _keycode && checkHotKey(convertToolHotKey, GET_SWITCH_KEY(convertToolHotKey) != 0xFE)) {
 				AppDelegate::getInstance()->onQuickConvert();
-				_lastFlag = 0;
+				_hasJustUsedHotKey = true;
 				_keycode = 0;
 				return -1;
 			}
 		}
+		_hasJustUsedHotKey = _lastFlag != 0;
 	} else if (_isFlagKey) {
 		if (_lastFlag == 0 || _lastFlag < _flag)
 			_lastFlag = _flag;
 		else if (_lastFlag > _flag) {
-			//check temporarily turn off spell checking
-			if (vTempOffSpelling && _lastFlag & MASK_CONTROL) {
-				vTempOffSpellChecking();
-			}
-			if (vTempOffOpenKey && _lastFlag & MASK_ALT) {
-				vTempOffEngine();
-			}
 			//check switch
 			if (checkHotKey(vSwitchKeyStatus, GET_SWITCH_KEY(vSwitchKeyStatus) != 0xFE)) {
 				switchLanguage();
+				_hasJustUsedHotKey = true;
 			}
 			if (checkHotKey(convertToolHotKey, GET_SWITCH_KEY(convertToolHotKey) != 0xFE)) {
 				AppDelegate::getInstance()->onQuickConvert();
+				_hasJustUsedHotKey = true;
 			}
-			_lastFlag = 0;
+			//check temporarily turn off spell checking
+			if (vTempOffSpelling && !_hasJustUsedHotKey && _lastFlag & MASK_CONTROL) {
+				vTempOffSpellChecking();
+			}
+			if (vTempOffOpenKey && !_hasJustUsedHotKey && _lastFlag & MASK_ALT) {
+				vTempOffEngine();
+			}
+			_lastFlag = _flag;
+			_hasJustUsedHotKey = false;
 		}
 		_keycode = 0;
 		return CallNextHookEx(hKeyboardHook, nCode, wParam, lParam);
@@ -541,8 +547,8 @@ LRESULT CALLBACK keyboardHookProcess(int nCode, WPARAM wParam, LPARAM lParam) {
 
 	//if is in english mode
 	if (vLanguage == 0) {
-		if (vUseMacro && vUseMacroInEnglishMode && wParam == WM_KEYDOWN) {
-			vEnglishMode((wParam == WM_KEYDOWN ? vKeyEventState::KeyDown : vKeyEventState::MouseDown),
+		if (vUseMacro && vUseMacroInEnglishMode && (wParam == WM_KEYDOWN || wParam == WM_SYSKEYDOWN)) {
+			vEnglishMode(((wParam == WM_KEYDOWN || wParam == WM_SYSKEYDOWN) ? vKeyEventState::KeyDown : vKeyEventState::MouseDown),
 				_keycode,
 				(_flag & MASK_SHIFT) || (_flag & MASK_CAPITAL),
 				OTHER_CONTROL_KEY);
@@ -556,7 +562,7 @@ LRESULT CALLBACK keyboardHookProcess(int nCode, WPARAM wParam, LPARAM lParam) {
 	}
 
 	//handle keyboard
-	if (wParam == WM_KEYDOWN) {
+	if (wParam == WM_KEYDOWN || wParam == WM_SYSKEYDOWN) {
 		//send event signal to Engine
 		vKeyHandleEvent(vKeyEvent::Keyboard,
 						vKeyEventState::KeyDown,
@@ -656,21 +662,26 @@ VOID CALLBACK winEventProcCallback(HWINEVENTHOOK hWinEventHook, DWORD dwEvent, H
 		if (exe.compare("explorer.exe") == 0) //dont apply with windows explorer
 			return;
 		_languageTemp = getAppInputMethodStatus(exe, vLanguage | (vCodeTable << 1));
+		vTempOffEngine(false);
 		if (vUseSmartSwitchKey && (_languageTemp & 0x01) != vLanguage) {
 			if (_languageTemp != -1) {
 				vLanguage = _languageTemp;
 				AppDelegate::getInstance()->onInputMethodChangedFromHotKey();
-				startNewSession();
 			} else {
 				saveSmartSwitchKeyData();
 			}
 		}
+		startNewSession();
 		if (vRememberCode && (_languageTemp >> 1) != vCodeTable) { //for remember table code feature
 			if (_languageTemp != -1) {
 				AppDelegate::getInstance()->onTableCode(_languageTemp >> 1);
 			} else {
 				saveSmartSwitchKeyData();
 			}
+		}
+		if (vSupportMetroApp && exe.compare("ApplicationFrameHost.exe") == 0) {//Metro App
+			SendMessage(HWND_BROADCAST, WM_CHAR, VK_BACK, 0L);
+			SendMessage(HWND_BROADCAST, WM_CHAR, VK_BACK, 0L);
 		}
 	}
 }
