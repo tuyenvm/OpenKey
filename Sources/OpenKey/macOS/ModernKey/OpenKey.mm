@@ -206,9 +206,13 @@ extern "C" {
     
     void SendPureCharacter(const Uint16& ch) {
         _newEventDown = CGEventCreateKeyboardEvent(myEventSource, 0, true);
+        _newEventUp = CGEventCreateKeyboardEvent(myEventSource, 0, false);
         CGEventKeyboardSetUnicodeString(_newEventDown, 1, &ch);
+        CGEventKeyboardSetUnicodeString(_newEventUp, 1, &ch);
         CGEventTapPostEvent(_proxy, _newEventDown);
+        CGEventTapPostEvent(_proxy, _newEventUp);
         CFRelease(_newEventDown);
+        CFRelease(_newEventUp);
         if (IS_DOUBLE_CODE(vCodeTable)) {
             InsertKeyLength(1);
         }
@@ -235,26 +239,35 @@ extern "C" {
             CGEventSetFlags(_newEventUp, _privateFlag);
             CGEventTapPostEvent(_proxy, _newEventDown);
             CGEventTapPostEvent(_proxy, _newEventUp);
-            CFRelease(_newEventUp);
         } else {
             if (vCodeTable == 0) { //unicode 2 bytes code
                 _newEventDown = CGEventCreateKeyboardEvent(myEventSource, 0, true);
+                _newEventUp = CGEventCreateKeyboardEvent(myEventSource, 0, false);
                 CGEventKeyboardSetUnicodeString(_newEventDown, 1, &_newChar);
+                CGEventKeyboardSetUnicodeString(_newEventUp, 1, &_newChar);
                 CGEventTapPostEvent(_proxy, _newEventDown);
+                CGEventTapPostEvent(_proxy, _newEventUp);
             } else if (vCodeTable == 1 || vCodeTable == 2 || vCodeTable == 4) { //others such as VNI Windows, TCVN3: 1 byte code
                 _newCharHi = HIBYTE(_newChar);
                 _newChar = LOBYTE(_newChar);
                 
                 _newEventDown = CGEventCreateKeyboardEvent(myEventSource, 0, true);
+                _newEventUp = CGEventCreateKeyboardEvent(myEventSource, 0, false);
                 CGEventKeyboardSetUnicodeString(_newEventDown, 1, &_newChar);
+                CGEventKeyboardSetUnicodeString(_newEventUp, 1, &_newChar);
                 CGEventTapPostEvent(_proxy, _newEventDown);
-                
+                CGEventTapPostEvent(_proxy, _newEventUp);
                 if (_newCharHi > 32) {
                     if (vCodeTable == 2) //VNI
                         InsertKeyLength(2);
+                    CFRelease(_newEventDown);
+                    CFRelease(_newEventUp);
                     _newEventDown = CGEventCreateKeyboardEvent(myEventSource, 0, true);
+                    _newEventUp = CGEventCreateKeyboardEvent(myEventSource, 0, false);
                     CGEventKeyboardSetUnicodeString(_newEventDown, 1, &_newCharHi);
+                    CGEventKeyboardSetUnicodeString(_newEventUp, 1, &_newCharHi);
                     CGEventTapPostEvent(_proxy, _newEventDown);
+                    CGEventTapPostEvent(_proxy, _newEventUp);
                 } else {
                     if (vCodeTable == 2) //VNI
                         InsertKeyLength(1);
@@ -266,11 +279,15 @@ extern "C" {
                 _uniChar[1] = _newCharHi > 0 ? (_unicodeCompoundMark[_newCharHi - 1]) : 0;
                 InsertKeyLength(_newCharHi > 0 ? 2 : 1);
                 _newEventDown = CGEventCreateKeyboardEvent(myEventSource, 0, true);
+                _newEventUp = CGEventCreateKeyboardEvent(myEventSource, 0, false);
                 CGEventKeyboardSetUnicodeString(_newEventDown, (_newCharHi > 0 ? 2 : 1), _uniChar);
+                CGEventKeyboardSetUnicodeString(_newEventUp, (_newCharHi > 0 ? 2 : 1), _uniChar);
                 CGEventTapPostEvent(_proxy, _newEventDown);
+                CGEventTapPostEvent(_proxy, _newEventUp);
             }
         }
         CFRelease(_newEventDown);
+        CFRelease(_newEventUp);
     }
     
     void SendEmptyCharacter() {
@@ -283,9 +300,13 @@ extern "C" {
         }
         
         _newEventDown = CGEventCreateKeyboardEvent(myEventSource, 0, true);
+        _newEventUp = CGEventCreateKeyboardEvent(myEventSource, 0, false);
         CGEventKeyboardSetUnicodeString(_newEventDown, 1, &_newChar);
+        CGEventKeyboardSetUnicodeString(_newEventUp, 1, &_newChar);
         CGEventTapPostEvent(_proxy, _newEventDown);
+        CGEventTapPostEvent(_proxy, _newEventUp);
         CFRelease(_newEventDown);
+        CFRelease(_newEventUp);
     }
     
     void SendVirtualKey(const Byte& vKey) {
@@ -427,9 +448,13 @@ extern "C" {
         }
         
         _newEventDown = CGEventCreateKeyboardEvent(myEventSource, 0, true);
+        _newEventUp = CGEventCreateKeyboardEvent(myEventSource, 0, false);
         CGEventKeyboardSetUnicodeString(_newEventDown, _willContinuteSending ? 16 : _newCharSize - offset, _newCharString);
+        CGEventKeyboardSetUnicodeString(_newEventUp, _willContinuteSending ? 16 : _newCharSize - offset, _newCharString);
         CGEventTapPostEvent(_proxy, _newEventDown);
+        CGEventTapPostEvent(_proxy, _newEventUp);
         CFRelease(_newEventDown);
+        CFRelease(_newEventUp);
 
         if (_willContinuteSending) {
             SendNewCharString(dataFromMacro, dataFromMacro ? _k : 16);
