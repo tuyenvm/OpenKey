@@ -36,6 +36,7 @@ extern int vTempOffOpenKey;
 extern int vShowIconOnDock;
 extern int vAutoCapsMacro;
 extern int vFixChromiumBrowser;
+extern int vPerformLayoutCompat;
 
 @implementation ViewController {
     __weak IBOutlet NSButton *CustomSwitchCommand;
@@ -268,6 +269,11 @@ extern int vFixChromiumBrowser;
     vSendKeyStepByStep = (int)val;
 }
 
+- (IBAction)onPerformLayoutCompat:(id)sender {
+    NSInteger val = [self setCustomValue:sender keyToSet:@"vPerformLayoutCompat"];
+    vPerformLayoutCompat = (int)val;
+}
+
 - (NSInteger)setCustomValue:(NSButton*)sender keyToSet:(NSString*) key {
     NSInteger val = 0;
     if (sender.state == NSControlStateValueOn) {
@@ -443,6 +449,9 @@ extern int vFixChromiumBrowser;
     value = [[NSUserDefaults standardUserDefaults] integerForKey:@"vFixChromiumBrowser"];
     self.FixChromiumBrowser.state = value ? NSControlStateValueOn : NSControlStateValueOff;
     self.FixChromiumBrowser.enabled = fixRecommendBrowser ? YES : NO;
+    
+    value = [[NSUserDefaults standardUserDefaults] integerForKey:@"vPerformLayoutCompat"];
+    self.PerformLayoutCompat.state = value ? NSControlStateValueOn : NSControlStateValueOff;
     
     CustomSwitchControl.state = (vSwitchKeyStatus & 0x100) ? NSControlStateValueOn : NSControlStateValueOff;
     CustomSwitchOption.state = (vSwitchKeyStatus & 0x200) ? NSControlStateValueOn : NSControlStateValueOff;

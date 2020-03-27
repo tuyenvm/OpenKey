@@ -26,6 +26,7 @@ extern ViewController* viewController;
 extern AppDelegate* appDelegate;
 extern int vSendKeyStepByStep;
 extern int vFixChromiumBrowser;
+extern int vPerformLayoutCompat;
 
 extern "C" {
     //app which must sent special empty character
@@ -89,6 +90,8 @@ extern "C" {
         LOAD_DATA(vTempOffOpenKey, vTempOffOpenKey);
         
         LOAD_DATA(vFixChromiumBrowser, vFixChromiumBrowser);
+        
+        LOAD_DATA(vPerformLayoutCompat, vPerformLayoutCompat);
         
         myEventSource = CGEventSourceCreate(kCGEventSourceStatePrivate);
         pData = (vKeyHookState*)vKeyInit();
@@ -523,6 +526,48 @@ extern "C" {
         SendKeyCode(_keycode | (_flag & kCGEventFlagMaskShift ? CAPS_MASK : 0));
     }
 
+    // TODO: Research API to convert character into CGKeyCode more elegantly!
+    int ConvertKeyStringToKeyCode(NSString *keyString, CGKeyCode fallback) {
+        // Infomation about capitalization (shift/caps) is already included
+        // in the original CGEvent, only find out which position on keyboard a key is pressed
+        NSString *lowercasedKeyString = [keyString lowercaseString];
+        if (!lowercasedKeyString) {
+            return fallback;
+        }
+        
+        // Ignore code for Modifier keys and numpad
+        // Reference: https://eastmanreference.com/complete-list-of-applescript-key-codes
+        NSDictionary *keyStringToKeyCodeMap = @{
+            // Characters from number row
+            @"`": @50, @"~": @50, @"1": @18, @"!": @18, @"2": @19, @"@": @19, @"3": @20, @"#": @20, @"4": @21, @"$": @21,
+            @"5": @23, @"%": @23, @"6": @22, @"^": @22, @"7": @26, @"&": @26, @"8": @28, @"*": @28, @"9": @25, @"(": @25,
+            @"0": @29, @")": @29, @"-": @27, @"_": @27, @"=": @24, @"+": @24,
+            // Characters from first keyboard row
+            @"q": @12, @"w": @13, @"e": @14, @"r": @15, @"t": @17, @"y": @16, @"u": @32, @"i": @34, @"o": @31, @"p": @35,
+            @"[": @33, @"{": @33, @"]": @30, @"}": @30, @"\\": @42, @"|": @42,
+            // Characters from second keyboard row
+            @"a": @0, @"s": @1, @"d": @2, @"f": @3, @"g": @5, @"h": @4, @"j": @38, @"k": @40, @"l": @37,
+            @";": @41, @":": @41, @"'": @39, @"\"": @39,
+            // Characters from second third row
+            @"z": @6, @"x": @7, @"c": @8, @"v": @9, @"b": @11, @"n": @45, @"m": @46,
+            @",": @43, @"<": @43, @".": @47, @">": @47, @"/": @44, @"?": @44
+        };
+        NSNumber *keycode = [keyStringToKeyCodeMap objectForKey:lowercasedKeyString];
+
+        if (keycode) {
+            return [keycode intValue];
+        }
+        return fallback;
+    }
+
+    // If conversion fails, return fallbackKeyCode
+    CGKeyCode ConvertEventToKeyboadLayoutCompatKeyCode(CGEventRef keyEvent, CGKeyCode fallbackKeyCode) {
+        NSEvent *kbLayoutCompatEvent = [NSEvent eventWithCGEvent:keyEvent];
+        NSString *kbLayoutCompatKeyString = kbLayoutCompatEvent.charactersIgnoringModifiers;
+        return ConvertKeyStringToKeyCode(kbLayoutCompatKeyString,
+                                         fallbackKeyCode);
+    }
+
     /**
      * MAIN HOOK entry, very important function.
      * MAIN Callback.
@@ -535,6 +580,11 @@ extern "C" {
         
         _flag = CGEventGetFlags(event);
         _keycode = (CGKeyCode)CGEventGetIntegerValueField(event, kCGKeyboardEventKeycode);
+        
+        if (type == kCGEventKeyDown && vPerformLayoutCompat) {
+            // If conversion fail, use current keycode
+           _keycode = ConvertEventToKeyboadLayoutCompatKeyCode(event, _keycode);
+        }
         
         //switch language shortcut; convert hotkey
         if (type == kCGEventKeyDown) {
