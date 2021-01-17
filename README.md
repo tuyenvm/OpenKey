@@ -71,16 +71,16 @@ $ /usr/bin/ruby -e "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/inst
 
 Kiểm tra phiên bản OpenKey:
 ```
-$ brew cask info openkey
+$ brew info --cask openkey
 ```
 Gõ lệnh sau để homebrew tự cài OpenKey cho bạn:
 ```
-$ brew cask install openkey
+$ brew install --cask openkey
 ```
 
 Để update phiên bản mới nhất của OpenKey
 ```
-$ brew cask upgrade openkey
+$ brew upgrade --cask openkey
 ```
 
 ## Note - Lưu ý:
