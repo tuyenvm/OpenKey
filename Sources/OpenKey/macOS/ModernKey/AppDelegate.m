@@ -49,6 +49,8 @@ int vTempOffOpenKey = 0; //new on version 2.0
 
 int vShowIconOnDock = 0; //new on version 2.0
 
+int vPerformLayoutCompat = 0;
+
 //beta feature
 int vFixChromiumBrowser = 0; //new on version 2.0
 
@@ -285,6 +287,7 @@ extern bool convertToolDontAlertWhenCompleted;
     vTempOffOpenKey = 0;[[NSUserDefaults standardUserDefaults] setInteger:vTempOffOpenKey forKey:@"vTempOffOpenKey"];
     vShowIconOnDock = 0;[[NSUserDefaults standardUserDefaults] setInteger:vShowIconOnDock forKey:@"vShowIconOnDock"];
     vFixChromiumBrowser = 0;[[NSUserDefaults standardUserDefaults] setInteger:vFixChromiumBrowser forKey:@"vFixChromiumBrowser"];
+    vPerformLayoutCompat = 0;[[NSUserDefaults standardUserDefaults] setInteger:vPerformLayoutCompat forKey:@"vPerformLayoutCompat"];
     [[NSUserDefaults standardUserDefaults] setInteger:1 forKey:@"RunOnStartup"];
     
     [self fillData];
