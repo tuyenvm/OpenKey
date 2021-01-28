@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		23136D92231FBD49000764E6 /* ConvertToolViewController.mm in Sources */ = {isa = PBXBuildFile; fileRef = 23136D91231FBD49000764E6 /* ConvertToolViewController.mm */; };
 		232DB1E421FAED290049A0B5 /* StatusHighlighted.png in Resources */ = {isa = PBXBuildFile; fileRef = 232DB1E021FAED280049A0B5 /* StatusHighlighted.png */; };
 		232DB1E521FAED290049A0B5 /* Status.png in Resources */ = {isa = PBXBuildFile; fileRef = 232DB1E121FAED280049A0B5 /* Status.png */; };
 		232DB1E621FAED290049A0B5 /* Status@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 232DB1E221FAED280049A0B5 /* Status@2x.png */; };
@@ -16,18 +17,22 @@
 		232EDA5E21F1B33F0085D362 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 232EDA5D21F1B33F0085D362 /* Assets.xcassets */; };
 		232EDA6121F1B33F0085D362 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 232EDA5F21F1B33F0085D362 /* Main.storyboard */; };
 		232EDA6421F1B33F0085D362 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 232EDA6321F1B33F0085D362 /* main.m */; };
-		23355FD821F2D31D00625798 /* Vietnamese.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 23355FD621F2D31D00625798 /* Vietnamese.cpp */; };
+		23310EA22314F31400226CA5 /* Icon.icns in Resources */ = {isa = PBXBuildFile; fileRef = 23310EA12314F31400226CA5 /* Icon.icns */; };
+		233C4A6E231F923D00DD7052 /* AppKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 233C4A6D231F923D00DD7052 /* AppKit.framework */; };
+		233C4A70231F937900DD7052 /* ConvertTool.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 233C4A6F231F937900DD7052 /* ConvertTool.cpp */; };
+		233D800322F7D1F000E02DC6 /* main.mm in Sources */ = {isa = PBXBuildFile; fileRef = 233D800222F7D1F000E02DC6 /* main.mm */; };
+		2345899A22F720D7003E0923 /* MacroViewController.mm in Sources */ = {isa = PBXBuildFile; fileRef = 2345899922F720D7003E0923 /* MacroViewController.mm */; };
 		234F70AC21FB50BD00D2F2CA /* StatusHighlightedEng.png in Resources */ = {isa = PBXBuildFile; fileRef = 234F70A821FB50BC00D2F2CA /* StatusHighlightedEng.png */; };
 		234F70AD21FB50BD00D2F2CA /* StatusEng@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 234F70A921FB50BC00D2F2CA /* StatusEng@2x.png */; };
 		234F70AE21FB50BD00D2F2CA /* StatusHighlightedEng@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 234F70AA21FB50BC00D2F2CA /* StatusHighlightedEng@2x.png */; };
 		234F70AF21FB50BD00D2F2CA /* StatusEng.png in Resources */ = {isa = PBXBuildFile; fileRef = 234F70AB21FB50BD00D2F2CA /* StatusEng.png */; };
+		2371AAEF22FA85B200CA1B57 /* OpenKey.mm in Sources */ = {isa = PBXBuildFile; fileRef = 2371AAEE22FA85B200CA1B57 /* OpenKey.mm */; };
 		2374A1302216720E005B0375 /* AboutViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 2374A12F2216720E005B0375 /* AboutViewController.m */; };
 		237559B62204156000FB8CB9 /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 237559B52204156000FB8CB9 /* AppDelegate.m */; };
 		237559B82204156000FB8CB9 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 237559B72204156000FB8CB9 /* Assets.xcassets */; };
 		237559BB2204156000FB8CB9 /* MainMenu.xib in Resources */ = {isa = PBXBuildFile; fileRef = 237559B92204156000FB8CB9 /* MainMenu.xib */; };
 		237559BE2204156000FB8CB9 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 237559BD2204156000FB8CB9 /* main.m */; };
-		238519F021F1B70E00E79A41 /* Engine.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 238519EF21F1B70E00E79A41 /* Engine.cpp */; };
-		238519F521F1B9B900E79A41 /* OpenKey.mm in Sources */ = {isa = PBXBuildFile; fileRef = 238519F421F1B9B900E79A41 /* OpenKey.mm */; };
+		2383405D2320F8170020F857 /* StartConvert@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 2383405B2320F8170020F857 /* StartConvert@2x.png */; };
 		238519F821F1BF3C00E79A41 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 238519F221F1B8E200E79A41 /* Foundation.framework */; };
 		238519FF21F1BF8A00E79A41 /* EventKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 238519FD21F1BF5100E79A41 /* EventKit.framework */; };
 		23851A0021F1BFA300E79A41 /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 238519FB21F1BF4900E79A41 /* Cocoa.framework */; };
@@ -39,22 +44,36 @@
 		238AF96922042E2500AEFA17 /* ThumbUp@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 238AF96822042E2500AEFA17 /* ThumbUp@2x.png */; };
 		238AF97122042EC600AEFA17 /* Icon.icns in Resources */ = {isa = PBXBuildFile; fileRef = 238AF97022042EC600AEFA17 /* Icon.icns */; };
 		23963B5022040C720097189E /* ServiceManagement.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 23963B4F22040C720097189E /* ServiceManagement.framework */; };
-		29CBBE6123325C3C00740F8A /* ConvertTool.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 29CBBE5C23325C3C00740F8A /* ConvertTool.cpp */; };
-		29CBBE6223325C3C00740F8A /* Macro.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 29CBBE5D23325C3C00740F8A /* Macro.cpp */; };
-		29CBBE6323325C3C00740F8A /* SmartSwitchKey.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 29CBBE5F23325C3C00740F8A /* SmartSwitchKey.cpp */; };
-		29CBBE6A23325D8600740F8A /* MyTextField.m in Sources */ = {isa = PBXBuildFile; fileRef = 29CBBE6423325D8600740F8A /* MyTextField.m */; };
-		29CBBE6B23325D8600740F8A /* ConvertToolViewController.mm in Sources */ = {isa = PBXBuildFile; fileRef = 29CBBE6723325D8600740F8A /* ConvertToolViewController.mm */; };
-		29CBBE6C23325D8600740F8A /* MacroViewController.mm in Sources */ = {isa = PBXBuildFile; fileRef = 29CBBE6823325D8600740F8A /* MacroViewController.mm */; };
-		29CBBE6E2332634700740F8A /* MJAccessibilityUtils.m in Sources */ = {isa = PBXBuildFile; fileRef = 29CBBE6D2332634700740F8A /* MJAccessibilityUtils.m */; };
+		2397059523143266002DDEA7 /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 2397059423143266002DDEA7 /* AppDelegate.m */; };
+		2397059723143267002DDEA7 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 2397059623143267002DDEA7 /* Assets.xcassets */; };
+		2397059A23143267002DDEA7 /* MainMenu.xib in Resources */ = {isa = PBXBuildFile; fileRef = 2397059823143267002DDEA7 /* MainMenu.xib */; };
+		2397059D23143267002DDEA7 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 2397059C23143267002DDEA7 /* main.m */; };
+		23CA6D1722F0439100804D6E /* MyTextField.m in Sources */ = {isa = PBXBuildFile; fileRef = 23CA6D1622F0439100804D6E /* MyTextField.m */; };
+		23E2E49D2314FD3A006CCC3E /* Macro.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 23E2E4952314FD3A006CCC3E /* Macro.cpp */; };
+		23E2E49E2314FD3A006CCC3E /* SmartSwitchKey.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 23E2E4982314FD3A006CCC3E /* SmartSwitchKey.cpp */; };
+		23E2E49F2314FD3A006CCC3E /* Engine.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 23E2E49A2314FD3A006CCC3E /* Engine.cpp */; };
+		23E2E4A02314FD3A006CCC3E /* Vietnamese.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 23E2E49B2314FD3A006CCC3E /* Vietnamese.cpp */; };
+		23E2E4AD231502EA006CCC3E /* OpenKeyUpdate.app in CopyFiles */ = {isa = PBXBuildFile; fileRef = 2397059123143266002DDEA7 /* OpenKeyUpdate.app */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
+		23F512852336386200397988 /* MJAccessibilityUtils.m in Sources */ = {isa = PBXBuildFile; fileRef = 23F512832336386200397988 /* MJAccessibilityUtils.m */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
+		233D7FFE22F7D1F000E02DC6 /* CopyFiles */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = /usr/share/man/man1/;
+			dstSubfolderSpec = 0;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 1;
+		};
 		237559C4220417DD00FB8CB9 /* CopyFiles */ = {
 			isa = PBXCopyFilesBuildPhase;
 			buildActionMask = 2147483647;
 			dstPath = Contents/Library/LoginItems;
 			dstSubfolderSpec = 1;
 			files = (
+				23E2E4AD231502EA006CCC3E /* OpenKeyUpdate.app in CopyFiles */,
 				2388EFB422041C4200DACE7C /* OpenKeyHelper.app in CopyFiles */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -62,6 +81,8 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		23136D90231FBD49000764E6 /* ConvertToolViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ConvertToolViewController.h; sourceTree = "<group>"; };
+		23136D91231FBD49000764E6 /* ConvertToolViewController.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = ConvertToolViewController.mm; sourceTree = "<group>"; };
 		232DB1E021FAED280049A0B5 /* StatusHighlighted.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = StatusHighlighted.png; sourceTree = "<group>"; };
 		232DB1E121FAED280049A0B5 /* Status.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = Status.png; sourceTree = "<group>"; };
 		232DB1E221FAED280049A0B5 /* Status@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "Status@2x.png"; sourceTree = "<group>"; };
@@ -76,13 +97,20 @@
 		232EDA6221F1B33F0085D362 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		232EDA6321F1B33F0085D362 /* main.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = "<group>"; };
 		232EDA6521F1B33F0085D362 /* ModernKey.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = ModernKey.entitlements; sourceTree = "<group>"; };
-		23355FD621F2D31D00625798 /* Vietnamese.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = Vietnamese.cpp; sourceTree = "<group>"; };
-		23355FD721F2D31D00625798 /* Vietnamese.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = Vietnamese.h; sourceTree = "<group>"; };
-		234584A721F1E96C00DE1DEC /* DataType.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = DataType.h; sourceTree = "<group>"; };
+		23310EA12314F31400226CA5 /* Icon.icns */ = {isa = PBXFileReference; lastKnownFileType = image.icns; path = Icon.icns; sourceTree = "<group>"; };
+		233C4A6D231F923D00DD7052 /* AppKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AppKit.framework; path = System/Library/Frameworks/AppKit.framework; sourceTree = SDKROOT; };
+		233C4A6F231F937900DD7052 /* ConvertTool.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = ConvertTool.cpp; sourceTree = "<group>"; };
+		233C4A71231F938800DD7052 /* ConvertTool.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ConvertTool.h; sourceTree = "<group>"; };
+		233D800022F7D1F000E02DC6 /* OpenKeyTest */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = OpenKeyTest; sourceTree = BUILT_PRODUCTS_DIR; };
+		233D800222F7D1F000E02DC6 /* main.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = main.mm; sourceTree = "<group>"; };
+		2344220522F42F70009E47D4 /* OpenKey.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = OpenKey.entitlements; sourceTree = "<group>"; };
+		2345899822F720D7003E0923 /* MacroViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = MacroViewController.h; sourceTree = "<group>"; };
+		2345899922F720D7003E0923 /* MacroViewController.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = MacroViewController.mm; sourceTree = "<group>"; };
 		234F70A821FB50BC00D2F2CA /* StatusHighlightedEng.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = StatusHighlightedEng.png; sourceTree = "<group>"; };
 		234F70A921FB50BC00D2F2CA /* StatusEng@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "StatusEng@2x.png"; sourceTree = "<group>"; };
 		234F70AA21FB50BC00D2F2CA /* StatusHighlightedEng@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "StatusHighlightedEng@2x.png"; sourceTree = "<group>"; };
 		234F70AB21FB50BD00D2F2CA /* StatusEng.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = StatusEng.png; sourceTree = "<group>"; };
+		2371AAEE22FA85B200CA1B57 /* OpenKey.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = OpenKey.mm; sourceTree = "<group>"; };
 		2374A12E2216720E005B0375 /* AboutViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = AboutViewController.h; sourceTree = "<group>"; };
 		2374A12F2216720E005B0375 /* AboutViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = AboutViewController.m; sourceTree = "<group>"; };
 		237559B22204156000FB8CB9 /* OpenKeyHelper.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = OpenKeyHelper.app; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -93,10 +121,11 @@
 		237559BC2204156000FB8CB9 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		237559BD2204156000FB8CB9 /* main.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = "<group>"; };
 		237559BF2204156000FB8CB9 /* OpenKeyHelper.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = OpenKeyHelper.entitlements; sourceTree = "<group>"; };
-		238519EE21F1B70E00E79A41 /* Engine.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Engine.h; sourceTree = "<group>"; };
-		238519EF21F1B70E00E79A41 /* Engine.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Engine.cpp; sourceTree = "<group>"; };
+		237724A3232BA3B800E92BDF /* linux.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = linux.h; sourceTree = "<group>"; };
+		237724A4232BA3B800E92BDF /* win32.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = win32.h; sourceTree = "<group>"; };
+		237724A5232BA3B800E92BDF /* mac.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = mac.h; sourceTree = "<group>"; };
+		2383405B2320F8170020F857 /* StartConvert@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "StartConvert@2x.png"; sourceTree = "<group>"; };
 		238519F221F1B8E200E79A41 /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = System/Library/Frameworks/Foundation.framework; sourceTree = SDKROOT; };
-		238519F421F1B9B900E79A41 /* OpenKey.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = OpenKey.mm; sourceTree = "<group>"; };
 		238519F921F1BF4400E79A41 /* CoreGraphics.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreGraphics.framework; path = System/Library/Frameworks/CoreGraphics.framework; sourceTree = SDKROOT; };
 		238519FB21F1BF4900E79A41 /* Cocoa.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Cocoa.framework; path = System/Library/Frameworks/Cocoa.framework; sourceTree = SDKROOT; };
 		238519FD21F1BF5100E79A41 /* EventKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = EventKit.framework; path = System/Library/Frameworks/EventKit.framework; sourceTree = SDKROOT; };
@@ -108,21 +137,28 @@
 		238AF96822042E2500AEFA17 /* ThumbUp@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "ThumbUp@2x.png"; sourceTree = "<group>"; };
 		238AF97022042EC600AEFA17 /* Icon.icns */ = {isa = PBXFileReference; lastKnownFileType = image.icns; path = Icon.icns; sourceTree = "<group>"; };
 		23963B4F22040C720097189E /* ServiceManagement.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = ServiceManagement.framework; path = System/Library/Frameworks/ServiceManagement.framework; sourceTree = SDKROOT; };
+		2397059123143266002DDEA7 /* OpenKeyUpdate.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = OpenKeyUpdate.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		2397059323143266002DDEA7 /* AppDelegate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = AppDelegate.h; sourceTree = "<group>"; };
+		2397059423143266002DDEA7 /* AppDelegate.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = AppDelegate.m; sourceTree = "<group>"; };
+		2397059623143267002DDEA7 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
+		2397059923143267002DDEA7 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = Base; path = Base.lproj/MainMenu.xib; sourceTree = "<group>"; };
+		2397059B23143267002DDEA7 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		2397059C23143267002DDEA7 /* main.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = "<group>"; };
+		2397059E23143267002DDEA7 /* OpenKeyUpdate.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = OpenKeyUpdate.entitlements; sourceTree = "<group>"; };
 		23A984BE220ED07E000914A2 /* IOKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = IOKit.framework; path = System/Library/Frameworks/IOKit.framework; sourceTree = SDKROOT; };
-		29CBBE5B23325C3C00740F8A /* ConvertTool.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ConvertTool.h; sourceTree = "<group>"; };
-		29CBBE5C23325C3C00740F8A /* ConvertTool.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = ConvertTool.cpp; sourceTree = "<group>"; };
-		29CBBE5D23325C3C00740F8A /* Macro.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Macro.cpp; sourceTree = "<group>"; };
-		29CBBE5E23325C3C00740F8A /* Macro.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Macro.h; sourceTree = "<group>"; };
-		29CBBE5F23325C3C00740F8A /* SmartSwitchKey.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = SmartSwitchKey.cpp; sourceTree = "<group>"; };
-		29CBBE6023325C3C00740F8A /* SmartSwitchKey.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SmartSwitchKey.h; sourceTree = "<group>"; };
-		29CBBE6423325D8600740F8A /* MyTextField.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MyTextField.m; sourceTree = "<group>"; };
-		29CBBE6523325D8600740F8A /* MacroViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MacroViewController.h; sourceTree = "<group>"; };
-		29CBBE6623325D8600740F8A /* ConvertToolViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ConvertToolViewController.h; sourceTree = "<group>"; };
-		29CBBE6723325D8600740F8A /* ConvertToolViewController.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = ConvertToolViewController.mm; sourceTree = "<group>"; };
-		29CBBE6823325D8600740F8A /* MacroViewController.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = MacroViewController.mm; sourceTree = "<group>"; };
-		29CBBE6923325D8600740F8A /* MyTextField.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MyTextField.h; sourceTree = "<group>"; };
-		29CBBE6D2332634700740F8A /* MJAccessibilityUtils.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = MJAccessibilityUtils.m; sourceTree = "<group>"; };
-		29CBBE6F233263F900740F8A /* MJAccessibilityUtils.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = MJAccessibilityUtils.h; sourceTree = "<group>"; };
+		23CA6D1522F0439100804D6E /* MyTextField.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = MyTextField.h; sourceTree = "<group>"; };
+		23CA6D1622F0439100804D6E /* MyTextField.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = MyTextField.m; sourceTree = "<group>"; };
+		23E2E4942314FD3A006CCC3E /* Engine.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Engine.h; sourceTree = "<group>"; };
+		23E2E4952314FD3A006CCC3E /* Macro.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Macro.cpp; sourceTree = "<group>"; };
+		23E2E4962314FD3A006CCC3E /* DataType.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DataType.h; sourceTree = "<group>"; };
+		23E2E4972314FD3A006CCC3E /* Macro.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Macro.h; sourceTree = "<group>"; };
+		23E2E4982314FD3A006CCC3E /* SmartSwitchKey.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = SmartSwitchKey.cpp; sourceTree = "<group>"; };
+		23E2E4992314FD3A006CCC3E /* Vietnamese.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Vietnamese.h; sourceTree = "<group>"; };
+		23E2E49A2314FD3A006CCC3E /* Engine.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Engine.cpp; sourceTree = "<group>"; };
+		23E2E49B2314FD3A006CCC3E /* Vietnamese.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Vietnamese.cpp; sourceTree = "<group>"; };
+		23E2E49C2314FD3A006CCC3E /* SmartSwitchKey.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SmartSwitchKey.h; sourceTree = "<group>"; };
+		23F512832336386200397988 /* MJAccessibilityUtils.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MJAccessibilityUtils.m; sourceTree = "<group>"; };
+		23F512842336386200397988 /* MJAccessibilityUtils.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MJAccessibilityUtils.h; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -130,6 +166,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				233C4A6E231F923D00DD7052 /* AppKit.framework in Frameworks */,
 				23963B5022040C720097189E /* ServiceManagement.framework in Frameworks */,
 				23851A0121F1C1A400E79A41 /* CoreGraphics.framework in Frameworks */,
 				23851A0021F1BFA300E79A41 /* Cocoa.framework in Frameworks */,
@@ -138,7 +175,21 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		233D7FFD22F7D1F000E02DC6 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		237559AF2204156000FB8CB9 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		2397058E23143266002DDEA7 /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -151,6 +202,7 @@
 		232DB1DF21FAED280049A0B5 /* Resources */ = {
 			isa = PBXGroup;
 			children = (
+				2383405B2320F8170020F857 /* StartConvert@2x.png */,
 				238AF97022042EC600AEFA17 /* Icon.icns */,
 				238AF96822042E2500AEFA17 /* ThumbUp@2x.png */,
 				238AF96622042D4900AEFA17 /* ExitButton@2x.png */,
@@ -170,10 +222,13 @@
 		232EDA4B21F1B33E0085D362 = {
 			isa = PBXGroup;
 			children = (
+				23E2E4932314FD3A006CCC3E /* engine */,
+				2344220522F42F70009E47D4 /* OpenKey.entitlements */,
 				232EDA5621F1B33E0085D362 /* ModernKey */,
-				238519ED21F1B70E00E79A41 /* engine */,
-				237559B32204156000FB8CB9 /* OpenKeyHelper */,
+				233D800122F7D1F000E02DC6 /* OpenKeyTest */,
+				2397059223143266002DDEA7 /* OpenKeyUpdate */,
 				232EDA5521F1B33E0085D362 /* Products */,
+				237559B32204156000FB8CB9 /* OpenKeyHelper */,
 				238519F121F1B8E200E79A41 /* Frameworks */,
 			);
 			sourceTree = "<group>";
@@ -183,6 +238,8 @@
 			children = (
 				232EDA5421F1B33E0085D362 /* OpenKey.app */,
 				237559B22204156000FB8CB9 /* OpenKeyHelper.app */,
+				233D800022F7D1F000E02DC6 /* OpenKeyTest */,
+				2397059123143266002DDEA7 /* OpenKeyUpdate.app */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -190,13 +247,9 @@
 		232EDA5621F1B33E0085D362 /* ModernKey */ = {
 			isa = PBXGroup;
 			children = (
-				29CBBE6623325D8600740F8A /* ConvertToolViewController.h */,
-				29CBBE6723325D8600740F8A /* ConvertToolViewController.mm */,
-				29CBBE6523325D8600740F8A /* MacroViewController.h */,
-				29CBBE6823325D8600740F8A /* MacroViewController.mm */,
-				29CBBE6923325D8600740F8A /* MyTextField.h */,
-				29CBBE6423325D8600740F8A /* MyTextField.m */,
 				232DB1DF21FAED280049A0B5 /* Resources */,
+				23F512842336386200397988 /* MJAccessibilityUtils.h */,
+				23F512832336386200397988 /* MJAccessibilityUtils.m */,
 				232EDA5721F1B33E0085D362 /* AppDelegate.h */,
 				232EDA5821F1B33E0085D362 /* AppDelegate.m */,
 				232EDA5A21F1B33E0085D362 /* ViewController.h */,
@@ -210,11 +263,31 @@
 				232EDA6521F1B33F0085D362 /* ModernKey.entitlements */,
 				2389467E21FDDC3F0030A13B /* OpenKeyManager.h */,
 				2389467C21FDDB920030A13B /* OpenKeyManager.m */,
-				238519F421F1B9B900E79A41 /* OpenKey.mm */,
-				29CBBE6D2332634700740F8A /* MJAccessibilityUtils.m */,
-				29CBBE6F233263F900740F8A /* MJAccessibilityUtils.h */,
+				23CA6D1522F0439100804D6E /* MyTextField.h */,
+				23CA6D1622F0439100804D6E /* MyTextField.m */,
+				2345899822F720D7003E0923 /* MacroViewController.h */,
+				2345899922F720D7003E0923 /* MacroViewController.mm */,
+				23136D90231FBD49000764E6 /* ConvertToolViewController.h */,
+				23136D91231FBD49000764E6 /* ConvertToolViewController.mm */,
+				2371AAEE22FA85B200CA1B57 /* OpenKey.mm */,
 			);
 			path = ModernKey;
+			sourceTree = "<group>";
+		};
+		23310EA02314F31400226CA5 /* Resources */ = {
+			isa = PBXGroup;
+			children = (
+				23310EA12314F31400226CA5 /* Icon.icns */,
+			);
+			path = Resources;
+			sourceTree = "<group>";
+		};
+		233D800122F7D1F000E02DC6 /* OpenKeyTest */ = {
+			isa = PBXGroup;
+			children = (
+				233D800222F7D1F000E02DC6 /* main.mm */,
+			);
+			path = OpenKeyTest;
 			sourceTree = "<group>";
 		};
 		237559B32204156000FB8CB9 /* OpenKeyHelper */ = {
@@ -231,28 +304,20 @@
 			path = OpenKeyHelper;
 			sourceTree = "<group>";
 		};
-		238519ED21F1B70E00E79A41 /* engine */ = {
+		237724A2232BA3B800E92BDF /* platforms */ = {
 			isa = PBXGroup;
 			children = (
-				29CBBE5C23325C3C00740F8A /* ConvertTool.cpp */,
-				29CBBE5B23325C3C00740F8A /* ConvertTool.h */,
-				29CBBE5D23325C3C00740F8A /* Macro.cpp */,
-				29CBBE5E23325C3C00740F8A /* Macro.h */,
-				29CBBE5F23325C3C00740F8A /* SmartSwitchKey.cpp */,
-				29CBBE6023325C3C00740F8A /* SmartSwitchKey.h */,
-				234584A721F1E96C00DE1DEC /* DataType.h */,
-				23355FD621F2D31D00625798 /* Vietnamese.cpp */,
-				23355FD721F2D31D00625798 /* Vietnamese.h */,
-				238519EE21F1B70E00E79A41 /* Engine.h */,
-				238519EF21F1B70E00E79A41 /* Engine.cpp */,
+				237724A3232BA3B800E92BDF /* linux.h */,
+				237724A4232BA3B800E92BDF /* win32.h */,
+				237724A5232BA3B800E92BDF /* mac.h */,
 			);
-			name = engine;
-			path = ../engine;
+			path = platforms;
 			sourceTree = "<group>";
 		};
 		238519F121F1B8E200E79A41 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				233C4A6D231F923D00DD7052 /* AppKit.framework */,
 				23A984BE220ED07E000914A2 /* IOKit.framework */,
 				23963B4F22040C720097189E /* ServiceManagement.framework */,
 				23874B0F220160A500000BC8 /* Carbon.framework */,
@@ -262,6 +327,41 @@
 				238519F221F1B8E200E79A41 /* Foundation.framework */,
 			);
 			name = Frameworks;
+			sourceTree = "<group>";
+		};
+		2397059223143266002DDEA7 /* OpenKeyUpdate */ = {
+			isa = PBXGroup;
+			children = (
+				23310EA02314F31400226CA5 /* Resources */,
+				2397059323143266002DDEA7 /* AppDelegate.h */,
+				2397059423143266002DDEA7 /* AppDelegate.m */,
+				2397059623143267002DDEA7 /* Assets.xcassets */,
+				2397059823143267002DDEA7 /* MainMenu.xib */,
+				2397059B23143267002DDEA7 /* Info.plist */,
+				2397059C23143267002DDEA7 /* main.m */,
+				2397059E23143267002DDEA7 /* OpenKeyUpdate.entitlements */,
+			);
+			path = OpenKeyUpdate;
+			sourceTree = "<group>";
+		};
+		23E2E4932314FD3A006CCC3E /* engine */ = {
+			isa = PBXGroup;
+			children = (
+				237724A2232BA3B800E92BDF /* platforms */,
+				23E2E4962314FD3A006CCC3E /* DataType.h */,
+				23E2E4972314FD3A006CCC3E /* Macro.h */,
+				23E2E4952314FD3A006CCC3E /* Macro.cpp */,
+				23E2E4982314FD3A006CCC3E /* SmartSwitchKey.cpp */,
+				23E2E49C2314FD3A006CCC3E /* SmartSwitchKey.h */,
+				23E2E4992314FD3A006CCC3E /* Vietnamese.h */,
+				23E2E49B2314FD3A006CCC3E /* Vietnamese.cpp */,
+				23E2E4942314FD3A006CCC3E /* Engine.h */,
+				23E2E49A2314FD3A006CCC3E /* Engine.cpp */,
+				233C4A6F231F937900DD7052 /* ConvertTool.cpp */,
+				233C4A71231F938800DD7052 /* ConvertTool.h */,
+			);
+			name = engine;
+			path = ../engine;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -285,6 +385,23 @@
 			productReference = 232EDA5421F1B33E0085D362 /* OpenKey.app */;
 			productType = "com.apple.product-type.application";
 		};
+		233D7FFF22F7D1F000E02DC6 /* OpenKeyTest */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 233D800622F7D1F000E02DC6 /* Build configuration list for PBXNativeTarget "OpenKeyTest" */;
+			buildPhases = (
+				233D7FFC22F7D1F000E02DC6 /* Sources */,
+				233D7FFD22F7D1F000E02DC6 /* Frameworks */,
+				233D7FFE22F7D1F000E02DC6 /* CopyFiles */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = OpenKeyTest;
+			productName = OpenKeyTest;
+			productReference = 233D800022F7D1F000E02DC6 /* OpenKeyTest */;
+			productType = "com.apple.product-type.tool";
+		};
 		237559B12204156000FB8CB9 /* OpenKeyHelper */ = {
 			isa = PBXNativeTarget;
 			buildConfigurationList = 237559C02204156000FB8CB9 /* Build configuration list for PBXNativeTarget "OpenKeyHelper" */;
@@ -302,6 +419,23 @@
 			productReference = 237559B22204156000FB8CB9 /* OpenKeyHelper.app */;
 			productType = "com.apple.product-type.application";
 		};
+		2397059023143266002DDEA7 /* OpenKeyUpdate */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 239705A123143267002DDEA7 /* Build configuration list for PBXNativeTarget "OpenKeyUpdate" */;
+			buildPhases = (
+				2397058D23143266002DDEA7 /* Sources */,
+				2397058E23143266002DDEA7 /* Frameworks */,
+				2397058F23143266002DDEA7 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = OpenKeyUpdate;
+			productName = OpenKeyUpdate;
+			productReference = 2397059123143266002DDEA7 /* OpenKeyUpdate.app */;
+			productType = "com.apple.product-type.application";
+		};
 /* End PBXNativeTarget section */
 
 /* Begin PBXProject section */
@@ -315,12 +449,28 @@
 						CreatedOnToolsVersion = 10.1;
 						SystemCapabilities = {
 							com.apple.Sandbox = {
-								enabled = 1;
+								enabled = 0;
 							};
 						};
 					};
+					233D7FFF22F7D1F000E02DC6 = {
+						CreatedOnToolsVersion = 10.2.1;
+					};
 					237559B12204156000FB8CB9 = {
 						CreatedOnToolsVersion = 10.1;
+						SystemCapabilities = {
+							com.apple.Sandbox = {
+								enabled = 0;
+							};
+						};
+					};
+					2397059023143266002DDEA7 = {
+						CreatedOnToolsVersion = 10.2.1;
+						SystemCapabilities = {
+							com.apple.Sandbox = {
+								enabled = 0;
+							};
+						};
 					};
 				};
 			};
@@ -339,6 +489,8 @@
 			targets = (
 				232EDA5321F1B33E0085D362 /* OpenKey */,
 				237559B12204156000FB8CB9 /* OpenKeyHelper */,
+				233D7FFF22F7D1F000E02DC6 /* OpenKeyTest */,
+				2397059023143266002DDEA7 /* OpenKeyUpdate */,
 			);
 		};
 /* End PBXProject section */
@@ -362,6 +514,7 @@
 				238AF96922042E2500AEFA17 /* ThumbUp@2x.png in Resources */,
 				232EDA5E21F1B33F0085D362 /* Assets.xcassets in Resources */,
 				232EDA6121F1B33F0085D362 /* Main.storyboard in Resources */,
+				2383405D2320F8170020F857 /* StartConvert@2x.png in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -374,6 +527,16 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		2397058F23143266002DDEA7 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				23310EA22314F31400226CA5 /* Icon.icns in Resources */,
+				2397059723143267002DDEA7 /* Assets.xcassets in Resources */,
+				2397059A23143267002DDEA7 /* MainMenu.xib in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
@@ -381,21 +544,29 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				29CBBE6323325C3C00740F8A /* SmartSwitchKey.cpp in Sources */,
+				23E2E49F2314FD3A006CCC3E /* Engine.cpp in Sources */,
 				232EDA5C21F1B33E0085D362 /* ViewController.m in Sources */,
+				23E2E49E2314FD3A006CCC3E /* SmartSwitchKey.cpp in Sources */,
+				23F512852336386200397988 /* MJAccessibilityUtils.m in Sources */,
 				2389467D21FDDB920030A13B /* OpenKeyManager.m in Sources */,
-				29CBBE6E2332634700740F8A /* MJAccessibilityUtils.m in Sources */,
-				29CBBE6223325C3C00740F8A /* Macro.cpp in Sources */,
+				23E2E4A02314FD3A006CCC3E /* Vietnamese.cpp in Sources */,
 				2374A1302216720E005B0375 /* AboutViewController.m in Sources */,
-				238519F021F1B70E00E79A41 /* Engine.cpp in Sources */,
-				29CBBE6123325C3C00740F8A /* ConvertTool.cpp in Sources */,
-				238519F521F1B9B900E79A41 /* OpenKey.mm in Sources */,
+				23CA6D1722F0439100804D6E /* MyTextField.m in Sources */,
 				232EDA6421F1B33F0085D362 /* main.m in Sources */,
-				23355FD821F2D31D00625798 /* Vietnamese.cpp in Sources */,
+				2345899A22F720D7003E0923 /* MacroViewController.mm in Sources */,
+				2371AAEF22FA85B200CA1B57 /* OpenKey.mm in Sources */,
+				23E2E49D2314FD3A006CCC3E /* Macro.cpp in Sources */,
+				233C4A70231F937900DD7052 /* ConvertTool.cpp in Sources */,
+				23136D92231FBD49000764E6 /* ConvertToolViewController.mm in Sources */,
 				232EDA5921F1B33E0085D362 /* AppDelegate.m in Sources */,
-				29CBBE6B23325D8600740F8A /* ConvertToolViewController.mm in Sources */,
-				29CBBE6A23325D8600740F8A /* MyTextField.m in Sources */,
-				29CBBE6C23325D8600740F8A /* MacroViewController.mm in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		233D7FFC22F7D1F000E02DC6 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				233D800322F7D1F000E02DC6 /* main.mm in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -405,6 +576,15 @@
 			files = (
 				237559BE2204156000FB8CB9 /* main.m in Sources */,
 				237559B62204156000FB8CB9 /* AppDelegate.m in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		2397058D23143266002DDEA7 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				2397059D23143267002DDEA7 /* main.m in Sources */,
+				2397059523143266002DDEA7 /* AppDelegate.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -423,6 +603,14 @@
 			isa = PBXVariantGroup;
 			children = (
 				237559BA2204156000FB8CB9 /* Base */,
+			);
+			name = MainMenu.xib;
+			sourceTree = "<group>";
+		};
+		2397059823143267002DDEA7 /* MainMenu.xib */ = {
+			isa = PBXVariantGroup;
+			children = (
+				2397059923143267002DDEA7 /* Base */,
 			);
 			name = MainMenu.xib;
 			sourceTree = "<group>";
@@ -547,9 +735,10 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				CLANG_ENABLE_MODULES = NO;
-				CODE_SIGN_ENTITLEMENTS = ModernKey/ModernKey.entitlements;
+				CODE_SIGN_IDENTITY = "Mac Developer";
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
+				CURRENT_PROJECT_VERSION = 48;
 				DEVELOPMENT_TEAM = 7X875U5EVD;
 				HEADER_SEARCH_PATHS = "";
 				INFOPLIST_FILE = ModernKey/Info.plist;
@@ -558,11 +747,13 @@
 					"@executable_path/../Frameworks",
 				);
 				MACOSX_DEPLOYMENT_TARGET = 10.10;
+				MARKETING_VERSION = 2.0.4;
 				OTHER_LDFLAGS = (
 					"-lc++\n-lc++",
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = com.tuyenmai.openkey;
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				PROVISIONING_PROFILE_SPECIFIER = "";
 			};
 			name = Debug;
 		};
@@ -570,9 +761,10 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				CLANG_ENABLE_MODULES = NO;
-				CODE_SIGN_ENTITLEMENTS = ModernKey/ModernKey.entitlements;
+				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
+				CURRENT_PROJECT_VERSION = 48;
 				DEVELOPMENT_TEAM = 7X875U5EVD;
 				HEADER_SEARCH_PATHS = "";
 				INFOPLIST_FILE = ModernKey/Info.plist;
@@ -581,10 +773,28 @@
 					"@executable_path/../Frameworks",
 				);
 				MACOSX_DEPLOYMENT_TARGET = 10.10;
+				MARKETING_VERSION = 2.0.4;
 				OTHER_LDFLAGS = (
 					"-lc++\n-lc++",
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = com.tuyenmai.openkey;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				PROVISIONING_PROFILE_SPECIFIER = "";
+			};
+			name = Release;
+		};
+		233D800422F7D1F000E02DC6 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_STYLE = Automatic;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+			};
+			name = Debug;
+		};
+		233D800522F7D1F000E02DC6 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_STYLE = Automatic;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 			};
 			name = Release;
@@ -593,7 +803,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
-				CODE_SIGN_ENTITLEMENTS = OpenKeyHelper/OpenKeyHelper.entitlements;
+				CODE_SIGN_IDENTITY = "Mac Developer";
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
 				DEVELOPMENT_TEAM = 7X875U5EVD;
@@ -602,8 +812,10 @@
 					"$(inherited)",
 					"@executable_path/../Frameworks",
 				);
+				MACOSX_DEPLOYMENT_TARGET = 10.10;
 				PRODUCT_BUNDLE_IDENTIFIER = com.tuyenmai.OpenKeyHelper;
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				PROVISIONING_PROFILE_SPECIFIER = "";
 				SKIP_INSTALL = YES;
 			};
 			name = Debug;
@@ -612,7 +824,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
-				CODE_SIGN_ENTITLEMENTS = OpenKeyHelper/OpenKeyHelper.entitlements;
+				CODE_SIGN_IDENTITY = "Mac Developer";
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
 				DEVELOPMENT_TEAM = 7X875U5EVD;
@@ -621,8 +833,50 @@
 					"$(inherited)",
 					"@executable_path/../Frameworks",
 				);
+				MACOSX_DEPLOYMENT_TARGET = 10.10;
 				PRODUCT_BUNDLE_IDENTIFIER = com.tuyenmai.OpenKeyHelper;
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				PROVISIONING_PROFILE_SPECIFIER = "";
+				SKIP_INSTALL = YES;
+			};
+			name = Release;
+		};
+		2397059F23143267002DDEA7 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_IDENTITY = "Mac Developer";
+				CODE_SIGN_STYLE = Automatic;
+				COMBINE_HIDPI_IMAGES = YES;
+				DEVELOPMENT_TEAM = 7X875U5EVD;
+				INFOPLIST_FILE = OpenKeyUpdate/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+				);
+				MACOSX_DEPLOYMENT_TARGET = 10.10;
+				PRODUCT_BUNDLE_IDENTIFIER = com.tuyenmai.OpenKeyUpdate;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				PROVISIONING_PROFILE_SPECIFIER = "";
+				SKIP_INSTALL = YES;
+			};
+			name = Debug;
+		};
+		239705A023143267002DDEA7 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_IDENTITY = "Mac Developer";
+				CODE_SIGN_STYLE = Automatic;
+				COMBINE_HIDPI_IMAGES = YES;
+				DEVELOPMENT_TEAM = 7X875U5EVD;
+				INFOPLIST_FILE = OpenKeyUpdate/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+				);
+				MACOSX_DEPLOYMENT_TARGET = 10.10;
+				PRODUCT_BUNDLE_IDENTIFIER = com.tuyenmai.OpenKeyUpdate;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				PROVISIONING_PROFILE_SPECIFIER = "";
 				SKIP_INSTALL = YES;
 			};
 			name = Release;
@@ -648,11 +902,29 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
+		233D800622F7D1F000E02DC6 /* Build configuration list for PBXNativeTarget "OpenKeyTest" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				233D800422F7D1F000E02DC6 /* Debug */,
+				233D800522F7D1F000E02DC6 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
 		237559C02204156000FB8CB9 /* Build configuration list for PBXNativeTarget "OpenKeyHelper" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				237559C12204156000FB8CB9 /* Debug */,
 				237559C22204156000FB8CB9 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		239705A123143267002DDEA7 /* Build configuration list for PBXNativeTarget "OpenKeyUpdate" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				2397059F23143267002DDEA7 /* Debug */,
+				239705A023143267002DDEA7 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
