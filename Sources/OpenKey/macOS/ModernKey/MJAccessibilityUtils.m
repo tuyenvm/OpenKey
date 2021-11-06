@@ -12,6 +12,7 @@
 #import "MJAccessibilityUtils.h"
 // #import "HSLogger.h"
 
+extern Boolean AXAPIEnabled(void);
 extern Boolean AXIsProcessTrustedWithOptions(CFDictionaryRef options) __attribute__((weak_import));
 extern CFStringRef kAXTrustedCheckOptionPrompt __attribute__((weak_import));
 
