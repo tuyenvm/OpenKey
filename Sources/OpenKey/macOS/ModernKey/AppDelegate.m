@@ -288,8 +288,10 @@ extern bool convertToolDontAlertWhenCompleted;
     vShowIconOnDock = 0;[[NSUserDefaults standardUserDefaults] setInteger:vShowIconOnDock forKey:@"vShowIconOnDock"];
     vFixChromiumBrowser = 0;[[NSUserDefaults standardUserDefaults] setInteger:vFixChromiumBrowser forKey:@"vFixChromiumBrowser"];
     vPerformLayoutCompat = 0;[[NSUserDefaults standardUserDefaults] setInteger:vPerformLayoutCompat forKey:@"vPerformLayoutCompat"];
+
+    [[NSUserDefaults standardUserDefaults] setInteger:1 forKey:@"GrayIcon"];
     [[NSUserDefaults standardUserDefaults] setInteger:1 forKey:@"RunOnStartup"];
-    
+
     [self fillData];
     [viewController fillData];
 }
