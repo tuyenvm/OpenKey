@@ -14,6 +14,9 @@ redistribute your new version, it MUST be open source.
 #include "MainControlDialog.h"
 #include "AppDelegate.h"
 #include <Shlobj.h>
+#include <Uxtheme.h>
+
+#pragma comment(lib, "UxTheme.lib")
 
 static Uint16 _lastKeyCode;
 
@@ -67,7 +70,7 @@ void MainControlDialog::initDialog() {
 	RECT r;
 	TabCtrl_GetItemRect(hTab, 0, &r);
 	TabCtrl_SetItemSize(hTab, r.right - r.left, (r.bottom - r.top) * 1.428f);
-	
+
 	//create tab page
 	hTabPage1 = CreateDialogParam(hIns, MAKEINTRESOURCE(IDD_DIALOG_TAB_GENERAL), hDlg, tabPageEventProc, (LPARAM)this);
 	hTabPage2 = CreateDialogParam(hIns, MAKEINTRESOURCE(IDD_DIALOG_TAB_MACRO), hDlg, tabPageEventProc, (LPARAM)this);
@@ -79,10 +82,10 @@ void MainControlDialog::initDialog() {
 	ScreenToClient(hDlg, &offset);
 	OffsetRect(&rc, offset.x, offset.y); //convert to client coordinates
 	rc.top += (LONG)((r.bottom - r.top) * 1.428f);
-	SetWindowPos(hTabPage1, 0, rc.left, rc.top, rc.right - rc.left, rc.bottom - rc.top, SWP_HIDEWINDOW);
-	SetWindowPos(hTabPage2, 0, rc.left, rc.top, rc.right - rc.left, rc.bottom - rc.top, SWP_HIDEWINDOW);
-	SetWindowPos(hTabPage3, 0, rc.left, rc.top, rc.right - rc.left, rc.bottom - rc.top, SWP_HIDEWINDOW);
-	SetWindowPos(hTabPage4, 0, rc.left, rc.top, rc.right - rc.left, rc.bottom - rc.top, SWP_HIDEWINDOW);
+	SetWindowPos(hTabPage1, 0, rc.left+1, rc.top+3, rc.right - rc.left - 5, rc.bottom - rc.top - 5, SWP_HIDEWINDOW);
+	SetWindowPos(hTabPage2, 0, rc.left + 1, rc.top + 3, rc.right - rc.left - 5, rc.bottom - rc.top - 6, SWP_HIDEWINDOW);
+	SetWindowPos(hTabPage3, 0, rc.left + 1, rc.top + 3, rc.right - rc.left - 5, rc.bottom - rc.top - 6, SWP_HIDEWINDOW);
+	SetWindowPos(hTabPage4, 0, rc.left + 1, rc.top + 3, rc.right - rc.left - 5, rc.bottom - rc.top - 6, SWP_HIDEWINDOW);
 	onTabIndexChanged();
 
 	checkCtrl = GetDlgItem(hDlg, IDC_CHECK_SWITCH_KEY_CTRL);
@@ -263,7 +266,7 @@ INT_PTR MainControlDialog::eventProc(HWND hDlg, UINT uMsg, WPARAM wParam, LPARAM
 		case NM_RETURN: {
 			PNMLINK link = (PNMLINK)lParam;
 			if (link->hdr.idFrom == IDC_SYSLINK_HOME_PAGE)
-				ShellExecute(NULL, _T("open"), _T("https://open-key.org"), NULL, NULL, SW_SHOWNORMAL);
+				ShellExecute(NULL, _T("open"), _T("http://open-key.org"), NULL, NULL, SW_SHOWNORMAL);
 			else if (link->hdr.idFrom == IDC_SYSLINK_FANPAGE)
 				ShellExecute(NULL, _T("open"), _T("https://www.facebook.com/OpenKeyVN"), NULL, NULL, SW_SHOWNORMAL);
 			else if (link->hdr.idFrom == IDC_SYSLINK_AUTHOR_EMAIL)
@@ -288,10 +291,21 @@ INT_PTR MainControlDialog::tabPageEventProc(HWND hDlg, UINT uMsg, WPARAM wParam,
 		return TRUE;
 	} else if (uMsg == WM_ERASEBKGND) {
 		return TRUE;
-	} else if (uMsg == WM_CTLCOLORSTATIC) {
+	} else if ((uMsg == WM_CTLCOLORSTATIC || uMsg == WM_CTLCOLORBTN) && IsThemeActive()) {
 		SetBkMode((HDC)wParam, TRANSPARENT);
-		return (LRESULT)GetStockObject(WHITE_BRUSH);
+		return (LRESULT)GetStockObject(COLOR_WINDOW + 1);
+	} else if (uMsg == WM_PAINT && IsThemeActive()) {
+		PAINTSTRUCT ps;
+		HDC hdc = BeginPaint(hDlg, &ps);
+
+		// All painting occurs here, between BeginPaint and EndPaint.
+		FillRect(hdc, &ps.rcPaint, (HBRUSH)(COLOR_WINDOW+1));
+
+		EndPaint(hDlg, &ps);
+		
+		return 0;
 	}
+
 #ifdef _WIN64
 	LONG_PTR attr = GetWindowLongPtr(hDlg, GWLP_USERDATA);
 #else

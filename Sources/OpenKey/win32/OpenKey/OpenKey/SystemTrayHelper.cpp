@@ -168,17 +168,17 @@ HWND SystemTrayHelper::createFakeWindow(const HINSTANCE & hIns) {
 	//create fake window
 	WNDCLASSEXW wcex;
 	wcex.cbSize = sizeof(WNDCLASSEX);
-	wcex.style = CS_HREDRAW | CS_VREDRAW;
+	wcex.style = 0;
 	wcex.lpfnWndProc = WndProc;
 	wcex.cbClsExtra = 0;
 	wcex.cbWndExtra = 0;
 	wcex.hInstance = hIns;
 	wcex.hIcon = LoadIcon(hIns, MAKEINTRESOURCE(IDI_APP_ICON));
-	wcex.hCursor = LoadCursor(nullptr, IDC_ARROW);
+	wcex.hCursor = NULL;
 	wcex.hbrBackground = (HBRUSH)(COLOR_WINDOW + 1);
-	wcex.lpszMenuName = MAKEINTRESOURCEW(IDC_OPENKEY);
+	wcex.lpszMenuName = NULL;
 	wcex.lpszClassName = APP_CLASS;
-	wcex.hIconSm = LoadIcon(wcex.hInstance, MAKEINTRESOURCE(IDI_APP_ICON));
+	wcex.hIconSm = NULL;
 	ATOM atom = RegisterClassExW(&wcex);
 	HWND hWnd = CreateWindowW(APP_CLASS, _T(""), WS_OVERLAPPEDWINDOW,
 		CW_USEDEFAULT, 0, CW_USEDEFAULT, 0, nullptr, nullptr, hIns, nullptr);
@@ -304,8 +304,22 @@ void SystemTrayHelper::updateData() {
 	ModifyMenu(popupMenu, POPUP_QUICK_CONVERT, MF_BYCOMMAND | MF_UNCHECKED, POPUP_QUICK_CONVERT, hotKeyString.c_str());
 }
 
-void SystemTrayHelper::createSystemTrayIcon(const HINSTANCE& hIns) {
-	HWND hWnd = createFakeWindow(hIns);
+static HINSTANCE ins;
+static int recreateCount = 0;
+
+void SystemTrayHelper::_createSystemTrayIcon(const HINSTANCE& hIns) {
+	HWND hWnd = createFakeWindow(ins);
+	
+	if (hWnd == NULL) { //Use timer to create
+		if (recreateCount >= 5) {
+			PostQuitMessage(0);
+			return;
+		}
+		ins = hIns;
+		SetTimer(NULL, 0, 1000 * 3, (TIMERPROC)&WaitToCreateFakeWindow);
+		++recreateCount;
+		return;
+	}
 	createPopupMenu();
 
 	//create system tray
@@ -315,9 +329,19 @@ void SystemTrayHelper::createSystemTrayIcon(const HINSTANCE& hIns) {
 	nid.uVersion = NOTIFYICON_VERSION;
 	nid.uCallbackMessage = WM_TRAYMESSAGE;
 	loadTrayIcon();
-	LoadString(hIns, IDS_APP_TITLE, nid.szTip, 128);
+	LoadString(ins, IDS_APP_TITLE, nid.szTip, 128);
 	nid.uFlags = NIF_MESSAGE | NIF_ICON | NIF_TIP;
 	Shell_NotifyIcon(NIM_ADD, &nid);
+}
+
+
+void CALLBACK SystemTrayHelper::WaitToCreateFakeWindow(HWND hwnd, UINT uMsg, UINT timerId, DWORD dwTime) {
+	_createSystemTrayIcon(ins);
+	KillTimer(0, timerId);
+}
+
+void SystemTrayHelper::createSystemTrayIcon(const HINSTANCE& hIns) {
+	_createSystemTrayIcon(hIns);
 }
 
 void SystemTrayHelper::removeSystemTray() {

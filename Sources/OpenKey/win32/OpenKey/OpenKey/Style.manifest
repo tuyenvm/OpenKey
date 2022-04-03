@@ -3,7 +3,7 @@
 <assembly xmlns="urn:schemas-microsoft-com:asm.v1" manifestVersion="1.0"> 
   <assemblyIdentity version="1.0.0.0" processorArchitecture="*" name="com.tuyenmai.openkey" type="win32"/> 
  
-  <description>Your application description here.</description> 
+  <description>Vietnamese Input Method.</description> 
     <dependency> 
     <dependentAssembly> 
       <assemblyIdentity 
