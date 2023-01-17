@@ -75,7 +75,8 @@ extern bool convertToolDontAlertWhenCompleted;
     
     NSMenuItem* mnuTelex;
     NSMenuItem* mnuVNI;
-    NSMenuItem* mnuSimpleTelex;
+    NSMenuItem* mnuSimpleTelex1;
+    NSMenuItem* mnuSimpleTelex2;
     
     NSMenuItem* mnuUnicode;
     NSMenuItem* mnuTCVN;
@@ -319,8 +320,10 @@ extern bool convertToolDontAlertWhenCompleted;
     mnuTelex.tag = 0;
     mnuVNI = [sub addItemWithTitle:@"VNI" action:@selector(onInputTypeSelected:) keyEquivalent:@""];
     mnuVNI.tag = 1;
-    mnuSimpleTelex = [sub addItemWithTitle:@"Simple Telex" action:@selector(onInputTypeSelected:) keyEquivalent:@""];
-    mnuSimpleTelex.tag = 2;
+    mnuSimpleTelex1 = [sub addItemWithTitle:@"Simple Telex 1" action:@selector(onInputTypeSelected:) keyEquivalent:@""];
+    mnuSimpleTelex1.tag = 2;
+    mnuSimpleTelex2 = [sub addItemWithTitle:@"Simple Telex 2" action:@selector(onInputTypeSelected:) keyEquivalent:@""];
+    mnuSimpleTelex2.tag = 3;
     [theMenu setSubmenu:sub forItem:parent];
 }
 
@@ -356,13 +359,16 @@ extern bool convertToolDontAlertWhenCompleted;
     NSInteger intInputType = [[NSUserDefaults standardUserDefaults] integerForKey:@"InputType"];
     [mnuTelex setState:NSControlStateValueOff];
     [mnuVNI setState:NSControlStateValueOff];
-    [mnuSimpleTelex setState:NSControlStateValueOff];
+    [mnuSimpleTelex1 setState:NSControlStateValueOff];
+    [mnuSimpleTelex2 setState:NSControlStateValueOff];
     if (intInputType == 0) {
         [mnuTelex setState:NSControlStateValueOn];
     } else if (intInputType == 1) {
         [mnuVNI setState:NSControlStateValueOn];
     } else if (intInputType == 2) {
-        [mnuSimpleTelex setState:NSControlStateValueOn];
+        [mnuSimpleTelex1 setState:NSControlStateValueOn];
+    } else if (intInputType == 3) {
+        [mnuSimpleTelex2 setState:NSControlStateValueOn];
     }
     vInputType = (int)intInputType;
     
