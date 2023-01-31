@@ -72,7 +72,7 @@ extern int vPerformLayoutCompat;
     
     [self showTab:0];
     
-    NSArray* inputTypeData = [[NSArray alloc] initWithObjects:@"Telex", @"VNI", @"Simple Telex", nil];
+    NSArray* inputTypeData = [[NSArray alloc] initWithObjects:@"Telex", @"VNI", @"Simple Telex 1", @"Simple Telex 2", nil];
     NSArray* codeData = [OpenKeyManager getTableCodes];
     
     //preset data
