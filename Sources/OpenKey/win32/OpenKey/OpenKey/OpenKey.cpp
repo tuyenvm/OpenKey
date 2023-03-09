@@ -14,6 +14,9 @@ redistribute your new version, it MUST be open source.
 #include "stdafx.h"
 #include "AppDelegate.h"
 
+#pragma comment(lib, "imm32")
+#define IMC_GETOPENSTATUS 0x0005
+
 #define MASK_SHIFT				0x01
 #define MASK_CONTROL			0x02
 #define MASK_ALT				0x04
@@ -487,7 +490,15 @@ LRESULT CALLBACK keyboardHookProcess(int nCode, WPARAM wParam, LPARAM lParam) {
 	if (keyboardData->dwExtraInfo != 0) {
 		return CallNextHookEx(hKeyboardHook, nCode, wParam, lParam);
 	}
-
+	
+	//ignore if IME pad is open when typing Japanese/Chinese...
+	HWND hWnd = GetForegroundWindow();
+	HWND hIME = ImmGetDefaultIMEWnd(hWnd);
+	LRESULT isImeON = SendMessage(hIME, WM_IME_CONTROL, IMC_GETOPENSTATUS, 0);
+	if (isImeON) {
+		return CallNextHookEx(hKeyboardHook, nCode, wParam, lParam);
+	}
+	
 	//check modifier key
 	if (wParam == WM_KEYDOWN || wParam == WM_SYSKEYDOWN) {
 		//LOG(L"Key down: %d\n", keyboardData->vkCode);
