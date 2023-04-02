@@ -45,6 +45,7 @@ int vAllowConsonantZFWJ = 0;
 int vQuickStartConsonant = 0;
 int vQuickEndConsonant = 0;
 int vRememberCode = 1; //new on version 2.0
+int vOtherLanguage = 1; //new on version 2.0
 int vTempOffOpenKey = 0; //new on version 2.0
 
 int vShowIconOnDock = 0; //new on version 2.0
@@ -285,6 +286,7 @@ extern bool convertToolDontAlertWhenCompleted;
     vQuickStartConsonant = 0;[[NSUserDefaults standardUserDefaults] setInteger:vQuickStartConsonant forKey:@"vQuickStartConsonant"];
     vQuickEndConsonant = 0;[[NSUserDefaults standardUserDefaults] setInteger:vQuickEndConsonant forKey:@"vQuickEndConsonant"];
     vRememberCode = 1;[[NSUserDefaults standardUserDefaults] setInteger:vRememberCode forKey:@"vRememberCode"];
+    vOtherLanguage = 1;[[NSUserDefaults standardUserDefaults] setInteger:vOtherLanguage forKey:@"vOtherLanguage"];
     vTempOffOpenKey = 0;[[NSUserDefaults standardUserDefaults] setInteger:vTempOffOpenKey forKey:@"vTempOffOpenKey"];
     vShowIconOnDock = 0;[[NSUserDefaults standardUserDefaults] setInteger:vShowIconOnDock forKey:@"vShowIconOnDock"];
     vFixChromiumBrowser = 0;[[NSUserDefaults standardUserDefaults] setInteger:vFixChromiumBrowser forKey:@"vFixChromiumBrowser"];

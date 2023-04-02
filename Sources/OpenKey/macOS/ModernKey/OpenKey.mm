@@ -6,6 +6,7 @@
 //  Copyright © 2019 Tuyen Mai. All rights reserved.
 //
 #import <Cocoa/Cocoa.h>
+#import <Carbon/Carbon.h>
 #import <Foundation/Foundation.h>
 #import "Engine.h"
 #import "AppDelegate.h"
@@ -105,6 +106,7 @@ extern "C" {
         LOAD_DATA(vQuickEndConsonant, vQuickEndConsonant);
         LOAD_DATA(vQuickStartConsonant, vQuickStartConsonant);
         LOAD_DATA(vRememberCode, vRememberCode);
+        LOAD_DATA(vOtherLanguage, vOtherLanguage);
         LOAD_DATA(vTempOffOpenKey, vTempOffOpenKey);
         
         LOAD_DATA(vFixChromiumBrowser, vFixChromiumBrowser);
@@ -665,6 +667,25 @@ extern "C" {
             return event;
         }
 
+        //if "turn off Vietnamese when in other language" mode on
+        if(vOtherLanguage){
+            TISInputSourceRef isource = TISCopyCurrentKeyboardInputSource();
+            if ( isource != NULL )
+            {
+                CFArrayRef languages = (CFArrayRef) TISGetInputSourceProperty(isource, kTISPropertyInputSourceLanguages);
+                
+                if (CFArrayGetCount(languages) > 0) {
+                    CFStringRef langRef = (CFStringRef)CFArrayGetValueAtIndex(languages, 0);
+                    NSString *currentLanguage = (__bridge NSString *)langRef;
+                    if(![currentLanguage isLike:@"en"]){
+                        return event;
+                    }
+                    CFRelease(langRef);
+                    CFRelease(isource);
+                }
+            }
+        }
+        
         //handle keyboard
         if (type == kCGEventKeyDown) {
             //send event signal to Engine
