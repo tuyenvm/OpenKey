@@ -1,0 +1,8 @@
+﻿################################################################################
+# This .gitignore file was automatically created by Microsoft(R) Visual Studio.
+################################################################################
+
+/Sources/OpenKey/win32/OpenKey/.vs/OpenKey
+/Sources/OpenKey/win32/OpenKey/x64/Debug
+/Sources/OpenKey/win32/OpenKey/OpenKey/x64/Debug
+,
