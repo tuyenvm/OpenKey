@@ -205,6 +205,8 @@ BEGIN
                     "Button",BS_AUTOCHECKBOX | WS_TABSTOP,7,50,95,10
     CONTROL         "Tự ghi nhớ bảng mã theo ứng dụng",IDC_CHECK_SMART_SWITCH_CODE,
                     "Button",BS_AUTOCHECKBOX | WS_TABSTOP,7,88,130,10
+    CONTROL         "Cho phép gõ trong các ngôn ngữ khác",IDC_CHECK_OTHER_LANGUAGES,
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,7,126,130,10                    
     CONTROL         "Tạm tắt OpenKey bằng phím Alt",IDC_CHECK_TEMP_OFF_OPEN_KEY,
                     "Button",BS_AUTOCHECKBOX | WS_TABSTOP,151,88,123,10
 END
@@ -482,6 +484,8 @@ BEGIN
     IDS_STRING_CHECK_UPDATE "Kiểm tra bản mới mỗi lần khởi động OpenKey"
     IDS_STRING_REMEMBER_TABLE_CODE 
                             "OpenKey sẽ tự động ghi nhớ bạn đã dùng bảng mã nào cho ứng dụng nào, để lần sau khi chuyển qua ứng dụng đó, OpenKey sẽ tự động chuyển sang bảng mã đó cho bạn. Rất thích hợp cho các ứng dụng kỹ thuật như Photoshop, CAD,..."
+    IDS_STRING_OTHER_LANGUAGES
+                            "Cho phép gõ tiếng Việt với các ngôn ngữ ngoài tiếng Anh"                            
     IDS_STRING_TEMP_OFF_OPENKEY 
                             "Bằng cách bấm phím Alt, OpenKey sẽ tạm ngừng hoạt động cho tới khi bạn gõ 1 từ mới."
 END
@@ -508,9 +512,9 @@ BEGIN
     IDS_STRING_MACRO_AUTO_CAP 
                             "Tự động chuyển qua chữ hoa. VD: định nghĩa ""ko = không"", nếu gõ ""KO"" sẽ thành ""KHÔNG"", gõ ""Ko"" sẽ thành Không"
     IDS_STRING_START_CONSONANT 
-                            "Thay thế nhanh các phụ âm đầu như f, j, w bằng ph, gi, qu. Ví dụ: fải→phải, jảng→giảng, wên→quên"
+                            "Thay thế nhanh các phụ âm đầu như f, j, w bằng ph, gi, qu.Ví dụ: fải→phải, jảng→giảng, wên→quên"
     IDS_STRING_END_CONSONANT 
-                            "Thay thế nhanh các phụ âm cuối như g, h, k bằng ng, nh, ch. Ví dụ: trươg→trương, nhah→nhanh, bák→bách"
+                            "Thay thế nhanh các phụ âm cuối như g, h, k bằng ng, nh, ch.Ví dụ: trươg→trương, nhah→nhanh, bák→bách"
 END
 
 STRINGTABLE
@@ -532,4 +536,3 @@ END
 
 /////////////////////////////////////////////////////////////////////////////
 #endif    // not APSTUDIO_INVOKED
-

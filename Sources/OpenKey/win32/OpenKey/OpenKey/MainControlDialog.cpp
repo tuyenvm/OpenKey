@@ -141,6 +141,9 @@ void MainControlDialog::initDialog() {
 	checkRememberTableCode = GetDlgItem(hTabPage1, IDC_CHECK_SMART_SWITCH_CODE);
 	createToolTip(checkRememberTableCode, IDS_STRING_REMEMBER_TABLE_CODE);
 
+	checkAllowOtherLanguages = GetDlgItem(hTabPage1, IDC_CHECK_OTHER_LANGUAGES);
+	createToolTip(checkAllowOtherLanguages, IDS_STRING_OTHER_LANGUAGES);
+
 	checkTempOffOpenKey = GetDlgItem(hTabPage1, IDC_CHECK_TEMP_OFF_OPEN_KEY);
 	createToolTip(checkTempOffOpenKey, IDS_STRING_TEMP_OFF_OPENKEY);
 
@@ -343,6 +346,7 @@ void MainControlDialog::fillData() {
 	SendMessage(checkQuickStartConsonant, BM_SETCHECK, vQuickStartConsonant ? 1 : 0, 0);
 	SendMessage(checkQuickEndConsonant, BM_SETCHECK, vQuickEndConsonant ? 1 : 0, 0);
 	SendMessage(checkRememberTableCode, BM_SETCHECK, vRememberCode ? 1 : 0, 0);
+  SendMessage(checkAllowOtherLanguages, BM_SETCHECK, vOtherLanguage ? 1 : 0, 0);
 	SendMessage(checkTempOffOpenKey, BM_SETCHECK, vTempOffOpenKey ? 1 : 0, 0);
 	
 	SendMessage(checkSmartSwitchKey, BM_SETCHECK, vUseSmartSwitchKey ? 1 : 0, 0);
@@ -511,6 +515,9 @@ void MainControlDialog::onCheckboxClicked(const HWND & hWnd) {
 	} else if (hWnd == checkRememberTableCode) {
 		val = (int)SendMessage(hWnd, BM_GETCHECK, 0, 0);
 		APP_SET_DATA(vRememberCode, val ? 1 : 0);
+	} else if (hWnd == checkAllowOtherLanguages) {
+		val = (int)SendMessage(hWnd, BM_GETCHECK, 0, 0);
+		APP_SET_DATA(vOtherLanguage, val ? 1 : 0);
 	} else if (hWnd == checkTempOffOpenKey) {
 		val = (int)SendMessage(hWnd, BM_GETCHECK, 0, 0);
 		APP_SET_DATA(vTempOffOpenKey, val ? 1 : 0);
