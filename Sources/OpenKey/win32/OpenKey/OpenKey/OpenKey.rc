@@ -108,12 +108,12 @@ BEGIN
     PUSHBUTTON      "Kiểm tra bản mới...",IDC_BUTTON_CHECK_VERSION,44,117,75,14
 END
 
-IDD_DIALOG_MAIN DIALOGEX 0, 0, 297, 250
+IDD_DIALOG_MAIN DIALOGEX 0, 0, 297, 261
 STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | DS_CENTER | WS_POPUP | WS_CAPTION | WS_SYSMENU
 CAPTION "OpenKey 1.4 - Bộ gõ Tiếng Việt"
 FONT 8, "MS Shell Dlg", 400, 0, 0x1
 BEGIN
-    PUSHBUTTON      "Cài đặt gốc",ID_BTN_DEFAULT,113,223,71,20
+    PUSHBUTTON      "Cài đặt gốc",ID_BTN_DEFAULT,113,234,71,20
     GROUPBOX        "Điều khiển",IDC_STATIC,7,7,283,73
     LTEXT           "Kiểu gõ:",IDC_STATIC,14,23,27,8
     COMBOBOX        IDC_COMBO_INPUT_TYPE,64,20,75,30,CBS_DROPDOWNLIST | WS_VSCROLL | WS_TABSTOP
@@ -129,9 +129,9 @@ BEGIN
     LTEXT           "Chế độ gõ:",IDC_STATIC,14,60,36,8
     CONTROL         "Tiếng Việt",IDC_RADIO_METHOD_VIETNAMESE,"Button",BS_AUTORADIOBUTTON,64,59,47,10
     CONTROL         "Tiếng Anh",IDC_RADIO_METHOD_ENGLISH,"Button",BS_AUTORADIOBUTTON,158,59,48,10
-    DEFPUSHBUTTON   "Đóng",IDBUTTON_OK,200,223,71,20
-    PUSHBUTTON      "Tắt OpenKey",IDBUTTON_EXIT,26,223,71,20
-    CONTROL         "",IDC_TAB_CONTROL,"SysTabControl32",TCS_FIXEDWIDTH,7,89,283,127
+    DEFPUSHBUTTON   "Đóng",IDBUTTON_OK,200,234,71,20
+    PUSHBUTTON      "Tắt OpenKey",IDBUTTON_EXIT,26,234,71,20
+    CONTROL         "",IDC_TAB_CONTROL,"SysTabControl32",TCS_FIXEDWIDTH,7,89,283,140
 END
 
 IDD_DIALOG_MACRO DIALOGEX 0, 0, 415, 253
@@ -183,7 +183,7 @@ BEGIN
     PUSHBUTTON      "Đảo",IDC_BUTTON_CONVERT_SWITCH,124,134,36,14
 END
 
-IDD_DIALOG_TAB_GENERAL DIALOGEX 0, 0, 353, 123
+IDD_DIALOG_TAB_GENERAL DIALOGEX 0, 0, 353, 137
 STYLE DS_SETFONT | DS_FIXEDSYS | WS_CHILD
 EXSTYLE WS_EX_TRANSPARENT
 FONT 8, "MS Shell Dlg", 400, 0, 0x1
@@ -206,7 +206,7 @@ BEGIN
     CONTROL         "Tự ghi nhớ bảng mã theo ứng dụng",IDC_CHECK_SMART_SWITCH_CODE,
                     "Button",BS_AUTOCHECKBOX | WS_TABSTOP,7,88,130,10
     CONTROL         "Cho phép gõ trong các ngôn ngữ khác",IDC_CHECK_OTHER_LANGUAGES,
-                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,7,126,130,10                    
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,7,106,204,10
     CONTROL         "Tạm tắt OpenKey bằng phím Alt",IDC_CHECK_TEMP_OFF_OPEN_KEY,
                     "Button",BS_AUTOCHECKBOX | WS_TABSTOP,151,88,123,10
 END
@@ -306,7 +306,7 @@ BEGIN
         LEFTMARGIN, 7
         RIGHTMARGIN, 290
         TOPMARGIN, 7
-        BOTTOMMARGIN, 243
+        BOTTOMMARGIN, 254
     END
 
     IDD_DIALOG_MACRO, DIALOG
@@ -330,7 +330,7 @@ BEGIN
         LEFTMARGIN, 7
         RIGHTMARGIN, 346
         TOPMARGIN, 7
-        BOTTOMMARGIN, 116
+        BOTTOMMARGIN, 130
     END
 
     IDD_DIALOG_TAB_MACRO, DIALOG
@@ -484,10 +484,14 @@ BEGIN
     IDS_STRING_CHECK_UPDATE "Kiểm tra bản mới mỗi lần khởi động OpenKey"
     IDS_STRING_REMEMBER_TABLE_CODE 
                             "OpenKey sẽ tự động ghi nhớ bạn đã dùng bảng mã nào cho ứng dụng nào, để lần sau khi chuyển qua ứng dụng đó, OpenKey sẽ tự động chuyển sang bảng mã đó cho bạn. Rất thích hợp cho các ứng dụng kỹ thuật như Photoshop, CAD,..."
-    IDS_STRING_OTHER_LANGUAGES
-                            "Cho phép gõ tiếng Việt với các ngôn ngữ ngoài tiếng Anh"                            
     IDS_STRING_TEMP_OFF_OPENKEY 
                             "Bằng cách bấm phím Alt, OpenKey sẽ tạm ngừng hoạt động cho tới khi bạn gõ 1 từ mới."
+END
+
+STRINGTABLE
+BEGIN
+    IDS_STRING_OTHER_LANGUAGES 
+                            "Cho phép gõ tiếng Việt với các ngôn ngữ ngoài tiếng Anh"
 END
 
 STRINGTABLE
@@ -536,3 +540,4 @@ END
 
 /////////////////////////////////////////////////////////////////////////////
 #endif    // not APSTUDIO_INVOKED
+
