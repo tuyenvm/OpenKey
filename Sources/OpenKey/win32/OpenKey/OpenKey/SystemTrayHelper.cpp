@@ -74,7 +74,12 @@ map<UINT, LPCTSTR> menuData = {
 };
 
 LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam) {
+	static UINT taskbarCreated;
+
 	switch (message) {
+	case WM_CREATE:
+		taskbarCreated = RegisterWindowMessage(_T("TaskbarCreated"));
+		break;
 	case WM_USER+2019:
 		AppDelegate::getInstance()->onControlPanel();
 		break;
@@ -159,6 +164,10 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam) 
 	}
 	break;
 	default:
+		// if the taskbar is restarted, add the system tray icon again
+		if (message == taskbarCreated) {
+			Shell_NotifyIcon(NIM_ADD, &nid);
+		}
 		return DefWindowProc(hWnd, message, wParam, lParam);
 	}
 	return 0;
@@ -331,7 +340,15 @@ void SystemTrayHelper::_createSystemTrayIcon(const HINSTANCE& hIns) {
 	loadTrayIcon();
 	LoadString(ins, IDS_APP_TITLE, nid.szTip, 128);
 	nid.uFlags = NIF_MESSAGE | NIF_ICON | NIF_TIP;
-	Shell_NotifyIcon(NIM_ADD, &nid);
+
+	// Shell_NotifyIcon may fail if the system tray icon is not fully initialized
+	const int maxRetries = 5;
+	for (int attempt = 0; attempt < maxRetries; ++attempt) {
+		if (Shell_NotifyIcon(NIM_ADD, &nid)) {
+			break;
+		}
+		Sleep(1000);
+	}
 }
 
 
