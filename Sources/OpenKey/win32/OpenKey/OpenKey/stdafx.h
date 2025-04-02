@@ -83,5 +83,6 @@ extern int vCreateDesktopShortcut;
 extern int vRunAsAdmin;
 extern int vCheckNewVersion;
 extern int vRememberCode;
+extern int vOtherLanguage;
 extern int vTempOffOpenKey;
 extern int vFixChromiumBrowser;

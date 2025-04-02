@@ -37,6 +37,7 @@ int vTempOffSpelling = 0;
 int vAllowConsonantZFWJ = 0;
 int vQuickStartConsonant = 0;
 int vQuickEndConsonant = 0;
+int vOtherLanguage = 1;
 int vRememberCode = 1;
 int vTempOffOpenKey = 0;
 
@@ -193,6 +194,7 @@ void AppDelegate::onDefaultConfig() {
 
 	APP_SET_DATA(vSupportMetroApp, 1);
 	APP_SET_DATA(vRememberCode, 1);
+	APP_SET_DATA(vOtherLanguage, 1);
 	APP_SET_DATA(vTempOffOpenKey, 0);
 	APP_SET_DATA(vFixChromiumBrowser, 0);
 

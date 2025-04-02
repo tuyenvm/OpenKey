@@ -62,6 +62,7 @@
 #define IDD_DIALOG_TAB_SYSTEM           147
 #define IDD_DIALOG_OLD                  148
 #define IDD_DIALOG_TAB_INFO             149
+#define IDS_STRING_OTHER_LANGUAGES		150
 #define IDC_COMBO1                      1000
 #define IDC_COMBO_INPUT_TYPE            1000
 #define IDC_CHECK1                      1001
@@ -180,6 +181,7 @@
 #define IDS_STRING_MACRO_AUTO_CAP       1065
 #define IDS_STRING_START_CONSONANT      1066
 #define IDS_STRING_END_CONSONANT        1067
+#define IDC_CHECK_OTHER_LANGUAGES       1068
 #define IDC_STATIC                      -1
 
 // Next default values for new objects
