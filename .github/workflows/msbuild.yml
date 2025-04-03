@@ -1,0 +1,64 @@
+name: MSBuild
+
+on:
+  push:
+    branches: [ "master" ]
+  pull_request:
+    branches: [ "master" ]
+
+env:
+  # Path to the solution file relative to the root of the project.
+  SOLUTION_FILE_PATH: .\Sources\OpenKey\win32\OpenKey
+
+  # Configuration type to build.
+  # You can convert this to a build matrix if you need coverage of multiple configuration types.
+  # https://docs.github.com/actions/learn-github-actions/managing-complex-workflows#using-a-build-matrix
+  BUILD_CONFIGURATION: Release
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    runs-on: windows-latest
+
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Add MSBuild to PATH
+      uses: microsoft/setup-msbuild@v2
+
+    - name: Build x86
+      run: msbuild -m -target:Rebuild -p:Configuration=Release -p:Platform=x86 ${{env.SOLUTION_FILE_PATH}}
+
+    - name: Build x64
+      run: msbuild -m -target:Rebuild -p:Configuration=Release -p:Platform=x64 ${{env.SOLUTION_FILE_PATH}}
+
+    - name: Upload a Build Artifact
+      id: upload
+      uses: actions/upload-artifact@v4
+      with:
+        name: OpenKey
+        path: |
+          ${{env.SOLUTION_FILE_PATH}}/Release/
+          ${{env.SOLUTION_FILE_PATH}}/x64/Release/
+
+    outputs:
+      subject-name: OpenKey
+      subject-digest: ${{steps.upload.outputs.artifact-digest}}
+
+  attest:
+    runs-on: ubuntu-latest
+    needs: build
+
+    permissions:
+      id-token: write
+      contents: read
+      attestations: write
+
+    steps:
+    - name: Generate artifact attestation
+      uses: actions/attest-build-provenance@v2
+      with:
+        subject-name: ${{needs.build.outputs.subject-name}}
+        subject-digest: sha256:${{needs.build.outputs.subject-digest}}
