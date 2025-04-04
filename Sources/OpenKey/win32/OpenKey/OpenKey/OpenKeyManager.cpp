@@ -56,24 +56,48 @@ bool OpenKeyManager::checkUpdate(string& newVersion) {
 	string data = wideStringToUtf8(dataW);
 
 	//simple parse
-	data = data.substr(data.find("latestWinVersion"));
-	data = data.substr(data.find("\"versionName\":"));
-	data = data.substr(14);
-	data = data.substr(data.find("\""));
-	data = data.substr(1);
-	string versionName = data.substr(0, data.find("\""));
-	newVersion = versionName;
-	data = data.substr(data.find("\"versionCode\":"));
-	data = data.substr(14);
-	string versionCodeString = data.substr(0, data.find("}"));
-	DWORD versionCode = (DWORD)atoi(versionCodeString.c_str());
-	DWORD currentVersion = OpenKeyHelper::getVersionNumber();
-	versionCode = (versionCode << 16) | (versionCode & 0x00FF00) | (versionCode >> 16 & 0xFF);
-	currentVersion = (currentVersion << 16) | (currentVersion & 0x00FF00) | (currentVersion >> 16 & 0xFF);
-	if (versionCode > currentVersion) {
-		return true;
+	constexpr char versionNameStr[] = "\"versionName\":";
+	constexpr char versionCodeStr[] = "\"versionCode\":";
+	constexpr char numbers[] = "0123456789";
+	size_t posBegin = string::npos;
+	size_t posEnd = string::npos;
+
+	posBegin = data.find("latestWinVersion");
+	posBegin = data.find(versionNameStr, posBegin);
+	posBegin += (sizeof(versionNameStr) - 1);
+	posBegin = data.find('\"', posBegin);
+	posBegin = data.find_first_of(numbers, posBegin);
+
+	posEnd = data.find('\"', posBegin);
+
+	if (posBegin == string::npos || posEnd == string::npos) {
+		return false;
 	}
-	return false;
+
+	newVersion = data.substr(posBegin, posEnd - posBegin);
+
+	posBegin = posEnd;
+	posBegin = data.find(versionCodeStr, posBegin);
+	posBegin += (sizeof(versionCodeStr) - 1);
+
+	posEnd = data.find("}", posBegin);
+
+	if (posBegin == string::npos || posEnd == string::npos) {
+		return false;
+	}
+
+	auto shiftVersion = [](DWORD version) {
+		return (version << 16) | (version & 0x00FF00) | (version >> 16 & 0xFF);
+		};
+
+	string newVersionCodeStr = data.substr(posBegin, posEnd - posBegin);
+	DWORD newVersionCode = (DWORD)atoi(newVersionCodeStr.data());
+	newVersionCode = shiftVersion(newVersionCode);
+
+	DWORD currentVersionCode = OpenKeyHelper::getVersionNumber();
+	currentVersionCode = shiftVersion(currentVersionCode);
+
+	return newVersionCode > currentVersionCode;
 }
 
 void OpenKeyManager::createDesktopShortcut() {
