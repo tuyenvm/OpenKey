@@ -307,7 +307,7 @@ wstring OpenKeyHelper::getVersionString() {
 
 wstring OpenKeyHelper::getContentOfUrl(LPCTSTR url){
 	WCHAR path[MAX_PATH];
-	GetCurrentDirectory(MAX_PATH, path);
+	GetTempPath2(MAX_PATH, path);
 	wsprintf(path, TEXT("%s\\_OpenKey.tempf"), path);
 	HRESULT res = URLDownloadToFile(NULL, url, path, 0, NULL);
 	
