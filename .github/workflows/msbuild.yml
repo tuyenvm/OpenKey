@@ -40,8 +40,8 @@ jobs:
       with:
         name: OpenKey
         path: |
-          ${{env.SOLUTION_FILE_PATH}}/Release/
-          ${{env.SOLUTION_FILE_PATH}}/x64/Release/
+          ${{env.SOLUTION_FILE_PATH}}/Release/x32
+          ${{env.SOLUTION_FILE_PATH}}/Release/x64
 
     outputs:
       subject-name: OpenKey
