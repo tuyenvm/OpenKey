@@ -685,9 +685,9 @@ void handleModernMark() {
         }
     }
     //rule 3.2
-    else if ((CHR(VSI) == KEY_I && (CHR(VSI) == KEY_A)) ||
-             (CHR(VSI) == KEY_Y && (CHR(VSI) == KEY_A)) ||
-             (CHR(VSI) == KEY_U && (CHR(VSI) == KEY_A)) ||
+    else if ((CHR(VSI) == KEY_I && (CHR(VSI+1) == KEY_A)) ||
+             (CHR(VSI) == KEY_Y && (CHR(VSI+1) == KEY_A)) ||
+             (CHR(VSI) == KEY_U && (CHR(VSI+1) == KEY_A)) ||
              (CHR(VSI) == KEY_U && (TypingWord[VSI+1] == (KEY_U | TONEW_MASK)))){
         
         VWSM = VSI;
