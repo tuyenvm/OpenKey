@@ -17,13 +17,13 @@ redistribute your new version, it MUST be open source.
 class OpenKeyManager {
 public:
 	static unsigned short _lastKeyCode;
-	static vector<LPCTSTR>& getInputType();
-	static vector<LPCTSTR>& getTableCode();
+	static std::vector<LPCTSTR>& getInputType();
+	static std::vector<LPCTSTR>& getTableCode();
 
 	static void initEngine();
 	static void freeEngine();
 
-	static bool checkUpdate(string& newVersion);
+	static bool checkUpdate(std::string& newVersion);
 
 	static void createDesktopShortcut();
 };

@@ -14,13 +14,13 @@ redistribute your new version, it MUST be open source.
 #include "OpenKeyManager.h"
 #include <shlobj.h>
 
-static vector<LPCTSTR> _inputType = {
+static std::vector<LPCTSTR> _inputType = {
 	_T("Telex"),
 	_T("VNI"),
 	_T("Simple Telex"),
 };
 
-static vector<LPCTSTR> _tableCode = {
+static std::vector<LPCTSTR> _tableCode = {
 	_T("Unicode"),
 	_T("TCVN3 (ABC)"),
 	_T("VNI Windows"),
@@ -35,11 +35,11 @@ extern void OpenKeyFree();
 
 unsigned short  OpenKeyManager::_lastKeyCode = 0;
 
-vector<LPCTSTR>& OpenKeyManager::getInputType() {
+std::vector<LPCTSTR>& OpenKeyManager::getInputType() {
 	return _inputType;
 }
 
-vector<LPCTSTR>& OpenKeyManager::getTableCode() {
+std::vector<LPCTSTR>& OpenKeyManager::getTableCode() {
 	return _tableCode;
 }
 
@@ -51,16 +51,16 @@ void OpenKeyManager::freeEngine() {
 	OpenKeyFree();
 }
 
-bool OpenKeyManager::checkUpdate(string& newVersion) {
-	wstring dataW = OpenKeyHelper::getContentOfUrl(L"https://raw.githubusercontent.com/tuyenvm/OpenKey/master/version.json");
-	string data = wideStringToUtf8(dataW);
+bool OpenKeyManager::checkUpdate(std::string& newVersion) {
+	std::wstring dataW = OpenKeyHelper::getContentOfUrl(L"https://raw.githubusercontent.com/tuyenvm/OpenKey/master/version.json");
+	std::string data = wideStringToUtf8(dataW);
 
 	//simple parse
 	constexpr char versionNameStr[] = "\"versionName\":";
 	constexpr char versionCodeStr[] = "\"versionCode\":";
 	constexpr char numbers[] = "0123456789";
-	size_t posBegin = string::npos;
-	size_t posEnd = string::npos;
+	size_t posBegin = std::string::npos;
+	size_t posEnd = std::string::npos;
 
 	posBegin = data.find("latestWinVersion");
 	posBegin = data.find(versionNameStr, posBegin);
@@ -70,7 +70,7 @@ bool OpenKeyManager::checkUpdate(string& newVersion) {
 
 	posEnd = data.find('\"', posBegin);
 
-	if (posBegin == string::npos || posEnd == string::npos) {
+	if (posBegin == std::string::npos || posEnd == std::string::npos) {
 		return false;
 	}
 
@@ -82,7 +82,7 @@ bool OpenKeyManager::checkUpdate(string& newVersion) {
 
 	posEnd = data.find("}", posBegin);
 
-	if (posBegin == string::npos || posEnd == string::npos) {
+	if (posBegin == std::string::npos || posEnd == std::string::npos) {
 		return false;
 	}
 
@@ -90,7 +90,7 @@ bool OpenKeyManager::checkUpdate(string& newVersion) {
 		return (version << 16) | (version & 0x00FF00) | (version >> 16 & 0xFF);
 		};
 
-	string newVersionCodeStr = data.substr(posBegin, posEnd - posBegin);
+	std::string newVersionCodeStr = data.substr(posBegin, posEnd - posBegin);
 	DWORD newVersionCode = (DWORD)atoi(newVersionCodeStr.data());
 	newVersionCode = shiftVersion(newVersionCode);
 
@@ -107,7 +107,7 @@ void OpenKeyManager::createDesktopShortcut() {
 	hres = CoCreateInstance(CLSID_ShellLink, NULL, CLSCTX_ALL,
 							IID_IShellLink, (void**)&pShellLink);
 	if (SUCCEEDED(hres)) {
-		wstring path = OpenKeyHelper::getFullPath();
+		std::wstring path = OpenKeyHelper::getFullPath();
 		pShellLink->SetPath(path.c_str());
 		pShellLink->SetDescription(_T("OpenKey - Bộ gõ Tiếng Việt"));
 		pShellLink->SetIconLocation(path.c_str(), 0);

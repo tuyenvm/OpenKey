@@ -20,8 +20,6 @@ redistribute your new version, it MUST be open source.
 #include <string>
 #pragma comment(lib, "Urlmon.lib")
 
-using namespace std;
-
 INT_PTR CALLBACK MainDialogProcess(HWND, UINT, WPARAM, LPARAM);
 void StartUpdate();
 HWND hDlg;
@@ -78,7 +76,7 @@ DWORD WINAPI UpdateThreadFunction(LPVOID lpParam) {
 	wsprintf(path, TEXT("%s\\_OpenKey.tempf"), currentDir);
 	HRESULT res = URLDownloadToFile(NULL, L"https://raw.githubusercontent.com/tuyenvm/OpenKey/master/version.json", path, 0, NULL);
 
-	wstring data;
+	std::wstring data;
 	if (res == S_OK) {
 		std::wifstream t(path);
 		std::wstringstream buffer;
@@ -98,7 +96,7 @@ DWORD WINAPI UpdateThreadFunction(LPVOID lpParam) {
 	data = data.substr(14);
 	data = data.substr(data.find(L"\""));
 	data = data.substr(1);
-	wstring versionName = data.substr(0, data.find(L"\""));
+	std::wstring versionName = data.substr(0, data.find(L"\""));
 	
 	//download zip file
 	WCHAR updateUrl[MAX_PATH];

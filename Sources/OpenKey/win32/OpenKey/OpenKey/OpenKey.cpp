@@ -29,7 +29,7 @@ redistribute your new version, it MUST be open source.
 #define DYNA_DATA(macro, pos) (macro ? pData->macroData[pos] : pData->charData[pos])
 #define EMPTY_HOTKEY 0xFE0000FE
 
-static vector<string> _chromiumBrowser = {
+static std::vector<std::string> _chromiumBrowser = {
 	"chrome.exe", "brave.exe", "msedge.exe"
 };
 
@@ -44,13 +44,13 @@ static HWINEVENTHOOK hSystemEvent;
 static KBDLLHOOKSTRUCT* keyboardData;
 static MSLLHOOKSTRUCT* mouseData;
 static vKeyHookState* pData;
-static vector<Uint16> _syncKey;
+static std::vector<Uint16> _syncKey;
 static Uint32 _flag = 0, _lastFlag = 0, _privateFlag;
 static bool _flagChanged = false, _isFlagKey;
 static Uint16 _keycode;
 static Uint16 _newChar, _newCharHi;
 
-static vector<Uint16> _newCharString;
+static std::vector<Uint16> _newCharString;
 static Uint16 _newCharSize;
 static bool _willSendControlKey = false;
 
@@ -58,9 +58,9 @@ static Uint16 _uniChar[2];
 static int _i, _j, _k;
 static Uint32 _tempChar;
 
-static string macroText, macroContent;
+static std::string macroText, macroContent;
 static int _languageTemp = 0; //use for smart switch key
-static vector<Byte> savedSmartSwitchKeyData; ////use for smart switch key
+static std::vector<Byte> savedSmartSwitchKeyData; ////use for smart switch key
 
 static bool _hasJustUsedHotKey = false;
 
@@ -674,7 +674,7 @@ LRESULT CALLBACK mouseHookProcess(int nCode, WPARAM wParam, LPARAM lParam) {
 VOID CALLBACK winEventProcCallback(HWINEVENTHOOK hWinEventHook, DWORD dwEvent, HWND hwnd, LONG idObject, LONG idChild, DWORD dwEventThread, DWORD dwmsEventTime) {
 	//smart switch key
 	if (vUseSmartSwitchKey || vRememberCode) {
-		string& exe = OpenKeyHelper::getFrontMostAppExecuteName();
+		std::string& exe = OpenKeyHelper::getFrontMostAppExecuteName();
 		if (exe.compare("explorer.exe") == 0) //dont apply with windows explorer
 			return;
 		_languageTemp = getAppInputMethodStatus(exe, vLanguage | (vCodeTable << 1));

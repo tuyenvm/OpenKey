@@ -85,7 +85,7 @@ void AboutDialog::initDialog() {
 
 void AboutDialog::onUpdateButton() {
 	EnableWindow(hUpdateButton, false);
-	string newVersion;
+	std::string newVersion;
 	if (OpenKeyManager::checkUpdate(newVersion)) {
 		WCHAR msg[256];
 		wsprintf(msg, 

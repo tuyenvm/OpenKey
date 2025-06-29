@@ -11,8 +11,6 @@
 
 #include <vector>
 
-using namespace std;
-
 //#define V_PLATFORM_MAC              1
 //#define V_PLATFORM_WINDOWS          2
 
@@ -76,8 +74,8 @@ struct vKeyHookState {
     
     Uint32 charData[MAX_BUFF]; //new character will be put in queue
     
-    vector<Uint32> macroKey; //used for macro function; it is a key
-    vector<Uint32> macroData; //used for macro function; it is keycode data
+    std::vector<Uint32> macroKey; //used for macro function; it is a key
+    std::vector<Uint32> macroData; //used for macro function; it is keycode data
 };
 
 #ifdef LINUX

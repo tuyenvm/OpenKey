@@ -60,7 +60,7 @@ bool AppDelegate::isDialogMsg(MSG & msg) const {
 }
 
 void AppDelegate::checkUpdate() {
-	string newVersion;
+	std::string newVersion;
 	if (OpenKeyManager::checkUpdate(newVersion)) {
 		WCHAR msg[256];
 		wsprintf(msg,
@@ -211,7 +211,7 @@ void AppDelegate::onToggleVietnamese() {
 	}
 	
 	if (vUseSmartSwitchKey) {
-		string& exe = OpenKeyHelper::getLastAppExecuteName();
+		std::string& exe = OpenKeyHelper::getLastAppExecuteName();
 		setAppInputMethodStatus(exe, vLanguage | (vCodeTable << 1));
 		saveSmartSwitchKeyData();
 	}

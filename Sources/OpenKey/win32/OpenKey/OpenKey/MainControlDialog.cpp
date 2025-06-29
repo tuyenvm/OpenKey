@@ -41,7 +41,7 @@ void MainControlDialog::initDialog() {
 
     //input type
     comboBoxInputType = GetDlgItem(hDlg, IDC_COMBO_INPUT_TYPE);
-    vector<LPCTSTR>& inputType = OpenKeyManager::getInputType();
+    std::vector<LPCTSTR>& inputType = OpenKeyManager::getInputType();
     for (int i = 0; i < inputType.size(); i++) {
         SendMessage(comboBoxInputType, CB_ADDSTRING, i, reinterpret_cast<LPARAM>(inputType[i]));
     }
@@ -49,7 +49,7 @@ void MainControlDialog::initDialog() {
 
     //code table
     comboBoxTableCode = GetDlgItem(hDlg, IDC_COMBO_TABLE_CODE);
-    vector<LPCTSTR>& tableCode = OpenKeyManager::getTableCode();
+    std::vector<LPCTSTR>& tableCode = OpenKeyManager::getTableCode();
     for (int i = 0; i < tableCode.size(); i++) {
         SendMessage(comboBoxTableCode, CB_ADDSTRING, i, reinterpret_cast<LPARAM>(tableCode[i]));
     }
@@ -602,7 +602,7 @@ void MainControlDialog::onTabIndexChanged() {
 
 void MainControlDialog::onUpdateButton() {
     EnableWindow(hUpdateButton, false);
-    string newVersion;
+    std::string newVersion;
     if (OpenKeyManager::checkUpdate(newVersion)) {
         WCHAR msg[256];
         wsprintf(msg,

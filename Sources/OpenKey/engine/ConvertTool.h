@@ -11,7 +11,6 @@
 
 #include "DataType.h"
 #include <string>
-using namespace std;
 
 extern bool convertToolDontAlertWhenCompleted;
 extern bool convertToolToAllCaps;
@@ -23,6 +22,6 @@ extern Uint8 convertToolFromCode;
 extern Uint8 convertToolToCode;
 extern int convertToolHotKey;
 
-string convertUtil(const string& sourceString);
+std::string convertUtil(const std::string& sourceString);
 
 #endif /* ConvertTool_h */

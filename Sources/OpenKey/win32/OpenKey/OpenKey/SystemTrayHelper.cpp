@@ -52,7 +52,7 @@ static HMENU otherCode;
 
 static NOTIFYICONDATA nid;
 
-map<UINT, LPCTSTR> menuData = {
+std::map<UINT, LPCTSTR> menuData = {
 	{POPUP_VIET_ON_OFF, _T("Bật Tiếng Việt")},
 	{POPUP_SPELLING, _T("Bật kiểm tra chính tả")},
 	{POPUP_SMART_SWITCH, _T("Bật loại trừ ứng dụng thông minh")},
@@ -269,7 +269,7 @@ void SystemTrayHelper::updateData() {
 	MODIFY_MENU(otherCode, POPUP_UNICODE_COMPOUND, vCodeTable == 3);
 	MODIFY_MENU(otherCode, POPUP_VN_LOCALE_1258, vCodeTable == 4);
 
-	wstring hotkey = L"";
+	std::wstring hotkey = L"";
 	bool hasAdd = false;
 	if (convertToolHotKey & 0x100) {
 		hotkey += L"Ctrl";
@@ -304,7 +304,7 @@ void SystemTrayHelper::updateData() {
 			hotkey += (wchar_t)k;
 	}
 
-	wstring hotKeyString = menuData[POPUP_QUICK_CONVERT];
+	std::wstring hotKeyString = menuData[POPUP_QUICK_CONVERT];
 	if (hasAdd) {
 		hotKeyString += L" - [";
 		hotKeyString += hotkey;

@@ -13,10 +13,8 @@
 #include <memory.h>
 #include <fstream>
 
-using namespace std;
-
 //main data
-map<vector<Uint32>, MacroData> macroMap;
+std::map<std::vector<Uint32>, MacroData> macroMap;
 
 extern int vCodeTable;
 //local variable
@@ -26,9 +24,9 @@ static Uint16 _kChar = 0;
 static Uint32 _charBuff;
 static int _kMacro;
 
-static void convert(const string& str, vector<Uint32>& outData) {
+static void convert(const std::string& str, std::vector<Uint32>& outData) {
     outData.clear();
-    wstring data = utf8ToWideString(str);
+    std::wstring data = utf8ToWideString(str);
     Uint32 t = 0;
     int kSign = -1;
     int k = 0;
@@ -42,7 +40,7 @@ static void convert(const string& str, vector<Uint32>& outData) {
         }
         
         //find character which has tone/mark
-        for (map<Uint32, vector<Uint16>>::iterator it = _codeTable[0].begin(); it != _codeTable[0].end(); ++it) {
+        for (std::map<Uint32, std::vector<Uint16>>::iterator it = _codeTable[0].begin(); it != _codeTable[0].end(); ++it) {
             kSign = -1;
             k = 0;
             for (int j = 0; j < it->second.size(); j++) {
@@ -89,19 +87,19 @@ void initMacroMap(const Byte* pData, const int& size) {
     Uint16 macroContentSize;
     for (int i = 0; i < macroCount; i++) {
         macroTextSize = pData[cursor++];
-        string macroText((char*)pData + cursor, macroTextSize);
+        std::string macroText((char*)pData + cursor, macroTextSize);
         cursor += macroTextSize;
         
         memcpy(&macroContentSize, pData + cursor, 2);
         cursor+=2;
-        string macroContent((char*)pData + cursor, macroContentSize);
+        std::string macroContent((char*)pData + cursor, macroContentSize);
         cursor += macroContentSize;
         
         MacroData data;
         data.macroText = macroText;
         data.macroContent = macroContent;
         
-        vector<Uint32> key;
+        std::vector<Uint32> key;
         convert(macroText, key);
         convert(macroContent, data.macroContentCode);
         
@@ -109,12 +107,12 @@ void initMacroMap(const Byte* pData, const int& size) {
     }
 }
 
-void getMacroSaveData(vector<Byte>& outData) {
+void getMacroSaveData(std::vector<Byte>& outData) {
     Uint16 totalMacro = (Uint16)macroMap.size();
     outData.push_back((Byte)totalMacro);
     outData.push_back((Byte)(totalMacro>>8));
     
-    for (std::map<vector<Uint32>, MacroData>::iterator it = macroMap.begin(); it != macroMap.end(); ++it) {
+    for (std::map<std::vector<Uint32>, MacroData>::iterator it = macroMap.begin(); it != macroMap.end(); ++it) {
         outData.push_back((Byte)it->second.macroText.size());
         for (int j = 0; j < it->second.macroText.size(); j++) {
             outData.push_back(it->second.macroText[j]);
@@ -137,7 +135,7 @@ static bool modifyCaseUnicode(Uint32& code, const bool& isUpperCase=true) {
     }
     
     //for unicode character
-    for (map<Uint32, vector<Uint16>>::iterator it = _codeTable[vCodeTable].begin(); it != _codeTable[vCodeTable].end(); ++it) {
+    for (std::map<Uint32, std::vector<Uint16>>::iterator it = _codeTable[vCodeTable].begin(); it != _codeTable[vCodeTable].end(); ++it) {
         for (_kMacro = 0; _kMacro < it->second.size(); _kMacro++) {
             if ((Uint16)code == it->second[_kMacro]) {
                 if (_kMacro % 2 == 0 && !isUpperCase)
@@ -152,7 +150,7 @@ static bool modifyCaseUnicode(Uint32& code, const bool& isUpperCase=true) {
     return false;
 }
 
-bool findMacro(vector<Uint32>& key, vector<Uint32>& macroContentCode) {
+bool findMacro(std::vector<Uint32>& key, std::vector<Uint32>& macroContentCode) {
     for (c = 0; c < key.size(); c++) {
         key[c] = getCharacterCode(key[c]);
     }
@@ -196,25 +194,25 @@ bool findMacro(vector<Uint32>& key, vector<Uint32>& macroContentCode) {
     return false;
 }
 
-bool hasMacro(const string& macroName) {
-    vector<Uint32> key;
+bool hasMacro(const std::string& macroName) {
+    std::vector<Uint32> key;
     convert(macroName, key);
     return (macroMap.find(key) != macroMap.end());
 }
 
-void getAllMacro(vector<vector<Uint32>>& keys, vector<string>& macroTexts, vector<string>& macroContents) {
+void getAllMacro(std::vector<std::vector<Uint32>>& keys, std::vector<std::string>& macroTexts, std::vector<std::string>& macroContents) {
     keys.clear();
     macroTexts.clear();
     macroContents.clear();
-    for (std::map<vector<Uint32>, MacroData>::iterator it = macroMap.begin(); it != macroMap.end(); ++it) {
+    for (std::map<std::vector<Uint32>, MacroData>::iterator it = macroMap.begin(); it != macroMap.end(); ++it) {
         keys.push_back(it->first);
         macroTexts.push_back(it->second.macroText);
         macroContents.push_back(it->second.macroContent);
     }
 }
 
-bool addMacro(const string& macroText, const string& macroContent) {
-    vector<Uint32> key;
+bool addMacro(const std::string& macroText, const std::string& macroContent) {
+    std::vector<Uint32> key;
     convert(macroText, key);
     if (macroMap.find(key) == macroMap.end()) { //add new macro
         MacroData data;
@@ -229,8 +227,8 @@ bool addMacro(const string& macroText, const string& macroContent) {
     return true;
 }
 
-bool deleteMacro(const string& macroText) {
-    vector<Uint32> key;
+bool deleteMacro(const std::string& macroText) {
+    std::vector<Uint32> key;
     convert(macroText, key);
     if (macroMap.find(key) != macroMap.end()) {
         macroMap.erase(key);
@@ -240,27 +238,27 @@ bool deleteMacro(const string& macroText) {
 }
 
 void onTableCodeChange() {
-    for (std::map<vector<Uint32>, MacroData>::iterator it = macroMap.begin(); it != macroMap.end(); ++it) {
+    for (std::map<std::vector<Uint32>, MacroData>::iterator it = macroMap.begin(); it != macroMap.end(); ++it) {
         convert(it->second.macroContent, it->second.macroContentCode);
     }
 }
 
-void saveToFile(const string& path) {
-    ofstream myfile;
+void saveToFile(const std::string& path) {
+    std::ofstream myfile;
     myfile.open(path.c_str());
     myfile << ";Compatible OpenKey Macro Data file for UniKey*** version=1 ***\n";
-    for (std::map<vector<Uint32>, MacroData>::iterator it = macroMap.begin(); it != macroMap.end(); ++it) {
+    for (std::map<std::vector<Uint32>, MacroData>::iterator it = macroMap.begin(); it != macroMap.end(); ++it) {
         myfile <<it->second.macroText << ":" << it->second.macroContent<<"\n";
     }
     myfile.close();
 }
 
-void readFromFile(const string& path, const bool& append) {
-    ifstream myfile(path.c_str());
-    string line;
+void readFromFile(const std::string& path, const bool& append) {
+    std::ifstream myfile(path.c_str());
+    std::string line;
     int k = 0;
     size_t pos = 0;
-    string name, content;
+    std::string name, content;
     if (myfile.is_open()) {
         if (!append) {
             macroMap.clear();
@@ -269,12 +267,12 @@ void readFromFile(const string& path, const bool& append) {
             k++;
             if (k == 1) continue;
             pos = line.find(":");
-            if (string::npos != pos) {
+            if (std::string::npos != pos) {
                 name = line.substr(0, pos);
                 content = line.substr(pos + 1, line.length() - pos - 1);
 				while (name.compare("") == 0 && content.compare("") != 0) {
 					pos = content.find(":");
-					if (string::npos != pos) {
+					if (std::string::npos != pos) {
 						name += ":";
 						name += content.substr(0, pos);
 						content = content.substr(pos + 1, line.length() - pos - 1);

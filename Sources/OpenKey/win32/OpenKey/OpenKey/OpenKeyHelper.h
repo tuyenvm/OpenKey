@@ -32,19 +32,19 @@ public:
 
 	static LPTSTR getExecutePath();
 
-	static string& getFrontMostAppExecuteName();
-	static string& getLastAppExecuteName();
+	static std::string& getFrontMostAppExecuteName();
+	static std::string& getLastAppExecuteName();
 
-	static wstring getFullPath();
+	static std::wstring getFullPath();
 
-	static wstring getClipboardText(const int& type);
+	static std::wstring getClipboardText(const int& type);
 	static void setClipboardText(LPCTSTR data, const int& len, const int& type);
 
 	static bool quickConvert();
 
 	static DWORD getVersionNumber();
-	static wstring getVersionString();
+	static std::wstring getVersionString();
 
-	static wstring getContentOfUrl(LPCTSTR url);
+	static std::wstring getContentOfUrl(LPCTSTR url);
 };
 

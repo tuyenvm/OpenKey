@@ -19,9 +19,9 @@ private:
 	HWND listMacro;
 	HWND hMacroName, hMacroContent;
 	HWND hAddButton, hAutoCaps;
-	vector<vector<Uint32>> keys;
-	vector<string> macroText;
-	vector<string> macroContent;
+	std::vector<std::vector<Uint32>> keys;
+	std::vector<std::string> macroText;
+	std::vector<std::string> macroContent;
 public:
 	MacroDialog(const HINSTANCE & hInstance, const int & resourceId);
 	~MacroDialog();

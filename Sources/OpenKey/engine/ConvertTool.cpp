@@ -10,6 +10,7 @@
 #include "ConvertTool.h"
 #include "Engine.h"
 #include <iostream>
+#include <algorithm>
 #include <memory.h>
 
 //option
@@ -23,11 +24,11 @@ Uint8 convertToolFromCode = 0;
 Uint8 convertToolToCode = 0;
 int convertToolHotKey = 0;
 
-static vector<Uint8> _breakCode = {'.', '?', '!'};
+static std::vector<Uint8> _breakCode = {'.', '?', '!'};
 
 static bool findKeyCode(const Uint32& charCode, const Uint8& code, int& j, int& k) {
     //find character which has tone/mark
-    for (map<Uint32, vector<Uint16>>::iterator it = _codeTable[code].begin(); it != _codeTable[code].end(); ++it) {
+    for (std::map<Uint32, std::vector<Uint16>>::iterator it = _codeTable[code].begin(); it != _codeTable[code].end(); ++it) {
         for (int z = 0; z < it->second.size(); z++) {
             if (charCode == it->second[z]) {
                 j = it->first;
@@ -48,11 +49,11 @@ static Uint16 getUnicodeCompoundMarkIndex(const Uint16& mark) {
     return 0;
 }
 
-string convertUtil(const string& sourceString) {
-    wstring data = utf8ToWideString(sourceString);
+std::string convertUtil(const std::string& sourceString) {
+    std::wstring data = utf8ToWideString(sourceString);
     Uint16 t = 0, target;
     int j, k, p;
-    vector<wchar_t> _temp;
+    std::vector<wchar_t> _temp;
     bool hasBreak = false;
     bool shouldUpperCase = false;
     if (convertToolToCapsFirstLetter || convertToolToCapsEachWord)
@@ -174,7 +175,7 @@ string convertUtil(const string& sourceString) {
         }
     }
     _temp.push_back(0);
-    wstring str(_temp.begin(), _temp.end());
+    std::wstring str(_temp.begin(), _temp.end());
     return wideStringToUtf8(str);
 }
 

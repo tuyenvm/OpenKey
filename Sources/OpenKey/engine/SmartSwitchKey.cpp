@@ -12,8 +12,8 @@
 #include <memory.h>
 
 //main data, i use `map` because it has O(Log(n))
-static map<string, Int8> _smartSwitchKeyData;
-static string _cacheKey = ""; //use cache for faster
+static std::map<std::string, Int8> _smartSwitchKeyData;
+static std::string _cacheKey = ""; //use cache for faster
 static Int8 _cacheData = 0; //use cache for faster
 
 void initSmartSwitchKey(const Byte* pData, const int& size) {
@@ -29,20 +29,20 @@ void initSmartSwitchKey(const Byte* pData, const int& size) {
     Uint8 value;
     for (int i = 0; i < count; i++) {
         bundleIdSize = pData[cursor++];
-        string bundleId((char*)pData + cursor, bundleIdSize);
+        std::string bundleId((char*)pData + cursor, bundleIdSize);
         cursor += bundleIdSize;
         value = pData[cursor++];
         _smartSwitchKeyData[bundleId] = value;
     }
 }
 
-void getSmartSwitchKeySaveData(vector<Byte>& outData) {
+void getSmartSwitchKeySaveData(std::vector<Byte>& outData) {
     outData.clear();
     Uint16 count = (Uint16)_smartSwitchKeyData.size();
     outData.push_back((Byte)count);
     outData.push_back((Byte)(count>>8));
     
-    for (std::map<string, Int8>::iterator it = _smartSwitchKeyData.begin(); it != _smartSwitchKeyData.end(); ++it) {
+    for (std::map<std::string, Int8>::iterator it = _smartSwitchKeyData.begin(); it != _smartSwitchKeyData.end(); ++it) {
         outData.push_back((Byte)it->first.length());
         for (int j = 0; j < it->first.length(); j++) {
             outData.push_back(it->first[j]);
@@ -51,7 +51,7 @@ void getSmartSwitchKeySaveData(vector<Byte>& outData) {
     }
 }
 
-int getAppInputMethodStatus(const string& bundleId, const int& currentInputMethod) {
+int getAppInputMethodStatus(const std::string& bundleId, const int& currentInputMethod) {
     if (_cacheKey.compare(bundleId) == 0) {
         return _cacheData;
     }
@@ -66,7 +66,7 @@ int getAppInputMethodStatus(const string& bundleId, const int& currentInputMetho
     return -1;
 }
 
-void setAppInputMethodStatus(const string& bundleId, const int& language) {
+void setAppInputMethodStatus(const std::string& bundleId, const int& language) {
     _smartSwitchKeyData[bundleId] = language;
     _cacheKey = bundleId;
     _cacheData = language;

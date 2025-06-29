@@ -8,7 +8,6 @@
 
 #include "Vietnamese.h"
 #include "iostream"
-using namespace std;
 
 //unicode
 Uint16 douKey[][2] = {
@@ -16,7 +15,7 @@ Uint16 douKey[][2] = {
     {KEY_E, 0xEA}  //e -> ê
 };
 
-map<Uint16, vector<vector<Uint16>>> _vowel = {
+std::map<Uint16, std::vector<std::vector<Uint16>>> _vowel = {
     {
         KEY_A, {
             {KEY_A, KEY_N, KEY_G}, {KEY_A, KEY_G | END_CONSONANT_MASK},
@@ -96,7 +95,7 @@ map<Uint16, vector<vector<Uint16>>> _vowel = {
     }
 };
 
-map<Uint16, vector<vector<Uint32>>> _vowelCombine = {
+std::map<Uint16, std::vector<std::vector<Uint32>>> _vowelCombine = {
     {
         KEY_A, {
             //fist elem can has end consonant or not
@@ -167,7 +166,7 @@ map<Uint16, vector<vector<Uint32>>> _vowelCombine = {
     }
 };
 
-vector<vector<Uint16>> _consonantD = {
+std::vector<std::vector<Uint16>> _consonantD = {
     {KEY_D, KEY_E, KEY_N, KEY_H}, {KEY_D, KEY_E, KEY_H | END_CONSONANT_MASK},
     {KEY_D, KEY_E, KEY_N, KEY_G}, {KEY_D, KEY_E, KEY_G | END_CONSONANT_MASK},
     {KEY_D, KEY_E, KEY_C, KEY_H}, {KEY_D, KEY_E, KEY_K | END_CONSONANT_MASK},
@@ -241,7 +240,7 @@ vector<vector<Uint16>> _consonantD = {
     {KEY_D}
 };
 
-map<Uint16, vector<vector<Uint16>>> _vowelForMark = {
+std::map<Uint16, std::vector<std::vector<Uint16>>> _vowelForMark = {
     {
         KEY_A, {
             {KEY_A, KEY_N, KEY_G}, {KEY_A, KEY_G | END_CONSONANT_MASK},
@@ -330,7 +329,7 @@ map<Uint16, vector<vector<Uint16>>> _vowelForMark = {
     }
 };
 
-vector<vector<Uint16>> _consonantTable = {
+std::vector<std::vector<Uint16>> _consonantTable = {
     { KEY_N, KEY_G, KEY_H },
     { KEY_P, KEY_H },
     { KEY_T, KEY_H },
@@ -366,17 +365,17 @@ vector<vector<Uint16>> _consonantTable = {
     { KEY_J | END_CONSONANT_MASK},
 };
 
-vector<vector<Uint16>> _endConsonantTable = {
+std::vector<std::vector<Uint16>> _endConsonantTable = {
     { KEY_T }, { KEY_P }, { KEY_C }, { KEY_N }, { KEY_M },
     { KEY_G | END_CONSONANT_MASK }, { KEY_K | END_CONSONANT_MASK }, { KEY_H | END_CONSONANT_MASK },
     { KEY_C, KEY_H }, { KEY_N, KEY_H }, { KEY_N, KEY_G },
 };
 
-vector<Uint16> _standaloneWbad = {
+std::vector<Uint16> _standaloneWbad = {
     KEY_W, KEY_E, KEY_Y, KEY_F, KEY_J, KEY_K, KEY_Z
 };
 
-vector<vector<Uint16>> _doubleWAllowed = {
+std::vector<std::vector<Uint16>> _doubleWAllowed = {
     {KEY_T, KEY_R},
     {KEY_T, KEY_H},
     {KEY_C, KEY_H},
@@ -388,13 +387,13 @@ vector<vector<Uint16>> _doubleWAllowed = {
     {KEY_G, KEY_H},
 };
 
-map<Uint16, vector<Uint16>> _quickStartConsonant = {
+std::map<Uint16, std::vector<Uint16>> _quickStartConsonant = {
     {KEY_F, {KEY_P, KEY_H}},
     {KEY_J, {KEY_G, KEY_I}},
     {KEY_W, {KEY_Q, KEY_U}},
 };
 
-map<Uint16, vector<Uint16>> _quickEndConsonant = {
+std::map<Uint16, std::vector<Uint16>> _quickEndConsonant = {
     {KEY_G, {KEY_N, KEY_G}},
     {KEY_H, {KEY_N, KEY_H}},
     {KEY_K, {KEY_C, KEY_H}},
@@ -407,7 +406,7 @@ map<Uint16, vector<Uint16>> _quickEndConsonant = {
  * 3: Unicode Compound
  * 4: Vietnamese Locale CP 1258
  */
-map<Uint32, vector<Uint16>> _codeTable[] = {
+std::map<Uint32, std::vector<Uint16>> _codeTable[] = {
     {
         //{keyCode, {CAPS_CHAR,    NORMAL_CHAR,     CAPS_W_CHAR,     NORMAL_W_CHAR}}
         //KEY_A,            {Â, â, Ă, ă, Á, á, À, à, Ả, ả, Ã, ã, Ạ, ạ
@@ -493,7 +492,7 @@ map<Uint32, vector<Uint16>> _codeTable[] = {
 Uint16 _unicodeCompoundMark[] = {0x0301, 0x0300, 0x0309, 0x0303, 0x0323};
 
 //for quick telex
-map<Uint32, vector<Uint16>> _quickTelex = {
+std::map<Uint32, std::vector<Uint16>> _quickTelex = {
     {KEY_C, {KEY_C, KEY_H}},
     {KEY_G, {KEY_G, KEY_I}},
     {KEY_K, {KEY_K, KEY_H}},
@@ -504,7 +503,7 @@ map<Uint32, vector<Uint16>> _quickTelex = {
     {KEY_U, {KEY_U, KEY_U}},
 };
 
-map<Uint32, Uint32> _characterMap = {
+std::map<Uint32, Uint32> _characterMap = {
     {'a', KEY_A}, {'A', KEY_A|CAPS_MASK},
     {'b', KEY_B}, {'B', KEY_B|CAPS_MASK},
     {'c', KEY_C}, {'C', KEY_C|CAPS_MASK},
@@ -555,7 +554,7 @@ map<Uint32, Uint32> _characterMap = {
     {' ', KEY_SPACE}
 };
 
-map<Uint32, Uint32> _keyCodeToChar;
+std::map<Uint32, Uint32> _keyCodeToChar;
 
 void initKeyCodeToChar() {
     _keyCodeToChar.clear();

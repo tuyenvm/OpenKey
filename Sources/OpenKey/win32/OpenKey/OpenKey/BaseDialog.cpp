@@ -14,7 +14,7 @@ redistribute your new version, it MUST be open source.
 #include "BaseDialog.h"
 static TCHAR tooltipBuff[1024];
 
-static INT_PTR CALLBACK DialogProc(HWND hDlg, UINT uMsg, WPARAM wParam, LPARAM lParam) {
+/*static*/ INT_PTR CALLBACK DialogProc(HWND hDlg, UINT uMsg, WPARAM wParam, LPARAM lParam) {
 	if (uMsg == WM_INITDIALOG) {
 #ifdef _WIN64
 		SetWindowLongPtr(hDlg, GWLP_USERDATA, lParam);

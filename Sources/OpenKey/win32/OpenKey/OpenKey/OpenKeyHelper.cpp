@@ -33,8 +33,8 @@ static HWND _tempWnd;
 static TCHAR _exePath[1024] = { 0 };
 static LPCTSTR _exeName = _exePath;
 static HANDLE _proc;
-static string _exeNameUtf8 = "TheOpenKeyProject";
-static string _unknownProgram = "UnknownProgram";
+static std::string _exeNameUtf8 = "TheOpenKeyProject";
+static std::string _unknownProgram = "UnknownProgram";
 
 int CF_RTF = RegisterClipboardFormat(_T("Rich Text Format"));
 int CF_HTML = RegisterClipboardFormat(_T("HTML Format"));
@@ -94,13 +94,13 @@ BYTE * OpenKeyHelper::getRegBinary(LPCTSTR key, DWORD& outSize) {
 void OpenKeyHelper::registerRunOnStartup(const int& val) {
 	if (val) {
 		if (vRunAsAdmin) {
-			string path = wideStringToUtf8(getFullPath());
+			std::string path = wideStringToUtf8(getFullPath());
 			char buff[MAX_PATH];
 			sprintf_s(buff, "schtasks /create /sc onlogon /tn OpenKey /rl highest /tr \"%s\" /f", path.c_str());
 			WinExec(buff, SW_HIDE);
 		} else {
 			RegOpenKeyEx(HKEY_CURRENT_USER, _runOnStartupKeyPath, NULL, KEY_ALL_ACCESS, &hKey);
-			wstring path = getFullPath();
+			std::wstring path = getFullPath();
 			RegSetValueEx(hKey, _T("OpenKey"), 0, REG_SZ, (byte*)path.c_str(), ((DWORD)path.size() + 1) * sizeof(TCHAR));
 			RegCloseKey(hKey);
 		}
@@ -121,7 +121,7 @@ LPTSTR OpenKeyHelper::getExecutePath() {
 	return _executePath;
 }
 
-string& OpenKeyHelper::getFrontMostAppExecuteName() {
+std::string& OpenKeyHelper::getFrontMostAppExecuteName() {
 	_tempWnd = GetForegroundWindow();
 	GetWindowThreadProcessId(_tempWnd, &_tempProcessId);
 	if (_tempProcessId == _cacheProcessId) {
@@ -149,21 +149,21 @@ string& OpenKeyHelper::getFrontMostAppExecuteName() {
 	return _exeNameUtf8;
 }
 
-string & OpenKeyHelper::getLastAppExecuteName() {
+std::string & OpenKeyHelper::getLastAppExecuteName() {
 	if (!vUseSmartSwitchKey)
 		return getFrontMostAppExecuteName();
 	return _exeNameUtf8;
 }
 
-wstring OpenKeyHelper::getFullPath() {
+std::wstring OpenKeyHelper::getFullPath() {
 	HMODULE hModule = GetModuleHandle(NULL);
 	TCHAR path[MAX_PATH];
 	GetModuleFileName(hModule, path, MAX_PATH);
-	wstring rs(path);
+	std::wstring rs(path);
 	return rs;
 }
 
-wstring OpenKeyHelper::getClipboardText(const int& type) {
+std::wstring OpenKeyHelper::getClipboardText(const int& type) {
 	// Try opening the clipboard
 	if (!OpenClipboard(nullptr)) {
 		return _T("");
@@ -181,8 +181,8 @@ wstring OpenKeyHelper::getClipboardText(const int& type) {
 		return _T("");
 	}
 
-	// Save text in a string class instance
-	wstring text(pszText);
+	// Save text in a std::string class instance
+	std::wstring text(pszText);
 	
 	// Release the lock
 	GlobalUnlock(hData);
@@ -205,14 +205,14 @@ void OpenKeyHelper::setClipboardText(LPCTSTR data, const int & len, const int& t
 
 bool OpenKeyHelper::quickConvert() {
 	//read data from clipboard
-	//support Unicode raw string, Rich Text Format and HTML
+	//support Unicode raw std::string, Rich Text Format and HTML
 
 	if (!OpenClipboard(nullptr)) {
 		return false;
 	}
 
-	string dataHTML, dataRTF;
-	wstring dataUnicode;
+	std::string dataHTML, dataRTF;
+	std::wstring dataUnicode;
 
 	char* pHTML = 0, pRTF = 0;
 	wchar_t* pUnicode = 0;
@@ -292,11 +292,11 @@ DWORD OpenKeyHelper::getVersionNumber() {
 	return 0;
 }
 
-wstring OpenKeyHelper::getVersionString() {
+std::wstring OpenKeyHelper::getVersionString() {
 	TCHAR versionBuffer[MAX_PATH];
 	DWORD ver = getVersionNumber();
 	wsprintfW(versionBuffer, _T("%d.%d.%d"), ver & 0xFF, (ver>>8) & 0xFF, (ver >> 16) & 0xFF);
-	return wstring(versionBuffer);
+	return std::wstring(versionBuffer);
 
 	// get the filename of the executable containing the version resource
 	TCHAR szFilename[MAX_PATH + 1] = { 0 };
@@ -305,7 +305,7 @@ wstring OpenKeyHelper::getVersionString() {
 	}
 }
 
-wstring OpenKeyHelper::getContentOfUrl(LPCTSTR url){
+std::wstring OpenKeyHelper::getContentOfUrl(LPCTSTR url){
 	WCHAR path[MAX_PATH];
 	GetTempPath2(MAX_PATH, path);
 	wsprintf(path, TEXT("%s\\_OpenKey.tempf"), path);

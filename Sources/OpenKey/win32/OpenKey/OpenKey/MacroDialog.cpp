@@ -57,7 +57,7 @@ INT_PTR MacroDialog::eventProc(HWND hDlg, UINT uMsg, WPARAM wParam, LPARAM lPara
 				if ((HWND)lParam == hMacroName) {
 					TCHAR buffer[128];
 					GetWindowText(hMacroName, buffer, 128);
-					wstring name = buffer;
+					std::wstring name = buffer;
 					if (hasMacro(wideStringToUtf8(name))) {
 						SetWindowText(hAddButton, BTN_UPDATE_TEXT);
 					} else {
@@ -124,7 +124,7 @@ void MacroDialog::fillData() {
 
 void MacroDialog::saveAndReload() {
 	//save
-	vector<Byte> macroData;
+	std::vector<Byte> macroData;
 	getMacroSaveData(macroData);
 	OpenKeyHelper::setRegBinary(_T("macroData"), macroData.data(), (int)macroData.size());
 
@@ -159,10 +159,10 @@ void MacroDialog::onSelectItem(const int & index) {
 void MacroDialog::onAddMacroButton() {
 	TCHAR buffer[MAX_MACRO_BUFFER];
 	GetWindowText(hMacroName, buffer, MAX_MACRO_BUFFER);
-	wstring name = buffer;
+	std::wstring name = buffer;
 
 	GetWindowText(hMacroContent, buffer, MAX_MACRO_BUFFER);
-	wstring content = buffer;
+	std::wstring content = buffer;
 
 	if (name.compare(L"") == 0 || content.compare(L"") == 0) {
 		MessageBox(hDlg, _T("Bạn hãy nhập từ cần gõ tắt!"), _T("OpenKey"), MB_OK);
@@ -179,7 +179,7 @@ void MacroDialog::onAddMacroButton() {
 void MacroDialog::onDeleteMacroButton() {
 	TCHAR buffer[MAX_MACRO_BUFFER];
 	GetWindowText(hMacroName, buffer, MAX_MACRO_BUFFER);
-	wstring name = buffer;
+	std::wstring name = buffer;
 
 	if (name.compare(L"") == 0) {
 		MessageBox(hDlg, _T("Bạn hãy chọn từ cần xoá!"), _T("OpenKey"), MB_OK);
@@ -217,7 +217,7 @@ void MacroDialog::onImportMacroButton() {
 			_T("Dữ liệu gõ tắt"),
 			MB_ICONEXCLAMATION | MB_YESNO
 		);
-		wstring path = ofn.lpstrFile;
+		std::wstring path = ofn.lpstrFile;
 		readFromFile(wideStringToUtf8(path), msgboxID == IDYES);
 		saveAndReload();
 	}
@@ -240,7 +240,7 @@ void MacroDialog::onExportMacrobutton() {
 	ofn.lpstrDefExt = (LPCWSTR)L"txt";
 	ofn.Flags = OFN_PATHMUSTEXIST | OFN_FILEMUSTEXIST;
 	if (GetSaveFileName(&ofn) == TRUE) {
-		wstring path = ofn.lpstrFile;
+		std::wstring path = ofn.lpstrFile;
 		saveToFile(wideStringToUtf8(path));
 	}
 }
