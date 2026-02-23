@@ -82,8 +82,10 @@ jobs:
       - name: Package with CPack (DEB)
         if: matrix.distro == 'ubuntu'
         run: |
-          # Re-configure to force /usr/lib instead of /usr/lib64 for Debian compliance
-          cmake -B build -S . -DCMAKE_INSTALL_LIBDIR=lib -DOPENKEY_VERSION="${{ env.VERSION }}"
+          # Re-configure to force the specific multiarch /usr/lib/x86_64-linux-gnu path
+          # This is critical for Ubuntu/Debian discovery
+          MULTIARCH=$(dpkg-architecture -qDEB_HOST_MULTIARCH)
+          cmake -B build -S . -DCMAKE_INSTALL_LIBDIR="lib/$MULTIARCH" -DOPENKEY_VERSION="${{ env.VERSION }}"
           cd build && cpack -G DEB
 
       - name: Package with CPack (RPM)
