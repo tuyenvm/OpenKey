@@ -87,15 +87,15 @@ $ brew upgrade --cask openkey
 OpenKey cần cấp quyền, vào *System Preferences -> Security & Privacy -> Accessibility*, kích hoạt `OpenKey.app`. **Không tắt nó khi đang dùng OpenKey**.
 ![Guide](https://raw.githubusercontent.com/tuyenvm/tuyenvm.github.io/master/images/openkey-guide.png "Accessibility").
 
-## Tác giả
-- Mai Vũ Tuyên.
-- Mọi góp ý, gửi cho mình qua maivutuyen.91@gmail.com  
+## Author
+- Mai Vu Tuyen.
+- Any feedback, send to me at maivutuyen.91@gmail.com  
 - Fanpage: [https://www.facebook.com/OpenKeyVN](https://www.facebook.com/OpenKeyVN)
 
 ## Build on Linux
 
 ```bash
-# Cài đặt công cụ (Ubuntu/Debian)
+# Install dependencies (Ubuntu/Debian)
 sudo apt-get install -y cmake build-essential
 
 # Build
@@ -103,20 +103,21 @@ mkdir -p build && cd build
 cmake ..
 make -j$(nproc)
 
-# Kiểm tra
+# Verify
 ./openkey-cli --test
 ```
 
-Chi tiết hơn tại [Sources/OpenKey/linux/README.md](https://github.com/tamld/OpenKey/tree/master/Sources/OpenKey/linux).
+More details at [Sources/OpenKey/linux/README.md](https://github.com/tamld/OpenKey/tree/master/Sources/OpenKey/linux).
 
-## Liên kết
-- [OpenKey cho Windows, xem chi tiết tại đây](https://github.com/tuyenvm/OpenKey/tree/master/Sources/OpenKey/win32)
-- [OpenKey cho Linux, xem hướng dẫn build tại đây](https://github.com/tamld/OpenKey/tree/master/Sources/OpenKey/linux)
-## Một điều nhỏ nhoi
-Đừng quên ủng hộ tác giả bằng cách mua ly cafe cho tác giả tỉnh ngủ nhé:  
+## Links
+- [OpenKey for Windows - details here](https://github.com/tuyenvm/OpenKey/tree/master/Sources/OpenKey/win32)
+- [OpenKey for Linux - build instructions here](https://github.com/tamld/OpenKey/tree/master/Sources/OpenKey/linux)
+
+## Support the Project
+Don't forget to support the author with a coffee ^^:  
 [Buy me a coffee ^^](https://tuyenvm.github.io/donate.html)  
-[Redbull cũng được ^^](https://paypal.me/tuyenmai)  
-Hoặc trực tiếp qua ví momo:   
+[Redbull works too ^^](https://paypal.me/tuyenmai)  
+Or directly via Momo:   
 ![Donate by momo](https://tuyenvm.github.io/images/momo.png "Momo").   
 
-Cảm ơn các bạn rất nhiều.
+Thank you very much.
