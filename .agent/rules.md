@@ -32,6 +32,10 @@ No code transitions from `develop` to `master` without passing:
 2. **Tier 2 (Smoke)**: Dockerized multi-distro installation (`ubuntu`, `fedora`, `archlinux`).
 3. **Tier 3 (E2E)**: UI Xvfb graphical smoke test.
 
+## 6. Living Document Synchronization (Anti-Drift)
+- **Rule**: Documentation is only "living" if it moves at the exact same speed as the code. Upon the completion of any Sub-Task or Phase, the executor MUST update the progress in `.agent/roadmap.md` and `.agent/DoD.md`.
+- **Enforcement**: A Pull Request cannot be merged if it completes a feature but fails to update the `Status` column in `DoD.md` or the `Timeline Overview` in `roadmap.md`.
+
 ## Executable Verification
 ```javascript
 WARN_IF_MATCHES: /ibus|electron|tauri|x11_hook/i
