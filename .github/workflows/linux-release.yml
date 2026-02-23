@@ -62,17 +62,17 @@ jobs:
 
       - name: Tier 2 & 3 - Smoke Install & Run
         run: |
-          if [ "${{ matrix.distro }}" == "ubuntu-latest" ]; then
+          if [ "${{ matrix.distro }}" = "ubuntu-latest" ]; then
             dpkg -i build/openkey-*.deb || apt-get install -f -y
           fi
-          if [ "${{ matrix.distro }}" == "fedora-latest" ]; then
+          if [ "${{ matrix.distro }}" = "fedora-latest" ]; then
             rpm -ivh build/openkey-*.rpm --nodeps
           fi
           
           # Test headless UI launch
-          xvfb-run -a /usr/bin/openkey-linux-ui &
+          xvfb-run --auto-servernum openkey-linux-ui &
           sleep 2
-          pkill openkey-linux
+          pkill -f openkey-linux || true
 
       - name: Generate SHA256 checksums
         if: matrix.distro == 'ubuntu-latest'
