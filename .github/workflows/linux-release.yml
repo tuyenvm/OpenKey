@@ -41,12 +41,12 @@ jobs:
         if: matrix.distro == 'ubuntu-latest'
         run: |
           apt-get update -qq
-          DEBIAN_FRONTEND=noninteractive apt-get install -y cmake build-essential pkg-config fcitx5 libfcitx5core-dev qtbase5-dev qt5-qmake qttools5-dev-tools libqt5svg5-dev dpkg-dev fakeroot lintian rpm xvfb
+          DEBIAN_FRONTEND=noninteractive apt-get install -y cmake build-essential pkg-config fcitx5 libfcitx5core-dev qtbase5-dev qt5-qmake qttools5-dev-tools libqt5svg5-dev dpkg-dev fakeroot lintian rpm xvfb procps
 
       - name: Prep Fedora
         if: matrix.distro == 'fedora-latest'
         run: |
-          dnf install -y cmake gcc-c++ make pkgconf fcitx5-devel qt5-qtbase-devel qt5-qttools-devel qt5-qtsvg-devel rpm-build xorg-x11-server-Xvfb
+          dnf install -y cmake gcc-c++ make pkgconf fcitx5-devel qt5-qtbase-devel qt5-qttools-devel qt5-qtsvg-devel rpm-build xorg-x11-server-Xvfb procps-ng
 
       - name: Configure CMake
         run: cmake -B build -DCMAKE_BUILD_TYPE=Release
@@ -70,7 +70,7 @@ jobs:
           fi
           
           # Test headless UI launch
-          xvfb-run -a /usr/local/bin/openkey-linux-ui &
+          xvfb-run -a /usr/bin/openkey-linux-ui &
           sleep 2
           pkill openkey-linux
 
