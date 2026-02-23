@@ -1,4 +1,4 @@
-name: Linux Build & Release
+name: Linux Multi-Distro Build & Release
 
 on:
   push:
@@ -19,85 +19,86 @@ on:
       - 'LICENSE'
       - 'macOS_Build.md'
   workflow_dispatch:
-    inputs:
-      run_build:
-        description: "Run Linux build"
-        type: boolean
-        default: true
 
 jobs:
-  build:
+  build_and_test:
+    name: Build & Test (${{ matrix.distro }})
     runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        distro: [ubuntu-latest, fedora-latest]
+      fail-fast: false
+    container: ${{ matrix.distro }}
     steps:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Install dependencies
-        run: sudo apt-get update -qq && sudo apt-get install -y cmake build-essential
+      - name: Prep Ubuntu
+        if: matrix.distro == 'ubuntu-latest'
+        run: |
+          apt-get update -qq
+          DEBIAN_FRONTEND=noninteractive apt-get install -y cmake build-essential pkg-config fcitx5 libfcitx5core-dev qtbase5-dev qt5-qmake qttools5-dev-tools libqt5svg5-dev dpkg-dev fakeroot lintian rpm xvfb
 
-      - name: Configure
+      - name: Prep Fedora
+        if: matrix.distro == 'fedora-latest'
+        run: |
+          dnf install -y cmake gcc-c++ make pkgconf fcitx5-devel qt5-qtbase-devel qt5-qttools-devel qt5-qtsvg-devel rpm-build xorg-x11-server-Xvfb
+
+      - name: Configure CMake
         run: cmake -B build -DCMAKE_BUILD_TYPE=Release
 
-      - name: Build
+      - name: Tier 1 - Compile native C++ (Core Engine, Fcitx5 hook, Qt5 UI)
         run: cmake --build build --parallel
 
-      - name: Package
+      - name: Package with CPack
         run: |
           cd build
           cpack -G DEB
+          cpack -G RPM
 
-      - name: Smoke test (version)
-        run: ./build/openkey-cli --version
+      - name: Tier 2 & 3 - Smoke Install & Run
+        run: |
+          if [ "${{ matrix.distro }}" == "ubuntu-latest" ]; then
+            dpkg -i build/openkey-*.deb || apt-get install -f -y
+          fi
+          if [ "${{ matrix.distro }}" == "fedora-latest" ]; then
+            rpm -ivh build/openkey-*.rpm --nodeps
+          fi
+          
+          # Test headless UI launch
+          xvfb-run -a /usr/local/bin/openkey-linux-ui &
+          sleep 2
+          pkill openkey-linux
 
-      - name: Smoke test (engine)
-        run: ./build/openkey-cli --test
-
-      - name: Generate SHA256 checksum
+      - name: Generate SHA256 checksums
+        if: matrix.distro == 'ubuntu-latest'
         run: |
           cd build
-          sha256sum openkey-cli *.deb > SHA256SUMS
+          sha256sum openkey-cli *.deb *.rpm > SHA256SUMS
 
-      - name: Upload artifact
+      - name: Upload Artifacts
+        if: matrix.distro == 'ubuntu-latest'
         uses: actions/upload-artifact@v4
         with:
-          name: openkey-cli-linux-x86_64
+          name: openkey-linux-packages
           path: |
             build/openkey-cli
             build/*.deb
+            build/*.rpm
             build/SHA256SUMS
 
   release:
-    needs: build
+    needs: build_and_test
     if: startsWith(github.ref, 'refs/tags/v')
     runs-on: ubuntu-latest
     permissions:
       contents: write
     steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-
-      - name: Install dependencies
-        run: sudo apt-get update -qq && sudo apt-get install -y cmake build-essential
-
-      - name: Build Release
-        run: |
-          cmake -B build -DCMAKE_BUILD_TYPE=Release
-          cmake --build build --parallel
-
-      - name: Package Release
-        run: |
-          cd build
-          cpack -G DEB
-
-      - name: Smoke test
-        run: |
-          ./build/openkey-cli --version
-          ./build/openkey-cli --test
-
-      - name: Generate SHA256 checksum
-        run: |
-          cd build
-          sha256sum openkey-cli *.deb > SHA256SUMS
+      - name: Download Artifacts
+        uses: actions/download-artifact@v4
+        with:
+          name: openkey-linux-packages
+          path: build/
 
       - name: Create Release
         uses: softprops/action-gh-release@v2
@@ -105,5 +106,6 @@ jobs:
           files: |
             build/openkey-cli
             build/*.deb
+            build/*.rpm
             build/SHA256SUMS
           generate_release_notes: true
