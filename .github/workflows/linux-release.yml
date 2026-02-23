@@ -26,9 +26,13 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        distro: [ubuntu-latest, fedora-latest]
+        include:
+          - distro: ubuntu-latest
+            container: ubuntu:latest
+          - distro: fedora-latest
+            container: fedora:latest
       fail-fast: false
-    container: ${{ matrix.distro }}
+    container: ${{ matrix.container }}
     steps:
       - name: Checkout
         uses: actions/checkout@v4
