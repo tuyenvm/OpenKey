@@ -2,8 +2,10 @@
 Name=OpenKey
 Category=InputMethod
 Type=SharedLibrary
+OnDemand=True
+Configurable=True
 Library=fcitx5-openkey
-Version=2.0.0
+Version=@OpenKey_VERSION@
 
 [Addon/Dependencies]
 0=core:5.1.0

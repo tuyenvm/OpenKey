@@ -1,3 +1,4 @@
+#include <QSettings>
 #include <fcitx/addonfactory.h>
 #include <fcitx/addonmanager.h>
 #include <fcitx/inputcontext.h>
@@ -203,7 +204,16 @@ namespace openkey {
 class OpenKeyEngine : public fcitx::InputMethodEngineV2 {
 public:
   OpenKeyEngine(fcitx::Instance *instance) : instance_(instance) {
+    loadConfig();
     hookState_ = static_cast<vKeyHookState *>(vKeyInit());
+  }
+
+  void loadConfig() {
+    QSettings settings("OpenKeyLinux", "Config");
+    vInputType = settings.value("inputType", 0).toInt();
+    vCodeTable = settings.value("codeTable", 0).toInt();
+    vFreeMark = settings.value("freeMark", true).toBool() ? 1 : 0;
+    vUseModernOrthography = settings.value("modernOrth", true).toBool() ? 1 : 0;
   }
 
   void keyEvent(const fcitx::InputMethodEntry &entry,
@@ -274,7 +284,9 @@ public:
       std::string commitStr;
       for (int i = 0; i < hookState_->newCharCount; i++) {
         Uint32 charCode = getCharacterCode(hookState_->charData[i]);
-        commitStr += unicodeToUtf8(charCode);
+        // Mask out internal engine flags (CHAR_CODE_MASK, etc.) before UTF-8
+        // conversion
+        commitStr += unicodeToUtf8(charCode & CHAR_MASK);
       }
 
       if (!commitStr.empty()) {
@@ -306,7 +318,7 @@ public:
       std::string macroStr;
       for (size_t i = 0; i < hookState_->macroData.size(); i++) {
         Uint32 charCode = getCharacterCode(hookState_->macroData[i]);
-        macroStr += unicodeToUtf8(charCode);
+        macroStr += unicodeToUtf8(charCode & CHAR_MASK);
       }
       if (!macroStr.empty()) {
         ic->commitString(macroStr);

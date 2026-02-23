@@ -6,6 +6,7 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 find_package(PkgConfig REQUIRED)
 find_package(Fcitx5Core REQUIRED)
+find_package(Qt5 REQUIRED COMPONENTS Core)
 
 # The Fcitx5 Addon Component
 add_library(fcitx5-openkey MODULE
@@ -18,7 +19,7 @@ add_library(fcitx5-openkey MODULE
 # Fcitx5 expects the addon shared library to have no "lib" prefix
 set_target_properties(fcitx5-openkey PROPERTIES PREFIX "")
 
-target_compile_definitions(fcitx5-openkey PRIVATE LINUX)
+target_compile_definitions(fcitx5-openkey PRIVATE LINUX QT_NO_KEYWORDS)
 target_include_directories(fcitx5-openkey PRIVATE
     ${ENGINE_DIR}
     ${ENGINE_DIR}/platforms
@@ -26,6 +27,7 @@ target_include_directories(fcitx5-openkey PRIVATE
 
 target_link_libraries(fcitx5-openkey
     Fcitx5::Core
+    Qt5::Core
 )
 
 include(GNUInstallDirs)
