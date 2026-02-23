@@ -1,6 +1,6 @@
 [InputMethod]
 Name=OpenKey
-Icon=fcitx-openkey
+Icon=openkey
 Label=VN
 LangCode=vi
 Addon=openkey

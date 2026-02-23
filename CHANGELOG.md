@@ -1,5 +1,10 @@
 # OpenKey Change Log
 
+##### Version 2.0.9 (Linux Patch): (2026-02-23)
+- [Feat] **UI Aesthetics & Icons**: Tích hợp icon chính thức của OpenKey vào Linux.
+- [Feat] App Menu integration: Icon xuất hiện trong menu ứng dụng của GNOME/KDE.
+- [Feat] Fcitx5 integration: Hiển thị icon OpenKey trong khay hệ thống và cấu hình Fcitx5.
+
 ##### Version 2.0.8 (Linux Patch): (2026-02-23)
 - [Fix] CI: Fix lỗi hỏng file `.deb` bằng cách tách riêng các generator CPack.
 - [Fix] CI: Ép đường dẫn `/usr/lib` cho Debian package (thay vì `/usr/lib64`).

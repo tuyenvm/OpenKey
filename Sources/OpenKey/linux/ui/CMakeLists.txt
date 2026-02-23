@@ -29,3 +29,6 @@ install(TARGETS openkey-linux-ui DESTINATION bin)
 # Install desktop entry for application menu visibility
 include(GNUInstallDirs)
 install(FILES openkey-linux-ui.desktop DESTINATION "${CMAKE_INSTALL_DATADIR}/applications")
+
+# Install the application icon (extracted from Windows .ico)
+install(FILES openkey.png DESTINATION "${CMAKE_INSTALL_DATADIR}/icons/hicolor/256x256/apps")

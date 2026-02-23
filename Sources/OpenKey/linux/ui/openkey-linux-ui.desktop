@@ -2,7 +2,7 @@
 Name=OpenKey Settings
 Comment=OpenKey Vietnamese Input Method Configuration
 Exec=openkey-linux-ui
-Icon=fcitx-openkey
+Icon=openkey
 Terminal=false
 Type=Application
 Categories=Settings;Utility;
