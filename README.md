@@ -92,6 +92,15 @@ OpenKey cần cấp quyền, vào *System Preferences -> Security & Privacy -> A
 - Any feedback, send to me at maivutuyen.91@gmail.com  
 - Fanpage: [https://www.facebook.com/OpenKeyVN](https://www.facebook.com/OpenKeyVN)
 
+## Cài đặt trên Linux (Ubuntu/Debian/Fedora)
+Tải gói cài đặt `.deb` hoặc `.rpm` mới nhất tại mục [Releases](https://github.com/tamld/OpenKey/releases/latest).
+
+Sau khi cài đặt xong, do giới hạn bảo mật chống Keylogger của giao thức **Wayland**, bạn CẦN cấp quyền cho Fcitx5 hoạt động như sau:
+- **KDE Plasma (Wayland)**: System Settings -> Virtual Keyboard -> Chọn `Fcitx 5`.
+- **GNOME (Wayland)**: Mở ứng dụng "Tweaks" -> Keyboard & Mouse -> Dưới cùng, đảm bảo Input Method là `fcitx5`. Hoặc cài đặt extension `Kimpanel` để hiển thị trên thanh trạng thái.
+
+Sau khi thiết lập, bộ gõ OpenKey sẽ tự động kích hoạt. Bạn có thể mở ứng dụng "OpenKey" trong Menu hệ thống để tuỳ chỉnh giao diện Control Center y hệt trên macOS.
+
 ## Build on Linux
 
 ```bash
