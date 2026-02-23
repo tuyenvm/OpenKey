@@ -1,0 +1,7 @@
+[InputMethod]
+Name=OpenKey
+Icon=fcitx-openkey
+Label=VN
+LangCode=vi
+Addon=openkey
+Configurable=True

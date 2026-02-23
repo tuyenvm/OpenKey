@@ -15,6 +15,9 @@ add_library(fcitx5-openkey MODULE
     ${ENGINE_SOURCES}
 )
 
+# Fcitx5 expects the addon shared library to have no "lib" prefix
+set_target_properties(fcitx5-openkey PROPERTIES PREFIX "")
+
 target_compile_definitions(fcitx5-openkey PRIVATE LINUX)
 target_include_directories(fcitx5-openkey PRIVATE
     ${ENGINE_DIR}
@@ -25,5 +28,15 @@ target_link_libraries(fcitx5-openkey
     Fcitx5::Core
 )
 
-# Standard installation path for Fcitx5 addons
-install(TARGETS fcitx5-openkey DESTINATION "${FCITX_INSTALL_ADDONDIR}")
+include(GNUInstallDirs)
+
+# Install shared library plugin to relative lib directory for packaging (multiarch aware)
+install(TARGETS fcitx5-openkey DESTINATION "${CMAKE_INSTALL_LIBDIR}/fcitx5")
+
+# Configure and install the Fcitx5 Addon Config file so Fcitx5 can load the plugin
+configure_file(openkey.conf.in ${CMAKE_CURRENT_BINARY_DIR}/openkey.conf @ONLY)
+install(FILES ${CMAKE_CURRENT_BINARY_DIR}/openkey.conf DESTINATION "${CMAKE_INSTALL_DATADIR}/fcitx5/addon")
+
+# Configure and install the Fcitx5 InputMethod Config file so OpenKey appears in the GUI
+configure_file(openkey-im.conf.in ${CMAKE_CURRENT_BINARY_DIR}/openkey-im.conf @ONLY)
+install(FILES ${CMAKE_CURRENT_BINARY_DIR}/openkey-im.conf DESTINATION "${CMAKE_INSTALL_DATADIR}/fcitx5/inputmethod")
