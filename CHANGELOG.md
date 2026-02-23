@@ -1,5 +1,10 @@
 # OpenKey Change Log
 
+##### Version 2.0.4 (Linux Patch): (2026-02-23)
+- [Fix] Thay thế toàn bộ hardcoded version bằng Dynamic Git Tag Extraction (`git describe --tags`).
+- [Fix] Đồng bộ phiên bản giữa Release Tag và tên file artifact (v2.0.x → openkey-2.0.x-linux-*.deb).
+- [Feat] Thêm `.desktop` entry để OpenKey Settings hiện trong Application Menu.
+
 ##### Version 2.0.3 (Linux Patch): (2026-02-23)
 - [ARM] Thêm hỗ trợ Native AArch64 cho GitHub Actions.
 - [Fix] Tự động nhận diện kiến trúc phần cứng (Dynamic Architecture Detection) trong CPack.
