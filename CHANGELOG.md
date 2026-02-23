@@ -1,5 +1,9 @@
 # OpenKey Change Log
 
+##### Version 2.0.8 (Linux Patch): (2026-02-23)
+- [Fix] CI: Fix lỗi hỏng file `.deb` bằng cách tách riêng các generator CPack.
+- [Fix] CI: Ép đường dẫn `/usr/lib` cho Debian package (thay vì `/usr/lib64`).
+
 ##### Version 2.0.7 (Linux Patch): (2026-02-23)
 - [Feat] **Functional Fcitx5 Engine**: Hoàn thiện bridge giữa OpenKey Engine và Fcitx5 InputMethodEngineV2.
 - [Feat] Keystroke processing: `vKeyHandleEvent()` → `commitString()` cho phép gõ Tiếng Việt thực sự.

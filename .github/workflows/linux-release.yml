@@ -73,16 +73,24 @@ jobs:
             VERSION="0.0.0"
           fi
           echo "Resolved version: $VERSION"
+          echo "VERSION=$VERSION" >> $GITHUB_ENV # Export VERSION for subsequent steps
           cmake -B build -DCMAKE_BUILD_TYPE=Release -DOPENKEY_VERSION="$VERSION"
 
       - name: Tier 1 - Compile native C++ (Core Engine, Fcitx5 hook, Qt5 UI)
         run: cmake --build build --parallel
 
-      - name: Package with CPack
+      - name: Package with CPack (DEB)
+        if: matrix.distro == 'ubuntu'
         run: |
-          cd build
-          cpack -G DEB
-          cpack -G RPM
+          # Re-configure to force /usr/lib instead of /usr/lib64 for Debian compliance
+          cmake -B build -S . -DCMAKE_INSTALL_LIBDIR=lib -DOPENKEY_VERSION="${{ env.VERSION }}"
+          cd build && cpack -G DEB
+
+      - name: Package with CPack (RPM)
+        if: matrix.distro == 'fedora'
+        run: |
+          # RPM usually prefers lib64 or follows system defaults, which is fine for Fedora matrix
+          cd build && cpack -G RPM
 
       - name: Tier 2 & 3 - Smoke Install & Run
         run: |
