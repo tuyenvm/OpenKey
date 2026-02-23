@@ -1,0 +1,10 @@
+# Development dependencies for Heavy3 Code Audit
+# Install with: pip install -r requirements-dev.txt
+
+# Testing
+pytest>=7.4.0
+pytest-mock>=3.11.0
+responses>=0.23.0  # Mock requests library
+
+# Production dependency (also needed for tests)
+requests>=2.31.0

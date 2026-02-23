@@ -1,0 +1,15 @@
+{
+  "model": "moonshotai/kimi-k2.5",
+  "free_model": "nvidia/nemotron-3-nano-30b-a3b:free",
+  "council_models": {
+    "correctness": "openai/gpt-5.2",
+    "performance": "google/gemini-3-pro-preview",
+    "security": "x-ai/grok-4"
+  },
+  "reasoning": "high",
+  "docs_folder": "documents",
+  "max_file_size": 50000,
+  "max_context": 200000,
+  "enable_web_search": true,
+  "_note": "Default: Kimi K2.5 (best price/performance for coding). Council uses 3 models. Use --council for 3-model review."
+}

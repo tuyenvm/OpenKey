@@ -1,0 +1,8 @@
+{
+  "model": "nvidia/nemotron-3-nano-30b-a3b:free",
+  "free_model": "nvidia/nemotron-3-nano-30b-a3b:free",
+  "reasoning": "high",
+  "docs_folder": "documents",
+  "enable_web_search": false,
+  "_note": "Use /h3 --free to use this model. Free models rotate on OpenRouter. Web search not available with :free models."
+}

@@ -1,0 +1,9 @@
+{
+  "model": "moonshotai/kimi-k2.5",
+  "free_model": "nvidia/nemotron-3-nano-30b-a3b:free",
+  "reasoning": "high",
+  "docs_folder": "documents",
+  "max_context": 200000,
+  "enable_web_search": true,
+  "_note": "Uses Kimi K2.5 with web search by default. Use /h3 --council for 3-model review."
+}
