@@ -8,3 +8,17 @@
 /Sources/OpenKey/win32/OpenKey/OpenKey/x64/Debug
 /Sources/OpenKey/win32/OpenKey/OpenKey/x64/Release
 /Sources/OpenKey/win32/OpenKey/OpenKeyUpdate/x64/Release
+
+################################################################################
+# Linux build artifacts
+################################################################################
+/build/
+CMakeCache.txt
+CMakeFiles/
+cmake_install.cmake
+Makefile
+
+################################################################################
+# Agent SSoT (internal only, not part of upstream PR)
+################################################################################
+.agent/

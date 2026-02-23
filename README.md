@@ -92,9 +92,26 @@ OpenKey cần cấp quyền, vào *System Preferences -> Security & Privacy -> A
 - Mọi góp ý, gửi cho mình qua maivutuyen.91@gmail.com  
 - Fanpage: [https://www.facebook.com/OpenKeyVN](https://www.facebook.com/OpenKeyVN)
 
+## Build on Linux
+
+```bash
+# Cài đặt công cụ (Ubuntu/Debian)
+sudo apt-get install -y cmake build-essential
+
+# Build
+mkdir -p build && cd build
+cmake ..
+make -j$(nproc)
+
+# Kiểm tra
+./openkey-cli --test
+```
+
+Chi tiết hơn tại [Sources/OpenKey/linux/README.md](https://github.com/tamld/OpenKey/tree/master/Sources/OpenKey/linux).
+
 ## Liên kết
 - [OpenKey cho Windows, xem chi tiết tại đây](https://github.com/tuyenvm/OpenKey/tree/master/Sources/OpenKey/win32)
-- [OpenKey cho Linux (đang phát triển)](https://github.com/tuyenvm/OpenKey/tree/master/Sources/OpenKey/linux)
+- [OpenKey cho Linux, xem hướng dẫn build tại đây](https://github.com/tamld/OpenKey/tree/master/Sources/OpenKey/linux)
 ## Một điều nhỏ nhoi
 Đừng quên ủng hộ tác giả bằng cách mua ly cafe cho tác giả tỉnh ngủ nhé:  
 [Buy me a coffee ^^](https://tuyenvm.github.io/donate.html)  

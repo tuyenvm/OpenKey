@@ -10,6 +10,7 @@
 #include "ConvertTool.h"
 #include "Engine.h"
 #include <iostream>
+#include <algorithm>
 #include <memory.h>
 
 //option
