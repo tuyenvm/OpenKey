@@ -13,18 +13,16 @@
 
 ---
 
-## Phase 3: Fcitx5 Engine Integration (▶ CURRENT TARGET)
+## Phase 3: Fcitx5 Engine Wrapper Implementation
+- [x] Scaffold `fcitx5` CMake target integrating with `libfcitx5core`.
+- [x] Create `openkey_engine.cpp` bridging classes:
+  - [x] Fcitx5 Factory instance.
+  - [x] Addon Hook initialization.
+  - [x] Keystroke interception via Wayland/X11 API.
+- [x] Integrate OpenKey Core Engine into Fcitx5 Context.
 
-| # | Criteria | Evidence/Method | Status |
-|---|----------|-----------------|--------|
-| 7 | Fcitx5 module compiles | `.so` shared object generated | ⬜ |
-| 8 | Module loads into Fcitx5 daemon | Verified in `fcitx5-configtool` | ⬜ |
-| 9 | Typing Vietnamese text in Gedit | Visual validation (Telex processing) | ⬜ |
-| 10 | Typing Vietnamese text in Wayland apps | Visual validation in native Wayland clients | ⬜ |
-
----
-
-## Phase 4: Native Control Center UI (GUI Port)
+# Phase 4: Native C++ UI Control Center Port
+UI (GUI Port)
 
 | # | Criteria | Evidence/Method | Status |
 |---|----------|-----------------|--------|

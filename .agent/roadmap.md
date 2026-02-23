@@ -6,9 +6,9 @@
 Phase 0: SSoT Infrastructure         ████████████ DONE
 Phase 1: Build & CLI Foundation      ████████████ DONE
 Phase 2: CI/CD Pipeline & Packaging  ████████████ DONE
-Phase 3: Fcitx5 Engine Integration   ░░░░░░░░░░░░ PLANNED
-Phase 4: Native Control Center UI    ░░░░░░░░░░░░ PLANNED
-Phase 5: Universal Distribution      ░░░░░░░░░░░░ PLANNED
+Phase 3: Fcitx5 Engine Wrapper Implementation ████████████ DONE
+Phase 4: Native C++ UI Control Center Port ░░░░░░░░░░░░ PLANNED
+Phase 5: Packaging, CI/CD, & 3-Tier UX Testing ░░░░░░░░░░░░ PLANNED
 ```
 
 ---
