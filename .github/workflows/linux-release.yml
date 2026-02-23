@@ -97,12 +97,31 @@ jobs:
     runs-on: ubuntu-latest
     permissions:
       contents: write
+    env:
+      GPG_PRIVATE_KEY: ${{ secrets.GPG_PRIVATE_KEY }}
+      GPG_PASSPHRASE: ${{ secrets.GPG_PASSPHRASE }}
     steps:
       - name: Download Artifacts
         uses: actions/download-artifact@v4
         with:
           name: openkey-linux-packages
           path: build/
+
+      - name: Import GPG signing key
+        id: import_gpg
+        if: ${{ env.GPG_PRIVATE_KEY != '' && env.GPG_PASSPHRASE != '' }}
+        uses: crazy-max/ghaction-import-gpg@v6
+        with:
+          gpg_private_key: ${{ env.GPG_PRIVATE_KEY }}
+          passphrase: ${{ env.GPG_PASSPHRASE }}
+
+      - name: Sign release checksums
+        if: ${{ steps.import_gpg.conclusion == 'success' }}
+        run: |
+          set -euo pipefail
+          gpg --batch --yes --pinentry-mode loopback --passphrase "$GPG_PASSPHRASE" --output build/SHA256SUMS.sig --detach-sign build/SHA256SUMS
+        env:
+          GPG_PASSPHRASE: ${{ env.GPG_PASSPHRASE }}
 
       - name: Create Release
         uses: softprops/action-gh-release@v2
@@ -112,4 +131,5 @@ jobs:
             build/*.deb
             build/*.rpm
             build/SHA256SUMS
+            build/SHA256SUMS.sig
           generate_release_notes: true
