@@ -27,7 +27,9 @@ Historically, Linux Vietnamese IMEs have suffered from stagnation and disjointed
 - **Tech Stack**: Native Linux UI Framework (C++ Qt5/Qt6 or GTK) to match the original C++/Objective-C codebase spirit.
 - Ensures zero "design language drift" from the upstream project.
 
-### Phase 4: Widespread Distribution
+### Phase 4: Widespread Distribution & UX
+- **Seamless Out-of-the-Box Experience**: Zero-configuration required. The user double-clicks the `.deb`, and the software is ready to use immediately without manual terminal configuration.
+- **Post-Install Hooks**: Automated scripts within packages to register the IME with the OS and trigger an Fcitx5 daemon reload automatically.
 - **AUR**: Arch User Repository deployment.
 - **Native Packages**: `.deb` and `.rpm` distribution ensuring deeply integrated system tray icons and UI components.
 
@@ -35,6 +37,7 @@ Historically, Linux Vietnamese IMEs have suffered from stagnation and disjointed
 1. **Performance**: Keystroke latency < 5ms.
 2. **Aesthetic Parity**: The Linux Preferences window must be indistinguishable in layout and functionality from the macOS version.
 3. **Compatibility**: Flawlessly works across Wayland compositors.
+4. **Reliability**: Pipeline passes 3-Tier Testing (Unit Tests, Environment Smoke Tests, and UI Automation Tests).
 
 ## Risks & Mitigations
 | Risk | Mitigation |

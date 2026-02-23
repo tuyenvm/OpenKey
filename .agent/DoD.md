@@ -35,6 +35,17 @@
 
 ---
 
+## Phase 5: Distribution & 3-Tier Testing (UX)
+
+| # | Criteria | Evidence/Method | Status |
+|---|----------|-----------------|--------|
+| 15 | Tier 1: Unit Tests | Automated GTest suite execution in CI | ⬜ |
+| 16 | Tier 2: Smoke Tests | Dockerized `.deb` installation succeeds | ⬜ |
+| 17 | Tier 3: UI E2E | Squish/Xvfb verifies UI launches cleanly | ⬜ |
+| 18 | Post-Install Hooks | `postinst` script registers Fcitx5 automatically without reboot | ⬜ |
+
+---
+
 ## Quality Gates & Rules
 - ⬜ = Pending / Not Started
 - ✅ = Passed (Evidence required)
