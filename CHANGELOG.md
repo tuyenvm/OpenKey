@@ -1,5 +1,9 @@
 # OpenKey Change Log
 
+##### Version 2.0.5 (Linux Patch): (2026-02-23)
+- [Fix] CI: Thêm `fetch-depth: 0` và `fetch-tags: true` để `git describe --tags` hoạt động trong container.
+- [Fix] CI: Cài đặt `git` vào Ubuntu/Fedora container để CMake có thể trích xuất version từ Git tag.
+
 ##### Version 2.0.4 (Linux Patch): (2026-02-23)
 - [Fix] Thay thế toàn bộ hardcoded version bằng Dynamic Git Tag Extraction (`git describe --tags`).
 - [Fix] Đồng bộ phiên bản giữa Release Tag và tên file artifact (v2.0.x → openkey-2.0.x-linux-*.deb).

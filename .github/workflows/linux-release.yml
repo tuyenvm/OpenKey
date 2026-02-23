@@ -48,17 +48,20 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          fetch-tags: true
 
       - name: Prep Ubuntu
         if: matrix.distro == 'ubuntu'
         run: |
           apt-get update -qq
-          DEBIAN_FRONTEND=noninteractive apt-get install -y cmake build-essential pkg-config fcitx5 libfcitx5core-dev qtbase5-dev qt5-qmake qttools5-dev-tools libqt5svg5-dev dpkg-dev fakeroot lintian rpm xvfb procps
+          DEBIAN_FRONTEND=noninteractive apt-get install -y git cmake build-essential pkg-config fcitx5 libfcitx5core-dev qtbase5-dev qt5-qmake qttools5-dev-tools libqt5svg5-dev dpkg-dev fakeroot lintian rpm xvfb procps
 
       - name: Prep Fedora
         if: matrix.distro == 'fedora'
         run: |
-          dnf install -y cmake gcc-c++ make pkgconf fcitx5-devel qt5-qtbase-devel qt5-qttools-devel qt5-qtsvg-devel rpm-build xorg-x11-server-Xvfb procps-ng
+          dnf install -y git cmake gcc-c++ make pkgconf fcitx5-devel qt5-qtbase-devel qt5-qttools-devel qt5-qtsvg-devel rpm-build xorg-x11-server-Xvfb procps-ng
 
       - name: Configure CMake
         run: cmake -B build -DCMAKE_BUILD_TYPE=Release
