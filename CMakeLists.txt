@@ -30,6 +30,12 @@ add_executable(openkey-cli
 # LINUX macro activates platforms/linux.h via DataType.h
 target_compile_definitions(openkey-cli PRIVATE LINUX)
 
+# Fcitx5 Integration Module
+add_subdirectory(${LINUX_DIR}/fcitx5)
+
+# Qt5 Native UI Control Center
+add_subdirectory(${LINUX_DIR}/ui)
+
 # Installation rules
 install(TARGETS openkey-cli DESTINATION bin)
 
