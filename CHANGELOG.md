@@ -1,6 +1,23 @@
 # OpenKey Change Log
 
-##### OpenKey for Linux: (in development)
+##### Version 2.0.3 (Linux Patch): (2026-02-23)
+- [ARM] Thêm hỗ trợ Native AArch64 cho GitHub Actions.
+- [Fix] Tự động nhận diện kiến trúc phần cứng (Dynamic Architecture Detection) trong CPack.
+- [Docs] Cập nhật hướng dẫn bật Virtual Keyboard cho KDE/GNOME Wayland.
+
+##### Version 2.0.2 (Linux): (2026-02-23)
+- [CI] Mở rộng Matrix build hỗ trợ nhiều distro (Ubuntu, Fedora).
+- [Security] Thêm chữ ký số GPG cho các bản phát hành.
+
+##### Version 2.0.1 (Linux Hotfix): (2026-02-23)
+- [Fix] Thêm metadata đăng ký Fcitx5 (`openkey.conf`, `openkey-im.conf`), giúp hệ thống tự động nhận diện bộ gõ.
+- [Fix] Chuyển đổi đường dẫn cài đặt sang chuẩn GNU (`GNUInstallDirs`), sửa lỗi "rơi rụng" file cấu hình khi tạo gói `.deb`.
+
+##### Version 2.0.0 (Linux Milestone): (2026-02-23)
+- Phát hành chính thức phiên bản OpenKey port cho Linux (Vision 2026).
+- Hỗ trợ đầy đủ Core Engine C++ nguyên bản.
+- Giao diện Control Center Native (Qt5) kế thừa 1:1 từ macOS.
+- Tích hợp sâu vào hệ thống Fcitx5 (Wayland/X11 compliant).
 
 ##### Version 1.2 RC5: (26/08/2019)
 - Sửa lỗi không gõ được chữ "quởn".

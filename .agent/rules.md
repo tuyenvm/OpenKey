@@ -58,6 +58,10 @@ graph LR
 - **Rule**: Documentation is only "living" if it moves at the exact same speed as the code. Upon the completion of any Sub-Task or Phase, the executor MUST update the progress in `.agent/roadmap.md` and `.agent/DoD.md`.
 - **Enforcement**: A Pull Request cannot be merged if it completes a feature but fails to update the `Status` column in `DoD.md` or the `Timeline Overview` in `roadmap.md`.
 
+- **Rule**: Mọi phiên bản được gắn Tag (Tag Release) BẮT BUỘC phải được cập nhật vào `CHANGELOG.md` trước khi đẩy lên GitHub.
+- **Content**: Changelog phải mô tả rõ các thay đổi về tính năng (feat), sửa lỗi (fix), và các cải tiến hạ tầng (ci/docs).
+- **Enforcement**: Việc vi phạm quy tắc này sẽ làm mất đi tính minh bạch và "Single Source of Truth" của dự án.
+
 ## Executable Verification
 ```javascript
 WARN_IF_MATCHES: /ibus|electron|tauri|x11_hook/i
