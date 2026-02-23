@@ -1,27 +1,29 @@
 cmake_minimum_required(VERSION 3.10)
 
-# Dynamic version extraction from Git tag (Zero Hardcode Policy)
-# Strips 'v' prefix and '-linux' suffix: v2.0.3-linux -> 2.0.3
-execute_process(
-    COMMAND git describe --tags --abbrev=0
-    WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
-    OUTPUT_VARIABLE GIT_TAG
-    OUTPUT_STRIP_TRAILING_WHITESPACE
-    ERROR_QUIET
-    RESULT_VARIABLE GIT_TAG_RESULT
-)
-
-if(GIT_TAG_RESULT EQUAL 0 AND GIT_TAG)
-    # Strip 'v' prefix
-    string(REGEX REPLACE "^v" "" GIT_VERSION "${GIT_TAG}")
-    # Strip '-linux' or any other suffix after the version digits
-    string(REGEX REPLACE "-.*$" "" GIT_VERSION "${GIT_VERSION}")
+# Dynamic version resolution (Zero Hardcode Policy)
+# Priority: 1. CMake -DOPENKEY_VERSION=x.y.z  2. git describe  3. fallback 0.0.0
+if(DEFINED OPENKEY_VERSION AND NOT OPENKEY_VERSION STREQUAL "")
+    set(GIT_VERSION "${OPENKEY_VERSION}")
+    message(STATUS "OpenKey version from CMake variable: ${GIT_VERSION}")
 else()
-    set(GIT_VERSION "0.0.0")
-    message(WARNING "No Git tag found. Using fallback version: ${GIT_VERSION}")
+    execute_process(
+        COMMAND git describe --tags --abbrev=0
+        WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
+        OUTPUT_VARIABLE GIT_TAG
+        OUTPUT_STRIP_TRAILING_WHITESPACE
+        ERROR_QUIET
+        RESULT_VARIABLE GIT_TAG_RESULT
+    )
+    if(GIT_TAG_RESULT EQUAL 0 AND GIT_TAG)
+        string(REGEX REPLACE "^v" "" GIT_VERSION "${GIT_TAG}")
+        string(REGEX REPLACE "-.*$" "" GIT_VERSION "${GIT_VERSION}")
+        message(STATUS "OpenKey version from Git tag: ${GIT_VERSION}")
+    else()
+        set(GIT_VERSION "0.0.0")
+        message(WARNING "No version source found. Using fallback: ${GIT_VERSION}")
+    endif()
 endif()
 
-message(STATUS "OpenKey version from Git: ${GIT_VERSION}")
 project(OpenKey VERSION ${GIT_VERSION} LANGUAGES CXX)
 
 set(CMAKE_CXX_STANDARD 11)

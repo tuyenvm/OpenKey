@@ -64,7 +64,16 @@ jobs:
           dnf install -y git cmake gcc-c++ make pkgconf fcitx5-devel qt5-qtbase-devel qt5-qttools-devel qt5-qtsvg-devel rpm-build xorg-x11-server-Xvfb procps-ng
 
       - name: Configure CMake
-        run: cmake -B build -DCMAKE_BUILD_TYPE=Release
+        run: |
+          # Extract version from Git tag (GITHUB_REF_NAME) or default to 0.0.0
+          REF_NAME="${GITHUB_REF_NAME:-}"
+          if echo "$REF_NAME" | grep -qE '^v[0-9]+\.[0-9]+\.[0-9]+'; then
+            VERSION=$(echo "$REF_NAME" | sed 's/^v//' | sed 's/-.*//')
+          else
+            VERSION="0.0.0"
+          fi
+          echo "Resolved version: $VERSION"
+          cmake -B build -DCMAKE_BUILD_TYPE=Release -DOPENKEY_VERSION="$VERSION"
 
       - name: Tier 1 - Compile native C++ (Core Engine, Fcitx5 hook, Qt5 UI)
         run: cmake --build build --parallel

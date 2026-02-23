@@ -1,5 +1,9 @@
 # OpenKey Change Log
 
+##### Version 2.0.6 (Linux Patch): (2026-02-23)
+- [Fix] CI: Trích xuất version từ `GITHUB_REF_NAME` và truyền vào CMake qua `-DOPENKEY_VERSION`.
+- [Fix] CMake: Hỗ trợ 3-Tier version (CMake variable → `git describe` → fallback `0.0.0`).
+
 ##### Version 2.0.5 (Linux Patch): (2026-02-23)
 - [Fix] CI: Thêm `fetch-depth: 0` và `fetch-tags: true` để `git describe --tags` hoạt động trong container.
 - [Fix] CI: Cài đặt `git` vào Ubuntu/Fedora container để CMake có thể trích xuất version từ Git tag.
