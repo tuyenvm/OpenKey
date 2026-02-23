@@ -1,6 +1,6 @@
 # CMake configuration for OpenKey Native UI (Qt5)
 cmake_minimum_required(VERSION 3.10)
-project(openkey-linux-ui VERSION 2.0.0 LANGUAGES CXX)
+project(openkey-linux-ui VERSION ${OpenKey_VERSION} LANGUAGES CXX)
 
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
@@ -25,3 +25,7 @@ target_link_libraries(openkey-linux-ui PRIVATE
 
 # Installation rules
 install(TARGETS openkey-linux-ui DESTINATION bin)
+
+# Install desktop entry for application menu visibility
+include(GNUInstallDirs)
+install(FILES openkey-linux-ui.desktop DESTINATION "${CMAKE_INSTALL_DATADIR}/applications")

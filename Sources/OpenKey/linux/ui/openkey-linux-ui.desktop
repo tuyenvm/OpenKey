@@ -1,0 +1,9 @@
+[Desktop Entry]
+Name=OpenKey Settings
+Comment=OpenKey Vietnamese Input Method Configuration
+Exec=openkey-linux-ui
+Icon=fcitx-openkey
+Terminal=false
+Type=Application
+Categories=Settings;Utility;
+Keywords=Vietnamese;Input;IME;Fcitx5;OpenKey;

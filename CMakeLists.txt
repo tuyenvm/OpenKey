@@ -1,5 +1,28 @@
 cmake_minimum_required(VERSION 3.10)
-project(OpenKey VERSION 2.0.0 LANGUAGES CXX)
+
+# Dynamic version extraction from Git tag (Zero Hardcode Policy)
+# Strips 'v' prefix and '-linux' suffix: v2.0.3-linux -> 2.0.3
+execute_process(
+    COMMAND git describe --tags --abbrev=0
+    WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
+    OUTPUT_VARIABLE GIT_TAG
+    OUTPUT_STRIP_TRAILING_WHITESPACE
+    ERROR_QUIET
+    RESULT_VARIABLE GIT_TAG_RESULT
+)
+
+if(GIT_TAG_RESULT EQUAL 0 AND GIT_TAG)
+    # Strip 'v' prefix
+    string(REGEX REPLACE "^v" "" GIT_VERSION "${GIT_TAG}")
+    # Strip '-linux' or any other suffix after the version digits
+    string(REGEX REPLACE "-.*$" "" GIT_VERSION "${GIT_VERSION}")
+else()
+    set(GIT_VERSION "0.0.0")
+    message(WARNING "No Git tag found. Using fallback version: ${GIT_VERSION}")
+endif()
+
+message(STATUS "OpenKey version from Git: ${GIT_VERSION}")
+project(OpenKey VERSION ${GIT_VERSION} LANGUAGES CXX)
 
 set(CMAKE_CXX_STANDARD 11)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
