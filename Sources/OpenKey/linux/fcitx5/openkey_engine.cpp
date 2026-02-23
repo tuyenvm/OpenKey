@@ -214,6 +214,20 @@ public:
     vCodeTable = settings.value("codeTable", 0).toInt();
     vFreeMark = settings.value("freeMark", true).toBool() ? 1 : 0;
     vUseModernOrthography = settings.value("modernOrth", true).toBool() ? 1 : 0;
+    vCheckSpelling = settings.value("checkSpelling", true).toBool() ? 1 : 0;
+    vUpperCaseFirstChar =
+        settings.value("upperCaseFirst", false).toBool() ? 1 : 0;
+
+    vUseMacro = settings.value("useMacro", false).toBool() ? 1 : 0;
+    vUseMacroInEnglishMode =
+        settings.value("useMacroEnglish", false).toBool() ? 1 : 0;
+    vAutoCapsMacro = settings.value("autoCapsMacro", true).toBool() ? 1 : 0;
+    vQuickTelex = settings.value("quickTelex", false).toBool() ? 1 : 0;
+    vQuickStartConsonant = settings.value("quickStart", false).toBool() ? 1 : 0;
+    vQuickEndConsonant = settings.value("quickEnd", false).toBool() ? 1 : 0;
+
+    vFixRecommendBrowser = settings.value("fixBrowser", true).toBool() ? 1 : 0;
+    vRememberCode = settings.value("runAtStartup", true).toBool() ? 1 : 0;
   }
 
   void keyEvent(const fcitx::InputMethodEntry &entry,
