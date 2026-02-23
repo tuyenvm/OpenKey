@@ -22,14 +22,26 @@ on:
 
 jobs:
   build_and_test:
-    name: Build & Test (${{ matrix.distro }})
-    runs-on: ubuntu-latest
+    name: Build & Test (${{ matrix.distro }} - ${{ matrix.arch }})
+    runs-on: ${{ matrix.runs_on }}
     strategy:
       matrix:
         include:
-          - distro: ubuntu-latest
+          - distro: ubuntu
+            arch: x86_64
+            runs_on: ubuntu-latest
             container: ubuntu:latest
-          - distro: fedora-latest
+          - distro: fedora
+            arch: x86_64
+            runs_on: ubuntu-latest
+            container: fedora:latest
+          - distro: ubuntu
+            arch: aarch64
+            runs_on: ubuntu-24.04-arm
+            container: ubuntu:24.04
+          - distro: fedora
+            arch: aarch64
+            runs_on: ubuntu-24.04-arm
             container: fedora:latest
       fail-fast: false
     container: ${{ matrix.container }}
@@ -38,13 +50,13 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Prep Ubuntu
-        if: matrix.distro == 'ubuntu-latest'
+        if: matrix.distro == 'ubuntu'
         run: |
           apt-get update -qq
           DEBIAN_FRONTEND=noninteractive apt-get install -y cmake build-essential pkg-config fcitx5 libfcitx5core-dev qtbase5-dev qt5-qmake qttools5-dev-tools libqt5svg5-dev dpkg-dev fakeroot lintian rpm xvfb procps
 
       - name: Prep Fedora
-        if: matrix.distro == 'fedora-latest'
+        if: matrix.distro == 'fedora'
         run: |
           dnf install -y cmake gcc-c++ make pkgconf fcitx5-devel qt5-qtbase-devel qt5-qttools-devel qt5-qtsvg-devel rpm-build xorg-x11-server-Xvfb procps-ng
 
@@ -62,10 +74,10 @@ jobs:
 
       - name: Tier 2 & 3 - Smoke Install & Run
         run: |
-          if [ "${{ matrix.distro }}" = "ubuntu-latest" ]; then
+          if [ "${{ matrix.distro }}" = "ubuntu" ]; then
             dpkg -i build/openkey-*.deb || apt-get install -f -y
           fi
-          if [ "${{ matrix.distro }}" = "fedora-latest" ]; then
+          if [ "${{ matrix.distro }}" = "fedora" ]; then
             rpm -ivh build/openkey-*.rpm --nodeps
           fi
           
@@ -75,21 +87,19 @@ jobs:
           pkill -f openkey-linux || true
 
       - name: Generate SHA256 checksums
-        if: matrix.distro == 'ubuntu-latest'
         run: |
           cd build
-          sha256sum openkey-cli *.deb *.rpm > SHA256SUMS
+          sha256sum openkey-cli *.deb *.rpm > SHA256SUMS-${{ matrix.distro }}-${{ matrix.arch }}
 
       - name: Upload Artifacts
-        if: matrix.distro == 'ubuntu-latest'
         uses: actions/upload-artifact@v4
         with:
-          name: openkey-linux-packages
+          name: openkey-linux-packages-${{ matrix.distro }}-${{ matrix.arch }}
           path: |
             build/openkey-cli
             build/*.deb
             build/*.rpm
-            build/SHA256SUMS
+            build/SHA256SUMS-*
 
   release:
     needs: build_and_test
@@ -104,8 +114,9 @@ jobs:
       - name: Download Artifacts
         uses: actions/download-artifact@v4
         with:
-          name: openkey-linux-packages
           path: build/
+          pattern: openkey-linux-packages-*
+          merge-multiple: true
 
       - name: Import GPG signing key
         id: import_gpg
@@ -130,6 +141,6 @@ jobs:
             build/openkey-cli
             build/*.deb
             build/*.rpm
-            build/SHA256SUMS
+            build/SHA256SUMS-*
             build/SHA256SUMS.sig
           generate_release_notes: true
