@@ -26,10 +26,10 @@ UI (GUI Port)
 
 | # | Criteria | Evidence/Method | Status |
 |---|----------|-----------------|--------|
-| 11 | Qt/GTK App builds via CMake | `make -j` success | ⬜ |
-| 12 | App layout mimics macOS perfectly | Side-by-side screenshot validation with macOS repo | ⬜ |
-| 13 | App updates Fcitx5 configuration successfully | Changes in UI immediately reflect in engine state | ⬜ |
-| 14 | Cross-platform code isolation | Ensure `Sources/OpenKey/linux/ui` holds pure Linux/Qt definitions | ⬜ |
+| 11 | Qt/GTK App builds via CMake | `make -j` success | ✅ |
+| 12 | App layout mimics macOS perfectly | Side-by-side screenshot validation with macOS repo | ✅ |
+| 13 | App updates Fcitx5 configuration successfully | Changes in UI immediately reflect in engine state | ✅ |
+| 14 | Cross-platform code isolation | Ensure `Sources/OpenKey/linux/ui` holds pure Linux/Qt definitions | ✅ |
 
 ---
 
@@ -37,10 +37,10 @@ UI (GUI Port)
 
 | # | Criteria | Evidence/Method | Status |
 |---|----------|-----------------|--------|
-| 15 | Tier 1: Unit Tests | Automated GTest suite execution in CI | ⬜ |
-| 16 | Tier 2: Smoke Tests | Dockerized `.deb` installation succeeds | ⬜ |
-| 17 | Tier 3: UI E2E | Squish/Xvfb verifies UI launches cleanly | ⬜ |
-| 18 | Post-Install Hooks | `postinst` script registers Fcitx5 automatically without reboot | ⬜ |
+| 15 | Tier 1: Unit Tests | Automated GTest suite execution in CI | ✅ |
+| 16 | Tier 2: Smoke Tests | Dockerized `.deb` and `.rpm` installation succeeds | ✅ |
+| 17 | Tier 3: UI E2E | Squish/Xvfb verifies UI launches cleanly | ✅ |
+| 18 | Post-Install Hooks | `postinst.sh` script registers Fcitx5 automatically without reboot | ✅ |
 
 ---
 

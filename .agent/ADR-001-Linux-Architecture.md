@@ -12,6 +12,25 @@ We architect the OpenKey Linux experience across three distinct pillars using a 
 2. **System Layer (Input Method)**: Integrate natively with **Fcitx5** using C++.
 3. **Control Layer (GUI)**: Utilize a **Native C++ UI Framework (Qt5/Qt6 or GTK)** to perfectly port the macOS UI layout.
 
+### Build Architecture Flowchart
+```mermaid
+graph TD
+    A[Source Code C++] --> B{CMake Core}
+    B -->|Builds| C[openkey-engine Static Lib]
+    
+    C -->|Links| D[openkey-cli Executable]
+    C -->|Links + Fcitx5 API| E[fcitx5-openkey.so Plugin]
+    
+    F[UI Source C++/Qt] --> G{CMake UI}
+    G -->|Builds| H[openkey-linux-ui Executable]
+    
+    D --> I((Final Package))
+    E --> I
+    H --> I
+    
+    style I fill:#f9f,stroke:#333,stroke-width:4px
+```
+
 ## Consequences
 
 ### Positive

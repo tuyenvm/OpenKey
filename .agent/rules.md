@@ -32,6 +32,26 @@ No code transitions from `develop` to `master` without passing:
 2. **Tier 2 (Smoke)**: Dockerized multi-distro installation (`ubuntu`, `fedora`, `archlinux`).
 3. **Tier 3 (E2E)**: UI Xvfb graphical smoke test.
 
+```mermaid
+graph LR
+    P[Code Push/PR] --> CI{GitHub Actions}
+    CI --> T1[Tier 1: GTest C++]
+    
+    T1 -->|Pass| B[Matrix Build]
+    B --> BU[Build Ubuntu .deb]
+    B --> BF[Build Fedora .rpm]
+    
+    BU --> T2U[Tier 2: Docker Ubuntu]
+    BF --> T2F[Tier 2: Docker Fedora]
+    
+    T2U --> T3[Tier 3: UI Xvfb Smoke]
+    T2F --> T3
+    
+    T3 -->|Pass| R((Draft Release))
+    
+    style R fill:#85C1E9,stroke:#2874A6,stroke-width:2px
+```
+
 **Optimization Rule**: CI/CD pipelines MUST be configured to skip execution on documentation updates (`docs:`, `*.md`) or chores to save build time and resources.
 
 ## 6. Living Document Synchronization (Anti-Drift)
