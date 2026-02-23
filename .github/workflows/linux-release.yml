@@ -4,8 +4,26 @@ on:
   push:
     branches: [master]
     tags: ['v*']
+    paths-ignore:
+      - '**.md'
+      - 'docs/**'
+      - '.agent/**'
+      - 'LICENSE'
+      - 'macOS_Build.md'
   pull_request:
     branches: [master]
+    paths-ignore:
+      - '**.md'
+      - 'docs/**'
+      - '.agent/**'
+      - 'LICENSE'
+      - 'macOS_Build.md'
+  workflow_dispatch:
+    inputs:
+      run_build:
+        description: "Run Linux build"
+        type: boolean
+        default: true
 
 jobs:
   build:
@@ -23,16 +41,24 @@ jobs:
       - name: Build
         run: cmake --build build --parallel
 
-      - name: Test
+      - name: Smoke test (version)
+        run: ./build/openkey-cli --version
+
+      - name: Smoke test (engine)
+        run: ./build/openkey-cli --test
+
+      - name: Generate SHA256 checksum
         run: |
-          ./build/openkey-cli --version
-          ./build/openkey-cli --test
+          cd build
+          sha256sum openkey-cli > SHA256SUMS
 
       - name: Upload artifact
         uses: actions/upload-artifact@v4
         with:
           name: openkey-cli-linux-x86_64
-          path: build/openkey-cli
+          path: |
+            build/openkey-cli
+            build/SHA256SUMS
 
   release:
     needs: build
@@ -52,8 +78,20 @@ jobs:
           cmake -B build -DCMAKE_BUILD_TYPE=Release
           cmake --build build --parallel
 
+      - name: Smoke test
+        run: |
+          ./build/openkey-cli --version
+          ./build/openkey-cli --test
+
+      - name: Generate SHA256 checksum
+        run: |
+          cd build
+          sha256sum openkey-cli > SHA256SUMS
+
       - name: Create Release
         uses: softprops/action-gh-release@v2
         with:
-          files: build/openkey-cli
+          files: |
+            build/openkey-cli
+            build/SHA256SUMS
           generate_release_notes: true
