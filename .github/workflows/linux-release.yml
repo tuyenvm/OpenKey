@@ -41,6 +41,11 @@ jobs:
       - name: Build
         run: cmake --build build --parallel
 
+      - name: Package
+        run: |
+          cd build
+          cpack -G DEB
+
       - name: Smoke test (version)
         run: ./build/openkey-cli --version
 
@@ -50,7 +55,7 @@ jobs:
       - name: Generate SHA256 checksum
         run: |
           cd build
-          sha256sum openkey-cli > SHA256SUMS
+          sha256sum openkey-cli *.deb > SHA256SUMS
 
       - name: Upload artifact
         uses: actions/upload-artifact@v4
@@ -58,6 +63,7 @@ jobs:
           name: openkey-cli-linux-x86_64
           path: |
             build/openkey-cli
+            build/*.deb
             build/SHA256SUMS
 
   release:
@@ -78,6 +84,11 @@ jobs:
           cmake -B build -DCMAKE_BUILD_TYPE=Release
           cmake --build build --parallel
 
+      - name: Package Release
+        run: |
+          cd build
+          cpack -G DEB
+
       - name: Smoke test
         run: |
           ./build/openkey-cli --version
@@ -86,12 +97,13 @@ jobs:
       - name: Generate SHA256 checksum
         run: |
           cd build
-          sha256sum openkey-cli > SHA256SUMS
+          sha256sum openkey-cli *.deb > SHA256SUMS
 
       - name: Create Release
         uses: softprops/action-gh-release@v2
         with:
           files: |
             build/openkey-cli
+            build/*.deb
             build/SHA256SUMS
           generate_release_notes: true

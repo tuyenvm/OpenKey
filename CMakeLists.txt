@@ -29,3 +29,18 @@ add_executable(openkey-cli
 
 # LINUX macro activates platforms/linux.h via DataType.h
 target_compile_definitions(openkey-cli PRIVATE LINUX)
+
+# Installation rules
+install(TARGETS openkey-cli DESTINATION bin)
+
+# Packaging (CPack)
+set(CPACK_PACKAGE_NAME "openkey-cli")
+set(CPACK_PACKAGE_VENDOR "OpenKey Team")
+set(CPACK_PACKAGE_DESCRIPTION_SUMMARY "OpenKey Engine CLI for Linux")
+set(CPACK_PACKAGE_VERSION ${PROJECT_VERSION})
+set(CPACK_PACKAGE_CONTACT "Tam Le <tamld@example.com>") # Placeholder contact
+set(CPACK_DEBIAN_PACKAGE_MAINTAINER ${CPACK_PACKAGE_CONTACT})
+set(CPACK_GENERATOR "DEB;TGZ") # Generate .deb and .tar.gz
+set(CPACK_PACKAGE_FILE_NAME "${CPACK_PACKAGE_NAME}-${CPACK_PACKAGE_VERSION}-linux-x86_64")
+
+include(CPack)
