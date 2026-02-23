@@ -1,5 +1,11 @@
 # OpenKey Change Log
 
+##### Version 2.0.7 (Linux Patch): (2026-02-23)
+- [Feat] **Functional Fcitx5 Engine**: Hoàn thiện bridge giữa OpenKey Engine và Fcitx5 InputMethodEngineV2.
+- [Feat] Keystroke processing: `vKeyHandleEvent()` → `commitString()` cho phép gõ Tiếng Việt thực sự.
+- [Feat] Hỗ trợ đầy đủ Telex, VNI, Unicode, TCVN3.
+- [Feat] Session management: auto reset khi chuyển ứng dụng hoặc word break.
+
 ##### Version 2.0.6 (Linux Patch): (2026-02-23)
 - [Fix] CI: Trích xuất version từ `GITHUB_REF_NAME` và truyền vào CMake qua `-DOPENKEY_VERSION`.
 - [Fix] CMake: Hỗ trợ 3-Tier version (CMake variable → `git describe` → fallback `0.0.0`).
