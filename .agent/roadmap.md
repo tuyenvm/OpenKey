@@ -9,16 +9,21 @@ Phase 2: CI/CD Pipeline & Packaging  ████████████ DONE
 Phase 3: Fcitx5 Engine Wrapper Implementation ████████████ DONE
 Phase 4: Native C++ UI Control Center Port ████████████ DONE
 Phase 5: Packaging, CI/CD, & 3-Tier UX Testing ████████████ DONE
+Phase 7: ARM Architecture Pipeline Validation ████████████ DONE
+Phase 8: Wayland hotfixes & Bug Hunting   ████████████ DONE
 ```
 
 ---
 
-## Phase 0-2: The Foundation ✅ (Completed v2.0.0-linux-beta)
+## Phase 0-5 & 7-9: The Complete Linux Port ✅ (Completed v2.0.3-linux)
 - [x] Agent `.agent/` SSoT & documentation standard.
 - [x] Engine compilation on Linux via CMake & GCC 15 fixes.
 - [x] `openkey-cli` for isolated behavior verification.
-- [x] GitHub Actions automated Linux builds.
-- [x] SHA256 verification and CPack `.deb` generation.
+- [x] Fcitx5 C++ Addon development: `fcitx5-openkey`.
+- [x] Native Qt5 UI Port mimicking the macOS layout.
+- [x] Universal distribution via `.deb` and `.rpm` (CPack).
+- [x] Native ARM (AArch64) support on GitHub CI.
+- [x] Full Wayland/KDE/GNOME metadata & documentation fix.
 
 ## Phase 3: Fcitx5 Engine Integration 🚀
 **Goal**: Connect the OpenKey Engine to the Linux display server natively via Fcitx5.
