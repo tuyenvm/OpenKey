@@ -62,13 +62,6 @@ extern bool convertToolDontAlertWhenCompleted;
 
 @end
 
-static void okdbg(NSString *fmt, ...) {
-    va_list ap; va_start(ap, fmt);
-    NSString *msg = [[NSString alloc] initWithFormat:fmt arguments:ap];
-    va_end(ap);
-    FILE *f = fopen("/tmp/openkey-debug.log", "a");
-    if (f) { fprintf(f, "%s\n", msg.UTF8String); fclose(f); }
-}
 
 @implementation AppDelegate {
     NSWindowController *_mainWC;
@@ -117,7 +110,6 @@ static void okdbg(NSString *fmt, ...) {
 }
 
 - (void)applicationDidFinishLaunching:(NSNotification *)aNotification {
-    okdbg(@"applicationDidFinishLaunching START");
     appDelegate = self;
 
     [self registerSupportedNotification];
@@ -129,38 +121,31 @@ static void okdbg(NSString *fmt, ...) {
     //check whether this app has been launched before that or not
     NSArray* runningApp = [[NSWorkspace sharedWorkspace] runningApplications];
     if ([runningApp containsObject:OPENKEY_BUNDLE]) { //if already running -> exit
-        okdbg(@"already running, terminating");
         [NSApp terminate:nil];
         return;
     }
-    okdbg(@"past dup check");
 
     // check if user granted Accessabilty permission
-    BOOL axOk = MJAccessibilityIsEnabled();
-    okdbg(@"accessibility=%d", axOk);
-    if (!axOk) {
-        // Don't early-return — let the UI still open so the user can interact.
-        // The event tap (typing) will be disabled until accessibility is granted.
-        MJAccessibilityOpenPanel();
+    if (!MJAccessibilityIsEnabled()) {
+        [self askPermission];
+        return;
     }
-    
+
     vShowIconOnDock = (int)[[NSUserDefaults standardUserDefaults] integerForKey:@"vShowIconOnDock"];
     if (vShowIconOnDock)
         [NSApp setActivationPolicy: NSApplicationActivationPolicyRegular];
-    
+
     if (vSwitchKeyStatus & 0x8000)
         NSBeep();
 
     [self createStatusBarMenu];
-    
+
     //init
     dispatch_async(dispatch_get_main_queue(), ^{
-        BOOL tapOk = [OpenKeyManager initEventTap];
-        NSInteger showui = [[NSUserDefaults standardUserDefaults] integerForKey:@"ShowUIOnStartup"];
-        okdbg(@"didFinishLaunching dispatch: tapOk=%d showui=%ld", tapOk, (long)showui);
-        if (!tapOk) {
+        if (![OpenKeyManager initEventTap]) {
             [self onControlPanelSelected];
         } else {
+            NSInteger showui = [[NSUserDefaults standardUserDefaults] integerForKey:@"ShowUIOnStartup"];
             if (showui == 1) {
                 [self onControlPanelSelected];
             }
@@ -487,25 +472,19 @@ static void okdbg(NSString *fmt, ...) {
 }
 
 -(void) onControlPanelSelected {
-    okdbg(@"onControlPanelSelected called, _mainWC=%@", _mainWC);
     if (_mainWC == nil) {
         _mainWC = [[NSStoryboard storyboardWithName:@"Main" bundle:nil] instantiateControllerWithIdentifier:@"OpenKey"];
-        okdbg(@"instantiated _mainWC=%@ window=%@", _mainWC, _mainWC.window);
     }
-    [NSApp setActivationPolicy:NSApplicationActivationPolicyRegular];
     if ([_mainWC.window isVisible]) {
         [NSApp activateIgnoringOtherApps:YES];
-        okdbg(@"already visible, frame=%@", NSStringFromRect(_mainWC.window.frame));
         return;
     }
     [NSApp activateIgnoringOtherApps:YES];
-    [_mainWC showWindow:nil];
     [_mainWC.window makeKeyAndOrderFront:nil];
-    [_mainWC.window setLevel:NSNormalWindowLevel];
+    [_mainWC.window setLevel:NSFloatingWindowLevel];
 
-    // Center on the screen with the menu bar (primary built-in display).
-    // Saved frames + multi-display setups can place the window off-screen
-    // or on a display the user isn't currently looking at.
+    // Center on the primary screen — saved frames from prior multi-display
+    // setups can land the window off-screen.
     [_mainWC.window setFrameAutosaveName:@""];
     NSScreen *primary = [NSScreen screens].firstObject ?: [NSScreen mainScreen];
     NSRect visible = primary.visibleFrame;
@@ -514,8 +493,6 @@ static void okdbg(NSString *fmt, ...) {
         visible.origin.x + (visible.size.width - frame.size.width) / 2,
         visible.origin.y + (visible.size.height - frame.size.height) / 2);
     [_mainWC.window setFrameOrigin:origin];
-    okdbg(@"primary visibleFrame=%@ moved to=%@", NSStringFromRect(visible), NSStringFromRect(_mainWC.window.frame));
-    okdbg(@"after show: visible=%d frame=%@ screen=%@", [_mainWC.window isVisible], NSStringFromRect(_mainWC.window.frame), _mainWC.window.screen);
 }
 
 -(void) onMacroSelected {
