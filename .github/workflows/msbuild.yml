@@ -10,11 +10,6 @@ env:
   # Path to the solution file relative to the root of the project.
   SOLUTION_FILE_PATH: .\Sources\OpenKey\win32\OpenKey
 
-  # Configuration type to build.
-  # You can convert this to a build matrix if you need coverage of multiple configuration types.
-  # https://docs.github.com/actions/learn-github-actions/managing-complex-workflows#using-a-build-matrix
-  BUILD_CONFIGURATION: Release
-
 permissions:
   contents: read
 
@@ -29,19 +24,37 @@ jobs:
       uses: microsoft/setup-msbuild@v2
 
     - name: Build x86
-      run: msbuild -m -target:Rebuild -p:Configuration=Release -p:Platform=x86 ${{env.SOLUTION_FILE_PATH}}
+      run: |
+        msbuild -m -target:Rebuild -p:Configuration=Release -p:Platform=x86 -p:OutDir="./Release/x86/" -p:IntDir="./Release/x86/" ${{env.SOLUTION_FILE_PATH}}
 
     - name: Build x64
-      run: msbuild -m -target:Rebuild -p:Configuration=Release -p:Platform=x64 ${{env.SOLUTION_FILE_PATH}}
+      run: |
+        msbuild -m -target:Rebuild -p:Configuration=Release -p:Platform=x64 -p:OutDir="./Release/x64/" -p:IntDir="./Release/x64/" ${{env.SOLUTION_FILE_PATH}}
 
-    - name: Upload a Build Artifact
+    - name: Prepare Artifact Directory
+      run: |
+        # Create target directories for both platforms
+        New-Item -Path "ArtifactOutput/Release/x86" -ItemType Directory -Force
+        New-Item -Path "ArtifactOutput/Release/x64" -ItemType Directory -Force
+        
+        # Copy x86 OpenKey and OpenKeyUpdate exes
+        Copy-Item -Path "Sources/OpenKey/win32/OpenKey/OpenKey/Release/x86/*.exe" -Destination "ArtifactOutput/Release/x86/" -Force
+        Copy-Item -Path "Sources/OpenKey/win32/OpenKey/OpenKeyUpdate/Release/x86/*.exe" -Destination "ArtifactOutput/Release/x86/" -Force
+        
+        # Copy x64 OpenKey and OpenKeyUpdate exes
+        Copy-Item -Path "Sources/OpenKey/win32/OpenKey/OpenKey/Release/x64/*.exe" -Destination "ArtifactOutput/Release/x64/" -Force
+        Copy-Item -Path "Sources/OpenKey/win32/OpenKey/OpenKeyUpdate/Release/x64/*.exe" -Destination "ArtifactOutput/Release/x64/" -Force
+        
+        # List files in the target directories to verify
+        Get-ChildItem -Path "ArtifactOutput/Release/x86"
+        Get-ChildItem -Path "ArtifactOutput/Release/x64"
+
+    - name: Archive and Upload Build Artifacts
       id: upload
       uses: actions/upload-artifact@v4
       with:
         name: OpenKey
-        path: |
-          ${{env.SOLUTION_FILE_PATH}}/Release/
-          ${{env.SOLUTION_FILE_PATH}}/x64/Release/
+        path: ArtifactOutput/Release/
 
     outputs:
       subject-name: OpenKey
