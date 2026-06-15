@@ -26,7 +26,7 @@ extern NSString* ConvertUtil(NSString* str);
 }
 static BOOL _isInited = NO;
 
-static CFMachPortRef      eventTap;
+CFMachPortRef      eventTap;
 static CGEventMask        eventMask;
 static CFRunLoopSourceRef runLoopSource;
 
@@ -73,18 +73,19 @@ static CFRunLoopSourceRef runLoopSource;
     
     // Enable the event tap.
     CGEventTapEnable(eventTap, true);
-    
-    // Set it all running.
-    CFRunLoopRun();
-    
+
+    // Do NOT call CFRunLoopRun() here: the main run loop is already running
+    // via NSApplicationMain(). Starting a nested run loop on the main queue
+    // blocks AppKit/NSMenu tracking (frozen menu-bar icon, dead preferences).
+
     return YES;
 }
 
 +(BOOL)stopEventTap {
     if (_isInited) { //release all object
-        CFRunLoopStop(CFRunLoopGetCurrent());
-        
-        CFRunLoopRemoveSource(CFRunLoopGetCurrent(), runLoopSource, kCFRunLoopDefaultMode);
+        CGEventTapEnable(eventTap, false);
+
+        CFRunLoopRemoveSource(CFRunLoopGetCurrent(), runLoopSource, kCFRunLoopCommonModes);
         CFRelease(runLoopSource);
         runLoopSource = nil;
         
@@ -152,6 +153,14 @@ static CFRunLoopSourceRef runLoopSource;
 #pragma mark -AutoUpdate feature
 
 +(void)checkNewVersion:(NSWindow*)parent callbackFunc:(CheckNewVersionCallback) callback {
+    //Update mechanism removed for NKey: the endpoint and updater bundle belong to
+    //the upstream OpenKey project. Just re-enable the caller's UI and do nothing.
+    dispatch_async(dispatch_get_main_queue(), ^{
+        if (callback != nil)
+            callback();
+    });
+    return;
+
     //load new version config
     NSURLSession *aSession = [NSURLSession sessionWithConfiguration:[NSURLSessionConfiguration defaultSessionConfiguration]];
     [[aSession dataTaskWithURL:[NSURL URLWithString:@"https://raw.githubusercontent.com/tuyenvm/OpenKey/master/version.json"] completionHandler:^(NSData *data, NSURLResponse *response, NSError *error) {
@@ -195,8 +204,8 @@ static CFRunLoopSourceRef runLoopSource;
 
 +(void)showUpdateMessage:(NSWindow*)parent needUpdating:(BOOL)needUpdating newVersion:(NSString*)versionString {
     NSAlert *alert = [[NSAlert alloc] init];
-    [alert setMessageText:(needUpdating ? [NSString stringWithFormat:@"OpenKey Có phiên bản mới (%@), bạn có muốn cập nhật không?", versionString] : @"Bạn đang dùng phiên bản mới nhất!")];
-    [alert setInformativeText:(needUpdating ? @"Bấm 'Có' để cập nhật OpenKey." : @"")];
+    [alert setMessageText:(needUpdating ? [NSString stringWithFormat:@"NKey Có phiên bản mới (%@), bạn có muốn cập nhật không?", versionString] : @"Bạn đang dùng phiên bản mới nhất!")];
+    [alert setInformativeText:(needUpdating ? @"Bấm 'Có' để cập nhật NKey." : @"")];
     
     if (!needUpdating) {
         [alert addButtonWithTitle:@"OK"];

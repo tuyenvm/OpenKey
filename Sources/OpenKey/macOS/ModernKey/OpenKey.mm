@@ -47,6 +47,8 @@ extern int vSendKeyStepByStep;
 extern int vFixChromiumBrowser;
 extern int vPerformLayoutCompat;
 
+extern CFMachPortRef eventTap;
+
 extern "C" {
     //app which must sent special empty character
     NSArray* _niceSpaceApp = @[@"com.sublimetext.3",
@@ -85,7 +87,26 @@ extern "C" {
     
     NSString* _frontMostApp = @"UnknownApp";
     
+    //load the English + Vietnamese-by-Telex word lists used by auto English detection.
+    //Both .dat files ship as bundle resources (ported from 84Key, GPLv3).
+    void loadEnglishDictionaries() {
+        NSBundle* bundle = [NSBundle mainBundle];
+        NSString* engPath = [bundle pathForResource:@"english_words" ofType:@"dat"];
+        NSString* vietPath = [bundle pathForResource:@"viet_telex" ofType:@"dat"];
+        if (engPath == nil || vietPath == nil)
+            return;
+        NSData* eng = [NSData dataWithContentsOfFile:engPath];
+        NSData* viet = [NSData dataWithContentsOfFile:vietPath];
+        if (eng != nil)
+            initEnglishDict((const Byte*)eng.bytes, (int)eng.length);
+        if (viet != nil)
+            initVietByTelexDict((const Byte*)viet.bytes, (int)viet.length);
+    }
+
     void OpenKeyInit() {
+        //default auto English detection ON unless the user has explicitly disabled it
+        [[NSUserDefaults standardUserDefaults] registerDefaults:@{@"vAutoDetectEnglish": @1}];
+
         //load saved data
         vFreeMark = 0;//(int)[[NSUserDefaults standardUserDefaults] integerForKey:@"FreeMark"];
         LOAD_DATA(vCodeTable, CodeTable); if (vCodeTable < 0) vCodeTable = 0;
@@ -108,7 +129,8 @@ extern "C" {
         LOAD_DATA(vRememberCode, vRememberCode);
         LOAD_DATA(vOtherLanguage, vOtherLanguage);
         LOAD_DATA(vTempOffOpenKey, vTempOffOpenKey);
-        
+        LOAD_DATA(vAutoDetectEnglish, vAutoDetectEnglish);
+
         LOAD_DATA(vFixChromiumBrowser, vFixChromiumBrowser);
         
         LOAD_DATA(vPerformLayoutCompat, vPerformLayoutCompat);
@@ -141,6 +163,9 @@ extern "C" {
         if (convertToolHotKey == 0) {
             convertToolHotKey = EMPTY_HOTKEY;
         }
+
+        //load word lists for auto English detection
+        loadEnglishDictionaries();
     }
     
     void RequestNewSession() {
@@ -346,8 +371,8 @@ extern "C" {
     void SendBackspace() {
         CGEventTapPostEvent(_proxy, eventBackSpaceDown);
         CGEventTapPostEvent(_proxy, eventBackSpaceUp);
-        
-        if (IS_DOUBLE_CODE(vCodeTable)) { //VNI or Unicode Compound
+
+        if (IS_DOUBLE_CODE(vCodeTable) && !_syncKey.empty()) { //VNI or Unicode Compound
             if (_syncKey.back() > 1) {
                 if (!(vCodeTable == 3 && containUnicodeCompoundApp(FRONT_APP))) {
                     CGEventTapPostEvent(_proxy, eventBackSpaceDown);
@@ -368,8 +393,8 @@ extern "C" {
         
         CGEventTapPostEvent(_proxy, eventVkeyDown);
         CGEventTapPostEvent(_proxy, eventVkeyUp);
-        
-        if (IS_DOUBLE_CODE(vCodeTable)) { //VNI or Unicode Compound
+
+        if (IS_DOUBLE_CODE(vCodeTable) && !_syncKey.empty()) { //VNI or Unicode Compound
             if (_syncKey.back() > 1) {
                 if (!(vCodeTable == 3 && containUnicodeCompoundApp(FRONT_APP))) {
                     CGEventTapPostEvent(_proxy, eventVkeyDown);
@@ -576,6 +601,13 @@ extern "C" {
      * MAIN Callback.
      */
     CGEventRef OpenKeyCallback(CGEventTapProxy proxy, CGEventType type, CGEventRef event, void *refcon) {
+        //macOS disables the tap if the callback is ever too slow (or on user input);
+        //re-enable it, otherwise typing silently stops working until restart.
+        if (type == kCGEventTapDisabledByTimeout || type == kCGEventTapDisabledByUserInput) {
+            CGEventTapEnable(eventTap, true);
+            return event;
+        }
+
         //dont handle my event
         if (CGEventGetIntegerValueField(event, kCGEventSourceStateID) == CGEventSourceGetSourceStateID(myEventSource)) {
             return event;
@@ -673,16 +705,17 @@ extern "C" {
             if ( isource != NULL )
             {
                 CFArrayRef languages = (CFArrayRef) TISGetInputSourceProperty(isource, kTISPropertyInputSourceLanguages);
-                
-                if (CFArrayGetCount(languages) > 0) {
+
+                if (languages != NULL && CFArrayGetCount(languages) > 0) {
+                    //langRef and languages follow the CF Get Rule: we don't own them, must not release.
                     CFStringRef langRef = (CFStringRef)CFArrayGetValueAtIndex(languages, 0);
                     NSString *currentLanguage = (__bridge NSString *)langRef;
                     if(![currentLanguage isLike:@"en"]){
+                        CFRelease(isource); //isource is from a Copy: we own it, release on every path
                         return event;
                     }
-                    CFRelease(langRef);
-                    CFRelease(isource);
                 }
+                CFRelease(isource);
             }
         }
         

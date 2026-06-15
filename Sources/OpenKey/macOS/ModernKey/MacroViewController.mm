@@ -86,7 +86,7 @@
     [openPanel setCanChooseDirectories:NO];
     [openPanel setAllowedFileTypes:[NSArray arrayWithObjects:@"txt", nil]];
     [openPanel setExtensionHidden:NO];
-    [openPanel setNameFieldStringValue:@"OpenKeyMacro"];
+    [openPanel setNameFieldStringValue:@"NKeyMacro"];
     [openPanel makeKeyAndOrderFront:nil];
     [openPanel setLevel:NSStatusWindowLevel];
     if ([openPanel runModal] == NSModalResponseOK ) {
@@ -110,7 +110,7 @@
     [savePanel setTitle:@"Chọn nơi lưu dữ liệu gõ tắt"];
     [savePanel setAllowedFileTypes:[NSArray arrayWithObjects:@"txt", nil]];
     [savePanel setExtensionHidden:NO];
-    [savePanel setNameFieldStringValue:@"OpenKeyMacro"];
+    [savePanel setNameFieldStringValue:@"NKeyMacro"];
     if ([savePanel runModal] == NSModalResponseOK) {
         saveToFile(savePanel.URL.path.UTF8String);
     }

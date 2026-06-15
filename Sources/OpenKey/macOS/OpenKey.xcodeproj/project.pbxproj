@@ -44,6 +44,9 @@
 		23E2E4A02314FD3A006CCC3E /* Vietnamese.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 23E2E49B2314FD3A006CCC3E /* Vietnamese.cpp */; };
 		23F512852336386200397988 /* MJAccessibilityUtils.m in Sources */ = {isa = PBXBuildFile; fileRef = 23F512832336386200397988 /* MJAccessibilityUtils.m */; };
 		A534F32629D8B78100296F25 /* Carbon.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 23874B0F220160A500000BC8 /* Carbon.framework */; };
+		AA00000000000000000000C1 /* EnglishDetect.cpp in Sources */ = {isa = PBXBuildFile; fileRef = AA00000000000000000000F1 /* EnglishDetect.cpp */; };
+		AA00000000000000000000C2 /* english_words.dat in Resources */ = {isa = PBXBuildFile; fileRef = AA00000000000000000000F3 /* english_words.dat */; };
+		AA00000000000000000000C3 /* viet_telex.dat in Resources */ = {isa = PBXBuildFile; fileRef = AA00000000000000000000F4 /* viet_telex.dat */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -65,7 +68,7 @@
 		232DB1E121FAED280049A0B5 /* Status.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = Status.png; sourceTree = "<group>"; };
 		232DB1E221FAED280049A0B5 /* Status@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "Status@2x.png"; sourceTree = "<group>"; };
 		232DB1E321FAED280049A0B5 /* StatusHighlighted@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "StatusHighlighted@2x.png"; sourceTree = "<group>"; };
-		232EDA5421F1B33E0085D362 /* OpenKey.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = OpenKey.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		232EDA5421F1B33E0085D362 /* NKey.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = NKey.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		232EDA5721F1B33E0085D362 /* AppDelegate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = AppDelegate.h; sourceTree = "<group>"; };
 		232EDA5821F1B33E0085D362 /* AppDelegate.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = AppDelegate.m; sourceTree = "<group>"; };
 		232EDA5A21F1B33E0085D362 /* ViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ViewController.h; sourceTree = "<group>"; };
@@ -134,6 +137,10 @@
 		23E2E49C2314FD3A006CCC3E /* SmartSwitchKey.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SmartSwitchKey.h; sourceTree = "<group>"; };
 		23F512832336386200397988 /* MJAccessibilityUtils.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MJAccessibilityUtils.m; sourceTree = "<group>"; };
 		23F512842336386200397988 /* MJAccessibilityUtils.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MJAccessibilityUtils.h; sourceTree = "<group>"; };
+		AA00000000000000000000F1 /* EnglishDetect.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = EnglishDetect.cpp; sourceTree = "<group>"; };
+		AA00000000000000000000F2 /* EnglishDetect.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = EnglishDetect.h; sourceTree = "<group>"; };
+		AA00000000000000000000F3 /* english_words.dat */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = english_words.dat; sourceTree = "<group>"; };
+		AA00000000000000000000F4 /* viet_telex.dat */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = viet_telex.dat; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -191,7 +198,7 @@
 		232EDA5521F1B33E0085D362 /* Products */ = {
 			isa = PBXGroup;
 			children = (
-				232EDA5421F1B33E0085D362 /* OpenKey.app */,
+				232EDA5421F1B33E0085D362 /* NKey.app */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -209,6 +216,8 @@
 				2374A12E2216720E005B0375 /* AboutViewController.h */,
 				2374A12F2216720E005B0375 /* AboutViewController.m */,
 				232EDA5D21F1B33F0085D362 /* Assets.xcassets */,
+				AA00000000000000000000F3 /* english_words.dat */,
+				AA00000000000000000000F4 /* viet_telex.dat */,
 				232EDA5F21F1B33F0085D362 /* Main.storyboard */,
 				232EDA6221F1B33F0085D362 /* Info.plist */,
 				232EDA6321F1B33F0085D362 /* main.m */,
@@ -309,6 +318,8 @@
 				23E2E49B2314FD3A006CCC3E /* Vietnamese.cpp */,
 				23E2E4942314FD3A006CCC3E /* Engine.h */,
 				23E2E49A2314FD3A006CCC3E /* Engine.cpp */,
+				AA00000000000000000000F1 /* EnglishDetect.cpp */,
+				AA00000000000000000000F2 /* EnglishDetect.h */,
 				233C4A6F231F937900DD7052 /* ConvertTool.cpp */,
 				233C4A71231F938800DD7052 /* ConvertTool.h */,
 			);
@@ -334,7 +345,7 @@
 			);
 			name = OpenKey;
 			productName = ModernKey;
-			productReference = 232EDA5421F1B33E0085D362 /* OpenKey.app */;
+			productReference = 232EDA5421F1B33E0085D362 /* NKey.app */;
 			productType = "com.apple.product-type.application";
 		};
 /* End PBXNativeTarget section */
@@ -379,6 +390,8 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				AA00000000000000000000C2 /* english_words.dat in Resources */,
+				AA00000000000000000000C3 /* viet_telex.dat in Resources */,
 				238AF96722042D4900AEFA17 /* ExitButton@2x.png in Resources */,
 				234F70AC21FB50BD00D2F2CA /* StatusHighlightedEng.png in Resources */,
 				232DB1E721FAED290049A0B5 /* StatusHighlighted@2x.png in Resources */,
@@ -416,6 +429,7 @@
 				2345899A22F720D7003E0923 /* MacroViewController.mm in Sources */,
 				2371AAEF22FA85B200CA1B57 /* OpenKey.mm in Sources */,
 				23E2E49D2314FD3A006CCC3E /* Macro.cpp in Sources */,
+				AA00000000000000000000C1 /* EnglishDetect.cpp in Sources */,
 				233C4A70231F937900DD7052 /* ConvertTool.cpp in Sources */,
 				23136D92231FBD49000764E6 /* ConvertToolViewController.mm in Sources */,
 				232EDA5921F1B33E0085D362 /* AppDelegate.m in Sources */,
@@ -569,24 +583,25 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				CLANG_ENABLE_MODULES = NO;
-				CODE_SIGN_IDENTITY = "Mac Developer";
-				CODE_SIGN_STYLE = Automatic;
+				CODE_SIGN_IDENTITY = "-";
+				"CODE_SIGN_IDENTITY[sdk=macosx*]" = "-";
+				CODE_SIGN_STYLE = Manual;
 				COMBINE_HIDPI_IMAGES = YES;
 				CURRENT_PROJECT_VERSION = 48;
-				DEVELOPMENT_TEAM = 8S7348QV8Q;
+				DEVELOPMENT_TEAM = QCK566ZXTF;
 				HEADER_SEARCH_PATHS = "";
 				INFOPLIST_FILE = ModernKey/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/../Frameworks",
 				);
-				MACOSX_DEPLOYMENT_TARGET = 10.10;
+				MACOSX_DEPLOYMENT_TARGET = 10.13;
 				MARKETING_VERSION = 2.0.4;
 				OTHER_LDFLAGS = (
 					"-lc++\n-lc++",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = com.tuyenmai.openkey;
-				PRODUCT_NAME = "$(TARGET_NAME)";
+				PRODUCT_BUNDLE_IDENTIFIER = com.nkey.app;
+				PRODUCT_NAME = NKey;
 				PROVISIONING_PROFILE_SPECIFIER = "";
 			};
 			name = Debug;
@@ -595,24 +610,25 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				CLANG_ENABLE_MODULES = NO;
-				CODE_SIGN_IDENTITY = "Apple Development";
-				CODE_SIGN_STYLE = Automatic;
+				CODE_SIGN_IDENTITY = "-";
+				"CODE_SIGN_IDENTITY[sdk=macosx*]" = "-";
+				CODE_SIGN_STYLE = Manual;
 				COMBINE_HIDPI_IMAGES = YES;
 				CURRENT_PROJECT_VERSION = 48;
-				DEVELOPMENT_TEAM = 8S7348QV8Q;
+				DEVELOPMENT_TEAM = QCK566ZXTF;
 				HEADER_SEARCH_PATHS = "";
 				INFOPLIST_FILE = ModernKey/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/../Frameworks",
 				);
-				MACOSX_DEPLOYMENT_TARGET = 10.10;
+				MACOSX_DEPLOYMENT_TARGET = 10.13;
 				MARKETING_VERSION = 2.0.4;
 				OTHER_LDFLAGS = (
 					"-lc++\n-lc++",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = com.tuyenmai.openkey;
-				PRODUCT_NAME = "$(TARGET_NAME)";
+				PRODUCT_BUNDLE_IDENTIFIER = com.nkey.app;
+				PRODUCT_NAME = NKey;
 				PROVISIONING_PROFILE_SPECIFIER = "";
 			};
 			name = Release;

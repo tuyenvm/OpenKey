@@ -48,6 +48,7 @@ extern int vPerformLayoutCompat;
     __weak IBOutlet NSButton *CustomBeepSound;
     NSArray* tabviews, *tabbuttons;
     NSRect tabViewRect;
+    NSView* tabButtonBackground;
 }
 
 - (void)viewDidLoad {
@@ -66,6 +67,21 @@ extern int vPerformLayoutCompat;
     //set correct tabgroup
     tabviews = [NSArray arrayWithObjects:self.tabviewPrimary, self.tabviewMacro, self.tabviewSystem, self.tabviewInfo, nil];
     tabbuttons = [NSArray arrayWithObjects:self.tabbuttonPrimary, self.tabbuttonMacro, self.tabbuttonSystem, self.tabbuttonInfo, nil];
+
+    //Fill the gaps between the tab buttons with a solid background, otherwise the
+    //unpainted seams render as light-gray blocks in dark mode (UI glitch).
+    NSButton* firstTabButton = [tabbuttons objectAtIndex:0];
+    NSView* tabButtonParent = firstTabButton.superview;
+    NSRect bgRect = firstTabButton.frame;
+    for (NSButton* button in tabbuttons) {
+        bgRect = NSUnionRect(bgRect, button.frame);
+    }
+    bgRect = NSInsetRect(bgRect, -2, -2);
+    tabButtonBackground = [[NSView alloc] initWithFrame:bgRect];
+    [tabButtonBackground setWantsLayer:YES];
+    tabButtonBackground.layer.backgroundColor = [[NSColor windowBackgroundColor] CGColor];
+    [tabButtonParent addSubview:tabButtonBackground positioned:NSWindowBelow relativeTo:firstTabButton];
+
     tabViewRect = self.tabviewPrimary.frame;
     for (NSBox* b in tabviews) {
         b.frame = tabViewRect;
@@ -96,7 +112,7 @@ extern int vPerformLayoutCompat;
 
 - (void)viewDidAppear {
     [super viewDidAppear];
-    NSString* str = @"OpenKey %@ - Bộ gõ Tiếng Việt";
+    NSString* str = @"NKey %@ - Bộ gõ Tiếng Việt";
     self.view.window.title = [NSString stringWithFormat:str, [[NSBundle mainBundle] objectForInfoDictionaryKey: @"CFBundleShortVersionString"]];
 }
 

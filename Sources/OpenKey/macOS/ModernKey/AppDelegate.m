@@ -47,6 +47,7 @@ int vQuickEndConsonant = 0;
 int vRememberCode = 1; //new on version 2.0
 int vOtherLanguage = 1; //new on version 2.0
 int vTempOffOpenKey = 0; //new on version 2.0
+int vAutoDetectEnglish = 1; //auto-detect English words in Telex (ported from 84Key)
 
 int vShowIconOnDock = 0; //new on version 2.0
 
@@ -87,11 +88,12 @@ extern bool convertToolDontAlertWhenCompleted;
     NSMenuItem* mnuVietnameseLocaleCP1258;
     
     NSMenuItem* mnuQuickConvert;
+    NSMenuItem* mnuAutoDetectEnglish;
 }
 
 -(void)askPermission {
     NSAlert *alert = [[NSAlert alloc] init];
-    [alert setMessageText: [NSString stringWithFormat:@"OpenKey cần bạn cấp quyền để có thể hoạt động!"]];
+    [alert setMessageText: [NSString stringWithFormat:@"NKey cần bạn cấp quyền để có thể hoạt động!"]];
     [alert setInformativeText:@"Vui lòng chạy lại ứng dụng sau khi cấp quyền."];
 
     [alert addButtonWithTitle:@"Không"];
@@ -159,10 +161,8 @@ extern bool convertToolDontAlertWhenCompleted;
     }
     [[NSUserDefaults standardUserDefaults] setInteger:1 forKey:@"NonFirstTime"];
     
-    //check update if enable
-    NSInteger dontCheckUpdate = [[NSUserDefaults standardUserDefaults] integerForKey:@"DontCheckUpdate"];
-    if (!dontCheckUpdate)
-        [OpenKeyManager checkNewVersion:nil callbackFunc:nil];
+    //auto update disabled for NKey: the update endpoint points to the upstream
+    //OpenKey project, so checking would offer to "update" to an OpenKey release.
     
     //correct run on startup
     NSInteger val = [[NSUserDefaults standardUserDefaults] integerForKey:@"RunOnStartup"];
@@ -209,7 +209,13 @@ extern bool convertToolDontAlertWhenCompleted;
     mnuQuickConvert = [theMenu addItemWithTitle:@"Chuyển mã nhanh" action:@selector(onQuickConvert) keyEquivalent:@""];
     
     [theMenu addItem:[NSMenuItem separatorItem]];
-    
+
+    mnuAutoDetectEnglish = [theMenu addItemWithTitle:@"Tự động nhận diện tiếng Anh"
+                                              action:@selector(onAutoDetectEnglishSelected)
+                                       keyEquivalent:@""];
+
+    [theMenu addItem:[NSMenuItem separatorItem]];
+
     [theMenu addItemWithTitle:@"Bảng điều khiển..." action:@selector(onControlPanelSelected) keyEquivalent:@""];
     [theMenu addItemWithTitle:@"Gõ tắt..." action:@selector(onMacroSelected) keyEquivalent:@""];
     [theMenu addItemWithTitle:@"Giới thiệu" action:@selector(onAboutSelected) keyEquivalent:@""];
@@ -288,6 +294,7 @@ extern bool convertToolDontAlertWhenCompleted;
     vRememberCode = 1;[[NSUserDefaults standardUserDefaults] setInteger:vRememberCode forKey:@"vRememberCode"];
     vOtherLanguage = 1;[[NSUserDefaults standardUserDefaults] setInteger:vOtherLanguage forKey:@"vOtherLanguage"];
     vTempOffOpenKey = 0;[[NSUserDefaults standardUserDefaults] setInteger:vTempOffOpenKey forKey:@"vTempOffOpenKey"];
+    vAutoDetectEnglish = 1;[[NSUserDefaults standardUserDefaults] setInteger:vAutoDetectEnglish forKey:@"vAutoDetectEnglish"];
     vShowIconOnDock = 0;[[NSUserDefaults standardUserDefaults] setInteger:vShowIconOnDock forKey:@"vShowIconOnDock"];
     vFixChromiumBrowser = 0;[[NSUserDefaults standardUserDefaults] setInteger:vFixChromiumBrowser forKey:@"vFixChromiumBrowser"];
     vPerformLayoutCompat = 0;[[NSUserDefaults standardUserDefaults] setInteger:vPerformLayoutCompat forKey:@"vPerformLayoutCompat"];
@@ -402,6 +409,13 @@ extern bool convertToolDontAlertWhenCompleted;
     NSInteger intRunOnStartup = [[NSUserDefaults standardUserDefaults] integerForKey:@"RunOnStartup"];
     [self setRunOnStartup:intRunOnStartup ? YES : NO];
 
+    [mnuAutoDetectEnglish setState:(vAutoDetectEnglish ? NSControlStateValueOn : NSControlStateValueOff)];
+}
+
+- (void)onAutoDetectEnglishSelected {
+    vAutoDetectEnglish = vAutoDetectEnglish ? 0 : 1;
+    [[NSUserDefaults standardUserDefaults] setInteger:vAutoDetectEnglish forKey:@"vAutoDetectEnglish"];
+    [self fillData];
 }
 
 -(void)onImputMethodChanged:(BOOL)willNotify {

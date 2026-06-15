@@ -17,6 +17,7 @@
 #include "Macro.h"
 #include "SmartSwitchKey.h"
 #include "ConvertTool.h"
+#include "EnglishDetect.h"
 
 #define IS_DEBUG 1
 
@@ -186,6 +187,14 @@ extern int vOtherLanguage;
  * Temporarily turn off OpenKey  by hot key (Command on mac, Alt on Windows and Linux)
  */
 extern int vTempOffOpenKey;
+
+/**
+ * 0: No; 1: Yes
+ * Auto-detect English words while typing in Vietnamese (Telex) and skip
+ * diacritics for them (e.g. "project", "guns", "code"). Needs the English
+ * dictionary loaded via initEnglishDict(). Telex only.
+ */
+extern int vAutoDetectEnglish;
 
 /**
  * Call this function first to receive data pointer

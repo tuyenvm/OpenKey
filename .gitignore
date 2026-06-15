@@ -8,3 +8,10 @@
 /Sources/OpenKey/win32/OpenKey/OpenKey/x64/Debug
 /Sources/OpenKey/win32/OpenKey/OpenKey/x64/Release
 /Sources/OpenKey/win32/OpenKey/OpenKeyUpdate/x64/Release
+
+# macOS build output (xcodebuild -derivedDataPath via Makefile)
+/Sources/OpenKey/macOS/build/
+
+# macOS Finder metadata
+.DS_Store
+*/.DS_Store

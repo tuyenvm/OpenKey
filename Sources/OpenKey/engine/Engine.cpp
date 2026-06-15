@@ -10,6 +10,7 @@
 #include "Engine.h"
 #include <string.h>
 #include <list>
+#include <string>
 #include "Macro.h"
 
 static vector<Uint8> _charKeyCode = {
@@ -93,6 +94,12 @@ static Uint32 KeyStates[MAX_BUFF];
 static Byte _stateIndex = 0;
 
 static bool tempDisableKey = false;
+//Set when a standalone vowel is toggled back to a literal letter this word
+//("ww" -> "w"). Tells the word-break English restore to leave the word alone, so
+//the escape isn't reverted to the raw English keystrokes (e.g. "ww " stays "w ").
+//(The tone-removal escape "iss" -> "is" deliberately does NOT set this: there the
+//word-break restore is wanted, so real English words like "miss" come out whole.)
+static bool _engTelexEscape = false;
 static int capsElem;
 static int key;
 static int markElem;
@@ -135,6 +142,8 @@ string wideStringToUtf8(const wstring& str) {
 void* vKeyInit() {
     _index = 0;
     _stateIndex = 0;
+    tempDisableKey = false;
+    _engTelexEscape = false;
     _useSpellCheckingBefore = vCheckSpelling;
     _typingStatesData.clear();
     _typingStates.clear();
@@ -459,6 +468,7 @@ void startNewSession() {
     hBPC = 0;
     hNCC = 0;
     tempDisableKey = false;
+    _engTelexEscape = false;
     _stateIndex = 0;
     _hasHandledMacro = false;
     _hasHandleQuickConsonant = false;
@@ -777,7 +787,7 @@ void insertMark(const Uint32& markMask, const bool& canModifyFlag) {
     kk = _index - 1 - VSI;
     //if duplicate same mark -> restore
     if (TypingWord[VWSM] & markMask) {
-        
+
         TypingWord[VWSM] &= ~MARK_MASK;
         if (canModifyFlag)
             hCode = vRestore;
@@ -949,6 +959,7 @@ void insertW(const Uint16& data, const bool& isCaps) {
                         hCode = vWillProcess;
                         if (CHR(ii) == KEY_U){
                             TypingWord[ii] = KEY_W | ((TypingWord[ii] & CAPS_MASK) ? CAPS_MASK : 0);
+                            _engTelexEscape = true;
                         } else if (CHR(ii) == KEY_O) {
                             hCode = vRestore;
                             TypingWord[ii] = KEY_O | ((TypingWord[ii] & CAPS_MASK) ? CAPS_MASK : 0);
@@ -1311,6 +1322,215 @@ void vEnglishMode(const vKeyEventState& state, const Uint16& data, const bool& i
     }
 }
 
+//Auto English detection: map a keycode (caps already stripped by Uint16 cast) to
+//its lowercase ascii letter, or 0 for any non a-z key.
+static char engKeyToChar(const Uint16& keyCode) {
+    switch (keyCode) {
+        case KEY_A: return 'a'; case KEY_B: return 'b'; case KEY_C: return 'c';
+        case KEY_D: return 'd'; case KEY_E: return 'e'; case KEY_F: return 'f';
+        case KEY_G: return 'g'; case KEY_H: return 'h'; case KEY_I: return 'i';
+        case KEY_J: return 'j'; case KEY_K: return 'k'; case KEY_L: return 'l';
+        case KEY_M: return 'm'; case KEY_N: return 'n'; case KEY_O: return 'o';
+        case KEY_P: return 'p'; case KEY_Q: return 'q'; case KEY_R: return 'r';
+        case KEY_S: return 's'; case KEY_T: return 't'; case KEY_U: return 'u';
+        case KEY_V: return 'v'; case KEY_W: return 'w'; case KEY_X: return 'x';
+        case KEY_Y: return 'y'; case KEY_Z: return 'z';
+        default: return 0;
+    }
+}
+
+static string _engRawWord;
+//Auto English detection only runs in a Telex-style input method with the
+//dictionary loaded and the option on.
+static bool engDetectEnabled() {
+    return vAutoDetectEnglish && isEnglishDictReady() &&
+           (vInputType == vTelex || vInputType == vSimpleTelex1 || vInputType == vSimpleTelex2);
+}
+
+//Rebuild _engRawWord from the raw keystroke history (KeyStates). Returns false
+//if the word is empty, too long, or contains a non-letter key.
+static bool buildEngRawFromStates() {
+    if (_stateIndex < 2 || _stateIndex > MAX_BUFF)
+        return false;
+    _engRawWord.clear();
+    for (i = 0; i < _stateIndex; i++) {
+        char c = engKeyToChar((Uint16)KeyStates[i]);
+        if (c == 0)
+            return false;
+        _engRawWord.push_back(c);
+    }
+    return true;
+}
+
+//Decide whether the word currently being typed is English, so the engine inserts
+//the raw key instead of applying a Vietnamese diacritic. This is only consulted
+//when a transform key would otherwise fire (see the gate below), so it stays off
+//the hot path for ordinary keys.
+static bool rawDdReorderIsViet();
+static bool shouldTreatAsEnglish() {
+    if (!engDetectEnabled() || !buildEngRawFromStates())
+        return false;
+
+    //Vietnamese-first for the đ-trigger placed after the vowel ("dod" = đo): its
+    //canonical spelling ("ddo") is Vietnamese even though the raw keys look English
+    //("dod"/"dodge"). restoreEnglishAtBreak() still reverts genuine English at the break.
+    if (rawDdReorderIsViet())
+        return false;
+
+    //Complete English word: suppress unless the keystrokes are also a valid
+    //Vietnamese word, OR could still grow into one. The prefix check matters for
+    //transform digraphs that are themselves short English words but the start of
+    //many Vietnamese words (e.g. "dd" -> đ, the prefix of đi/đường/...): without
+    //it, English-detection would wrongly block every đ-word.
+    if (isEnglishWord(_engRawWord))
+        return !isVietByTelex(_engRawWord) && !isVietByTelexPrefix(_engRawWord);
+
+    //Prefix of an English word (e.g. "goo" of "google"): stricter, also bail out
+    //if the keystrokes could still grow into a Vietnamese word.
+    if (isEnglishPrefix(_engRawWord))
+        return !isVietByTelex(_engRawWord) && !isVietByTelexPrefix(_engRawWord);
+
+    return false;
+}
+
+//Typing the modifier key again to turn a standalone vowel back into its literal
+//letter ("ww" -> "w", undoing the lone-w -> ư) is a deliberate Telex escape. It must
+//run even though "ww" is an English-dictionary word, so the user can type a literal w.
+static bool isStandaloneToggle(const Uint16& data) {
+    return data == KEY_W && _index > 0 &&
+           CHR(_index - 1) == KEY_U && (TypingWord[_index - 1] & TONEW_MASK);
+}
+
+//Telex lets the tone key sit anywhere after the vowel: "ít" can be typed
+//i-t-s OR i-s-t. The Vietnamese dictionary only stores the canonical tone-last
+//spelling ("its"), so a tone-first raw string ("ist") slips past the viet
+//guards in restoreEnglishAtBreak — and since it happens to be an English word
+//("ist"), the valid Vietnamese word would be wrongly restored. Rebuild the
+//canonical spelling by moving the applied tone key to the end.
+//
+//We only override the English restore when that canonical spelling is ITSELF
+//both a Vietnamese word and an English word (e.g. "its" = ít): typing it in
+//canonical order already resolves to Vietnamese (the "favor Vietnamese" rule),
+//so the tone-first variant must too. This deliberately leaves genuine English
+//like "test" alone — its canonical form "tets" is not an English word, so
+//"test" stays a distinct English token (the Vietnamese "tét" is typed "tets").
+//Only fires when a tone mark was actually applied (toneless English like
+//"google" is untouched).
+static bool rawToneReorderIsViet() {
+    Uint32 markMask = 0;
+    for (i = 0; i < _index; i++) {
+        if (TypingWord[i] & MARK_MASK) { markMask = TypingWord[i] & MARK_MASK; break; }
+    }
+    if (!markMask)
+        return false;
+    Uint16 toneKey = markMask == MARK1_MASK ? KEY_S : markMask == MARK2_MASK ? KEY_F :
+                     markMask == MARK3_MASK ? KEY_R : markMask == MARK4_MASK ? KEY_X :
+                     markMask == MARK5_MASK ? KEY_J : 0;
+    char toneChar = toneKey ? engKeyToChar(toneKey) : 0;
+    if (!toneChar)
+        return false;
+    string w = _engRawWord;
+    size_t pos = w.rfind(toneChar);
+    if (pos == string::npos || pos == w.size() - 1) //missing, or already tone-last
+        return false;
+    w.erase(pos, 1);
+    w.push_back(toneChar);
+    return isEnglishWord(w) && (isVietByTelex(w) || isVietByTelexPrefix(w));
+}
+
+//Telex lets the đ-trigger 'd' sit after the vowel/coda: "đo" can be typed
+//d-d-o (canonical) OR d-o-d. The Vietnamese dictionary only stores the canonical
+//leading-"dd" spelling ("ddo"), so a trigger-last raw ("dod") looks English
+//("dod"/"dodge") and gets suppressed — while "dond"/"dongd" transform only because
+//they happen not to be English. In Vietnamese mode we favor Vietnamese: rebuild the
+//canonical spelling (drop the trailing trigger 'd', prepend a 'd') and check the
+//dict. Naturally scoped to words that start AND end with 'd', so English like
+//"add"/"dad"/"dodge" (no trailing trigger) is untouched. Mirrors rawToneReorderIsViet().
+static bool rawDdReorderIsViet() {
+    string w = _engRawWord;
+    if (w.size() < 2 || w[0] != 'd' || w.back() != 'd')
+        return false;
+    w.pop_back();
+    w.insert(w.begin(), 'd');           // "dod" -> "ddo"
+    return isVietByTelex(w) || isVietByTelexPrefix(w);
+}
+
+//At a word boundary, if the whole typed word turned out to be English but a
+//diacritic was applied mid-word (the ambiguous-prefix case the keystroke-time
+//check intentionally leaves to Vietnamese, e.g. "google", "message"), restore
+//the raw keystrokes so the final word is clean. Returns true if it restored.
+static bool restoreEnglishAtBreak(const int& handleCode) {
+    if (!engDetectEnabled() || _index == 0 || _engTelexEscape || !buildEngRawFromStates())
+        return false;
+    //Don't restore if the keystrokes spell a Vietnamese word, or are still a
+    //valid Vietnamese prefix (e.g. "dd" -> đ): otherwise a complete-English-word
+    //digraph like "dd" would be reverted at the break, undoing the diacritic.
+    //rawToneReorderIsViet() covers tone-first spellings ("ist" of "ít").
+    if (!isEnglishWord(_engRawWord) || isVietByTelex(_engRawWord) || isVietByTelexPrefix(_engRawWord)
+        || rawToneReorderIsViet() || rawDdReorderIsViet())
+        return false;
+
+    //Only act if the current on-screen word actually differs from the raw keys.
+    bool differs = (_index != _stateIndex);
+    for (i = 0; !differs && i < _index; i++) {
+        if (TypingWord[i] != KeyStates[i])
+            differs = true;
+    }
+    if (!differs)
+        return false;
+
+    hCode = handleCode;
+    hBPC = _index;
+    hNCC = _stateIndex;
+    for (i = 0; i < _stateIndex; i++) {
+        TypingWord[i] = KeyStates[i];
+        hData[_stateIndex - 1 - i] = TypingWord[i];
+    }
+    _index = _stateIndex;
+    return true;
+}
+
+//At a word boundary, drop a doubled-tone-key mark so an ambiguous short word the
+//user "escaped" comes out as the literal English letters: "is" -> í (prefer
+//Vietnamese), but a 2nd "s" ("iss") -> "is". Only fires when the word is neither a
+//real English word (those are handled by restoreEnglishAtBreak, e.g. "miss",
+//"issue") nor valid Vietnamese, and the mark's tone key was actually pressed twice
+//(so single-tone Vietnamese like "í"/"á" is never touched). Returns true if it acted.
+static bool dropDoubledToneAtBreak(const int& handleCode) {
+    if (!engDetectEnabled() || _index == 0 || !buildEngRawFromStates())
+        return false;
+    if (isEnglishWord(_engRawWord) || isVietByTelex(_engRawWord) || isVietByTelexPrefix(_engRawWord))
+        return false;
+
+    Uint32 markMask = 0;
+    for (i = 0; i < _index; i++) {
+        if (TypingWord[i] & MARK_MASK) { markMask = TypingWord[i] & MARK_MASK; break; }
+    }
+    if (!markMask)
+        return false;
+    Uint16 toneKey = markMask == MARK1_MASK ? KEY_S : markMask == MARK2_MASK ? KEY_F :
+                     markMask == MARK3_MASK ? KEY_R : markMask == MARK4_MASK ? KEY_X :
+                     markMask == MARK5_MASK ? KEY_J : 0;
+    if (!toneKey)
+        return false;
+
+    int toneKeyCount = 0;
+    for (i = 0; i < _stateIndex; i++)
+        if ((KeyStates[i] & CHAR_MASK) == toneKey)
+            toneKeyCount++;
+    if (toneKeyCount < 2)
+        return false;
+
+    hCode = handleCode;
+    hBPC = _index;
+    for (i = 0; i < _index; i++)
+        TypingWord[i] &= ~MARK_MASK;
+    hNCC = _index;
+    for (i = 0; i < _index; i++)
+        hData[_index - 1 - i] = GET(TypingWord[i]);
+    return true;
+}
+
 void vKeyHandleEvent(const vKeyEvent& event,
                      const vKeyEventState& state,
                      const Uint16& data,
@@ -1339,8 +1559,15 @@ void vKeyHandleEvent(const vKeyEvent& event,
             if (tempDisableKey && !checkRestoreIfWrongSpelling(vRestoreAndStartNewSession)) {
                 hCode = vDoNothing;
             }
+        } else if (!_hasHandledMacro && (restoreEnglishAtBreak(vRestoreAndStartNewSession)
+                                         || dropDoubledToneAtBreak(vRestoreAndStartNewSession))) {
+            //We are already in the word-break / number / control branch, so the
+            //word is ending no matter which key did it — space, ".", "!", numpad
+            //".", a Cmd-combo, etc. restoreEnglishAtBreak self-gates (it only acts
+            //when an English word had a mid-word diacritic), so fire it for all of
+            //them rather than only the break-code set (e.g. "wow!"/numpad "." too).
         }
-        
+
         _isCharKeyCode = state == KeyDown && std::find(_charKeyCode.begin(), _charKeyCode.end(), data) != _charKeyCode.end();
         if (!_isCharKeyCode) { //clear all line cache
             _specialChar.clear();
@@ -1396,6 +1623,9 @@ void vKeyHandleEvent(const vKeyEvent& event,
             if (!checkRestoreIfWrongSpelling(vRestore)) {
                 hCode = vDoNothing;
             }
+            _spaceCount++;
+        } else if (!_hasHandledMacro && (restoreEnglishAtBreak(vRestore)
+                                         || dropDoubledToneAtBreak(vRestore))) { //English word restore, or drop a doubled-tone escape ("iss" -> "is")
             _spaceCount++;
         } else { //do nothing with SPACE KEY
             hCode = vDoNothing;
@@ -1483,7 +1713,7 @@ void vKeyHandleEvent(const vKeyEvent& event,
 
         insertState(data, _isCaps); //save state
         
-        if (!IS_SPECIALKEY(data) || tempDisableKey) { //do nothing
+        if (!IS_SPECIALKEY(data) || tempDisableKey || (shouldTreatAsEnglish() && !isStandaloneToggle(data))) { //do nothing
             if (vQuickTelex && IS_QUICK_TELEX_KEY(data)) {
                 handleQuickTelex(data, _isCaps);
                 return;
