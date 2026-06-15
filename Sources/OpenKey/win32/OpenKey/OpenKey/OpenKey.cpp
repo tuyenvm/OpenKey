@@ -77,6 +77,27 @@ void OpenKeyFree() {
 	UnhookWinEvent(hSystemEvent);
 }
 
+void OpenKeyReinitHooks() {
+	// Unhook existing hooks
+	UnhookWindowsHookEx(hMouseHook);
+	UnhookWindowsHookEx(hKeyboardHook);
+	UnhookWinEvent(hSystemEvent);
+
+	// IMPORTANT: Reset modifier key state to prevent stale state issues
+	// This fixes the bug where hotkeys don't work after unlock because
+	// _lastFlag still contains old modifier key values
+	_flag = 0;
+	_lastFlag = 0;
+	_keycode = 0;
+	_isFlagKey = false;
+
+	// Reinitialize hooks
+	HINSTANCE hInstance = GetModuleHandle(NULL);
+	hKeyboardHook = SetWindowsHookEx(WH_KEYBOARD_LL, keyboardHookProcess, hInstance, 0);
+	hMouseHook = SetWindowsHookEx(WH_MOUSE_LL, mouseHookProcess, hInstance, 0);
+	hSystemEvent = SetWinEventHook(EVENT_SYSTEM_FOREGROUND, EVENT_SYSTEM_FOREGROUND, NULL, winEventProcCallback, 0, 0, WINEVENT_OUTOFCONTEXT | WINEVENT_SKIPOWNPROCESS);
+}
+
 void OpenKeyInit() {
 	APP_GET_DATA(vLanguage, 1);
 	APP_GET_DATA(vInputType, 0);

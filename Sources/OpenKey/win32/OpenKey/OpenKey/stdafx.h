@@ -37,6 +37,7 @@ redistribute your new version, it MUST be open source.
 #include <shellapi.h>
 #include <Commctrl.h>
 #include <psapi.h>
+#include <wtsapi32.h>
 
 #include "resource.h"
 
