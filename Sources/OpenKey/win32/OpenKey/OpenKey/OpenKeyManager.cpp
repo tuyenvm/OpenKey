@@ -17,7 +17,8 @@ redistribute your new version, it MUST be open source.
 static vector<LPCTSTR> _inputType = {
 	_T("Telex"),
 	_T("VNI"),
-	_T("Simple Telex"),
+	_T("Simple Telex 1"),
+	_T("Simple Telex 2"),
 };
 
 static vector<LPCTSTR> _tableCode = {

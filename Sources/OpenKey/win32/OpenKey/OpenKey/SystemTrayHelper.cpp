@@ -24,7 +24,8 @@ redistribute your new version, it MUST be open source.
 
 #define POPUP_TELEX 910
 #define POPUP_VNI 911
-#define POPUP_SIMPLE_TELEX 912
+#define POPUP_SIMPLE_TELEX_1 912
+#define POPUP_SIMPLE_TELEX_2 913
 
 #define POPUP_UNICODE 930
 #define POPUP_TCVN3 931
@@ -59,7 +60,8 @@ map<UINT, LPCTSTR> menuData = {
 	{POPUP_USE_MACRO, _T("Bật gõ tắt")},
 	{POPUP_TELEX, _T("Kiểu gõ Telex")},
 	{POPUP_VNI, _T("Kiểu gõ VNI")},
-	{POPUP_SIMPLE_TELEX, _T("Kiểu gõ Simple Telex")},
+	{POPUP_SIMPLE_TELEX_1, _T("Kiểu gõ Simple Telex 1")},
+	{POPUP_SIMPLE_TELEX_2, _T("Kiểu gõ Simple Telex 2")},
 	{POPUP_UNICODE, _T("Unicode dựng sẵn")},
 	{POPUP_TCVN3, _T("TCVN3 (ABC)")},
 	{POPUP_VNI_WINDOWS, _T("VNI Windows")},
@@ -131,8 +133,11 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam) 
 			case POPUP_VNI:
 				AppDelegate::getInstance()->onInputType(1);
 				break;
-			case POPUP_SIMPLE_TELEX:
+			case POPUP_SIMPLE_TELEX_1:
 				AppDelegate::getInstance()->onInputType(2);
+				break;
+			case POPUP_SIMPLE_TELEX_2:
+				AppDelegate::getInstance()->onInputType(3);
 				break;
 			case POPUP_UNICODE:
 				AppDelegate::getInstance()->onTableCode(0);
@@ -215,7 +220,8 @@ void SystemTrayHelper::createPopupMenu() {
 	//menuInputType = CreatePopupMenu();
 	AppendMenu(popupMenu, MF_CHECKED, POPUP_TELEX, menuData[POPUP_TELEX]);
 	AppendMenu(popupMenu, MF_CHECKED, POPUP_VNI, menuData[POPUP_VNI]);
-	AppendMenu(popupMenu, MF_CHECKED, POPUP_SIMPLE_TELEX, menuData[POPUP_SIMPLE_TELEX]);
+	AppendMenu(popupMenu, MF_CHECKED, POPUP_SIMPLE_TELEX_1, menuData[POPUP_SIMPLE_TELEX_1]);
+	AppendMenu(popupMenu, MF_CHECKED, POPUP_SIMPLE_TELEX_2, menuData[POPUP_SIMPLE_TELEX_2]);
 
 	//AppendMenu(popupMenu, MF_POPUP, (UINT_PTR)menuInputType, _T("Kiểu gõ"));
 	AppendMenu(popupMenu, MF_SEPARATOR, 0, 0);
@@ -262,7 +268,8 @@ void SystemTrayHelper::updateData() {
 	MODIFY_MENU(popupMenu, POPUP_USE_MACRO, vUseMacro);
 	MODIFY_MENU(popupMenu, POPUP_TELEX, vInputType == 0);
 	MODIFY_MENU(popupMenu, POPUP_VNI, vInputType == 1);
-	MODIFY_MENU(popupMenu, POPUP_SIMPLE_TELEX, vInputType == 2);
+	MODIFY_MENU(popupMenu, POPUP_SIMPLE_TELEX_1, vInputType == 2);
+	MODIFY_MENU(popupMenu, POPUP_SIMPLE_TELEX_2, vInputType == 3);
 	MODIFY_MENU(popupMenu, POPUP_UNICODE, vCodeTable == 0);
 	MODIFY_MENU(popupMenu, POPUP_TCVN3, vCodeTable == 1);
 	MODIFY_MENU(popupMenu, POPUP_VNI_WINDOWS, vCodeTable == 2);
