@@ -176,12 +176,31 @@ extern "C" {
     }
 
     BOOL isSpotlightVisible() {
+        // Only treat Spotlight as active when its window is ACTUALLY visible and on top,
+        // not merely present on screen. A closed/fading Spotlight window can linger in the
+        // window list with alpha 0; using it there makes OpenKey wrongly switch to the
+        // selection-replacement path in other apps, which duplicates characters. We require:
+        //  - alpha > 0 (window is really being drawn, not mid fade-out / stale)
+        //  - window layer > 0 (Spotlight's panel floats above normal app windows)
         NSArray *windows = CFBridgingRelease(CGWindowListCopyWindowInfo(kCGWindowListOptionOnScreenOnly | kCGWindowListExcludeDesktopElements,
                                                                         kCGNullWindowID));
         for (NSDictionary *window in windows) {
-            if ([[window objectForKey:(__bridge NSString *)kCGWindowOwnerName] isEqualToString:@"Spotlight"]) {
-                return true;
-            }
+            if (![[window objectForKey:(__bridge NSString *)kCGWindowOwnerName] isEqualToString:@"Spotlight"])
+                continue;
+
+            // Skip windows that are not actually being drawn (alpha == 0 => stale/fading).
+            NSNumber* alpha = [window objectForKey:(__bridge NSString *)kCGWindowAlpha];
+            if (alpha != nil && [alpha doubleValue] <= 0.0)
+                continue;
+
+            // Spotlight's search field floats above normal app windows (layer > 0).
+            // Leftover / background Spotlight layers sit at the normal window level (0)
+            // or below; only the actual floating search panel should count.
+            NSNumber* layer = [window objectForKey:(__bridge NSString *)kCGWindowLayer];
+            if (layer != nil && [layer intValue] <= 0)
+                continue;
+
+            return true;
         }
         return false;
     }
