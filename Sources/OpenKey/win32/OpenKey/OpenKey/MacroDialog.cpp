@@ -293,7 +293,7 @@ void MacroDialog::onImportMacroButton() {
 	ofn.hwndOwner = hDlg;
 	ofn.lpstrFile = szFile;
 	ofn.nMaxFile = sizeof(szFile);
-	ofn.lpstrFilter = _T("Text file (*.txt)\0*.txt\0All (*.*)\0*.*\0");
+	ofn.lpstrFilter = _T("Markdown file (*.md)\0*.md\0All (*.*)\0*.*\0");
 	ofn.nFilterIndex = 1;
 	ofn.lpstrFileTitle = NULL;
 	ofn.nMaxFileTitle = 0;
@@ -321,13 +321,13 @@ void MacroDialog::onExportMacrobutton() {
 	ofn.hwndOwner = hDlg;
 	ofn.lpstrFile = szFile;
 	ofn.nMaxFile = sizeof(szFile);
-	ofn.lpstrFilter = _T("Text file (*.txt)\0*.txt\0");
+	ofn.lpstrFilter = _T("Markdown file (*.md)\0*.md\0");
 	ofn.lpstrFileTitle = (LPTSTR)_T("lpstrFile");
 	ofn.nFilterIndex = 1;
 	ofn.lpstrFileTitle = NULL;
 	ofn.nMaxFileTitle = 0;
 	ofn.lpstrInitialDir = NULL;
-	ofn.lpstrDefExt = (LPCWSTR)L"txt";
+	ofn.lpstrDefExt = (LPCWSTR)L"md";
 	ofn.Flags = OFN_PATHMUSTEXIST | OFN_FILEMUSTEXIST;
 	if (GetSaveFileName(&ofn) == TRUE) {
 		wstring path = ofn.lpstrFile;
