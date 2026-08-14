@@ -1066,6 +1066,7 @@ void checkForStandaloneCharTBT(const Uint16& data, const bool& isCaps, const Uin
         hCode = vWillProcess;
         hBPC = 1;
         hNCC = 1;
+        hExt = 4;
         TypingWord[_index - 1] = data | (isCaps ? CAPS_MASK : 0);
         hData[0] = GET(TypingWord[_index - 1]);
         return;
@@ -1532,9 +1533,10 @@ void vKeyHandleEvent(const vKeyEvent& event,
     bool isTBTOrCustomNumberAction = (vInputType == vTuBinhTranDonGian || vInputType == vTuDinhNghia) &&
                                      (data == KEY_6 || data == KEY_7 || data == KEY_8 || data == KEY_9);
     bool isNumberBreak = (IS_NUMBER_KEY(data) && capsStatus == 1) && !isTBTOrCustomNumberAction;
+    bool isNumberAtStartBreak = (_index == 0 && IS_NUMBER_KEY(data)) && !isTBTOrCustomNumberAction;
 
     if (isNumberBreak
-        || otherControlKey || isWordBreak(event, state, data) || (_index == 0 && IS_NUMBER_KEY(data)) || isTriggerModifier) {
+        || otherControlKey || isWordBreak(event, state, data) || isNumberAtStartBreak || isTriggerModifier) {
         hCode = vDoNothing;
         hBPC = 0;
         hNCC = 0;
