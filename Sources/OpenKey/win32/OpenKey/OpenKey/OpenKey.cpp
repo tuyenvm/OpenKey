@@ -14,6 +14,7 @@ redistribute your new version, it MUST be open source.
 #define _CRT_SECURE_NO_WARNINGS
 #include "stdafx.h"
 #include "AppDelegate.h"
+#include <fstream>
 
 #pragma comment(lib, "imm32")
 #define IMC_GETOPENSTATUS 0x0005
@@ -156,10 +157,10 @@ void OpenKeyInit() {
 
 	//init and load macro data from file, fallback to registry
 	wstring macroPath = OpenKeyHelper::getExecutePath();
-	macroPath += L"\\openkeymacro.txt";
-	FILE* fMacro = _wfopen(macroPath.c_str(), L"r");
-	if (fMacro) {
-		fclose(fMacro);
+	macroPath += L"\\openkeymacro.md";
+	ifstream testFile(wideStringToUtf8(macroPath).c_str(), ios::in | ios::binary);
+	if (testFile.is_open()) {
+		testFile.close();
 		readFromFile(wideStringToUtf8(macroPath), false);
 	} else {
 		DWORD macroDataSize;

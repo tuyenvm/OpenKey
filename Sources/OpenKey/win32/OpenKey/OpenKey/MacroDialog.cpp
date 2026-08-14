@@ -213,9 +213,9 @@ void MacroDialog::saveAndReload() {
 	getMacroSaveData(macroData);
 	OpenKeyHelper::setRegBinary(_T("macroData"), macroData.data(), (int)macroData.size());
 
-	// Save to openkeymacro.txt in executable folder
+	// Save to openkeymacro.md in executable folder
 	wstring macroPath = OpenKeyHelper::getExecutePath();
-	macroPath += L"\\openkeymacro.txt";
+	macroPath += L"\\openkeymacro.md";
 	saveToFile(wideStringToUtf8(macroPath));
 
 	//reload data

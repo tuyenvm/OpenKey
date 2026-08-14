@@ -254,68 +254,80 @@ void onTableCodeChange() {
 }
 
 void saveToFile(const string& path) {
-    wstring wpath = utf8ToWideString(path);
-    FILE* f = _wfopen(wpath.c_str(), L"w, ccs=UTF-8");
-    if (f) {
-        fwprintf(f, L";Compatible OpenKey Macro Data file for UniKey*** version=1 ***\n");
+    ofstream myfile(path.c_str(), ios::out | ios::binary);
+    if (myfile.is_open()) {
+        // Write UTF-8 BOM
+        unsigned char bom[] = {0xEF, 0xBB, 0xBF};
+        myfile.write((char*)bom, 3);
+        
+        string header = ";Compatible OpenKey Macro Data file for UniKey*** version=1 ***\n";
+        myfile.write(header.c_str(), header.length());
+        
         for (std::map<vector<Uint32>, MacroData>::iterator it = macroMap.begin(); it != macroMap.end(); ++it) {
-            wstring name = utf8ToWideString(it->second.macroText);
-            wstring content = utf8ToWideString(it->second.macroContent);
+            string name = it->second.macroText;
+            string content = it->second.macroContent;
             
             // Escape newlines as \n
             size_t start_pos = 0;
-            while ((start_pos = content.find(L"\n", start_pos)) != wstring::npos) {
-                content.replace(start_pos, 1, L"\\n");
+            while ((start_pos = content.find("\n", start_pos)) != string::npos) {
+                content.replace(start_pos, 1, "\\n");
                 start_pos += 2;
             }
             // Remove \r just in case
             start_pos = 0;
-            while ((start_pos = content.find(L"\r", start_pos)) != wstring::npos) {
+            while ((start_pos = content.find("\r", start_pos)) != string::npos) {
                 content.erase(start_pos, 1);
             }
             
-            fwprintf(f, L"%s||%s\n", name.c_str(), content.c_str());
+            string line = name + "||" + content + "\n";
+            myfile.write(line.c_str(), line.length());
         }
-        fclose(f);
+        myfile.close();
     }
 }
 
 void readFromFile(const string& path, const bool& append) {
-    wstring wpath = utf8ToWideString(path);
-    FILE* f = _wfopen(wpath.c_str(), L"r, ccs=UTF-8");
-    if (f) {
+    ifstream myfile(path.c_str(), ios::in | ios::binary);
+    if (myfile.is_open()) {
         if (!append) {
             macroMap.clear();
         }
-        wchar_t line[8192];
+        
+        // Skip UTF-8 BOM if present
+        unsigned char bom[3] = {0};
+        myfile.read((char*)bom, 3);
+        if (!(bom[0] == 0xEF && bom[1] == 0xBB && bom[2] == 0xBF)) {
+            // No BOM, seek back to beginning
+            myfile.seekg(0);
+        }
+        
+        string line;
         int k = 0;
-        while (fgetws(line, 8192, f)) {
-            size_t len = wcslen(line);
-            while (len > 0 && (line[len-1] == L'\n' || line[len-1] == L'\r')) {
-                line[len-1] = L'\0';
-                len--;
+        while (getline(myfile, line)) {
+            // Remove trailing \r or \n
+            while (!line.empty() && (line.back() == '\r' || line.back() == '\n')) {
+                line.pop_back();
             }
             k++;
             if (k == 1) continue;
             
-            wstring wline(line);
-            size_t pos = wline.find(L"||");
-            if (pos != wstring::npos) {
-                wstring wname = wline.substr(0, pos);
-                wstring wcontent = wline.substr(pos + 2);
+            size_t pos = line.find("||");
+            if (pos != string::npos) {
+                string name = line.substr(0, pos);
+                string content = line.substr(pos + 2);
                 
                 // Replace escaped \n with real newlines
                 size_t start_pos = 0;
-                while ((start_pos = wcontent.find(L"\\n", start_pos)) != wstring::npos) {
-                    wcontent.replace(start_pos, 2, L"\n");
+                while ((start_pos = content.find("\\n", start_pos)) != string::npos) {
+                    content.replace(start_pos, 2, "\n");
                     start_pos += 1;
                 }
                 
-                if (!wname.empty()) {
-                    addMacro(wideStringToUtf8(wname), wideStringToUtf8(wcontent));
+                if (!name.empty()) {
+                    addMacro(name, content);
                 }
             }
         }
-        fclose(f);
+        myfile.close();
     }
 }
