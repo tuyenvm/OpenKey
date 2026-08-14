@@ -52,6 +52,7 @@ extern int vLanguage;
  * 1: VNI
  */
 extern int vInputType;
+extern vector<CustomRule> customRules;
 
 /**
  * 0: No

@@ -35,7 +35,8 @@ enum vKeyInputType {
     vVNI,
     vSimpleTelex1,
     vSimpleTelex2,
-    vTuBinhTranDonGian
+    vTuBinhTranDonGian,
+    vTuDinhNghia
 };
 
 typedef unsigned char Byte;
@@ -79,6 +80,11 @@ struct vKeyHookState {
     
     vector<Uint32> macroKey; //used for macro function; it is a key
     vector<Uint32> macroData; //used for macro function; it is keycode data
+};
+
+struct CustomRule {
+    Uint32 key;
+    int action;
 };
 
 #ifdef LINUX

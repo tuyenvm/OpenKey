@@ -19,6 +19,7 @@ static vector<LPCTSTR> _inputType = {
 	_T("VNI"),
 	_T("Simple Telex"),
 	_T("Tư Bình Trần đơn giản"),
+	_T("Tự định nghĩa"),
 };
 
 static vector<LPCTSTR> _tableCode = {

@@ -162,6 +162,14 @@ void OpenKeyInit() {
 	BYTE* data = OpenKeyHelper::getRegBinary(_T("smartSwitchKey"), smartSwitchKeySize);
 	initSmartSwitchKey((Byte*)data, (int)smartSwitchKeySize);
 
+	//load custom rules
+	DWORD customRulesSize = 0;
+	BYTE* customRulesData = OpenKeyHelper::getRegBinary(_T("customRules"), customRulesSize);
+	if (customRulesData && customRulesSize > 0) {
+		customRules.assign((CustomRule*)customRulesData, (CustomRule*)customRulesData + (customRulesSize / sizeof(CustomRule)));
+		free(customRulesData);
+	}
+
 	//init hook
 	HINSTANCE hInstance = GetModuleHandle(NULL);
 	hKeyboardHook = SetWindowsHookEx(WH_KEYBOARD_LL, keyboardHookProcess, hInstance, 0);

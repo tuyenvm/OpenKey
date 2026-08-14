@@ -13,6 +13,7 @@ redistribute your new version, it MUST be open source.
 -----------------------------------------------------------*/
 #include "SystemTrayHelper.h"
 #include "AppDelegate.h"
+#include "../../../engine/Engine.h"
 
 #define WM_TRAYMESSAGE (WM_USER + 1)
 #define TRAY_ICONUID 100
@@ -26,6 +27,7 @@ redistribute your new version, it MUST be open source.
 #define POPUP_VNI 911
 #define POPUP_SIMPLE_TELEX 912
 #define POPUP_TU_BINH_TRAN_DON_GIAN 913
+#define POPUP_TU_DINH_NGHIA 914
 
 #define POPUP_UNICODE 930
 #define POPUP_TCVN3 931
@@ -62,6 +64,7 @@ map<UINT, LPCTSTR> menuData = {
 	{POPUP_VNI, _T("Kiểu gõ VNI")},
 	{POPUP_SIMPLE_TELEX, _T("Kiểu gõ Simple Telex")},
 	{POPUP_TU_BINH_TRAN_DON_GIAN, _T("Kiểu gõ Tư Bình Trần đơn giản")},
+	{POPUP_TU_DINH_NGHIA, _T("Kiểu gõ Tự định nghĩa")},
 	{POPUP_UNICODE, _T("Unicode dựng sẵn")},
 	{POPUP_TCVN3, _T("TCVN3 (ABC)")},
 	{POPUP_VNI_WINDOWS, _T("VNI Windows")},
@@ -138,6 +141,9 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam) 
 				break;
 			case POPUP_TU_BINH_TRAN_DON_GIAN:
 				AppDelegate::getInstance()->onInputType(vTuBinhTranDonGian);
+				break;
+			case POPUP_TU_DINH_NGHIA:
+				AppDelegate::getInstance()->onInputType(vTuDinhNghia);
 				break;
 			case POPUP_UNICODE:
 				AppDelegate::getInstance()->onTableCode(0);
@@ -222,6 +228,7 @@ void SystemTrayHelper::createPopupMenu() {
 	AppendMenu(popupMenu, MF_CHECKED, POPUP_VNI, menuData[POPUP_VNI]);
 	AppendMenu(popupMenu, MF_CHECKED, POPUP_SIMPLE_TELEX, menuData[POPUP_SIMPLE_TELEX]);
 	AppendMenu(popupMenu, MF_CHECKED, POPUP_TU_BINH_TRAN_DON_GIAN, menuData[POPUP_TU_BINH_TRAN_DON_GIAN]);
+	AppendMenu(popupMenu, MF_CHECKED, POPUP_TU_DINH_NGHIA, menuData[POPUP_TU_DINH_NGHIA]);
 
 	//AppendMenu(popupMenu, MF_POPUP, (UINT_PTR)menuInputType, _T("Kiểu gõ"));
 	AppendMenu(popupMenu, MF_SEPARATOR, 0, 0);
@@ -270,6 +277,7 @@ void SystemTrayHelper::updateData() {
 	MODIFY_MENU(popupMenu, POPUP_VNI, vInputType == 1);
 	MODIFY_MENU(popupMenu, POPUP_SIMPLE_TELEX, vInputType == 2);
 	MODIFY_MENU(popupMenu, POPUP_TU_BINH_TRAN_DON_GIAN, vInputType == vTuBinhTranDonGian);
+	MODIFY_MENU(popupMenu, POPUP_TU_DINH_NGHIA, vInputType == vTuDinhNghia);
 	MODIFY_MENU(popupMenu, POPUP_UNICODE, vCodeTable == 0);
 	MODIFY_MENU(popupMenu, POPUP_TCVN3, vCodeTable == 1);
 	MODIFY_MENU(popupMenu, POPUP_VNI_WINDOWS, vCodeTable == 2);

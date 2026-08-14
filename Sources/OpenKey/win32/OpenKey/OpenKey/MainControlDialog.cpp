@@ -13,6 +13,7 @@ redistribute your new version, it MUST be open source.
 -----------------------------------------------------------*/
 #include "MainControlDialog.h"
 #include "AppDelegate.h"
+#include "../../../engine/Engine.h"
 #include <Shlobj.h>
 #include <Uxtheme.h>
 
@@ -236,6 +237,9 @@ INT_PTR MainControlDialog::eventProc(HWND hDlg, UINT uMsg, WPARAM wParam, LPARAM
         case IDC_BUTTON_MACRO_TABLE:
             AppDelegate::getInstance()->onMacroTable();
             break;
+        case IDC_BTN_CUSTOM_INPUT_METHOD:
+            AppDelegate::getInstance()->onCustomInputMethodDialog();
+            break;
         case IDC_BUTTON_CHECK_UPDATE:
             onUpdateButton();
             break;
@@ -326,8 +330,10 @@ INT_PTR MainControlDialog::tabPageEventProc(HWND hDlg, UINT uMsg, WPARAM wParam,
 void MainControlDialog::fillData() {
     int sel = vInputType;
     if (sel == vTuBinhTranDonGian) sel = 3;
+    else if (sel == vTuDinhNghia) sel = 4;
     SendMessage(comboBoxInputType, CB_SETCURSEL, sel, 0);
     SendMessage(comboBoxTableCode, CB_SETCURSEL, vCodeTable, 0);
+    EnableWindow(GetDlgItem(hDlg, IDC_BTN_CUSTOM_INPUT_METHOD), vInputType == vTuDinhNghia);
 
     SendMessage(checkCtrl, BM_SETCHECK, HAS_CONTROL(vSwitchKeyStatus) ? 1 : 0, 0);
     SendMessage(checkAlt, BM_SETCHECK, HAS_OPTION(vSwitchKeyStatus) ? 1 : 0, 0);
@@ -392,7 +398,9 @@ void MainControlDialog::onComboBoxSelected(const HWND& hCombobox, const int& com
         int sel = (int)SendMessage(hCombobox, CB_GETCURSEL, 0, 0);
         int type = sel;
         if (sel == 3) type = vTuBinhTranDonGian;
+        else if (sel == 4) type = vTuDinhNghia;
         APP_SET_DATA(vInputType, type);
+        EnableWindow(GetDlgItem(hDlg, IDC_BTN_CUSTOM_INPUT_METHOD), vInputType == vTuDinhNghia);
     }
     else if (hCombobox == comboBoxTableCode) {
         APP_SET_DATA(vCodeTable, (int)SendMessage(hCombobox, CB_GETCURSEL, 0, 0));
