@@ -1529,7 +1529,11 @@ void vKeyHandleEvent(const vKeyEvent& event,
                              (data == VK_LCONTROL && (vMacroTriggerMask & 0x10)) ||
                              (data == VK_RCONTROL && (vMacroTriggerMask & 0x20));
 
-    if ((IS_NUMBER_KEY(data) && capsStatus == 1)
+    bool isTBTOrCustomNumberAction = (vInputType == vTuBinhTranDonGian || vInputType == vTuDinhNghia) &&
+                                     (data == KEY_6 || data == KEY_7 || data == KEY_8 || data == KEY_9);
+    bool isNumberBreak = (IS_NUMBER_KEY(data) && capsStatus == 1) && !isTBTOrCustomNumberAction;
+
+    if (isNumberBreak
         || otherControlKey || isWordBreak(event, state, data) || (_index == 0 && IS_NUMBER_KEY(data)) || isTriggerModifier) {
         hCode = vDoNothing;
         hBPC = 0;
