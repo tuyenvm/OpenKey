@@ -321,8 +321,8 @@ static void SendEmptyCharacter() {
 static void SendNewCharString(const bool& dataFromMacro = false) {
 	_j = 0;
 	_newCharSize = dataFromMacro ? (Uint16)pData->macroData.size() : pData->newCharCount;
-	if (_newCharString.size() < _newCharSize) {
-		_newCharString.resize(_newCharSize);
+	if (_newCharString.size() < _newCharSize + 2) {
+		_newCharString.resize(_newCharSize + 2);
 	}
 	_willSendControlKey = false;
 	
@@ -335,6 +335,9 @@ static void SendNewCharString(const bool& dataFromMacro = false) {
 			if (_tempChar & PURE_CHARACTER_MASK) {
 				Uint32 pureChar = _tempChar & ~PURE_CHARACTER_MASK;
 				if (pureChar <= 0xFFFF) {
+					if (_newCharString.size() < _j + 2) {
+						_newCharString.resize(_j + 2);
+					}
 					_newCharString[_j++] = (Uint16)pureChar;
 					if (IS_DOUBLE_CODE(vCodeTable)) {
 						InsertKeyLength(1);
@@ -342,8 +345,8 @@ static void SendNewCharString(const bool& dataFromMacro = false) {
 				} else {
 					Uint16 high = (Uint16)(((pureChar - 0x10000) >> 10) + 0xD800);
 					Uint16 low = (Uint16)(((pureChar - 0x10000) & 0x3FF) + 0xDC00);
-					if (_newCharString.size() < _newCharSize + 1) {
-						_newCharString.resize(_newCharSize + 1);
+					if (_newCharString.size() < _j + 3) {
+						_newCharString.resize(_j + 3);
 					}
 					_newCharString[_j++] = high;
 					_newCharString[_j++] = low;
@@ -355,19 +358,31 @@ static void SendNewCharString(const bool& dataFromMacro = false) {
 			} else if (!(_tempChar & CHAR_CODE_MASK)) {
 				if (IS_DOUBLE_CODE(vCodeTable)) //VNI
 					InsertKeyLength(1);
+				if (_newCharString.size() < _j + 2) {
+					_newCharString.resize(_j + 2);
+				}
 				_newCharString[_j++] = keyCodeToCharacter(_tempChar);
 			} else {
 				_newChar = _tempChar;
 				if (vCodeTable == 0) {  //unicode 2 bytes code
+					if (_newCharString.size() < _j + 2) {
+						_newCharString.resize(_j + 2);
+					}
 					_newCharString[_j++] = _newChar;
 				} else if (vCodeTable == 1 || vCodeTable == 2 || vCodeTable == 4) { //others such as VNI Windows, TCVN3: 1 byte code
 					_newCharHi = HIBYTE(_newChar);
 					_newChar = LOBYTE(_newChar);
+					if (_newCharString.size() < _j + 2) {
+						_newCharString.resize(_j + 2);
+					}
 					_newCharString[_j++] = _newChar;
 
 					if (_newCharHi > 32) {
 						if (vCodeTable == 2) //VNI
 							InsertKeyLength(2);
+						if (_newCharString.size() < _j + 2) {
+							_newCharString.resize(_j + 2);
+						}
 						_newCharString[_j++] = _newCharHi;
 						_newCharSize++;
 					}
@@ -380,9 +395,15 @@ static void SendNewCharString(const bool& dataFromMacro = false) {
 					_newChar &= 0x1FFF;
 
 					InsertKeyLength(_newCharHi > 0 ? 2 : 1);
+					if (_newCharString.size() < _j + 2) {
+						_newCharString.resize(_j + 2);
+					}
 					_newCharString[_j++] = _newChar;
 					if (_newCharHi > 0) {
 						_newCharSize++;
+						if (_newCharString.size() < _j + 2) {
+							_newCharString.resize(_j + 2);
+						}
 						_newCharString[_j++] = _unicodeCompoundMark[_newCharHi - 1];
 					}
 
@@ -394,6 +415,9 @@ static void SendNewCharString(const bool& dataFromMacro = false) {
 	if (pData->code == vRestore || pData->code == vRestoreAndStartNewSession) { //if is restore
 		if (keyCodeToCharacter(_keycode) != 0) {
 			_newCharSize++;
+			if (_newCharString.size() < _j + 2) {
+				_newCharString.resize(_j + 2);
+			}
 			_newCharString[_j++] = keyCodeToCharacter(_keycode | ((_flag & MASK_SHIFT) || (_flag & MASK_CAPITAL) ? CAPS_MASK : 0));
 		} else {
 			_willSendControlKey = true;
@@ -403,7 +427,12 @@ static void SendNewCharString(const bool& dataFromMacro = false) {
 		startNewSession();
 	}
 
-	OpenKeyHelper::setClipboardText((LPCTSTR)_newCharString.data(), _newCharSize + 1, CF_UNICODETEXT);
+	if (_newCharString.size() < _j + 1) {
+		_newCharString.resize(_j + 1);
+	}
+	_newCharString[_j] = 0;
+
+	OpenKeyHelper::setClipboardText((LPCTSTR)_newCharString.data(), _j + 1, CF_UNICODETEXT);
 
 	//Send shift + insert
 	SendCombineKey(KEY_LEFT_SHIFT, VK_INSERT, 0, KEYEVENTF_EXTENDEDKEY);
@@ -449,18 +478,17 @@ void switchLanguage() {
 }
 
 static void SendPureCharacter(const Uint32& ch) {
-	if (ch < 128)
-		SendKeyCode(ch);
-	else if (ch <= 0xFFFF) {
-		prepareUnicodeEvent(keyEvent[0], (Uint16)ch, true);
-		prepareUnicodeEvent(keyEvent[1], (Uint16)ch, false);
+	Uint32 pureChar = ch & ~PURE_CHARACTER_MASK;
+	if (pureChar <= 0xFFFF) {
+		prepareUnicodeEvent(keyEvent[0], (Uint16)pureChar, true);
+		prepareUnicodeEvent(keyEvent[1], (Uint16)pureChar, false);
 		SendInput(2, keyEvent, sizeof(INPUT));
 		if (IS_DOUBLE_CODE(vCodeTable)) {
 			InsertKeyLength(1);
 		}
 	} else {
-		Uint16 high = (Uint16)(((ch - 0x10000) >> 10) + 0xD800);
-		Uint16 low = (Uint16)(((ch - 0x10000) & 0x3FF) + 0xDC00);
+		Uint16 high = (Uint16)(((pureChar - 0x10000) >> 10) + 0xD800);
+		Uint16 low = (Uint16)(((pureChar - 0x10000) & 0x3FF) + 0xDC00);
 		
 		prepareUnicodeEvent(keyEvent[0], high, true);
 		prepareUnicodeEvent(keyEvent[1], high, false);
