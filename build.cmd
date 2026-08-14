@@ -1,6 +1,7 @@
 @echo off
 setlocal enabledelayedexpansion
 
+taskkill /im openkey64.exe /f
 :: Find VS Installation Path
 set "VS_PATH="
 for /f "usebackq tokens=*" %%i in (`"%ProgramFiles(x86)%\Microsoft Visual Studio\Installer\vswhere.exe" -latest -property installationPath`) do (

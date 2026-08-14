@@ -83,6 +83,11 @@ static wchar_t getCharFromKeyCode(Uint32 key) {
     if (baseKey >= 0x41 && baseKey <= 0x5A) {
         return isCaps ? (wchar_t)baseKey : (wchar_t)(baseKey + 32);
     }
+    if (_keyCodeToChar.empty()) {
+        for (const auto& pair : _characterMap) {
+            _keyCodeToChar[pair.second] = pair.first;
+        }
+    }
     if (_keyCodeToChar.find(key) != _keyCodeToChar.end()) {
         return _keyCodeToChar[key];
     }
@@ -105,6 +110,42 @@ INT_PTR CustomInputMethodDialog::eventProc(HWND hDlg, UINT uMsg, WPARAM wParam, 
 		this->hDlg = hDlg;
 		initDialog();
 		return TRUE;
+	case WM_SIZE: {
+		int newWidth = LOWORD(lParam);
+		int newHeight = HIWORD(lParam);
+		
+		HWND listRules = GetDlgItem(hDlg, IDC_LIST_RULES);
+		HWND btnDelete = GetDlgItem(hDlg, IDC_BTN_DELETE_RULE);
+		HWND btnSave = GetDlgItem(hDlg, IDOK);
+		HWND btnClose = GetDlgItem(hDlg, IDCANCEL);
+		HWND groupRules = GetDlgItem(hDlg, IDC_STATIC); // groupbox definition
+
+		if (listRules) {
+			RECT rect;
+			GetWindowRect(listRules, &rect);
+			MapWindowPoints(HWND_DESKTOP, hDlg, (LPPOINT)&rect, 2);
+			MoveWindow(listRules, rect.left, rect.top, newWidth - rect.left * 2, newHeight - rect.top - 65, TRUE);
+		}
+		if (btnDelete) {
+			RECT rect;
+			GetWindowRect(btnDelete, &rect);
+			MapWindowPoints(HWND_DESKTOP, hDlg, (LPPOINT)&rect, 2);
+			MoveWindow(btnDelete, rect.left, newHeight - 50, rect.right - rect.left, rect.bottom - rect.top, TRUE);
+		}
+		if (btnSave) {
+			RECT rect;
+			GetWindowRect(btnSave, &rect);
+			MapWindowPoints(HWND_DESKTOP, hDlg, (LPPOINT)&rect, 2);
+			MoveWindow(btnSave, newWidth - 145, newHeight - 33, rect.right - rect.left, rect.bottom - rect.top, TRUE);
+		}
+		if (btnClose) {
+			RECT rect;
+			GetWindowRect(btnClose, &rect);
+			MapWindowPoints(HWND_DESKTOP, hDlg, (LPPOINT)&rect, 2);
+			MoveWindow(btnClose, newWidth - 75, newHeight - 33, rect.right - rect.left, rect.bottom - rect.top, TRUE);
+		}
+		break;
+	}
 	case WM_COMMAND: {
 		int wmId = LOWORD(wParam);
 		switch (wmId) {
