@@ -12,6 +12,13 @@
 #include <list>
 #include "Macro.h"
 
+#ifndef VK_LSHIFT
+#define VK_LSHIFT 0xA0
+#define VK_RSHIFT 0xA1
+#define VK_LCONTROL 0xA2
+#define VK_RCONTROL 0xA3
+#endif
+
 static vector<Uint8> _charKeyCode = {
     KEY_BACKQUOTE, KEY_1, KEY_2, KEY_3, KEY_4, KEY_5, KEY_6, KEY_7, KEY_8, KEY_9, KEY_0, KEY_MINUS, KEY_EQUALS,
     KEY_LEFT_BRACKET, KEY_RIGHT_BRACKET, KEY_BACK_SLASH,
@@ -1476,8 +1483,16 @@ void vEnglishMode(const vKeyEventState& state, const Uint16& data, const bool& i
     if (state == vKeyEventState::MouseDown || (otherControlKey && !isCaps)) {
         hMacroKey.clear();
         _willTempOffEngine = false;
-    } else if (data == KEY_SPACE) {
-        if (!_hasHandledMacro && findMacro(hMacroKey, hMacroData)) {
+    } else if (data == KEY_SPACE || data == KEY_RETURN || data == KEY_ENTER || data == VK_LSHIFT || data == VK_RSHIFT || data == VK_LCONTROL || data == VK_RCONTROL) {
+        bool isTrigger = false;
+        if (data == KEY_SPACE && (vMacroTriggerMask & 0x01)) isTrigger = true;
+        else if ((data == KEY_RETURN || data == KEY_ENTER) && (vMacroTriggerMask & 0x02)) isTrigger = true;
+        else if (data == VK_LSHIFT && (vMacroTriggerMask & 0x04)) isTrigger = true;
+        else if (data == VK_RSHIFT && (vMacroTriggerMask & 0x08)) isTrigger = true;
+        else if (data == VK_LCONTROL && (vMacroTriggerMask & 0x10)) isTrigger = true;
+        else if (data == VK_RCONTROL && (vMacroTriggerMask & 0x20)) isTrigger = true;
+        
+        if (isTrigger && !_hasHandledMacro && findMacro(hMacroKey, hMacroData)) {
             hCode = vReplaceMaro;
             hBPC = (Byte)hMacroKey.size();
         }
@@ -1508,15 +1523,30 @@ void vKeyHandleEvent(const vKeyEvent& event,
                      const bool& otherControlKey) {
     _isCaps = (capsStatus == 1 || //shift
                capsStatus == 2); //caps lock
+               
+    bool isTriggerModifier = (data == VK_LSHIFT && (vMacroTriggerMask & 0x04)) ||
+                             (data == VK_RSHIFT && (vMacroTriggerMask & 0x08)) ||
+                             (data == VK_LCONTROL && (vMacroTriggerMask & 0x10)) ||
+                             (data == VK_RCONTROL && (vMacroTriggerMask & 0x20));
+
     if ((IS_NUMBER_KEY(data) && capsStatus == 1)
-        || otherControlKey || isWordBreak(event, state, data) || (_index == 0 && IS_NUMBER_KEY(data))) {
+        || otherControlKey || isWordBreak(event, state, data) || (_index == 0 && IS_NUMBER_KEY(data)) || isTriggerModifier) {
         hCode = vDoNothing;
         hBPC = 0;
         hNCC = 0;
         hExt = 1; //word break
         
         //check macro feature
-        if (vUseMacro && isMacroBreakCode(data) && !_hasHandledMacro && findMacro(hMacroKey, hMacroData)) {
+        bool canTriggerMacro = false;
+        if (data == KEY_SPACE && (vMacroTriggerMask & 0x01)) canTriggerMacro = true;
+        else if ((data == KEY_RETURN || data == KEY_ENTER) && (vMacroTriggerMask & 0x02)) canTriggerMacro = true;
+        else if (data == VK_LSHIFT && (vMacroTriggerMask & 0x04)) canTriggerMacro = true;
+        else if (data == VK_RSHIFT && (vMacroTriggerMask & 0x08)) canTriggerMacro = true;
+        else if (data == VK_LCONTROL && (vMacroTriggerMask & 0x10)) canTriggerMacro = true;
+        else if (data == VK_RCONTROL && (vMacroTriggerMask & 0x20)) canTriggerMacro = true;
+        else if (isMacroBreakCode(data)) canTriggerMacro = true;
+
+        if (vUseMacro && canTriggerMacro && !_hasHandledMacro && findMacro(hMacroKey, hMacroData)) {
             hCode = vReplaceMaro;
             hBPC = (Byte)hMacroKey.size();
             _hasHandledMacro = true;
@@ -1575,7 +1605,7 @@ void vKeyHandleEvent(const vKeyEvent& event,
         if (!tempDisableKey && vCheckSpelling) {
             checkSpelling(true); //force check spelling
         }
-        if (vUseMacro && !_hasHandledMacro && findMacro(hMacroKey, hMacroData)) { //macro
+        if (vUseMacro && (vMacroTriggerMask & 0x01) && !_hasHandledMacro && findMacro(hMacroKey, hMacroData)) { //macro
             hCode = vReplaceMaro;
             hBPC = (Byte)hMacroKey.size();
             _spaceCount++;
@@ -1739,8 +1769,8 @@ void vKeyHandleEvent(const vKeyEvent& event,
             }
         }
         bool isTBTStandalone = (vInputType == vTuBinhTranDonGian) && (IS_BRACKET_KEY(data) || data == KEY_6 || data == KEY_7 || data == KEY_8 || data == KEY_9);
-        if ((IS_BRACKET_KEY(data) && (( IS_BRACKET_KEY((Uint16)hData[0])) || vInputType == vSimpleTelex1 || vInputType == vSimpleTelex2)) ||
-            ((isTBTStandalone || isCustomStandalone) && ((Uint16)hData[0] == data))) {
+        if ((IS_BRACKET_KEY(data) && (( IS_BRACKET_KEY( (((Uint16)hData[0] & ~CAPS_MASK)) )) || vInputType == vSimpleTelex1 || vInputType == vSimpleTelex2)) ||
+            ((isTBTStandalone || isCustomStandalone) && ((((Uint16)hData[0] & ~CAPS_MASK)) == data))) {
             if (_index - (hCode == vWillProcess ? hBPC : 0) > 0) {
                 _index--;
                 saveWord();

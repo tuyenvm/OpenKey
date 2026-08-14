@@ -1,4 +1,4 @@
-﻿/*----------------------------------------------------------
+/*----------------------------------------------------------
 OpenKey - The Cross platform Open source Vietnamese Keyboard application.
 
 Copyright (C) 2019 Mai Vu Tuyen
@@ -33,6 +33,68 @@ INT_PTR MacroDialog::eventProc(HWND hDlg, UINT uMsg, WPARAM wParam, LPARAM lPara
 		this->hDlg = hDlg;
 		initDialog();
 		return TRUE;
+	case WM_MEASUREITEM: {
+		LPMEASUREITEMSTRUCT lpmis = (LPMEASUREITEMSTRUCT)lParam;
+		if (lpmis->CtlID == IDC_COMBO_MACRO_TRIGGERS) {
+			lpmis->itemHeight = 18;
+			return TRUE;
+		}
+		break;
+	}
+	case WM_DRAWITEM: {
+		LPDRAWITEMSTRUCT lpdis = (LPDRAWITEMSTRUCT)lParam;
+		if (lpdis->CtlID == IDC_COMBO_MACRO_TRIGGERS && lpdis->itemID != -1) {
+			int bitIndex = lpdis->itemID;
+			bool checked = (vMacroTriggerMask & (1 << bitIndex)) != 0;
+
+			if (lpdis->itemState & ODS_SELECTED) {
+				SetBkColor(lpdis->hDC, GetSysColor(COLOR_HIGHLIGHT));
+				SetTextColor(lpdis->hDC, GetSysColor(COLOR_HIGHLIGHTTEXT));
+			} else {
+				SetBkColor(lpdis->hDC, GetSysColor(COLOR_WINDOW));
+				SetTextColor(lpdis->hDC, GetSysColor(COLOR_WINDOWTEXT));
+			}
+			ExtTextOut(lpdis->hDC, 0, 0, ETO_OPAQUE, &lpdis->rcItem, NULL, 0, NULL);
+
+			if (lpdis->itemState & ODS_COMBOBOXEDIT) {
+				wstring summary = L"";
+				if (vMacroTriggerMask & 0x01) summary += L"Space, ";
+				if (vMacroTriggerMask & 0x02) summary += L"Enter, ";
+				if (vMacroTriggerMask & 0x04) summary += L"LShift, ";
+				if (vMacroTriggerMask & 0x08) summary += L"RShift, ";
+				if (vMacroTriggerMask & 0x10) summary += L"LControl, ";
+				if (vMacroTriggerMask & 0x20) summary += L"RControl, ";
+				if (!summary.empty()) {
+					summary = summary.substr(0, summary.length() - 2);
+				} else {
+					summary = L"(Không)";
+				}
+				RECT rcText = lpdis->rcItem;
+				rcText.left += 4;
+				DrawText(lpdis->hDC, summary.c_str(), -1, &rcText, DT_SINGLELINE | DT_VCENTER);
+			} else {
+				RECT rcCheck = lpdis->rcItem;
+				rcCheck.left += 4;
+				rcCheck.right = rcCheck.left + 14;
+				rcCheck.top += (rcCheck.bottom - rcCheck.top - 14) / 2;
+				rcCheck.bottom = rcCheck.top + 14;
+				DrawFrameControl(lpdis->hDC, &rcCheck, DFC_BUTTON, DFCS_BUTTONCHECK | (checked ? DFCS_CHECKED : 0));
+
+				TCHAR buffer[64];
+				SendMessage(lpdis->hwndItem, CB_GETLBTEXT, lpdis->itemID, (LPARAM)buffer);
+
+				RECT rcText = lpdis->rcItem;
+				rcText.left += 22;
+				DrawText(lpdis->hDC, buffer, -1, &rcText, DT_SINGLELINE | DT_VCENTER);
+			}
+
+			if (lpdis->itemState & ODS_FOCUS) {
+				DrawFocusRect(lpdis->hDC, &lpdis->rcItem);
+			}
+			return TRUE;
+		}
+		break;
+	}
 	case WM_COMMAND: {
 		int wmId = LOWORD(wParam);
 		switch (wmId) {
@@ -51,6 +113,18 @@ INT_PTR MacroDialog::eventProc(HWND hDlg, UINT uMsg, WPARAM wParam, LPARAM lPara
 			break;
 		case IDC_BUTTON_EXPORT_MACRO:
 			onExportMacrobutton();
+			break;
+		case IDC_COMBO_MACRO_TRIGGERS:
+			if (HIWORD(wParam) == CBN_SELCHANGE) {
+				HWND hCombo = (HWND)lParam;
+				int sel = (int)SendMessage(hCombo, CB_GETCURSEL, 0, 0);
+				if (sel != -1) {
+					vMacroTriggerMask ^= (1 << sel);
+					APP_SET_DATA(vMacroTriggerMask, vMacroTriggerMask);
+					InvalidateRect(hCombo, NULL, TRUE);
+					SendMessage(hCombo, CB_SETCURSEL, (WPARAM)-1, 0);
+				}
+			}
 			break;
 		default:
 			if (HIWORD(wParam) == EN_CHANGE) {
@@ -96,6 +170,17 @@ void MacroDialog::initDialog() {
 	hAddButton = GetDlgItem(hDlg, IDC_BUTTON_ADD);
 	hAutoCaps = GetDlgItem(hDlg, IDC_CHECK_AUTO_CAPS);
 
+	HWND hComboTriggers = GetDlgItem(hDlg, IDC_COMBO_MACRO_TRIGGERS);
+	if (hComboTriggers) {
+		SendMessage(hComboTriggers, CB_ADDSTRING, 0, (LPARAM)_T("Space"));
+		SendMessage(hComboTriggers, CB_ADDSTRING, 0, (LPARAM)_T("Enter"));
+		SendMessage(hComboTriggers, CB_ADDSTRING, 0, (LPARAM)_T("Left Shift"));
+		SendMessage(hComboTriggers, CB_ADDSTRING, 0, (LPARAM)_T("Right Shift"));
+		SendMessage(hComboTriggers, CB_ADDSTRING, 0, (LPARAM)_T("Left Control"));
+		SendMessage(hComboTriggers, CB_ADDSTRING, 0, (LPARAM)_T("Right Control"));
+		SendMessage(hComboTriggers, CB_SETCURSEL, (WPARAM)-1, 0);
+	}
+
 	LVCOLUMN LvCol;
 	memset(&LvCol, 0, sizeof(LvCol));
 	LvCol.mask = LVCF_FMT | LVCF_TEXT | LVCF_WIDTH | LVCF_SUBITEM;
@@ -127,6 +212,11 @@ void MacroDialog::saveAndReload() {
 	vector<Byte> macroData;
 	getMacroSaveData(macroData);
 	OpenKeyHelper::setRegBinary(_T("macroData"), macroData.data(), (int)macroData.size());
+
+	// Save to openkeymacro.txt in executable folder
+	wstring macroPath = OpenKeyHelper::getExecutePath();
+	macroPath += L"\\openkeymacro.txt";
+	saveToFile(wideStringToUtf8(macroPath));
 
 	//reload data
 	fillData();

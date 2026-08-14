@@ -193,6 +193,9 @@
 #define IDS_STRING_END_CONSONANT        1067
 #define IDC_CHECK_OTHER_LANGUAGES       1068
 #define IDC_BTN_CUSTOM_INPUT_METHOD     1069
+#define IDC_GRP_DEFINE_KEY              1080
+#define IDC_GRP_PRESETS                 1081
+#define IDC_COMBO_MACRO_TRIGGERS        1085
 #define IDC_STATIC                      -1
 
 // Next default values for new objects

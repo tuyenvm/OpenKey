@@ -11,6 +11,7 @@ which is released under GPL license.
 You can fork, modify, improve this program. If you
 redistribute your new version, it MUST be open source.
 -----------------------------------------------------------*/
+#define _CRT_SECURE_NO_WARNINGS
 #include "stdafx.h"
 #include "AppDelegate.h"
 
@@ -92,6 +93,7 @@ void OpenKeyInit() {
 	APP_GET_DATA(vUseMacroInEnglishMode, 0);
 	APP_GET_DATA(vAutoCapsMacro, 0);
 	APP_GET_DATA(vSendKeyStepByStep, 1);
+	APP_GET_DATA(vMacroTriggerMask, 3);
 	APP_GET_DATA(vUseGrayIcon, 0);
 	APP_GET_DATA(vShowOnStartUp, 1);
 	APP_GET_DATA(vRunWithWindows, 1);
@@ -152,10 +154,19 @@ void OpenKeyInit() {
 	if (GetKeyState(VK_CAPITAL) == 1) _flag |= MASK_CAPITAL;
 	if (GetKeyState(VK_SCROLL) < 0) _flag |= MASK_SCROLL;
 
-	//init and load macro data
-	DWORD macroDataSize;
-	BYTE* macroData = OpenKeyHelper::getRegBinary(_T("macroData"), macroDataSize);
-	initMacroMap((Byte*)macroData, (int)macroDataSize);
+	//init and load macro data from file, fallback to registry
+	wstring macroPath = OpenKeyHelper::getExecutePath();
+	macroPath += L"\\openkeymacro.txt";
+	FILE* fMacro = _wfopen(macroPath.c_str(), L"r");
+	if (fMacro) {
+		fclose(fMacro);
+		readFromFile(wideStringToUtf8(macroPath), false);
+	} else {
+		DWORD macroDataSize;
+		BYTE* macroData = OpenKeyHelper::getRegBinary(_T("macroData"), macroDataSize);
+		initMacroMap((Byte*)macroData, (int)macroDataSize);
+		saveToFile(wideStringToUtf8(macroPath));
+	}
 
 	//init and load smart switch key data
 	DWORD smartSwitchKeySize;
@@ -520,6 +531,19 @@ LRESULT CALLBACK keyboardHookProcess(int nCode, WPARAM wParam, LPARAM lParam) {
 		//LOG(L"Key up: %d\n", keyboardData->vkCode);
 		UnsetModifierMask((Uint16)keyboardData->vkCode);
 	}
+	
+	bool isTriggerModifier = false;
+	if (vUseMacro) {
+		if (keyboardData->vkCode == VK_LSHIFT && (vMacroTriggerMask & 0x04)) isTriggerModifier = true;
+		else if (keyboardData->vkCode == VK_RSHIFT && (vMacroTriggerMask & 0x08)) isTriggerModifier = true;
+		else if (keyboardData->vkCode == VK_LCONTROL && (vMacroTriggerMask & 0x10)) isTriggerModifier = true;
+		else if (keyboardData->vkCode == VK_RCONTROL && (vMacroTriggerMask & 0x20)) isTriggerModifier = true;
+	}
+
+	if (isTriggerModifier) {
+		_isFlagKey = false;
+	}
+
 	if (!_isFlagKey && wParam != WM_KEYUP && wParam != WM_SYSKEYUP)
 		_keycode = (Uint16)keyboardData->vkCode;
 

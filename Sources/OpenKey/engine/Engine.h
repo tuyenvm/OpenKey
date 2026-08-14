@@ -115,6 +115,8 @@ extern int vFixRecommendBrowser;
  */
 extern int vUseMacro;
 
+extern int vMacroTriggerMask;
+
 /**
  * Still use macro if you are in english mode
  */

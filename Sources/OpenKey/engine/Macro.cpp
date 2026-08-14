@@ -2,6 +2,7 @@
 //  Macro.cpp
 //  OpenKey
 //
+#define _CRT_SECURE_NO_WARNINGS
 //  Created by Tuyen on 8/4/19.
 //  Copyright © 2019 Tuyen Mai. All rights reserved.
 //
@@ -246,48 +247,68 @@ void onTableCodeChange() {
 }
 
 void saveToFile(const string& path) {
-    ofstream myfile;
-    myfile.open(path.c_str());
-    myfile << ";Compatible OpenKey Macro Data file for UniKey*** version=1 ***\n";
-    for (std::map<vector<Uint32>, MacroData>::iterator it = macroMap.begin(); it != macroMap.end(); ++it) {
-        myfile <<it->second.macroText << ":" << it->second.macroContent<<"\n";
+    wstring wpath = utf8ToWideString(path);
+    FILE* f = _wfopen(wpath.c_str(), L"w, ccs=UTF-8");
+    if (f) {
+        fwprintf(f, L";Compatible OpenKey Macro Data file for UniKey*** version=1 ***\n");
+        for (std::map<vector<Uint32>, MacroData>::iterator it = macroMap.begin(); it != macroMap.end(); ++it) {
+            wstring name = utf8ToWideString(it->second.macroText);
+            wstring content = utf8ToWideString(it->second.macroContent);
+            
+            // Escape newlines as \n
+            size_t start_pos = 0;
+            while ((start_pos = content.find(L"\n", start_pos)) != wstring::npos) {
+                content.replace(start_pos, 1, L"\\n");
+                start_pos += 2;
+            }
+            // Remove \r just in case
+            start_pos = 0;
+            while ((start_pos = content.find(L"\r", start_pos)) != wstring::npos) {
+                content.erase(start_pos, 1);
+            }
+            
+            fwprintf(f, L"%s||%s\n", name.c_str(), content.c_str());
+        }
+        fclose(f);
     }
-    myfile.close();
 }
 
 void readFromFile(const string& path, const bool& append) {
-    ifstream myfile(path.c_str());
-    string line;
-    int k = 0;
-    size_t pos = 0;
-    string name, content;
-    if (myfile.is_open()) {
+    wstring wpath = utf8ToWideString(path);
+    FILE* f = _wfopen(wpath.c_str(), L"r, ccs=UTF-8");
+    if (f) {
         if (!append) {
             macroMap.clear();
         }
-        while (getline (myfile,line) ) {
+        wchar_t line[8192];
+        int k = 0;
+        while (fgetws(line, 8192, f)) {
+            size_t len = wcslen(line);
+            while (len > 0 && (line[len-1] == L'\n' || line[len-1] == L'\r')) {
+                line[len-1] = L'\0';
+                len--;
+            }
             k++;
             if (k == 1) continue;
-            pos = line.find(":");
-            if (string::npos != pos) {
-                name = line.substr(0, pos);
-                content = line.substr(pos + 1, line.length() - pos - 1);
-				while (name.compare("") == 0 && content.compare("") != 0) {
-					pos = content.find(":");
-					if (string::npos != pos) {
-						name += ":";
-						name += content.substr(0, pos);
-						content = content.substr(pos + 1, line.length() - pos - 1);
-					} else {
-						break;
-					}
-				}
-
-                if (name.compare("") != 0 && !hasMacro(name)) {
-                    addMacro(name, content);
+            
+            wstring wline(line);
+            size_t pos = wline.find(L"||");
+            if (pos != wstring::npos) {
+                wstring wname = wline.substr(0, pos);
+                wstring wcontent = wline.substr(pos + 2);
+                
+                // Replace escaped \n with real newlines
+                size_t start_pos = 0;
+                while ((start_pos = wcontent.find(L"\\n", start_pos)) != wstring::npos) {
+                    wcontent.replace(start_pos, 2, L"\n");
+                    start_pos += 1;
+                }
+                
+                if (!wname.empty()) {
+                    addMacro(wideStringToUtf8(wname), wideStringToUtf8(wcontent));
                 }
             }
         }
-        myfile.close();
+        fclose(f);
     }
 }

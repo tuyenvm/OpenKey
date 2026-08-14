@@ -118,31 +118,57 @@ INT_PTR CustomInputMethodDialog::eventProc(HWND hDlg, UINT uMsg, WPARAM wParam, 
 		HWND btnDelete = GetDlgItem(hDlg, IDC_BTN_DELETE_RULE);
 		HWND btnSave = GetDlgItem(hDlg, IDOK);
 		HWND btnClose = GetDlgItem(hDlg, IDCANCEL);
-		HWND groupRules = GetDlgItem(hDlg, IDC_STATIC); // groupbox definition
+		HWND grpPresets = GetDlgItem(hDlg, IDC_GRP_PRESETS);
+		HWND comboPresets = GetDlgItem(hDlg, IDC_COMBO_PRESETS);
+		HWND btnLoadPreset = GetDlgItem(hDlg, IDC_BTN_LOAD_PRESET);
+		HWND grpDefineKey = GetDlgItem(hDlg, IDC_GRP_DEFINE_KEY);
+		HWND comboAction = GetDlgItem(hDlg, IDC_COMBO_CUSTOM_ACTION);
+		HWND btnAddRule = GetDlgItem(hDlg, IDC_BTN_ADD_RULE);
+		HWND btnReplaceRule = GetDlgItem(hDlg, IDC_BTN_REPLACE_RULE);
 
+		if (grpPresets) {
+			RECT rect; GetWindowRect(grpPresets, &rect); MapWindowPoints(HWND_DESKTOP, hDlg, (LPPOINT)&rect, 2);
+			MoveWindow(grpPresets, rect.left, rect.top, newWidth - rect.left * 2, rect.bottom - rect.top, TRUE);
+		}
+		if (comboPresets) {
+			RECT rect; GetWindowRect(comboPresets, &rect); MapWindowPoints(HWND_DESKTOP, hDlg, (LPPOINT)&rect, 2);
+			MoveWindow(comboPresets, rect.left, rect.top, newWidth - 110, rect.bottom - rect.top, TRUE);
+		}
+		if (btnLoadPreset) {
+			RECT rect; GetWindowRect(btnLoadPreset, &rect); MapWindowPoints(HWND_DESKTOP, hDlg, (LPPOINT)&rect, 2);
+			MoveWindow(btnLoadPreset, newWidth - 90, rect.top, rect.right - rect.left, rect.bottom - rect.top, TRUE);
+		}
+		if (grpDefineKey) {
+			RECT rect; GetWindowRect(grpDefineKey, &rect); MapWindowPoints(HWND_DESKTOP, hDlg, (LPPOINT)&rect, 2);
+			MoveWindow(grpDefineKey, rect.left, rect.top, newWidth - rect.left * 2, newHeight - rect.top - 40, TRUE);
+		}
+		if (comboAction) {
+			RECT rect; GetWindowRect(comboAction, &rect); MapWindowPoints(HWND_DESKTOP, hDlg, (LPPOINT)&rect, 2);
+			MoveWindow(comboAction, rect.left, rect.top, newWidth - rect.left - 15, rect.bottom - rect.top, TRUE);
+		}
+		if (btnAddRule) {
+			RECT rect; GetWindowRect(btnAddRule, &rect); MapWindowPoints(HWND_DESKTOP, hDlg, (LPPOINT)&rect, 2);
+			MoveWindow(btnAddRule, newWidth - 145, rect.top, rect.right - rect.left, rect.bottom - rect.top, TRUE);
+		}
+		if (btnReplaceRule) {
+			RECT rect; GetWindowRect(btnReplaceRule, &rect); MapWindowPoints(HWND_DESKTOP, hDlg, (LPPOINT)&rect, 2);
+			MoveWindow(btnReplaceRule, newWidth - 80, rect.top, rect.right - rect.left, rect.bottom - rect.top, TRUE);
+		}
 		if (listRules) {
-			RECT rect;
-			GetWindowRect(listRules, &rect);
-			MapWindowPoints(HWND_DESKTOP, hDlg, (LPPOINT)&rect, 2);
+			RECT rect; GetWindowRect(listRules, &rect); MapWindowPoints(HWND_DESKTOP, hDlg, (LPPOINT)&rect, 2);
 			MoveWindow(listRules, rect.left, rect.top, newWidth - rect.left * 2, newHeight - rect.top - 65, TRUE);
 		}
 		if (btnDelete) {
-			RECT rect;
-			GetWindowRect(btnDelete, &rect);
-			MapWindowPoints(HWND_DESKTOP, hDlg, (LPPOINT)&rect, 2);
+			RECT rect; GetWindowRect(btnDelete, &rect); MapWindowPoints(HWND_DESKTOP, hDlg, (LPPOINT)&rect, 2);
 			MoveWindow(btnDelete, rect.left, newHeight - 50, rect.right - rect.left, rect.bottom - rect.top, TRUE);
 		}
 		if (btnSave) {
-			RECT rect;
-			GetWindowRect(btnSave, &rect);
-			MapWindowPoints(HWND_DESKTOP, hDlg, (LPPOINT)&rect, 2);
-			MoveWindow(btnSave, newWidth - 145, newHeight - 33, rect.right - rect.left, rect.bottom - rect.top, TRUE);
+			RECT rect; GetWindowRect(btnSave, &rect); MapWindowPoints(HWND_DESKTOP, hDlg, (LPPOINT)&rect, 2);
+			MoveWindow(btnSave, newWidth - 145, newHeight - 27, rect.right - rect.left, rect.bottom - rect.top, TRUE);
 		}
 		if (btnClose) {
-			RECT rect;
-			GetWindowRect(btnClose, &rect);
-			MapWindowPoints(HWND_DESKTOP, hDlg, (LPPOINT)&rect, 2);
-			MoveWindow(btnClose, newWidth - 75, newHeight - 33, rect.right - rect.left, rect.bottom - rect.top, TRUE);
+			RECT rect; GetWindowRect(btnClose, &rect); MapWindowPoints(HWND_DESKTOP, hDlg, (LPPOINT)&rect, 2);
+			MoveWindow(btnClose, newWidth - 75, newHeight - 27, rect.right - rect.left, rect.bottom - rect.top, TRUE);
 		}
 		break;
 	}
