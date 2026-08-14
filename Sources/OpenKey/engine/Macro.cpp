@@ -72,6 +72,24 @@ static void convert(const string& str, vector<Uint32>& outData) {
     }
 }
 
+static string normalizeNewlines(const string& str) {
+    string result;
+    result.reserve(str.size() + 16);
+    for (size_t i = 0; i < str.size(); i++) {
+        if (str[i] == '\r') {
+            if (i + 1 < str.size() && str[i + 1] == '\n') {
+                i++;
+            }
+            result += "\r\n";
+        } else if (str[i] == '\n') {
+            result += "\r\n";
+        } else {
+            result += str[i];
+        }
+    }
+    return result;
+}
+
 /**
  * data structure:
  * byte 0 and 1: macro count
@@ -107,11 +125,11 @@ void initMacroMap(const Byte* pData, const int& size) {
         
         MacroData data;
         data.macroText = macroText;
-        data.macroContent = macroContent;
+        data.macroContent = normalizeNewlines(macroContent);
         
         vector<Uint32> key;
         convert(macroText, key);
-        convert(macroContent, data.macroContentCode);
+        convert(data.macroContent, data.macroContentCode);
         
         macroMap[key] = data;
     }
@@ -224,15 +242,16 @@ void getAllMacro(vector<vector<Uint32>>& keys, vector<string>& macroTexts, vecto
 bool addMacro(const string& macroText, const string& macroContent) {
     vector<Uint32> key;
     convert(macroText, key);
+    string normalizedContent = normalizeNewlines(macroContent);
     if (macroMap.find(key) == macroMap.end()) { //add new macro
         MacroData data;
         data.macroText = macroText;
-        data.macroContent = macroContent;
-        convert(macroContent, data.macroContentCode);
+        data.macroContent = normalizedContent;
+        convert(normalizedContent, data.macroContentCode);
         macroMap[key] = data;
     } else { //edit this macro
-        macroMap[key].macroContent = macroContent;
-        convert(macroContent, macroMap[key].macroContentCode);
+        macroMap[key].macroContent = normalizedContent;
+        convert(normalizedContent, macroMap[key].macroContentCode);
     }
     return true;
 }
@@ -267,16 +286,22 @@ void saveToFile(const string& path) {
             string name = it->second.macroText;
             string content = it->second.macroContent;
             
-            // Escape newlines as \n
+            // Normalize CRLF or lone CR to \n first
             size_t start_pos = 0;
+            while ((start_pos = content.find("\r\n", start_pos)) != string::npos) {
+                content.replace(start_pos, 2, "\n");
+                start_pos += 1;
+            }
+            start_pos = 0;
+            while ((start_pos = content.find("\r", start_pos)) != string::npos) {
+                content.replace(start_pos, 1, "\n");
+                start_pos += 1;
+            }
+            // Escape newlines as \n
+            start_pos = 0;
             while ((start_pos = content.find("\n", start_pos)) != string::npos) {
                 content.replace(start_pos, 1, "\\n");
                 start_pos += 2;
-            }
-            // Remove \r just in case
-            start_pos = 0;
-            while ((start_pos = content.find("\r", start_pos)) != string::npos) {
-                content.erase(start_pos, 1);
             }
             
             string line = name + "||" + content + "\n";
@@ -316,11 +341,11 @@ void readFromFile(const string& path, const bool& append) {
                 string name = line.substr(0, pos);
                 string content = line.substr(pos + 2);
                 
-                // Replace escaped \n with real newlines
+                // Replace escaped \n with real CRLF
                 size_t start_pos = 0;
                 while ((start_pos = content.find("\\n", start_pos)) != string::npos) {
-                    content.replace(start_pos, 2, "\n");
-                    start_pos += 1;
+                    content.replace(start_pos, 2, "\r\n");
+                    start_pos += 2;
                 }
                 
                 if (!name.empty()) {
