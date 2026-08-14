@@ -332,9 +332,24 @@ static void SendNewCharString(const bool& dataFromMacro = false) {
 
 			_tempChar = DYNA_DATA(dataFromMacro, _k);
 			if (_tempChar & PURE_CHARACTER_MASK) {
-				_newCharString[_j++] = _tempChar;
-				if (IS_DOUBLE_CODE(vCodeTable)) {
-					InsertKeyLength(1);
+				Uint32 pureChar = _tempChar & ~PURE_CHARACTER_MASK;
+				if (pureChar <= 0xFFFF) {
+					_newCharString[_j++] = (Uint16)pureChar;
+					if (IS_DOUBLE_CODE(vCodeTable)) {
+						InsertKeyLength(1);
+					}
+				} else {
+					Uint16 high = (Uint16)(((pureChar - 0x10000) >> 10) + 0xD800);
+					Uint16 low = (Uint16)(((pureChar - 0x10000) & 0x3FF) + 0xDC00);
+					if (_newCharString.size() < _newCharSize + 1) {
+						_newCharString.resize(_newCharSize + 1);
+					}
+					_newCharString[_j++] = high;
+					_newCharString[_j++] = low;
+					_newCharSize++;
+					if (IS_DOUBLE_CODE(vCodeTable)) {
+						InsertKeyLength(2);
+					}
 				}
 			} else if (!(_tempChar & CHAR_CODE_MASK)) {
 				if (IS_DOUBLE_CODE(vCodeTable)) //VNI
@@ -432,15 +447,29 @@ void switchLanguage() {
 	startNewSession();
 }
 
-static void SendPureCharacter(const Uint16& ch) {
+static void SendPureCharacter(const Uint32& ch) {
 	if (ch < 128)
 		SendKeyCode(ch);
-	else {
-		prepareUnicodeEvent(keyEvent[0], ch, true);
-		prepareUnicodeEvent(keyEvent[1], ch, false);
+	else if (ch <= 0xFFFF) {
+		prepareUnicodeEvent(keyEvent[0], (Uint16)ch, true);
+		prepareUnicodeEvent(keyEvent[1], (Uint16)ch, false);
 		SendInput(2, keyEvent, sizeof(INPUT));
 		if (IS_DOUBLE_CODE(vCodeTable)) {
 			InsertKeyLength(1);
+		}
+	} else {
+		Uint16 high = (Uint16)(((ch - 0x10000) >> 10) + 0xD800);
+		Uint16 low = (Uint16)(((ch - 0x10000) & 0x3FF) + 0xDC00);
+		
+		prepareUnicodeEvent(keyEvent[0], high, true);
+		prepareUnicodeEvent(keyEvent[1], high, false);
+		SendInput(2, keyEvent, sizeof(INPUT));
+		
+		prepareUnicodeEvent(keyEvent[0], low, true);
+		prepareUnicodeEvent(keyEvent[1], low, false);
+		SendInput(2, keyEvent, sizeof(INPUT));
+		if (IS_DOUBLE_CODE(vCodeTable)) {
+			InsertKeyLength(2);
 		}
 	}
 }

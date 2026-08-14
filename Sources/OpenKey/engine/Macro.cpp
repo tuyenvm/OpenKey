@@ -35,6 +35,13 @@ static void convert(const string& str, vector<Uint32>& outData) {
     int k = 0;
     for (int i = 0; i < data.size(); i++) {
         t = (Uint32)data[i];
+        if (t >= 0xD800 && t <= 0xDBFF && i + 1 < data.size()) {
+            Uint32 low = data[i + 1];
+            if (low >= 0xDC00 && low <= 0xDFFF) {
+                t = 0x10000 + ((t - 0xD800) << 10) + (low - 0xDC00);
+                i++;
+            }
+        }
         
         //find normal character fist
         if (_characterMap.find(t) != _characterMap.end()) {
