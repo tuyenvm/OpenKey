@@ -53,6 +53,7 @@ extern int vLanguage;
  */
 extern int vInputType;
 extern vector<CustomRule> customRules;
+bool isSpecialKeyCustom(Uint16 keyCode);
 
 /**
  * 0: No

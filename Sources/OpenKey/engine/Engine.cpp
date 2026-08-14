@@ -36,7 +36,8 @@ static Uint16 ProcessingChar[][11] = {
     {KEY_1, KEY_2, KEY_3, KEY_4, KEY_5, KEY_6, KEY_6, KEY_7, KEY_8, KEY_9, KEY_0}, //VNI
     {KEY_S, KEY_F, KEY_R, KEY_X, KEY_J, KEY_A, KEY_O, KEY_E, KEY_W, KEY_D, KEY_Z}, //Simple Telex 1
     {KEY_S, KEY_F, KEY_R, KEY_X, KEY_J, KEY_A, KEY_O, KEY_E, KEY_W, KEY_D, KEY_Z}, //Simple Telex 2
-    {KEY_1, KEY_2, KEY_3, KEY_4, KEY_5, KEY_6, KEY_8, KEY_7, KEY_9, KEY_D, KEY_0}  //Tu Binh Tran Don Gian
+    {KEY_1, KEY_2, KEY_3, KEY_4, KEY_5, KEY_6, KEY_8, KEY_7, KEY_9, KEY_D, KEY_0}, //Tu Binh Tran Don Gian
+    {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0}                                              //Tu Dinh Nghia
 };
 
 #define IS_KEY_Z(key) (ProcessingChar[vInputType][10] == key || (vInputType == vTuBinhTranDonGian && key == KEY_Z))
@@ -1044,6 +1045,15 @@ void checkForStandaloneChar(const Uint16& data, const bool& isCaps, const Uint32
     insertKey(data, isCaps);
 }
 
+bool isSpecialKeyCustom(Uint16 keyCode) {
+    for (const auto& rule : customRules) {
+        if ((rule.key & CHAR_MASK) == keyCode) {
+            return true;
+        }
+    }
+    return false;
+}
+
 void checkForStandaloneCharTBT(const Uint16& data, const bool& isCaps, const Uint32& keyWillReverse, const Uint32& maskToAdd) {
     if (_index > 0 && CHR(_index - 1) == keyWillReverse && (TypingWord[_index - 1] & maskToAdd) && (TypingWord[_index - 1] & STANDALONE_MASK)) {
         hCode = vWillProcess;
@@ -1111,78 +1121,126 @@ void handleMainKey(const Uint16& data, const bool& isCaps) {
         for (const auto& rule : customRules) {
             if (rule.key == lookupKey) {
                 int action = rule.action;
-                if (action == 0) {
-                    removeMark();
-                    if (!isChanged) insertKey(data, isCaps);
-                    return;
-                }
+                
+                auto hasChar = [](Uint16 targetKey) -> bool {
+                    for (int ii = _index - 1; ii >= 0; ii--) {
+                        if (CHR(ii) == targetKey) return true;
+                    }
+                    return false;
+                };
+
+                auto hasAnyChar = [&](const vector<Uint16>& targets) -> bool {
+                    for (Uint16 t : targets) {
+                        if (hasChar(t)) return true;
+                    }
+                    return false;
+                };
+
+                bool applicable = false;
                 if (action >= 1 && action <= 5) {
-                    Uint32 masks[] = { MARK1_MASK, MARK2_MASK, MARK3_MASK, MARK4_MASK, MARK5_MASK };
-                    insertMark(masks[action - 1]);
-                    return;
-                }
-                if (action == 6) {
+                    vowelCount = 0;
                     findAndCalculateVowel();
-                    if (vowelCount > 0) {
-                        Uint32 lastVowel = CHR(VEI);
-                        if (lastVowel == KEY_A || lastVowel == KEY_E || lastVowel == KEY_O) {
-                            insertAOE(lastVowel, isCaps);
+                    applicable = (vowelCount > 0);
+                } else if (action == 6) {
+                    vowelCount = 0;
+                    findAndCalculateVowel();
+                    applicable = (vowelCount > 0 && (CHR(VEI) == KEY_A || CHR(VEI) == KEY_E || CHR(VEI) == KEY_O));
+                } else if (action == 7) {
+                    applicable = hasChar(KEY_A);
+                } else if (action == 8) {
+                    applicable = hasChar(KEY_E);
+                } else if (action == 9) {
+                    applicable = hasChar(KEY_O);
+                } else if (action == 10) {
+                    applicable = hasAnyChar({KEY_A, KEY_U, KEY_O});
+                } else if (action == 11) {
+                    applicable = hasChar(KEY_U) && hasChar(KEY_O);
+                } else if (action == 12) {
+                    applicable = hasChar(KEY_U);
+                } else if (action == 13) {
+                    applicable = hasChar(KEY_O);
+                } else if (action == 14) {
+                    applicable = hasChar(KEY_A);
+                } else if (action == 15) {
+                    applicable = hasChar(KEY_D);
+                } else {
+                    applicable = true;
+                }
+
+                if (applicable) {
+                    if (action == 0) {
+                        removeMark();
+                        if (!isChanged) insertKey(data, isCaps);
+                        return;
+                    }
+                    if (action >= 1 && action <= 5) {
+                        Uint32 masks[] = { MARK1_MASK, MARK2_MASK, MARK3_MASK, MARK4_MASK, MARK5_MASK };
+                        insertMark(masks[action - 1]);
+                        return;
+                    }
+                    if (action == 6) {
+                        findAndCalculateVowel();
+                        if (vowelCount > 0) {
+                            Uint32 lastVowel = CHR(VEI);
+                            if (lastVowel == KEY_A || lastVowel == KEY_E || lastVowel == KEY_O) {
+                                insertAOE(lastVowel, isCaps);
+                            }
                         }
+                        return;
                     }
-                    return;
-                }
-                if (action == 7) { insertAOE(KEY_A, isCaps); return; }
-                if (action == 8) { insertAOE(KEY_E, isCaps); return; }
-                if (action == 9) { insertAOE(KEY_O, isCaps); return; }
-                if (action == 10) { insertW(KEY_W, isCaps); return; }
-                if (action == 11) { insertW(KEY_W, isCaps); return; }
-                if (action == 12) {
-                    findAndCalculateVowel();
-                    if (vowelCount > 0 && CHR(VEI) == KEY_U) {
-                        insertW(KEY_U, isCaps);
+                    if (action == 7) { insertAOE(KEY_A, isCaps); return; }
+                    if (action == 8) { insertAOE(KEY_E, isCaps); return; }
+                    if (action == 9) { insertAOE(KEY_O, isCaps); return; }
+                    if (action == 10) { insertW(KEY_W, isCaps); return; }
+                    if (action == 11) { insertW(KEY_W, isCaps); return; }
+                    if (action == 12) {
+                        findAndCalculateVowel();
+                        if (vowelCount > 0 && CHR(VEI) == KEY_U) {
+                            insertW(KEY_U, isCaps);
+                        }
+                        return;
                     }
-                    return;
-                }
-                if (action == 13) {
-                    findAndCalculateVowel();
-                    if (vowelCount > 0 && CHR(VEI) == KEY_O) {
-                        insertW(KEY_O, isCaps);
+                    if (action == 13) {
+                        findAndCalculateVowel();
+                        if (vowelCount > 0 && CHR(VEI) == KEY_O) {
+                            insertW(KEY_O, isCaps);
+                        }
+                        return;
                     }
-                    return;
-                }
-                if (action == 14) {
-                    findAndCalculateVowel();
-                    if (vowelCount > 0 && CHR(VEI) == KEY_A) {
-                        insertW(KEY_A, isCaps);
+                    if (action == 14) {
+                        findAndCalculateVowel();
+                        if (vowelCount > 0 && CHR(VEI) == KEY_A) {
+                            insertW(KEY_A, isCaps);
+                        }
+                        return;
                     }
-                    return;
+                    if (action == 15) {
+                        insertD(data, isCaps);
+                        return;
+                    }
+                    if (action == 16 || action == 17) {
+                        insertW(KEY_W, isCaps);
+                        return;
+                    }
+                    if (action == 18) {
+                        insertKey(data, isCaps);
+                        return;
+                    }
+                    if (action == 19) { checkForStandaloneCharTBT(data, false, KEY_A, TONEW_MASK); return; }
+                    if (action == 20) { checkForStandaloneCharTBT(data, true, KEY_A, TONEW_MASK | CAPS_MASK); return; }
+                    if (action == 21) { checkForStandaloneCharTBT(data, false, KEY_A, TONE_MASK); return; }
+                    if (action == 22) { checkForStandaloneCharTBT(data, true, KEY_A, TONE_MASK | CAPS_MASK); return; }
+                    if (action == 23) { checkForStandaloneCharTBT(data, false, KEY_D, TONE_MASK); return; }
+                    if (action == 24) { checkForStandaloneCharTBT(data, true, KEY_D, TONE_MASK | CAPS_MASK); return; }
+                    if (action == 25) { checkForStandaloneCharTBT(data, false, KEY_E, TONE_MASK); return; }
+                    if (action == 26) { checkForStandaloneCharTBT(data, true, KEY_E, TONE_MASK | CAPS_MASK); return; }
+                    if (action == 27) { checkForStandaloneCharTBT(data, false, KEY_O, TONE_MASK); return; }
+                    if (action == 28) { checkForStandaloneCharTBT(data, true, KEY_O, TONE_MASK | CAPS_MASK); return; }
+                    if (action == 29) { checkForStandaloneCharTBT(data, false, KEY_O, TONEW_MASK); return; }
+                    if (action == 30) { checkForStandaloneCharTBT(data, true, KEY_O, TONEW_MASK | CAPS_MASK); return; }
+                    if (action == 31) { checkForStandaloneCharTBT(data, false, KEY_U, TONEW_MASK); return; }
+                    if (action == 32) { checkForStandaloneCharTBT(data, true, KEY_U, TONEW_MASK | CAPS_MASK); return; }
                 }
-                if (action == 15) {
-                    insertD(data, isCaps);
-                    return;
-                }
-                if (action == 16 || action == 17) {
-                    insertW(KEY_W, isCaps);
-                    return;
-                }
-                if (action == 18) {
-                    insertKey(data, isCaps);
-                    return;
-                }
-                if (action == 19) { checkForStandaloneCharTBT(data, false, KEY_A, TONEW_MASK); return; }
-                if (action == 20) { checkForStandaloneCharTBT(data, true, KEY_A, TONEW_MASK | CAPS_MASK); return; }
-                if (action == 21) { checkForStandaloneCharTBT(data, false, KEY_A, TONE_MASK); return; }
-                if (action == 22) { checkForStandaloneCharTBT(data, true, KEY_A, TONE_MASK | CAPS_MASK); return; }
-                if (action == 23) { checkForStandaloneCharTBT(data, false, KEY_D, TONE_MASK); return; }
-                if (action == 24) { checkForStandaloneCharTBT(data, true, KEY_D, TONE_MASK | CAPS_MASK); return; }
-                if (action == 25) { checkForStandaloneCharTBT(data, false, KEY_E, TONE_MASK); return; }
-                if (action == 26) { checkForStandaloneCharTBT(data, true, KEY_E, TONE_MASK | CAPS_MASK); return; }
-                if (action == 27) { checkForStandaloneCharTBT(data, false, KEY_O, TONE_MASK); return; }
-                if (action == 28) { checkForStandaloneCharTBT(data, true, KEY_O, TONE_MASK | CAPS_MASK); return; }
-                if (action == 29) { checkForStandaloneCharTBT(data, false, KEY_O, TONEW_MASK); return; }
-                if (action == 30) { checkForStandaloneCharTBT(data, true, KEY_O, TONEW_MASK | CAPS_MASK); return; }
-                if (action == 31) { checkForStandaloneCharTBT(data, false, KEY_U, TONEW_MASK); return; }
-                if (action == 32) { checkForStandaloneCharTBT(data, true, KEY_U, TONEW_MASK | CAPS_MASK); return; }
             }
         }
     }
