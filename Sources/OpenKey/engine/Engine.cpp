@@ -198,12 +198,21 @@ bool isLetterKey(const Uint16& data) {
     }
 }
 
+bool isTBTConsonantContextAt(const int& index) {
+    if (index < 0)
+        return false;
+    Uint16 key = CHR(index);
+    if (IS_TBT_CONSONANT_CONTEXT(key))
+        return true;
+    return index > 0 && ((key == KEY_I && CHR(index - 1) == KEY_G) || (key == KEY_U && CHR(index - 1) == KEY_Q));
+}
+
 bool shouldKeepTBTStandaloneKeyRaw(const Uint16& data) {
     if (vInputType != vTuBinhTranDonGian || !IS_TBT_STANDALONE_KEY(data))
         return false;
     if (_specialChar.size() > 0)
         return true;
-    return _index > 0 && !IS_TBT_CONSONANT_CONTEXT(CHR(_index - 1)) && !canApplyTBTStandaloneInVowel(data);
+    return _index > 0 && !isTBTConsonantContextAt(_index - 1) && !canApplyTBTStandaloneInVowel(data);
 }
 
 bool isSpellingConsonant(const Uint16& data) {
