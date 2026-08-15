@@ -207,5 +207,6 @@
 #define _APS_NEXT_COMMAND_VALUE         32771
 #define _APS_NEXT_CONTROL_VALUE         1052
 #define _APS_NEXT_SYMED_VALUE           110
+#define IDC_LABEL_MACRO_TRIGGERS        1099
 #endif
 #endif

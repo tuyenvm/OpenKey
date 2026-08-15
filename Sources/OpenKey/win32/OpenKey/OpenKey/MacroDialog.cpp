@@ -151,16 +151,14 @@ INT_PTR MacroDialog::eventProc(HWND hDlg, UINT uMsg, WPARAM wParam, LPARAM lPara
 
 		// Get handles of the controls
 		HWND hList = GetDlgItem(hDlg, IDC_LIST_MACRO_DATA);
-		HWND hNameLabel = GetDlgItem(hDlg, IDC_STATIC); // Careful: multiple IDC_STATIC might exist
 		HWND hName = GetDlgItem(hDlg, IDC_EDIT_MACRO_NAME);
-		HWND hContentLabel = GetDlgItem(hDlg, IDC_STATIC); // Fortunately, we can reposition edit controls directly
 		HWND hContent = GetDlgItem(hDlg, IDC_EDIT_MACRO_CONTENT);
 		HWND hAdd = GetDlgItem(hDlg, IDC_BUTTON_ADD);
 		HWND hDel = GetDlgItem(hDlg, IDC_BUTTON_DELETE);
 		HWND hImport = GetDlgItem(hDlg, IDC_BUTTON_IMPORT_MACRO);
 		HWND hExport = GetDlgItem(hDlg, IDC_BUTTON_EXPORT_MACRO);
 		HWND hCaps = GetDlgItem(hDlg, IDC_CHECK_AUTO_CAPS);
-		HWND hTriggerLabel = GetDlgItem(hDlg, IDC_STATIC);
+		HWND hTriggerLabel = GetDlgItem(hDlg, IDC_LABEL_MACRO_TRIGGERS);
 		HWND hTriggerCombo = GetDlgItem(hDlg, IDC_COMBO_MACRO_TRIGGERS);
 
 		// Layout constants based on original dialog (415 x 253 DLU ~ 622 x 380 pixels)
@@ -194,6 +192,10 @@ INT_PTR MacroDialog::eventProc(HWND hDlg, UINT uMsg, WPARAM wParam, LPARAM lPara
 			SetWindowPos(hExport, NULL, 120, bottomY, 100, 22, SWP_NOZORDER);
 			// Auto Caps checkbox: x=230, w=130, h=22
 			SetWindowPos(hCaps, NULL, 230, bottomY, 130, 22, SWP_NOZORDER);
+			// Trigger Label: x=width - 250, w=60, h=22
+			if (hTriggerLabel) {
+				SetWindowPos(hTriggerLabel, NULL, width - 260, bottomY + 3, 60, 22, SWP_NOZORDER);
+			}
 			// Combo triggers: x=width - 195, w=185, h=22 (drop height is handled by OS)
 			SetWindowPos(hTriggerCombo, NULL, width - 195, bottomY - 3, 185, 22, SWP_NOZORDER);
 		}
@@ -223,6 +225,11 @@ void MacroDialog::initDialog() {
 	hMacroContent = GetDlgItem(hDlg, IDC_EDIT_MACRO_CONTENT);
 	hAddButton = GetDlgItem(hDlg, IDC_BUTTON_ADD);
 	hAutoCaps = GetDlgItem(hDlg, IDC_CHECK_AUTO_CAPS);
+
+	// Set EM_SETLIMITTEXT to 0 for unlimited character limit in content edit box
+	if (hMacroContent) {
+		SendMessage(hMacroContent, EM_SETLIMITTEXT, 0, 0);
+	}
 
 	HWND hComboTriggers = GetDlgItem(hDlg, IDC_COMBO_MACRO_TRIGGERS);
 	if (hComboTriggers) {
