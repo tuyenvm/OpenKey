@@ -524,7 +524,7 @@ static void handleMacro() {
 	SendNewCharString(true);
 
 	// Wait briefly or yield to allow paste event to be processed by target app
-	Sleep(100);
+	Sleep(50);
 
 	// Restore clipboard
 	if (!backupText.empty()) {
