@@ -242,17 +242,23 @@ void getAllMacro(vector<vector<Uint32>>& keys, vector<string>& macroTexts, vecto
 
 bool addMacro(const string& macroText, const string& macroContent) {
     vector<Uint32> key;
-    convert(macroText, key);
     string normalizedContent = normalizeNewlines(macroContent);
+    vector<Uint32> contentCode;
+    try {
+        convert(macroText, key);
+        convert(normalizedContent, contentCode);
+    } catch (...) {
+        return false;
+    }
     if (macroMap.find(key) == macroMap.end()) { //add new macro
         MacroData data;
         data.macroText = macroText;
         data.macroContent = normalizedContent;
-        convert(normalizedContent, data.macroContentCode);
+        data.macroContentCode = contentCode;
         macroMap[key] = data;
     } else { //edit this macro
         macroMap[key].macroContent = normalizedContent;
-        convert(normalizedContent, macroMap[key].macroContentCode);
+        macroMap[key].macroContentCode = contentCode;
     }
     return true;
 }
@@ -443,8 +449,7 @@ static int importEvKeyLines(const vector<string>& lines) {
                 start_pos += 2;
             }
 
-            if (!name.empty()) {
-                addMacro(name, content);
+            if (!name.empty() && addMacro(name, content)) {
                 importedCount++;
             }
         }
@@ -492,8 +497,9 @@ static int readMacroFileCount(const string& path, const bool& append, const bool
                     continue;
                 }
                 if (inBlock && lines[i] == "::end") {
-                    addMacro(name, content);
-                    importedCount++;
+                    if (addMacro(name, content)) {
+                        importedCount++;
+                    }
                     inBlock = false;
                     continue;
                 }
