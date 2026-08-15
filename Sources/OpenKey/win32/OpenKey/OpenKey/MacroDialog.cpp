@@ -16,7 +16,7 @@ redistribute your new version, it MUST be open source.
 #include "AppDelegate.h"
 #include <commdlg.h>
 
-#define MAX_MACRO_BUFFER 4096
+#define MAX_MACRO_BUFFER 65536
 #define BTN_ADD_TEXT _T("+ Thêm")
 #define BTN_UPDATE_TEXT _T("+ Sửa")
 
@@ -144,6 +144,60 @@ INT_PTR MacroDialog::eventProc(HWND hDlg, UINT uMsg, WPARAM wParam, LPARAM lPara
 			break;
 		}
 		break;
+	}
+	case WM_SIZE: {
+		int width = LOWORD(lParam);
+		int height = HIWORD(lParam);
+
+		// Get handles of the controls
+		HWND hList = GetDlgItem(hDlg, IDC_LIST_MACRO_DATA);
+		HWND hNameLabel = GetDlgItem(hDlg, IDC_STATIC); // Careful: multiple IDC_STATIC might exist
+		HWND hName = GetDlgItem(hDlg, IDC_EDIT_MACRO_NAME);
+		HWND hContentLabel = GetDlgItem(hDlg, IDC_STATIC); // Fortunately, we can reposition edit controls directly
+		HWND hContent = GetDlgItem(hDlg, IDC_EDIT_MACRO_CONTENT);
+		HWND hAdd = GetDlgItem(hDlg, IDC_BUTTON_ADD);
+		HWND hDel = GetDlgItem(hDlg, IDC_BUTTON_DELETE);
+		HWND hImport = GetDlgItem(hDlg, IDC_BUTTON_IMPORT_MACRO);
+		HWND hExport = GetDlgItem(hDlg, IDC_BUTTON_EXPORT_MACRO);
+		HWND hCaps = GetDlgItem(hDlg, IDC_CHECK_AUTO_CAPS);
+		HWND hTriggerLabel = GetDlgItem(hDlg, IDC_STATIC);
+		HWND hTriggerCombo = GetDlgItem(hDlg, IDC_COMBO_MACRO_TRIGGERS);
+
+		// Layout constants based on original dialog (415 x 253 DLU ~ 622 x 380 pixels)
+		// We will adjust controls using SetWindowPos
+		if (hName && hContent && hAdd && hDel && hList && hImport && hExport && hCaps && hTriggerCombo) {
+			// Top controls:
+			// Name: x=10, y=28, w=110, h=22
+			SetWindowPos(hName, NULL, 10, 28, 110, 22, SWP_NOZORDER);
+
+			// Content: x=130, y=28, w=width - 275, h=50
+			int contentWidth = width - 275;
+			if (contentWidth < 100) contentWidth = 100;
+			SetWindowPos(hContent, NULL, 130, 28, contentWidth, 50, SWP_NOZORDER);
+
+			// Add Button: x=width - 135, y=28, w=125, h=22
+			SetWindowPos(hAdd, NULL, width - 135, 28, 125, 22, SWP_NOZORDER);
+
+			// Delete Button: x=width - 135, y=54, w=125, h=22
+			SetWindowPos(hDel, NULL, width - 135, 54, 125, 22, SWP_NOZORDER);
+
+			// List Macro: x=10, y=90, w=width - 20, h=height - 135
+			int listHeight = height - 135;
+			if (listHeight < 50) listHeight = 50;
+			SetWindowPos(hList, NULL, 10, 90, width - 20, listHeight, SWP_NOZORDER);
+
+			// Bottom controls: y = height - 35
+			int bottomY = height - 35;
+			// Import: x=10, w=100, h=22
+			SetWindowPos(hImport, NULL, 10, bottomY, 100, 22, SWP_NOZORDER);
+			// Export: x=120, w=100, h=22
+			SetWindowPos(hExport, NULL, 120, bottomY, 100, 22, SWP_NOZORDER);
+			// Auto Caps checkbox: x=230, w=130, h=22
+			SetWindowPos(hCaps, NULL, 230, bottomY, 130, 22, SWP_NOZORDER);
+			// Combo triggers: x=width - 195, w=185, h=22 (drop height is handled by OS)
+			SetWindowPos(hTriggerCombo, NULL, width - 195, bottomY - 3, 185, 22, SWP_NOZORDER);
+		}
+		return TRUE;
 	}
 	case WM_NOTIFY: {
 		switch (((LPNMHDR)lParam)->code) {
