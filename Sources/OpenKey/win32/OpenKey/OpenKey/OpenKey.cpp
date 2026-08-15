@@ -711,6 +711,7 @@ LRESULT CALLBACK keyboardHookProcess(int nCode, WPARAM wParam, LPARAM lParam) {
 
 			if (pData->code == vReplaceMaro) { //handle macro in english mode
 				handleMacro();
+				startNewSession();
 				return NULL;
 			}
 		}
@@ -781,6 +782,7 @@ LRESULT CALLBACK keyboardHookProcess(int nCode, WPARAM wParam, LPARAM lParam) {
 			}
 		} else if (pData->code == vReplaceMaro) { //MACRO
 			handleMacro();
+			startNewSession();
 		}
 		return -1; //consume event
 	}

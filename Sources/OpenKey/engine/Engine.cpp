@@ -1785,6 +1785,7 @@ void vKeyHandleEvent(const vKeyEvent& event,
             if (findMacroMatch(hMacroKey, hMacroData, macroBackspace)) {
                 hCode = vReplaceMaro;
                 hBPC = macroBackspace;
+                hExt = 5;
                 _hasHandledMacro = true;
             }
         } else if ((vQuickStartConsonant || vQuickEndConsonant) && !tempDisableKey && isMacroBreakCode(data)) {
@@ -1848,7 +1849,8 @@ void vKeyHandleEvent(const vKeyEvent& event,
         if (vUseMacro && (vMacroTriggerMask & 0x01) && !_hasHandledMacro && findMacroMatch(hMacroKey, hMacroData, macroBackspace)) { //macro
             hCode = vReplaceMaro;
             hBPC = macroBackspace;
-            _spaceCount++;
+            hExt = 5;
+            _spaceCount = 0;
             _hasHandledMacro = true;
         } else if ((vQuickStartConsonant || vQuickEndConsonant) && !tempDisableKey && checkQuickConsonant()) {
             _spaceCount++;
