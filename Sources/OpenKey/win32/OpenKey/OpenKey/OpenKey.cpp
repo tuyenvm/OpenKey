@@ -554,7 +554,7 @@ static void handleMacro() {
 	SendCombineKey(KEY_LEFT_SHIFT, VK_INSERT, 0, KEYEVENTF_EXTENDEDKEY);
 
 	// Wait for target application to process the paste message before restoring clipboard
-	Sleep(360);
+	Sleep(120);
 
 	// Restore clipboard with dynamic retry to handle clipboard locks
 	if (!backupText.empty()) {
