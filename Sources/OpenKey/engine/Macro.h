@@ -73,5 +73,6 @@ void saveToFile(const string& path);
  */
 void readFromFile(const string& path, const bool& append=true);
 int readFromFileCount(const string& path, const bool& append=true);
+int readEvKeyFromFileCount(const string& path, const bool& append=true);
 
 #endif /* Macro_h */

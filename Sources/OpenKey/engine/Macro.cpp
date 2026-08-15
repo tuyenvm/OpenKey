@@ -364,52 +364,118 @@ static bool isEvKeyMarkerLine(const string& line) {
     return line.find("<<") != string::npos && line.find("Unicode") != string::npos;
 }
 
-int readFromFileCount(const string& path, const bool& append) {
+static string trimEvKeyControlChars(const string& line) {
+    size_t start = 0;
+    size_t end = line.size();
+    while (start < end && ((unsigned char)line[start] <= 0x20 || (unsigned char)line[start] == 0xEF)) {
+        start++;
+    }
+    while (end > start && (unsigned char)line[end - 1] <= 0x20) {
+        end--;
+    }
+    return line.substr(start, end - start);
+}
+
+static string readMacroTextFile(const string& path, bool& ok) {
+    ok = false;
+    ifstream myfile(path.c_str(), ios::in | ios::binary);
+    if (!myfile.is_open()) {
+        return "";
+    }
+    string fileData((istreambuf_iterator<char>(myfile)), istreambuf_iterator<char>());
+    myfile.close();
+    ok = true;
+
+    if (looksLikeUtf16LE(fileData)) {
+        return utf16BytesToUtf8(fileData, false);
+    }
+    if (looksLikeUtf16BE(fileData)) {
+        return utf16BytesToUtf8(fileData, true);
+    }
+    if (fileData.size() >= 3 &&
+        (unsigned char)fileData[0] == 0xEF &&
+        (unsigned char)fileData[1] == 0xBB &&
+        (unsigned char)fileData[2] == 0xBF) {
+        fileData.erase(0, 3);
+    }
+    return fileData;
+}
+
+static void splitMacroLines(const string& fileData, vector<string>& lines) {
+    lines.clear();
+    string line;
+    for (size_t i = 0; i <= fileData.size(); i++) {
+        if (i < fileData.size() && fileData[i] != '\n') {
+            line += fileData[i];
+            continue;
+        }
+        while (!line.empty() && line.back() == '\r') {
+            line.pop_back();
+        }
+        line = trimEvKeyControlChars(line);
+        if (!isEvKeyMarkerLine(line)) {
+            lines.push_back(line);
+        }
+        line.clear();
+    }
+}
+
+static int importEvKeyLines(const vector<string>& lines) {
+    int importedCount = 0;
+    for (size_t i = 0; i < lines.size(); i++) {
+        string line = lines[i];
+        if (line.empty() || line[0] == ';') continue;
+
+        size_t pos = line.find("||");
+        if (pos != string::npos) {
+            string name = trimEvKeyControlChars(line.substr(0, pos));
+            string content = line.substr(pos + 2);
+
+            // Replace escaped \n with real CRLF
+            size_t start_pos = 0;
+            while ((start_pos = content.find("\\n", start_pos)) != string::npos) {
+                content.replace(start_pos, 2, "\r\n");
+                start_pos += 2;
+            }
+            start_pos = 0;
+            while ((start_pos = content.find("\xEF\xBF\xBE", start_pos)) != string::npos) {
+                content.replace(start_pos, 3, "\r\n");
+                start_pos += 2;
+            }
+
+            if (!name.empty()) {
+                addMacro(name, content);
+                importedCount++;
+            }
+        }
+    }
+    return importedCount;
+}
+
+static int readMacroFileCount(const string& path, const bool& append, const bool& evKeyOnly) {
     int importedCount = 0;
     map<vector<Uint32>, MacroData> oldMacroMap;
     bool clearedMacroMap = false;
-    ifstream myfile(path.c_str(), ios::in | ios::binary);
-    if (myfile.is_open()) {
+    bool readOk = false;
+    string fileData = readMacroTextFile(path, readOk);
+    if (readOk) {
         if (!append) {
             oldMacroMap = macroMap;
             macroMap.clear();
             clearedMacroMap = true;
         }
 
-        string fileData((istreambuf_iterator<char>(myfile)), istreambuf_iterator<char>());
-        if (looksLikeUtf16LE(fileData)) {
-            fileData = utf16BytesToUtf8(fileData, false);
-        } else if (looksLikeUtf16BE(fileData)) {
-            fileData = utf16BytesToUtf8(fileData, true);
-        } else if (fileData.size() >= 3 &&
-                   (unsigned char)fileData[0] == 0xEF &&
-                   (unsigned char)fileData[1] == 0xBB &&
-                   (unsigned char)fileData[2] == 0xBF) {
-            fileData.erase(0, 3);
-        }
-
         vector<string> lines;
-        string line;
-        for (size_t i = 0; i <= fileData.size(); i++) {
-            if (i < fileData.size() && fileData[i] != '\n') {
-                line += fileData[i];
-                continue;
-            }
-            while (!line.empty() && line.back() == '\r') {
-                line.pop_back();
-            }
-            if (!isEvKeyMarkerLine(line)) {
-                lines.push_back(line);
-            }
-            line.clear();
-        }
+        splitMacroLines(fileData, lines);
 
         bool hasBlockMacro = false;
-        for (size_t i = 0; i < lines.size(); i++) {
-            string blockName;
-            if (readBlockMacroLine(lines[i], blockName)) {
-                hasBlockMacro = true;
-                break;
+        if (!evKeyOnly) {
+            for (size_t i = 0; i < lines.size(); i++) {
+                string blockName;
+                if (readBlockMacroLine(lines[i], blockName)) {
+                    hasBlockMacro = true;
+                    break;
+                }
             }
         }
 
@@ -439,35 +505,8 @@ int readFromFileCount(const string& path, const bool& append) {
                 }
             }
         } else {
-            for (size_t i = 0; i < lines.size(); i++) {
-                line = lines[i];
-                if (line.empty() || line[0] == ';') continue;
-
-                size_t pos = line.find("||");
-                if (pos != string::npos) {
-                    string name = line.substr(0, pos);
-                    string content = line.substr(pos + 2);
-
-                    // Replace escaped \n with real CRLF
-                    size_t start_pos = 0;
-                    while ((start_pos = content.find("\\n", start_pos)) != string::npos) {
-                        content.replace(start_pos, 2, "\r\n");
-                        start_pos += 2;
-                    }
-                    start_pos = 0;
-                    while ((start_pos = content.find("\xEF\xBF\xBE", start_pos)) != string::npos) {
-                        content.replace(start_pos, 3, "\r\n");
-                        start_pos += 2;
-                    }
-
-                    if (!name.empty()) {
-                        addMacro(name, content);
-                        importedCount++;
-                    }
-                }
-            }
+            importedCount = importEvKeyLines(lines);
         }
-        myfile.close();
     }
     if (importedCount == 0 && clearedMacroMap) {
         macroMap = oldMacroMap;
@@ -475,6 +514,14 @@ int readFromFileCount(const string& path, const bool& append) {
     return importedCount;
 }
 
+int readFromFileCount(const string& path, const bool& append) {
+    return readMacroFileCount(path, append, false);
+}
+
 void readFromFile(const string& path, const bool& append) {
     readFromFileCount(path, append);
+}
+
+int readEvKeyFromFileCount(const string& path, const bool& append) {
+    return readMacroFileCount(path, append, true);
 }

@@ -430,19 +430,18 @@ void MacroDialog::onConvertEvKeyMacroButton() {
 	if (GetOpenFileName(&ofn) == TRUE) {
 		int msgboxID = MessageBox(
 			hDlg,
-			_T("Báº¡n cÃ³ muá»‘n giá»¯ láº¡i dá»¯ liá»‡u hiá»‡n táº¡i khÃ´ng?"),
-			_T("Chuyá»ƒn EvKey macro"),
+			L"B\u1EA1n c\u00F3 mu\u1ED1n gi\u1EEF l\u1EA1i d\u1EEF li\u1EC7u hi\u1EC7n t\u1EA1i kh\u00F4ng?",
+			L"Chuy\u1EC3n EvKey macro",
 			MB_ICONEXCLAMATION | MB_YESNO
 		);
 		wstring path = ofn.lpstrFile;
-		if (readFromFileCount(wideStringToUtf8(path), msgboxID == IDYES) > 0) {
+		if (readEvKeyFromFileCount(wideStringToUtf8(path), msgboxID == IDYES) > 0) {
 			saveAndReload();
 		} else {
-			MessageBox(hDlg, _T("Khong tim thay macro EvKey hop le trong file."), _T("OpenKey"), MB_OK | MB_ICONWARNING);
+			MessageBox(hDlg, L"Kh\u00F4ng t\u00ECm th\u1EA5y macro EvKey h\u1EE3p l\u1EC7 trong file.", L"OpenKey", MB_OK | MB_ICONWARNING);
 		}
 	}
 }
-
 void MacroDialog::onExportMacrobutton() {
 	OPENFILENAME ofn;
 	TCHAR szFile[MAX_PATH] = { 'o', 'p', 'e', 'n', 'k', 'e', 'y', 'm', 'a', 'c', 'r', 'o', '.', 't', 'x', 't' };
