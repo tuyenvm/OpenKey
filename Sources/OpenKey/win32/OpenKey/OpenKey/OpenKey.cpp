@@ -554,7 +554,7 @@ static void handleMacro() {
 	SendCombineKey(KEY_LEFT_SHIFT, VK_INSERT, 0, KEYEVENTF_EXTENDEDKEY);
 
 	// Wait for target application to process the paste message before restoring clipboard
-	Sleep(60);
+	Sleep(360);
 
 	// Restore clipboard with dynamic retry to handle clipboard locks
 	if (!backupText.empty()) {
@@ -574,14 +574,6 @@ static void handleMacro() {
 			}
 			Sleep(10);
 		}
-	} else {
-		// If clipboard was empty, clear it
-		int retry = 5;
-		while (retry-- > 0 && !OpenClipboard(NULL)) {
-			Sleep(10);
-		}
-		EmptyClipboard();
-		CloseClipboard();
 	}
 
 	if (pData->extCode != 5) {

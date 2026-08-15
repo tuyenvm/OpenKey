@@ -184,6 +184,16 @@ bool isMacroBreakCode(const int& data) {
     return false;
 }
 
+static bool isMacroTriggerKey(const Uint16& data) {
+    if (data == KEY_SPACE && (vMacroTriggerMask & 0x01)) return true;
+    if ((data == KEY_RETURN || data == KEY_ENTER) && (vMacroTriggerMask & 0x02)) return true;
+    if (data == VK_LSHIFT && (vMacroTriggerMask & 0x04)) return true;
+    if (data == VK_RSHIFT && (vMacroTriggerMask & 0x08)) return true;
+    if (data == VK_LCONTROL && (vMacroTriggerMask & 0x10)) return true;
+    if (data == VK_RCONTROL && (vMacroTriggerMask & 0x20)) return true;
+    return false;
+}
+
 static bool canAppendCurrentKeyToMacro(const Uint16& data, const bool& isCaps) {
     return data != KEY_SPACE && keyCodeToCharacter(data | (isCaps ? CAPS_MASK : 0)) != 0;
 }
@@ -1714,36 +1724,18 @@ void vEnglishMode(const vKeyEventState& state, const Uint16& data, const bool& i
     if (state == vKeyEventState::MouseDown || (otherControlKey && !isCaps)) {
         hMacroKey.clear();
         _willTempOffEngine = false;
-    } else if (isMacroBreakCode(data)) {
-        vector<Uint32> macroKey = hMacroKey;
-        if (canAppendCurrentKeyToMacro(data, isCaps)) {
-            macroKey.push_back(data | (isCaps ? CAPS_MASK : 0));
-        }
-        Byte macroBackspace = 0;
-        if (!_hasHandledMacro && findMacroMatch(macroKey, hMacroData, macroBackspace)) {
-            hCode = vReplaceMaro;
-            hBPC = macroBackspace > 0 ? macroBackspace - 1 : 0;
-            hExt = 5;
-            _hasHandledMacro = true;
-        } else {
-            hMacroKey = macroKey;
-        }
     } else if (data == KEY_SPACE || data == KEY_RETURN || data == KEY_ENTER || data == VK_LSHIFT || data == VK_RSHIFT || data == VK_LCONTROL || data == VK_RCONTROL) {
-        bool isTrigger = false;
-        if (data == KEY_SPACE && (vMacroTriggerMask & 0x01)) isTrigger = true;
-        else if ((data == KEY_RETURN || data == KEY_ENTER) && (vMacroTriggerMask & 0x02)) isTrigger = true;
-        else if (data == VK_LSHIFT && (vMacroTriggerMask & 0x04)) isTrigger = true;
-        else if (data == VK_RSHIFT && (vMacroTriggerMask & 0x08)) isTrigger = true;
-        else if (data == VK_LCONTROL && (vMacroTriggerMask & 0x10)) isTrigger = true;
-        else if (data == VK_RCONTROL && (vMacroTriggerMask & 0x20)) isTrigger = true;
-        
         Byte macroBackspace = 0;
-        if (isTrigger && !_hasHandledMacro && findMacroMatch(hMacroKey, hMacroData, macroBackspace)) {
+        if (isMacroTriggerKey(data) && !_hasHandledMacro && findMacroMatch(hMacroKey, hMacroData, macroBackspace)) {
             hCode = vReplaceMaro;
             hBPC = macroBackspace;
         }
         hMacroKey.clear();
         _willTempOffEngine = false;
+    } else if (isMacroBreakCode(data)) {
+        if (canAppendCurrentKeyToMacro(data, isCaps)) {
+            hMacroKey.push_back(data | (isCaps ? CAPS_MASK : 0));
+        }
     } else if (data == KEY_DELETE) {
         if (hMacroKey.size() > 0) {
             hMacroKey.pop_back();
@@ -1788,25 +1780,11 @@ void vKeyHandleEvent(const vKeyEvent& event,
         hExt = 1; //word break
         
         //check macro feature
-        bool canTriggerMacro = false;
-        if (data == KEY_SPACE && (vMacroTriggerMask & 0x01)) canTriggerMacro = true;
-        else if ((data == KEY_RETURN || data == KEY_ENTER) && (vMacroTriggerMask & 0x02)) canTriggerMacro = true;
-        else if (data == VK_LSHIFT && (vMacroTriggerMask & 0x04)) canTriggerMacro = true;
-        else if (data == VK_RSHIFT && (vMacroTriggerMask & 0x08)) canTriggerMacro = true;
-        else if (data == VK_LCONTROL && (vMacroTriggerMask & 0x10)) canTriggerMacro = true;
-        else if (data == VK_RCONTROL && (vMacroTriggerMask & 0x20)) canTriggerMacro = true;
-        else if (isMacroBreakCode(data)) canTriggerMacro = true;
-
-        if (vUseMacro && canTriggerMacro && !_hasHandledMacro) {
-            vector<Uint32> macroKey = hMacroKey;
-            if (isMacroBreakCode(data) && canAppendCurrentKeyToMacro(data, _isCaps)) {
-                macroKey.push_back(data | (_isCaps ? CAPS_MASK : 0));
-            }
+        if (vUseMacro && isMacroTriggerKey(data) && !_hasHandledMacro) {
             Byte macroBackspace = 0;
-            if (findMacroMatch(macroKey, hMacroData, macroBackspace)) {
+            if (findMacroMatch(hMacroKey, hMacroData, macroBackspace)) {
                 hCode = vReplaceMaro;
-                hBPC = macroKey.size() == hMacroKey.size() ? macroBackspace : (macroBackspace > 0 ? macroBackspace - 1 : 0);
-                hExt = macroKey.size() == hMacroKey.size() ? hExt : 5;
+                hBPC = macroBackspace;
                 _hasHandledMacro = true;
             }
         } else if ((vQuickStartConsonant || vQuickEndConsonant) && !tempDisableKey && isMacroBreakCode(data)) {
