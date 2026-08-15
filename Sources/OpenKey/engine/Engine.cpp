@@ -140,6 +140,7 @@ void findAndCalculateVowel(const bool& forGrammar=false);
 void insertMark(const Uint32& markMask, const bool& canModifyFlag=true);
 void insertKey(const Uint16& keyCode, const bool& isCaps, const bool& isCheckSpelling=true);
 void saveWord();
+bool canApplyTBTStandaloneInVowel(const Uint16& data);
 
 static std::wstring_convert<std::codecvt_utf8_utf16<wchar_t>> converter;
 wstring utf8ToWideString(const string& str) {
@@ -199,7 +200,7 @@ bool shouldKeepTBTStandaloneKeyRaw(const Uint16& data) {
         return false;
     if (_specialChar.size() > 0)
         return true;
-    return _index > 0 && !IS_TBT_CONSONANT_CONTEXT(CHR(_index - 1));
+    return _index > 0 && !IS_TBT_CONSONANT_CONTEXT(CHR(_index - 1)) && !canApplyTBTStandaloneInVowel(data);
 }
 
 bool isSpellingConsonant(const Uint16& data) {
@@ -237,6 +238,64 @@ bool getTBTStandaloneRawKey(const Uint32& value, Uint16& rawKey) {
     if (key == KEY_O && mark == TONEW_MASK) {
         rawKey = KEY_RIGHT_BRACKET;
         return true;
+    }
+    return false;
+}
+
+bool getTBTStandaloneValue(const Uint16& data, Uint32& value) {
+    switch (data) {
+        case KEY_6:
+            value = KEY_A | TONE_MASK;
+            return true;
+        case KEY_7:
+            value = KEY_E | TONE_MASK;
+            return true;
+        case KEY_8:
+            value = KEY_O | TONE_MASK;
+            return true;
+        case KEY_9:
+            value = KEY_A | TONEW_MASK;
+            return true;
+        case KEY_LEFT_BRACKET:
+            value = KEY_U | TONEW_MASK;
+            return true;
+        case KEY_RIGHT_BRACKET:
+            value = KEY_O | TONEW_MASK;
+            return true;
+        default:
+            return false;
+    }
+}
+
+bool canApplyTBTStandaloneInVowel(const Uint16& data) {
+    Uint32 target;
+    if (!getTBTStandaloneValue(data, target) || _index == 0)
+        return false;
+
+    vector<Uint32> seq;
+    for (int pos = _index - 1; pos >= 0; pos--) {
+        Uint16 key = CHR(pos);
+        if (!isLetterKey(key) || isSpellingConsonant(key))
+            break;
+        seq.insert(seq.begin(), key | (TypingWord[pos] & (TONE_MASK | TONEW_MASK)));
+    }
+    seq.push_back(target);
+    if (seq.size() < 2)
+        return false;
+
+    vector<vector<Uint32>>& vowelSet = _vowelCombine[(Uint16)(seq[0] & CHAR_MASK)];
+    for (const auto& vowel : vowelSet) {
+        if (seq.size() > vowel.size() - 1)
+            continue;
+        bool matches = true;
+        for (size_t pos = 0; pos < seq.size(); pos++) {
+            if (vowel[pos + 1] != seq[pos]) {
+                matches = false;
+                break;
+            }
+        }
+        if (matches)
+            return true;
     }
     return false;
 }
