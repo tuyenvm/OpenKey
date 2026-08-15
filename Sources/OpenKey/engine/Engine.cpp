@@ -1067,10 +1067,25 @@ void checkForStandaloneCharTBT(const Uint16& data, const bool& isCaps, const Uin
         hBPC = 1;
         hNCC = 1;
         hExt = 4;
-        TypingWord[_index - 1] = data | (isCaps ? CAPS_MASK : 0);
+        TypingWord[_index - 1] = data | (isCaps ? CAPS_MASK : 0); // No STANDALONE_MASK
         hData[0] = GET(TypingWord[_index - 1]);
         saveWord();
         return;
+    }
+    // If the previous key was a numeric key (6, 7, 8, 9), then do not trigger accent transformation, insert it directly
+    if (_index > 0) {
+        Uint16 prevChar = CHR(_index - 1);
+        if (prevChar == KEY_6 || prevChar == KEY_7 || prevChar == KEY_8 || prevChar == KEY_9) {
+            hCode = vWillProcess;
+            hBPC = 0;
+            hNCC = 1;
+            hExt = 3;
+            TypingWord[_index] = data | (isCaps ? CAPS_MASK : 0);
+            hData[0] = GET(TypingWord[_index]);
+            _index++;
+            saveWord();
+            return;
+        }
     }
     hCode = vWillProcess;
     hBPC = 0;
