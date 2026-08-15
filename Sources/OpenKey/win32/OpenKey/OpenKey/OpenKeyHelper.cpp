@@ -252,8 +252,17 @@ wstring OpenKeyHelper::getClipboardText(const int& type) {
 	if (!IsClipboardFormatAvailable(type)) {
 		return _T("");
 	}
-	// Try opening the clipboard
-	if (!OpenClipboard(nullptr)) {
+	// Try opening the clipboard with retry
+	int retry = 5;
+	bool opened = false;
+	while (retry-- > 0) {
+		if (OpenClipboard(nullptr)) {
+			opened = true;
+			break;
+		}
+		Sleep(10);
+	}
+	if (!opened) {
 		return _T("");
 	}
 
@@ -267,6 +276,7 @@ wstring OpenKeyHelper::getClipboardText(const int& type) {
 	// Lock the handle to get the actual text pointer
 	wchar_t * pszText = static_cast<wchar_t*>(GlobalLock(hData));
 	if (pszText == nullptr) {
+		CloseClipboard();
 		return _T("");
 	}
 
@@ -284,12 +294,20 @@ wstring OpenKeyHelper::getClipboardText(const int& type) {
 
 void OpenKeyHelper::setClipboardText(LPCTSTR data, const int & len, const int& type) {
 	HGLOBAL hMem = GlobalAlloc(GMEM_MOVEABLE, len * sizeof(WCHAR));
+	if (!hMem) return;
 	memcpy(GlobalLock(hMem), data, len * sizeof(WCHAR));
 	GlobalUnlock(hMem);
-	OpenClipboard(0);
-	EmptyClipboard();
-	SetClipboardData(type, hMem);
-	CloseClipboard();
+	int retry = 5;
+	while (retry-- > 0) {
+		if (OpenClipboard(0)) {
+			EmptyClipboard();
+			SetClipboardData(type, hMem);
+			CloseClipboard();
+			return;
+		}
+		Sleep(10);
+	}
+	GlobalFree(hMem);
 }
 
 bool OpenKeyHelper::quickConvert() {
