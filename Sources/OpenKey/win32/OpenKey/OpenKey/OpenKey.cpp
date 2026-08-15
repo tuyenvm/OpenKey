@@ -447,9 +447,8 @@ static void SendNewCharString(const bool& dataFromMacro = false) {
 	}
 	_newCharString[_j] = 0;
 
-	OpenKeyHelper::setClipboardText((LPCTSTR)_newCharString.data(), _j + 1, CF_UNICODETEXT);
-
 	if (!dataFromMacro) {
+		OpenKeyHelper::setClipboardText((LPCTSTR)_newCharString.data(), _j + 1, CF_UNICODETEXT);
 		//Send shift + insert
 		SendCombineKey(KEY_LEFT_SHIFT, VK_INSERT, 0, KEYEVENTF_EXTENDEDKEY);
 	}
