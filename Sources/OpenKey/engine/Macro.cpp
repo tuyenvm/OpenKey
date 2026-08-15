@@ -13,6 +13,7 @@
 #include <iostream>
 #include <memory.h>
 #include <fstream>
+#include <iterator>
 
 using namespace std;
 
@@ -313,28 +314,85 @@ static bool readBlockMacroLine(const string& line, string& name) {
     return !name.empty();
 }
 
+static bool looksLikeUtf16LE(const string& data) {
+    if (data.size() >= 2 && (unsigned char)data[0] == 0xFF && (unsigned char)data[1] == 0xFE) {
+        return true;
+    }
+    size_t nulCount = 0;
+    size_t checkCount = data.size() < 200 ? data.size() : 200;
+    for (size_t i = 1; i < checkCount; i += 2) {
+        if (data[i] == 0) {
+            nulCount++;
+        }
+    }
+    return checkCount > 20 && nulCount > checkCount / 4;
+}
+
+static bool looksLikeUtf16BE(const string& data) {
+    if (data.size() >= 2 && (unsigned char)data[0] == 0xFE && (unsigned char)data[1] == 0xFF) {
+        return true;
+    }
+    size_t nulCount = 0;
+    size_t checkCount = data.size() < 200 ? data.size() : 200;
+    for (size_t i = 0; i < checkCount; i += 2) {
+        if (data[i] == 0) {
+            nulCount++;
+        }
+    }
+    return checkCount > 20 && nulCount > checkCount / 4;
+}
+
+static string utf16BytesToUtf8(const string& data, const bool& bigEndian) {
+    wstring text;
+    size_t start = data.size() >= 2 &&
+        ((unsigned char)data[0] == 0xFF && (unsigned char)data[1] == 0xFE ||
+         (unsigned char)data[0] == 0xFE && (unsigned char)data[1] == 0xFF) ? 2 : 0;
+    for (size_t i = start; i + 1 < data.size(); i += 2) {
+        unsigned char a = (unsigned char)data[i];
+        unsigned char b = (unsigned char)data[i + 1];
+        wchar_t ch = (wchar_t)(bigEndian ? (a << 8 | b) : (b << 8 | a));
+        text += ch;
+    }
+    return wideStringToUtf8(text);
+}
+
+static bool isEvKeyMarkerLine(const string& line) {
+    return line.find("<<") != string::npos && line.find("Unicode") != string::npos;
+}
+
 void readFromFile(const string& path, const bool& append) {
     ifstream myfile(path.c_str(), ios::in | ios::binary);
     if (myfile.is_open()) {
         if (!append) {
             macroMap.clear();
         }
-        
-        // Skip UTF-8 BOM if present
-        unsigned char bom[3] = {0};
-        myfile.read((char*)bom, 3);
-        if (!(bom[0] == 0xEF && bom[1] == 0xBB && bom[2] == 0xBF)) {
-            // No BOM, seek back to beginning
-            myfile.seekg(0);
+
+        string fileData((istreambuf_iterator<char>(myfile)), istreambuf_iterator<char>());
+        if (looksLikeUtf16LE(fileData)) {
+            fileData = utf16BytesToUtf8(fileData, false);
+        } else if (looksLikeUtf16BE(fileData)) {
+            fileData = utf16BytesToUtf8(fileData, true);
+        } else if (fileData.size() >= 3 &&
+                   (unsigned char)fileData[0] == 0xEF &&
+                   (unsigned char)fileData[1] == 0xBB &&
+                   (unsigned char)fileData[2] == 0xBF) {
+            fileData.erase(0, 3);
         }
-        
+
         vector<string> lines;
         string line;
-        while (getline(myfile, line)) {
+        for (size_t i = 0; i <= fileData.size(); i++) {
+            if (i < fileData.size() && fileData[i] != '\n') {
+                line += fileData[i];
+                continue;
+            }
             while (!line.empty() && line.back() == '\r') {
                 line.pop_back();
             }
-            lines.push_back(line);
+            if (!isEvKeyMarkerLine(line)) {
+                lines.push_back(line);
+            }
+            line.clear();
         }
 
         bool hasBlockMacro = false;
