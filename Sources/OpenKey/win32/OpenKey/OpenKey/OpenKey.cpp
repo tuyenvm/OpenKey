@@ -516,18 +516,22 @@ static void handleMacro() {
 			SendBackspace();
 		}
 	}
+
 	// Backup clipboard
 	wstring backupText = OpenKeyHelper::getClipboardText(CF_UNICODETEXT);
 
 	//send real data
 	SendNewCharString(true);
 
+	// Wait briefly or yield to allow paste event to be processed by target app
+	Sleep(50);
+
 	// Restore clipboard
 	if (!backupText.empty()) {
-		OpenKeyHelper::setClipboardText(backupText.c_str(), (int)backupText.size() + 1, CF_UNICODETEXT);
+		OpenKeyHelper::setClipboardText(backupText.c_str(), (int)backupText.length() + 1, CF_UNICODETEXT);
 	} else {
 		// If clipboard was empty, clear it
-		if (OpenClipboard(nullptr)) {
+		if (OpenClipboard(0)) {
 			EmptyClipboard();
 			CloseClipboard();
 		}
