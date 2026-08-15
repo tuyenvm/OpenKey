@@ -538,16 +538,22 @@ static void handleMacro() {
 	wstring backupText = OpenKeyHelper::getClipboardText(CF_UNICODETEXT);
 
 	// Send real data to clipboard
-	SendNewCharString(true);
-
-	// Dynamic wait: Ensure the clipboard content has updated to the macro text before pasting
-	wstring macroString = (wchar_t*)_newCharString.data();
-	for (int retry = 0; retry < 10; ++retry) {
-		wstring currentClip = OpenKeyHelper::getClipboardText(CF_UNICODETEXT);
-		if (currentClip == macroString) {
-			break;
+	int setRetry = 5;
+	while (setRetry-- > 0) {
+		SendNewCharString(true);
+		// Dynamic wait: Ensure the clipboard content has updated to the macro text before pasting
+		wstring macroString = (wchar_t*)_newCharString.data();
+		bool match = false;
+		for (int retry = 0; retry < 15; ++retry) {
+			wstring currentClip = OpenKeyHelper::getClipboardText(CF_UNICODETEXT);
+			if (currentClip == macroString) {
+				match = true;
+				break;
+			}
+			Sleep(10);
 		}
-		Sleep(5);
+		if (match) break;
+		Sleep(15);
 	}
 
 	// Send shift + insert to paste
