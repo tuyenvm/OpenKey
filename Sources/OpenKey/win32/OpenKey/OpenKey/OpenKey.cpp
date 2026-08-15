@@ -434,8 +434,10 @@ static void SendNewCharString(const bool& dataFromMacro = false) {
 
 	OpenKeyHelper::setClipboardText((LPCTSTR)_newCharString.data(), _j + 1, CF_UNICODETEXT);
 
-	//Send shift + insert
-	SendCombineKey(KEY_LEFT_SHIFT, VK_INSERT, 0, KEYEVENTF_EXTENDEDKEY);
+	if (!dataFromMacro) {
+		//Send shift + insert
+		SendCombineKey(KEY_LEFT_SHIFT, VK_INSERT, 0, KEYEVENTF_EXTENDEDKEY);
+	}
 	
 	//the case when hCode is vRestore or vRestoreAndStartNewSession,
 	//the word is invalid and last key is control key such as TAB, LEFT ARROW, RIGHT ARROW,...
@@ -520,15 +522,43 @@ static void handleMacro() {
 	// Backup clipboard
 	wstring backupText = OpenKeyHelper::getClipboardText(CF_UNICODETEXT);
 
-	//send real data
+	// Send real data to clipboard
 	SendNewCharString(true);
 
-	// Wait briefly or yield to allow paste event to be processed by target app
-	Sleep(50);
+	// Dynamic wait: Ensure the clipboard content has updated to the macro text before pasting
+	wstring macroString = (wchar_t*)_newCharString.data();
+	for (int retry = 0; retry < 10; ++retry) {
+		wstring currentClip = OpenKeyHelper::getClipboardText(CF_UNICODETEXT);
+		if (currentClip == macroString) {
+			break;
+		}
+		Sleep(5);
+	}
 
-	// Restore clipboard
+	// Send shift + insert to paste
+	SendCombineKey(KEY_LEFT_SHIFT, VK_INSERT, 0, KEYEVENTF_EXTENDEDKEY);
+
+	// Wait for target application to process the paste message before restoring clipboard
+	Sleep(60);
+
+	// Restore clipboard with dynamic retry to handle clipboard locks
 	if (!backupText.empty()) {
-		OpenKeyHelper::setClipboardText(backupText.c_str(), (int)backupText.length() + 1, CF_UNICODETEXT);
+		int retry = 5;
+		while (retry-- > 0) {
+			HGLOBAL hMem = GlobalAlloc(GMEM_MOVEABLE, (backupText.length() + 1) * sizeof(WCHAR));
+			if (hMem) {
+				memcpy(GlobalLock(hMem), backupText.c_str(), (backupText.length() + 1) * sizeof(WCHAR));
+				GlobalUnlock(hMem);
+				if (OpenClipboard(0)) {
+					EmptyClipboard();
+					SetClipboardData(CF_UNICODETEXT, hMem);
+					CloseClipboard();
+					break;
+				}
+				GlobalFree(hMem);
+			}
+			Sleep(10);
+		}
 	} else {
 		// If clipboard was empty, clear it
 		int retry = 5;
