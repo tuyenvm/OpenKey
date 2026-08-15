@@ -141,6 +141,9 @@ void insertMark(const Uint32& markMask, const bool& canModifyFlag=true);
 void insertKey(const Uint16& keyCode, const bool& isCaps, const bool& isCheckSpelling=true);
 void saveWord();
 bool canApplyTBTStandaloneInVowel(const Uint16& data);
+void reverseLastStandaloneChar(const Uint32& keyCode, const bool& isCaps);
+void insertW(const Uint16& data, const bool& isCaps);
+void checkForStandaloneChar(const Uint16& data, const bool& isCaps, const Uint32& keyWillReverse);
 
 static std::wstring_convert<std::codecvt_utf8_utf16<wchar_t>> converter;
 wstring utf8ToWideString(const string& str) {
@@ -298,6 +301,33 @@ bool canApplyTBTStandaloneInVowel(const Uint16& data) {
             return true;
     }
     return false;
+}
+
+bool canTBTStandaloneStartVowel(const Uint32& value) {
+    if (!(value & STANDALONE_MASK))
+        return false;
+    Uint32 key = (value & CHAR_MASK) | (value & (TONE_MASK | TONEW_MASK));
+    for (const auto& vowelEntry : _vowelCombine) {
+        for (const auto& vowel : vowelEntry.second) {
+            if (vowel.size() > 2 && vowel[1] == key)
+                return true;
+        }
+    }
+    return false;
+}
+
+void insertCustomW(const Uint16& data, const bool& isCaps, const bool& allowStandaloneAtStart) {
+    findAndCalculateVowel();
+    if (vowelCount > 0) {
+        insertW(KEY_W, isCaps);
+    } else if (_index == 0 && allowStandaloneAtStart) {
+        insertKey(data, isCaps, false);
+        reverseLastStandaloneChar(KEY_U, isCaps);
+    } else if (_index > 0) {
+        checkForStandaloneChar(data, isCaps, KEY_U);
+    } else {
+        insertKey(data, isCaps);
+    }
 }
 
 bool restoreTBTStandaloneThenInsertRaw(const Uint16& data, const bool& isCaps) {
@@ -1362,8 +1392,8 @@ void handleMainKey(const Uint16& data, const bool& isCaps) {
                     if (action == 7) { insertAOE(KEY_A, isCaps); return; }
                     if (action == 8) { insertAOE(KEY_E, isCaps); return; }
                     if (action == 9) { insertAOE(KEY_O, isCaps); return; }
-                    if (action == 10) { insertW(KEY_W, isCaps); return; }
-                    if (action == 11) { insertW(KEY_W, isCaps); return; }
+                    if (action == 10) { insertCustomW(data, isCaps, false); return; }
+                    if (action == 11) { insertCustomW(data, isCaps, false); return; }
                     if (action == 12) {
                         findAndCalculateVowel();
                         if (vowelCount > 0 && CHR(VEI) == KEY_U) {
@@ -1390,7 +1420,7 @@ void handleMainKey(const Uint16& data, const bool& isCaps) {
                         return;
                     }
                     if (action == 16 || action == 17) {
-                        insertW(KEY_W, isCaps);
+                        insertCustomW(data, isCaps, action == 16);
                         return;
                     }
                     if (action == 18) {
@@ -1941,7 +1971,7 @@ void vKeyHandleEvent(const vKeyEvent& event,
                 }
             }
         }
-        bool isTBTStandalone = (vInputType == vTuBinhTranDonGian) && IS_TBT_STANDALONE_KEY(data) && !shouldKeepTBTStandaloneKeyRaw(data);
+        bool isTBTStandalone = (vInputType == vTuBinhTranDonGian) && IS_TBT_STANDALONE_KEY(data) && !shouldKeepTBTStandaloneKeyRaw(data) && !canTBTStandaloneStartVowel(TypingWord[_index - 1]);
         if ((IS_BRACKET_KEY(data) && (( IS_BRACKET_KEY( (((Uint16)hData[0] & ~CAPS_MASK)) )) || vInputType == vSimpleTelex1 || vInputType == vSimpleTelex2)) ||
             ((isTBTStandalone || isCustomStandalone) && ((((Uint16)hData[0] & ~CAPS_MASK)) == data))) {
             if (_index - (hCode == vWillProcess ? hBPC : 0) > 0) {
