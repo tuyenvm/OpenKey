@@ -279,7 +279,7 @@ void saveToFile(const string& path) {
         unsigned char bom[] = {0xEF, 0xBB, 0xBF};
         myfile.write((char*)bom, 3);
         
-        string header = ";Compatible OpenKey Macro Data file for UniKey*** version=1 ***\n";
+        string header = ";OpenKey Macro Text Data version=2\n";
         myfile.write(header.c_str(), header.length());
         
         for (std::map<vector<Uint32>, MacroData>::iterator it = macroMap.begin(); it != macroMap.end(); ++it) {
@@ -297,18 +297,20 @@ void saveToFile(const string& path) {
                 content.replace(start_pos, 1, "\n");
                 start_pos += 1;
             }
-            // Escape newlines as \n
-            start_pos = 0;
-            while ((start_pos = content.find("\n", start_pos)) != string::npos) {
-                content.replace(start_pos, 1, "\\n");
-                start_pos += 2;
-            }
             
-            string line = name + "||" + content + "\n";
+            string line = "::" + name + "\n" + content + "\n::end\n\n";
             myfile.write(line.c_str(), line.length());
         }
         myfile.close();
     }
+}
+
+static bool readBlockMacroLine(const string& line, string& name) {
+    if (line.size() <= 2 || line[0] != ':' || line[1] != ':' || line == "::end") {
+        return false;
+    }
+    name = line.substr(2);
+    return !name.empty();
 }
 
 void readFromFile(const string& path, const bool& append) {
@@ -326,30 +328,68 @@ void readFromFile(const string& path, const bool& append) {
             myfile.seekg(0);
         }
         
+        vector<string> lines;
         string line;
-        int k = 0;
         while (getline(myfile, line)) {
-            // Remove trailing \r or \n
-            while (!line.empty() && (line.back() == '\r' || line.back() == '\n')) {
+            while (!line.empty() && line.back() == '\r') {
                 line.pop_back();
             }
-            k++;
-            if (k == 1) continue;
-            
-            size_t pos = line.find("||");
-            if (pos != string::npos) {
-                string name = line.substr(0, pos);
-                string content = line.substr(pos + 2);
-                
-                // Replace escaped \n with real CRLF
-                size_t start_pos = 0;
-                while ((start_pos = content.find("\\n", start_pos)) != string::npos) {
-                    content.replace(start_pos, 2, "\r\n");
-                    start_pos += 2;
+            lines.push_back(line);
+        }
+
+        bool hasBlockMacro = false;
+        for (size_t i = 0; i < lines.size(); i++) {
+            string blockName;
+            if (readBlockMacroLine(lines[i], blockName)) {
+                hasBlockMacro = true;
+                break;
+            }
+        }
+
+        if (hasBlockMacro) {
+            string name;
+            string content;
+            bool inBlock = false;
+            for (size_t i = 0; i < lines.size(); i++) {
+                string blockName;
+                if (!inBlock && readBlockMacroLine(lines[i], blockName)) {
+                    name = blockName;
+                    content.clear();
+                    inBlock = true;
+                    continue;
                 }
-                
-                if (!name.empty()) {
+                if (inBlock && lines[i] == "::end") {
                     addMacro(name, content);
+                    inBlock = false;
+                    continue;
+                }
+                if (inBlock) {
+                    if (!content.empty()) {
+                        content += "\n";
+                    }
+                    content += lines[i];
+                }
+            }
+        } else {
+            for (size_t i = 0; i < lines.size(); i++) {
+                line = lines[i];
+                if (line.empty() || line[0] == ';') continue;
+
+                size_t pos = line.find("||");
+                if (pos != string::npos) {
+                    string name = line.substr(0, pos);
+                    string content = line.substr(pos + 2);
+
+                    // Replace escaped \n with real CRLF
+                    size_t start_pos = 0;
+                    while ((start_pos = content.find("\\n", start_pos)) != string::npos) {
+                        content.replace(start_pos, 2, "\r\n");
+                        start_pos += 2;
+                    }
+
+                    if (!name.empty()) {
+                        addMacro(name, content);
+                    }
                 }
             }
         }

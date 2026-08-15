@@ -69,6 +69,20 @@ static bool _hasJustUsedHotKey = false;
 static INPUT backspaceEvent[2];
 static INPUT keyEvent[2];
 
+static wstring getExecuteFolderPath() {
+	wstring path = OpenKeyHelper::getExecutePath();
+	size_t pos = path.find_last_of(L"\\/");
+	if (pos != wstring::npos) {
+		path = path.substr(0, pos);
+	}
+	return path;
+}
+
+static bool fileExists(const wstring& path) {
+	ifstream file(wideStringToUtf8(path).c_str(), ios::in | ios::binary);
+	return file.is_open();
+}
+
 LRESULT CALLBACK keyboardHookProcess(int nCode, WPARAM wParam, LPARAM lParam);
 LRESULT CALLBACK mouseHookProcess(int nCode, WPARAM wParam, LPARAM lParam);
 VOID CALLBACK winEventProcCallback(HWINEVENTHOOK hWinEventHook, DWORD dwEvent, HWND hwnd, LONG idObject, LONG idChild, DWORD dwEventThread, DWORD dwmsEventTime);
@@ -155,13 +169,14 @@ void OpenKeyInit() {
 	if (GetKeyState(VK_CAPITAL) == 1) _flag |= MASK_CAPITAL;
 	if (GetKeyState(VK_SCROLL) < 0) _flag |= MASK_SCROLL;
 
-	//init and load macro data from file, fallback to registry
-	wstring macroPath = OpenKeyHelper::getExecutePath();
-	macroPath += L"\\openkeymacro.md";
-	ifstream testFile(wideStringToUtf8(macroPath).c_str(), ios::in | ios::binary);
-	if (testFile.is_open()) {
-		testFile.close();
+	//init and load macro data from text file, fallback to old text/binary data
+	wstring macroPath = getExecuteFolderPath() + L"\\openkeymacro.txt";
+	wstring oldMacroPath = getExecuteFolderPath() + L"\\openkeymacro.md";
+	if (fileExists(macroPath)) {
 		readFromFile(wideStringToUtf8(macroPath), false);
+	} else if (fileExists(oldMacroPath)) {
+		readFromFile(wideStringToUtf8(oldMacroPath), false);
+		saveToFile(wideStringToUtf8(macroPath));
 	} else {
 		DWORD macroDataSize;
 		BYTE* macroData = OpenKeyHelper::getRegBinary(_T("macroData"), macroDataSize);

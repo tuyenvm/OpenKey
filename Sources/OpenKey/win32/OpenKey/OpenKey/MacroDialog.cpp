@@ -17,6 +17,16 @@ redistribute your new version, it MUST be open source.
 #include <commdlg.h>
 
 #define MAX_MACRO_BUFFER 65536
+
+static wstring getMacroTextPath() {
+	wstring macroPath = OpenKeyHelper::getExecutePath();
+	size_t pos = macroPath.find_last_of(L"\\/");
+	if (pos != wstring::npos) {
+		macroPath = macroPath.substr(0, pos);
+	}
+	macroPath += L"\\openkeymacro.txt";
+	return macroPath;
+}
 #define BTN_ADD_TEXT _T("+ Thêm")
 #define BTN_UPDATE_TEXT _T("+ Sửa")
 
@@ -274,10 +284,7 @@ void MacroDialog::saveAndReload() {
 	getMacroSaveData(macroData);
 	OpenKeyHelper::setRegBinary(_T("macroData"), macroData.data(), (int)macroData.size());
 
-	// Save to openkeymacro.md in executable folder
-	wstring macroPath = OpenKeyHelper::getExecutePath();
-	macroPath += L"\\openkeymacro.md";
-	saveToFile(wideStringToUtf8(macroPath));
+	saveToFile(wideStringToUtf8(getMacroTextPath()));
 
 	//reload data
 	fillData();
@@ -360,7 +367,7 @@ void MacroDialog::onImportMacroButton() {
 	ofn.hwndOwner = hDlg;
 	ofn.lpstrFile = szFile;
 	ofn.nMaxFile = sizeof(szFile);
-	ofn.lpstrFilter = _T("Markdown file (*.md)\0*.md\0All (*.*)\0*.*\0");
+	ofn.lpstrFilter = _T("Text file (*.txt)\0*.txt\0Markdown file (*.md)\0*.md\0All (*.*)\0*.*\0");
 	ofn.nFilterIndex = 1;
 	ofn.lpstrFileTitle = NULL;
 	ofn.nMaxFileTitle = 0;
@@ -382,19 +389,19 @@ void MacroDialog::onImportMacroButton() {
 
 void MacroDialog::onExportMacrobutton() {
 	OPENFILENAME ofn;
-	TCHAR szFile[MAX_PATH] = { 'O', 'p', 'e', 'n', 'K', 'e', 'y', 'M', 'a', 'c', 'r', 'o' };
+	TCHAR szFile[MAX_PATH] = { 'o', 'p', 'e', 'n', 'k', 'e', 'y', 'm', 'a', 'c', 'r', 'o', '.', 't', 'x', 't' };
 	ZeroMemory(&ofn, sizeof(ofn));
 	ofn.lStructSize = sizeof(ofn);
 	ofn.hwndOwner = hDlg;
 	ofn.lpstrFile = szFile;
 	ofn.nMaxFile = sizeof(szFile);
-	ofn.lpstrFilter = _T("Markdown file (*.md)\0*.md\0");
+	ofn.lpstrFilter = _T("Text file (*.txt)\0*.txt\0");
 	ofn.lpstrFileTitle = (LPTSTR)_T("lpstrFile");
 	ofn.nFilterIndex = 1;
 	ofn.lpstrFileTitle = NULL;
 	ofn.nMaxFileTitle = 0;
 	ofn.lpstrInitialDir = NULL;
-	ofn.lpstrDefExt = (LPCWSTR)L"md";
+	ofn.lpstrDefExt = (LPCWSTR)L"txt";
 	ofn.Flags = OFN_PATHMUSTEXIST | OFN_FILEMUSTEXIST;
 	if (GetSaveFileName(&ofn) == TRUE) {
 		wstring path = ofn.lpstrFile;
