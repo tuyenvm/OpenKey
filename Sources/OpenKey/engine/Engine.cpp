@@ -65,6 +65,8 @@ static Uint16 ProcessingChar[][11] = {
                                 (keyCode == KEY_1 || keyCode == KEY_2 || keyCode == KEY_3 || keyCode == KEY_4 || keyCode == KEY_5) : \
                                 (keyCode == KEY_S || keyCode == KEY_F || keyCode == KEY_R || keyCode == KEY_J || keyCode == KEY_X))
 #define IS_BRACKET_KEY(key) (key == KEY_LEFT_BRACKET || key == KEY_RIGHT_BRACKET)
+#define IS_TBT_STANDALONE_KEY(key) (key == KEY_6 || key == KEY_7 || key == KEY_8 || key == KEY_9)
+#define IS_TBT_CONSONANT_CONTEXT(key) (isLetterKey(key) && IS_CONSONANT(key))
 
 #define VSI vowelStartIndex
 #define VEI vowelEndIndex
@@ -173,6 +175,28 @@ bool isMacroBreakCode(const int& data) {
         }
     }
     return false;
+}
+
+bool isLetterKey(const Uint16& data) {
+    switch (data) {
+        case KEY_A: case KEY_B: case KEY_C: case KEY_D: case KEY_E:
+        case KEY_F: case KEY_G: case KEY_H: case KEY_I: case KEY_J:
+        case KEY_K: case KEY_L: case KEY_M: case KEY_N: case KEY_O:
+        case KEY_P: case KEY_Q: case KEY_R: case KEY_S: case KEY_T:
+        case KEY_U: case KEY_V: case KEY_W: case KEY_X: case KEY_Y:
+        case KEY_Z:
+            return true;
+        default:
+            return false;
+    }
+}
+
+bool shouldKeepTBTNumberKeyRaw(const Uint16& data) {
+    if (vInputType != vTuBinhTranDonGian || !IS_TBT_STANDALONE_KEY(data))
+        return false;
+    if (_specialChar.size() > 0)
+        return true;
+    return _index > 0 && !IS_TBT_CONSONANT_CONTEXT(CHR(_index - 1));
 }
 
 void setKeyData(const Byte& index, const Uint16& keyCode, const bool& isCaps) {
@@ -1072,20 +1096,13 @@ void checkForStandaloneCharTBT(const Uint16& data, const bool& isCaps, const Uin
         saveWord();
         return;
     }
-    // If the previous key was a numeric key (6, 7, 8, 9), then do not trigger accent transformation, insert it directly
-    if (_index > 0) {
-        Uint16 prevChar = CHR(_index - 1);
-        if (prevChar == KEY_6 || prevChar == KEY_7 || prevChar == KEY_8 || prevChar == KEY_9) {
-            hCode = vWillProcess;
-            hBPC = 0;
-            hNCC = 1;
-            hExt = 3;
-            TypingWord[_index] = data | (isCaps ? CAPS_MASK : 0);
-            hData[0] = GET(TypingWord[_index]);
-            _index++;
-            saveWord();
-            return;
-        }
+    if (shouldKeepTBTNumberKeyRaw(data)) {
+        hCode = vDoNothing;
+        hBPC = 0;
+        hNCC = 0;
+        hExt = 3;
+        insertKey(data, isCaps);
+        return;
     }
     hCode = vWillProcess;
     hBPC = 0;
@@ -1547,12 +1564,13 @@ void vKeyHandleEvent(const vKeyEvent& event,
                              (data == VK_RCONTROL && (vMacroTriggerMask & 0x20));
 
     bool isTBTOrCustomNumberAction = (vInputType == vTuBinhTranDonGian || vInputType == vTuDinhNghia) &&
-                                     (data == KEY_6 || data == KEY_7 || data == KEY_8 || data == KEY_9);
+                                     IS_TBT_STANDALONE_KEY(data);
+    bool isRawTBTNumberAction = shouldKeepTBTNumberKeyRaw(data);
     bool isNumberBreak = (IS_NUMBER_KEY(data) && capsStatus == 1) && !isTBTOrCustomNumberAction;
     bool isNumberAtStartBreak = (_index == 0 && IS_NUMBER_KEY(data)) && !isTBTOrCustomNumberAction;
 
     if (isNumberBreak
-        || otherControlKey || isWordBreak(event, state, data) || isNumberAtStartBreak || isTriggerModifier) {
+        || otherControlKey || isWordBreak(event, state, data) || isNumberAtStartBreak || isTriggerModifier || isRawTBTNumberAction) {
         hCode = vDoNothing;
         hBPC = 0;
         hNCC = 0;
