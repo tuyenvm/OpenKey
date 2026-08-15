@@ -524,17 +524,19 @@ static void handleMacro() {
 	SendNewCharString(true);
 
 	// Wait briefly or yield to allow paste event to be processed by target app
-	Sleep(50);
+	Sleep(100);
 
 	// Restore clipboard
 	if (!backupText.empty()) {
 		OpenKeyHelper::setClipboardText(backupText.c_str(), (int)backupText.length() + 1, CF_UNICODETEXT);
 	} else {
 		// If clipboard was empty, clear it
-		if (OpenClipboard(0)) {
-			EmptyClipboard();
-			CloseClipboard();
+		int retry = 5;
+		while (retry-- > 0 && !OpenClipboard(NULL)) {
+			Sleep(10);
 		}
+		EmptyClipboard();
+		CloseClipboard();
 	}
 
 	SendKeyCode(_keycode | (_flag & MASK_SHIFT ? CAPS_MASK : 0));
