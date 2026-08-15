@@ -198,6 +198,8 @@
 #define IDC_COMBO_MACRO_TRIGGERS        1085
 #define IDC_STATIC                      -1
 
+#define IDC_LABEL_MACRO_TRIGGERS        1099
+
 // Next default values for new objects
 // 
 #ifdef APSTUDIO_INVOKED
@@ -207,6 +209,5 @@
 #define _APS_NEXT_COMMAND_VALUE         32771
 #define _APS_NEXT_CONTROL_VALUE         1052
 #define _APS_NEXT_SYMED_VALUE           110
-#define IDC_LABEL_MACRO_TRIGGERS        1099
 #endif
 #endif
