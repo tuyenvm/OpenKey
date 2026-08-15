@@ -584,7 +584,9 @@ static void handleMacro() {
 		CloseClipboard();
 	}
 
-	SendKeyCode(_keycode | (_flag & MASK_SHIFT ? CAPS_MASK : 0));
+	if (pData->extCode != 5) {
+		SendKeyCode(_keycode | (_flag & MASK_SHIFT ? CAPS_MASK : 0));
+	}
 }
 
 static bool SetModifierMask(const Uint16& vkCode) {

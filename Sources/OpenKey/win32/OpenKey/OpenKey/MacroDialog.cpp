@@ -121,6 +121,9 @@ INT_PTR MacroDialog::eventProc(HWND hDlg, UINT uMsg, WPARAM wParam, LPARAM lPara
 		case IDC_BUTTON_IMPORT_MACRO:
 			onImportMacroButton();
 			break;
+		case IDC_BUTTON_CONVERT_EVKEY_MACRO:
+			onConvertEvKeyMacroButton();
+			break;
 		case IDC_BUTTON_EXPORT_MACRO:
 			onExportMacrobutton();
 			break;
@@ -166,6 +169,7 @@ INT_PTR MacroDialog::eventProc(HWND hDlg, UINT uMsg, WPARAM wParam, LPARAM lPara
 		HWND hAdd = GetDlgItem(hDlg, IDC_BUTTON_ADD);
 		HWND hDel = GetDlgItem(hDlg, IDC_BUTTON_DELETE);
 		HWND hImport = GetDlgItem(hDlg, IDC_BUTTON_IMPORT_MACRO);
+		HWND hConvertEvKey = GetDlgItem(hDlg, IDC_BUTTON_CONVERT_EVKEY_MACRO);
 		HWND hExport = GetDlgItem(hDlg, IDC_BUTTON_EXPORT_MACRO);
 		HWND hCaps = GetDlgItem(hDlg, IDC_CHECK_AUTO_CAPS);
 		HWND hTriggerLabel = GetDlgItem(hDlg, IDC_LABEL_MACRO_TRIGGERS);
@@ -173,7 +177,7 @@ INT_PTR MacroDialog::eventProc(HWND hDlg, UINT uMsg, WPARAM wParam, LPARAM lPara
 
 		// Layout constants based on original dialog (415 x 253 DLU ~ 622 x 380 pixels)
 		// We will adjust controls using SetWindowPos
-		if (hName && hContent && hAdd && hDel && hList && hImport && hExport && hCaps && hTriggerCombo) {
+		if (hName && hContent && hAdd && hDel && hList && hImport && hConvertEvKey && hExport && hCaps && hTriggerCombo) {
 			// Top controls:
 			// Name: x=10, y=28, w=110, h=22
 			SetWindowPos(hName, NULL, 10, 28, 110, 22, SWP_NOZORDER);
@@ -198,10 +202,9 @@ INT_PTR MacroDialog::eventProc(HWND hDlg, UINT uMsg, WPARAM wParam, LPARAM lPara
 			int bottomY = height - 35;
 			// Import: x=10, w=100, h=22
 			SetWindowPos(hImport, NULL, 10, bottomY, 100, 22, SWP_NOZORDER);
-			// Export: x=120, w=100, h=22
-			SetWindowPos(hExport, NULL, 120, bottomY, 100, 22, SWP_NOZORDER);
-			// Auto Caps checkbox: x=230, w=130, h=22
-			SetWindowPos(hCaps, NULL, 230, bottomY, 130, 22, SWP_NOZORDER);
+			SetWindowPos(hConvertEvKey, NULL, 120, bottomY, 115, 22, SWP_NOZORDER);
+			SetWindowPos(hExport, NULL, 245, bottomY, 100, 22, SWP_NOZORDER);
+			SetWindowPos(hCaps, NULL, 355, bottomY, 130, 22, SWP_NOZORDER);
 			// Trigger Label: x=width - 250, w=60, h=22
 			if (hTriggerLabel) {
 				SetWindowPos(hTriggerLabel, NULL, width - 260, bottomY + 3, 60, 22, SWP_NOZORDER);
@@ -379,6 +382,31 @@ void MacroDialog::onImportMacroButton() {
 			hDlg,
 			_T("Bạn có muốn giữ lại dữ liệu hiện tại không?"),
 			_T("Dữ liệu gõ tắt"),
+			MB_ICONEXCLAMATION | MB_YESNO
+		);
+		wstring path = ofn.lpstrFile;
+		readFromFile(wideStringToUtf8(path), msgboxID == IDYES);
+		saveAndReload();
+	}
+}
+
+void MacroDialog::onConvertEvKeyMacroButton() {
+	OPENFILENAME ofn;
+	TCHAR szFile[MAX_PATH] = { 0 };
+	ZeroMemory(&ofn, sizeof(ofn));
+	ofn.lStructSize = sizeof(ofn);
+	ofn.hwndOwner = hDlg;
+	ofn.lpstrFile = szFile;
+	ofn.nMaxFile = sizeof(szFile);
+	ofn.lpstrFilter = _T("EVKey macro (*.txt)\0*.txt\0All (*.*)\0*.*\0");
+	ofn.nFilterIndex = 1;
+	ofn.Flags = OFN_PATHMUSTEXIST | OFN_FILEMUSTEXIST;
+
+	if (GetOpenFileName(&ofn) == TRUE) {
+		int msgboxID = MessageBox(
+			hDlg,
+			_T("Báº¡n cÃ³ muá»‘n giá»¯ láº¡i dá»¯ liá»‡u hiá»‡n táº¡i khÃ´ng?"),
+			_T("Chuyá»ƒn EvKey macro"),
 			MB_ICONEXCLAMATION | MB_YESNO
 		);
 		wstring path = ofn.lpstrFile;

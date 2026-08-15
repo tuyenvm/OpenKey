@@ -38,6 +38,7 @@ private:
 	void onDeleteMacroButton();
 
 	void onImportMacroButton();
+	void onConvertEvKeyMacroButton();
 	void onExportMacrobutton();
 
 	void onCheckboxClicked(const HWND& hWnd);
