@@ -73,6 +73,7 @@ struct vKeyHookState {
      * 2: Delete key
      * 3: Normal key
      * 4: Should not send empty character
+     * 6: Macro triggered by Space, send one trailing space
      */
     Byte extCode;
     

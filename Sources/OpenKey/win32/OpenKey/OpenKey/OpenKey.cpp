@@ -576,7 +576,9 @@ static void handleMacro() {
 		}
 	}
 
-	if (pData->extCode != 5) {
+	if (pData->extCode == 6) {
+		SendKeyCode(KEY_SPACE);
+	} else if (pData->extCode != 5) {
 		SendKeyCode(_keycode | (_flag & MASK_SHIFT ? CAPS_MASK : 0));
 	}
 }

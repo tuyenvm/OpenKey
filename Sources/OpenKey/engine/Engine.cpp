@@ -1849,7 +1849,7 @@ void vKeyHandleEvent(const vKeyEvent& event,
         if (vUseMacro && (vMacroTriggerMask & 0x01) && !_hasHandledMacro && findMacroMatch(hMacroKey, hMacroData, macroBackspace)) { //macro
             hCode = vReplaceMaro;
             hBPC = macroBackspace;
-            hExt = 5;
+            hExt = 6;
             _spaceCount = 0;
             _hasHandledMacro = true;
         } else if ((vQuickStartConsonant || vQuickEndConsonant) && !tempDisableKey && checkQuickConsonant()) {
