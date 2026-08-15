@@ -202,6 +202,12 @@ bool shouldKeepTBTStandaloneKeyRaw(const Uint16& data) {
     return _index > 0 && !IS_TBT_CONSONANT_CONTEXT(CHR(_index - 1));
 }
 
+bool isSpellingConsonant(const Uint16& data) {
+    if (vInputType == vTuBinhTranDonGian)
+        return IS_TBT_CONSONANT_CONTEXT(data);
+    return IS_CONSONANT(data);
+}
+
 bool getTBTStandaloneRawKey(const Uint32& value, Uint16& rawKey) {
     if (!(value & STANDALONE_MASK))
         return false;
@@ -242,9 +248,16 @@ bool restoreTBTStandaloneThenInsertRaw(const Uint16& data, const bool& isCaps) {
 
     hCode = vWillProcess;
     hBPC = 1;
-    hNCC = 2;
     hExt = 3;
     TypingWord[_index - 1] = previousRawKey | (TypingWord[_index - 1] & CAPS_MASK);
+    if (previousRawKey == data) {
+        hNCC = 1;
+        hData[0] = TypingWord[_index - 1];
+        saveWord();
+        return true;
+    }
+
+    hNCC = 2;
     hData[1] = TypingWord[_index - 1];
     insertKey(data, isCaps);
     hData[0] = TypingWord[_index - 1];
@@ -274,16 +287,17 @@ void checkSpelling(const bool& forceCheckVowel=false) {
     
     if (_spellingEndIndex > 0) {
         j = 0;
+        vector<vector<Uint16>>& consonantTable = (vInputType == vTuBinhTranDonGian) ? _consonantTableTBT : _consonantTable;
         //Check first consonant
-        if (IS_CONSONANT(CHR(0))) {
-            for (i = 0; i < _consonantTable.size(); i++) {
+        if (isSpellingConsonant(CHR(0))) {
+            for (i = 0; i < consonantTable.size(); i++) {
                 _spellingFlag = false;
-                if (_spellingEndIndex < _consonantTable[i].size())
+                if (_spellingEndIndex < consonantTable[i].size())
                     _spellingFlag = true;
-                for (j = 0; j < _consonantTable[i].size(); j++) {
+                for (j = 0; j < consonantTable[i].size(); j++) {
                     if (_spellingEndIndex > j &&
-                        (_consonantTable[i][j] & ~(vQuickStartConsonant ? END_CONSONANT_MASK : 0)) != CHR(j) &&
-                        (_consonantTable[i][j] & ~(vAllowConsonantZFWJ ? CONSONANT_ALLOW_MASK : 0)) != CHR(j)) {
+                        (consonantTable[i][j] & ~(vQuickStartConsonant ? END_CONSONANT_MASK : 0)) != CHR(j) &&
+                        (consonantTable[i][j] & ~(vAllowConsonantZFWJ ? CONSONANT_ALLOW_MASK : 0)) != CHR(j)) {
                         _spellingFlag = true;
                         break;
                     }
@@ -307,11 +321,11 @@ void checkSpelling(const bool& forceCheckVowel=false) {
             k = k + 1;
             j = k;
             VSI = k;
-        } else if (_index >= 2 && CHR(0) == KEY_G && CHR(1) == KEY_I && IS_CONSONANT(CHR(2))) {
+        } else if (_index >= 2 && CHR(0) == KEY_G && CHR(1) == KEY_I && isSpellingConsonant(CHR(2))) {
             VSI = k = j = 1; //Sep 28th: fix gìn
         }
         for (l = 0; l < 3; l++) {
-            if (k < _spellingEndIndex && !IS_CONSONANT(CHR(k))) {
+            if (k < _spellingEndIndex && !isSpellingConsonant(CHR(k))) {
                 k++;
                 VEI = k;
             }
@@ -329,13 +343,13 @@ void checkSpelling(const bool& forceCheckVowel=false) {
                             break;
                         }
                     }
-                    if (_spellingFlag || (k < _spellingEndIndex && !vowelSet[l][0]) || (j + ii - 1 < _spellingEndIndex && !IS_CONSONANT(CHR(j + ii - 1))))
+                    if (_spellingFlag || (k < _spellingEndIndex && !vowelSet[l][0]) || (j + ii - 1 < _spellingEndIndex && !isSpellingConsonant(CHR(j + ii - 1))))
                         continue;
                     
                     _spellingVowelOK = true;
                     break;
                 }
-            } else if (!IS_CONSONANT(CHR(j))) {
+            } else if (!isSpellingConsonant(CHR(j))) {
                 _spellingVowelOK = true;
             }
             
