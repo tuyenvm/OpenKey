@@ -197,6 +197,7 @@
 #define IDC_GRP_PRESETS                 1081
 #define IDC_COMBO_MACRO_TRIGGERS        1085
 #define IDC_BUTTON_CONVERT_EVKEY_MACRO  1086
+#define IDC_BUTTON_DELETE_ALL_MACRO     1087
 #define IDC_STATIC                      -1
 
 #define IDC_LABEL_MACRO_TRIGGERS        1099

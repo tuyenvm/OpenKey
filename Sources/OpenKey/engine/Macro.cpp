@@ -267,6 +267,10 @@ bool deleteMacro(const string& macroText) {
     return false;
 }
 
+void clearMacro() {
+    macroMap.clear();
+}
+
 void onTableCodeChange() {
     for (std::map<vector<Uint32>, MacroData>::iterator it = macroMap.begin(); it != macroMap.end(); ++it) {
         convert(it->second.macroContent, it->second.macroContentCode);
@@ -360,11 +364,16 @@ static bool isEvKeyMarkerLine(const string& line) {
     return line.find("<<") != string::npos && line.find("Unicode") != string::npos;
 }
 
-void readFromFile(const string& path, const bool& append) {
+int readFromFileCount(const string& path, const bool& append) {
+    int importedCount = 0;
+    map<vector<Uint32>, MacroData> oldMacroMap;
+    bool clearedMacroMap = false;
     ifstream myfile(path.c_str(), ios::in | ios::binary);
     if (myfile.is_open()) {
         if (!append) {
+            oldMacroMap = macroMap;
             macroMap.clear();
+            clearedMacroMap = true;
         }
 
         string fileData((istreambuf_iterator<char>(myfile)), istreambuf_iterator<char>());
@@ -418,6 +427,7 @@ void readFromFile(const string& path, const bool& append) {
                 }
                 if (inBlock && lines[i] == "::end") {
                     addMacro(name, content);
+                    importedCount++;
                     inBlock = false;
                     continue;
                 }
@@ -452,10 +462,19 @@ void readFromFile(const string& path, const bool& append) {
 
                     if (!name.empty()) {
                         addMacro(name, content);
+                        importedCount++;
                     }
                 }
             }
         }
         myfile.close();
     }
+    if (importedCount == 0 && clearedMacroMap) {
+        macroMap = oldMacroMap;
+    }
+    return importedCount;
+}
+
+void readFromFile(const string& path, const bool& append) {
+    readFromFileCount(path, append);
 }

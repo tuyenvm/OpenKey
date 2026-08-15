@@ -36,6 +36,7 @@ private:
 	void onSelectItem(const int& index);
 	void onAddMacroButton();
 	void onDeleteMacroButton();
+	void onDeleteAllMacroButton();
 
 	void onImportMacroButton();
 	void onConvertEvKeyMacroButton();

@@ -118,6 +118,9 @@ INT_PTR MacroDialog::eventProc(HWND hDlg, UINT uMsg, WPARAM wParam, LPARAM lPara
 		case IDC_BUTTON_DELETE:
 			onDeleteMacroButton();
 			break;
+		case IDC_BUTTON_DELETE_ALL_MACRO:
+			onDeleteAllMacroButton();
+			break;
 		case IDC_BUTTON_IMPORT_MACRO:
 			onImportMacroButton();
 			break;
@@ -168,6 +171,7 @@ INT_PTR MacroDialog::eventProc(HWND hDlg, UINT uMsg, WPARAM wParam, LPARAM lPara
 		HWND hContent = GetDlgItem(hDlg, IDC_EDIT_MACRO_CONTENT);
 		HWND hAdd = GetDlgItem(hDlg, IDC_BUTTON_ADD);
 		HWND hDel = GetDlgItem(hDlg, IDC_BUTTON_DELETE);
+		HWND hDeleteAll = GetDlgItem(hDlg, IDC_BUTTON_DELETE_ALL_MACRO);
 		HWND hImport = GetDlgItem(hDlg, IDC_BUTTON_IMPORT_MACRO);
 		HWND hConvertEvKey = GetDlgItem(hDlg, IDC_BUTTON_CONVERT_EVKEY_MACRO);
 		HWND hExport = GetDlgItem(hDlg, IDC_BUTTON_EXPORT_MACRO);
@@ -177,34 +181,35 @@ INT_PTR MacroDialog::eventProc(HWND hDlg, UINT uMsg, WPARAM wParam, LPARAM lPara
 
 		// Layout constants based on original dialog (415 x 253 DLU ~ 622 x 380 pixels)
 		// We will adjust controls using SetWindowPos
-		if (hName && hContent && hAdd && hDel && hList && hImport && hConvertEvKey && hExport && hCaps && hTriggerCombo) {
+		if (hName && hContent && hAdd && hDel && hDeleteAll && hList && hImport && hConvertEvKey && hExport && hCaps && hTriggerCombo) {
 			// Top controls:
 			// Name: x=10, y=28, w=110, h=22
 			SetWindowPos(hName, NULL, 10, 28, 110, 22, SWP_NOZORDER);
 
-			// Content: x=130, y=28, w=width - 275, h=50
+			// Content: x=130, y=28, w=width - 275, h=80
 			int contentWidth = width - 275;
 			if (contentWidth < 100) contentWidth = 100;
-			SetWindowPos(hContent, NULL, 130, 28, contentWidth, 50, SWP_NOZORDER);
+			SetWindowPos(hContent, NULL, 130, 28, contentWidth, 80, SWP_NOZORDER);
 
 			// Add Button: x=width - 135, y=28, w=125, h=22
 			SetWindowPos(hAdd, NULL, width - 135, 28, 125, 22, SWP_NOZORDER);
 
 			// Delete Button: x=width - 135, y=54, w=125, h=22
 			SetWindowPos(hDel, NULL, width - 135, 54, 125, 22, SWP_NOZORDER);
+			SetWindowPos(hDeleteAll, NULL, 10, 60, 110, 22, SWP_NOZORDER);
 
-			// List Macro: x=10, y=90, w=width - 20, h=height - 135
-			int listHeight = height - 135;
+			// List Macro: x=10, y=120, w=width - 20, h=height - 165
+			int listHeight = height - 165;
 			if (listHeight < 50) listHeight = 50;
-			SetWindowPos(hList, NULL, 10, 90, width - 20, listHeight, SWP_NOZORDER);
+			SetWindowPos(hList, NULL, 10, 120, width - 20, listHeight, SWP_NOZORDER);
 
 			// Bottom controls: y = height - 35
 			int bottomY = height - 35;
 			// Import: x=10, w=100, h=22
 			SetWindowPos(hImport, NULL, 10, bottomY, 100, 22, SWP_NOZORDER);
-			SetWindowPos(hConvertEvKey, NULL, 120, bottomY, 115, 22, SWP_NOZORDER);
-			SetWindowPos(hExport, NULL, 245, bottomY, 100, 22, SWP_NOZORDER);
-			SetWindowPos(hCaps, NULL, 355, bottomY, 130, 22, SWP_NOZORDER);
+			SetWindowPos(hExport, NULL, 120, bottomY, 100, 22, SWP_NOZORDER);
+			SetWindowPos(hConvertEvKey, NULL, 230, bottomY, 125, 22, SWP_NOZORDER);
+			SetWindowPos(hCaps, NULL, 365, bottomY, 130, 22, SWP_NOZORDER);
 			// Trigger Label: x=width - 250, w=60, h=22
 			if (hTriggerLabel) {
 				SetWindowPos(hTriggerLabel, NULL, width - 260, bottomY + 3, 60, 22, SWP_NOZORDER);
@@ -362,6 +367,23 @@ void MacroDialog::onDeleteMacroButton() {
 	SetWindowText(hAddButton, BTN_ADD_TEXT);
 }
 
+void MacroDialog::onDeleteAllMacroButton() {
+	int msgboxID = MessageBox(
+		hDlg,
+		_T("Bạn có chắc muốn xóa toàn bộ gõ tắt không?"),
+		_T("Xóa toàn bộ gõ tắt"),
+		MB_ICONEXCLAMATION | MB_YESNO
+	);
+	if (msgboxID != IDYES) {
+		return;
+	}
+	clearMacro();
+	saveAndReload();
+	SetWindowText(hMacroName, _T(""));
+	SetWindowText(hMacroContent, _T(""));
+	SetWindowText(hAddButton, BTN_ADD_TEXT);
+}
+
 void MacroDialog::onImportMacroButton() {
 	OPENFILENAME ofn;
 	TCHAR szFile[MAX_PATH] = { 0 };
@@ -385,8 +407,11 @@ void MacroDialog::onImportMacroButton() {
 			MB_ICONEXCLAMATION | MB_YESNO
 		);
 		wstring path = ofn.lpstrFile;
-		readFromFile(wideStringToUtf8(path), msgboxID == IDYES);
-		saveAndReload();
+		if (readFromFileCount(wideStringToUtf8(path), msgboxID == IDYES) > 0) {
+			saveAndReload();
+		} else {
+			MessageBox(hDlg, _T("Khong tim thay macro hop le trong file."), _T("OpenKey"), MB_OK | MB_ICONWARNING);
+		}
 	}
 }
 
@@ -410,8 +435,11 @@ void MacroDialog::onConvertEvKeyMacroButton() {
 			MB_ICONEXCLAMATION | MB_YESNO
 		);
 		wstring path = ofn.lpstrFile;
-		readFromFile(wideStringToUtf8(path), msgboxID == IDYES);
-		saveAndReload();
+		if (readFromFileCount(wideStringToUtf8(path), msgboxID == IDYES) > 0) {
+			saveAndReload();
+		} else {
+			MessageBox(hDlg, _T("Khong tim thay macro EvKey hop le trong file."), _T("OpenKey"), MB_OK | MB_ICONWARNING);
+		}
 	}
 }
 
