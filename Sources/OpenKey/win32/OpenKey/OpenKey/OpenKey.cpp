@@ -517,7 +517,28 @@ static void handleMacro() {
 		}
 	}
 	//send real data
-	SendNewCharString(true);
+	for (size_t i = 0; i < pData->macroData.size(); i++) {
+		Uint32 ch = pData->macroData[i];
+		if (ch & PURE_CHARACTER_MASK) {
+			Uint32 pure = ch & ~PURE_CHARACTER_MASK;
+			if (pure == '\r') {
+				if (i + 1 < pData->macroData.size() && (pData->macroData[i + 1] & ~PURE_CHARACTER_MASK) == '\n') {
+					i++;
+				}
+				prepareKeyEvent(keyEvent[0], VK_RETURN, true);
+				prepareKeyEvent(keyEvent[1], VK_RETURN, false);
+				SendInput(2, keyEvent, sizeof(INPUT));
+			} else if (pure == '\n') {
+				prepareKeyEvent(keyEvent[0], VK_RETURN, true);
+				prepareKeyEvent(keyEvent[1], VK_RETURN, false);
+				SendInput(2, keyEvent, sizeof(INPUT));
+			} else {
+				SendPureCharacter(ch);
+			}
+		} else {
+			SendKeyCode(pData->macroData[i]);
+		}
+	}
 	SendKeyCode(_keycode | (_flag & MASK_SHIFT ? CAPS_MASK : 0));
 }
 

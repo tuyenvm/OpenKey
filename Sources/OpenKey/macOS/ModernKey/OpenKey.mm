@@ -555,7 +555,13 @@ extern "C" {
             }
         }
         //send real data
-        SendNewCharString(true);
+        for (int i = 0; i < pData->macroData.size(); i++) {
+            if (pData->macroData[i] & PURE_CHARACTER_MASK) {
+                SendPureCharacter(pData->macroData[i]);
+            } else {
+                SendKeyCode(pData->macroData[i]);
+            }
+        }
         SendKeyCode(_keycode | (_flag & kCGEventFlagMaskShift ? CAPS_MASK : 0));
     }
 
