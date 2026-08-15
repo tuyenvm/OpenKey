@@ -172,12 +172,14 @@ wstring OpenKeyHelper::getClipboardText(const int& type) {
 	// Get handle of clipboard object for ANSI text
 	HANDLE hData = GetClipboardData(type);
 	if (hData == nullptr) {
+		CloseClipboard();
 		return _T("");
 	}
 
 	// Lock the handle to get the actual text pointer
 	wchar_t * pszText = static_cast<wchar_t*>(GlobalLock(hData));
 	if (pszText == nullptr) {
+		CloseClipboard();
 		return _T("");
 	}
 
