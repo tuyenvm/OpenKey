@@ -308,14 +308,19 @@ void MacroDialog::onSelectItem(const int & index) {
 }
 
 void MacroDialog::onAddMacroButton() {
-	TCHAR buffer[MAX_MACRO_BUFFER];
-	GetWindowText(hMacroName, buffer, MAX_MACRO_BUFFER);
-	wstring name = buffer;
+	int nameLen = GetWindowTextLength(hMacroName);
+	int contentLen = GetWindowTextLength(hMacroContent);
 
-	GetWindowText(hMacroContent, buffer, MAX_MACRO_BUFFER);
-	wstring content = buffer;
+	vector<TCHAR> nameBuf(nameLen + 1);
+	vector<TCHAR> contentBuf(contentLen + 1);
 
-	if (name.compare(L"") == 0 || content.compare(L"") == 0) {
+	GetWindowText(hMacroName, nameBuf.data(), nameLen + 1);
+	wstring name = nameBuf.data();
+
+	GetWindowText(hMacroContent, contentBuf.data(), contentLen + 1);
+	wstring content = contentBuf.data();
+
+	if (name.empty() || content.empty()) {
 		MessageBox(hDlg, _T("Bạn hãy nhập từ cần gõ tắt!"), _T("OpenKey"), MB_OK);
 		return;
 	}
@@ -328,9 +333,10 @@ void MacroDialog::onAddMacroButton() {
 }
 
 void MacroDialog::onDeleteMacroButton() {
-	TCHAR buffer[MAX_MACRO_BUFFER];
-	GetWindowText(hMacroName, buffer, MAX_MACRO_BUFFER);
-	wstring name = buffer;
+	int nameLen = GetWindowTextLength(hMacroName);
+	vector<TCHAR> nameBuf(nameLen + 1);
+	GetWindowText(hMacroName, nameBuf.data(), nameLen + 1);
+	wstring name = nameBuf.data();
 
 	if (name.compare(L"") == 0) {
 		MessageBox(hDlg, _T("Bạn hãy chọn từ cần xoá!"), _T("OpenKey"), MB_OK);
