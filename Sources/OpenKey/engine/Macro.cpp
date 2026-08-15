@@ -17,6 +17,13 @@
 
 using namespace std;
 
+static string toLowercase(string str) {
+    for (char &c : str) {
+        c = tolower((unsigned char)c);
+    }
+    return str;
+}
+
 //main data
 map<vector<Uint32>, MacroData> macroMap;
 
@@ -124,12 +131,13 @@ void initMacroMap(const Byte* pData, const int& size) {
         string macroContent((char*)pData + cursor, macroContentSize);
         cursor += macroContentSize;
         
+        string lowerText = toLowercase(macroText);
         MacroData data;
-        data.macroText = macroText;
+        data.macroText = lowerText;
         data.macroContent = normalizeNewlines(macroContent);
         
         vector<Uint32> key;
-        convert(macroText, key);
+        convert(lowerText, key);
         convert(data.macroContent, data.macroContentCode);
         
         macroMap[key] = data;
@@ -224,8 +232,9 @@ bool findMacro(vector<Uint32>& key, vector<Uint32>& macroContentCode) {
 }
 
 bool hasMacro(const string& macroName) {
+    string lowerName = toLowercase(macroName);
     vector<Uint32> key;
-    convert(macroName, key);
+    convert(lowerName, key);
     return (macroMap.find(key) != macroMap.end());
 }
 
@@ -241,18 +250,19 @@ void getAllMacro(vector<vector<Uint32>>& keys, vector<string>& macroTexts, vecto
 }
 
 bool addMacro(const string& macroText, const string& macroContent) {
+    string lowerText = toLowercase(macroText);
     vector<Uint32> key;
     string normalizedContent = normalizeNewlines(macroContent);
     vector<Uint32> contentCode;
     try {
-        convert(macroText, key);
+        convert(lowerText, key);
         convert(normalizedContent, contentCode);
     } catch (...) {
         return false;
     }
     if (macroMap.find(key) == macroMap.end()) { //add new macro
         MacroData data;
-        data.macroText = macroText;
+        data.macroText = lowerText;
         data.macroContent = normalizedContent;
         data.macroContentCode = contentCode;
         macroMap[key] = data;
@@ -264,8 +274,9 @@ bool addMacro(const string& macroText, const string& macroContent) {
 }
 
 bool deleteMacro(const string& macroText) {
+    string lowerText = toLowercase(macroText);
     vector<Uint32> key;
-    convert(macroText, key);
+    convert(lowerText, key);
     if (macroMap.find(key) != macroMap.end()) {
         macroMap.erase(key);
         return true;
