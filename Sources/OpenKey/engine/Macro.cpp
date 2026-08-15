@@ -386,6 +386,11 @@ void readFromFile(const string& path, const bool& append) {
                         content.replace(start_pos, 2, "\r\n");
                         start_pos += 2;
                     }
+                    start_pos = 0;
+                    while ((start_pos = content.find("\xEF\xBF\xBE", start_pos)) != string::npos) {
+                        content.replace(start_pos, 3, "\r\n");
+                        start_pos += 2;
+                    }
 
                     if (!name.empty()) {
                         addMacro(name, content);
