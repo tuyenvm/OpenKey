@@ -516,29 +516,23 @@ static void handleMacro() {
 			SendBackspace();
 		}
 	}
+	// Backup clipboard
+	wstring backupText = OpenKeyHelper::getClipboardText(CF_UNICODETEXT);
+
 	//send real data
-	for (size_t i = 0; i < pData->macroData.size(); i++) {
-		Uint32 ch = pData->macroData[i];
-		if (ch & PURE_CHARACTER_MASK) {
-			Uint32 pure = ch & ~PURE_CHARACTER_MASK;
-			if (pure == '\r') {
-				if (i + 1 < pData->macroData.size() && (pData->macroData[i + 1] & ~PURE_CHARACTER_MASK) == '\n') {
-					i++;
-				}
-				prepareKeyEvent(keyEvent[0], VK_RETURN, true);
-				prepareKeyEvent(keyEvent[1], VK_RETURN, false);
-				SendInput(2, keyEvent, sizeof(INPUT));
-			} else if (pure == '\n') {
-				prepareKeyEvent(keyEvent[0], VK_RETURN, true);
-				prepareKeyEvent(keyEvent[1], VK_RETURN, false);
-				SendInput(2, keyEvent, sizeof(INPUT));
-			} else {
-				SendPureCharacter(ch);
-			}
-		} else {
-			SendKeyCode(pData->macroData[i]);
+	SendNewCharString(true);
+
+	// Restore clipboard
+	if (!backupText.empty()) {
+		OpenKeyHelper::setClipboardText(backupText.c_str(), (int)backupText.size() + 1, CF_UNICODETEXT);
+	} else {
+		// If clipboard was empty, clear it
+		if (OpenClipboard(nullptr)) {
+			EmptyClipboard();
+			CloseClipboard();
 		}
 	}
+
 	SendKeyCode(_keycode | (_flag & MASK_SHIFT ? CAPS_MASK : 0));
 }
 
