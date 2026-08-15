@@ -1868,7 +1868,7 @@ void vKeyHandleEvent(const vKeyEvent& event,
                 }
             }
         }
-        bool isTBTStandalone = (vInputType == vTuBinhTranDonGian) && (IS_BRACKET_KEY(data) || data == KEY_6 || data == KEY_7 || data == KEY_8 || data == KEY_9);
+        bool isTBTStandalone = (vInputType == vTuBinhTranDonGian) && IS_TBT_STANDALONE_KEY(data) && !shouldKeepTBTStandaloneKeyRaw(data);
         if ((IS_BRACKET_KEY(data) && (( IS_BRACKET_KEY( (((Uint16)hData[0] & ~CAPS_MASK)) )) || vInputType == vSimpleTelex1 || vInputType == vSimpleTelex2)) ||
             ((isTBTStandalone || isCustomStandalone) && ((((Uint16)hData[0] & ~CAPS_MASK)) == data))) {
             if (_index - (hCode == vWillProcess ? hBPC : 0) > 0) {
