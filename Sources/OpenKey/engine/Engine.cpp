@@ -1069,6 +1069,7 @@ void checkForStandaloneCharTBT(const Uint16& data, const bool& isCaps, const Uin
         hExt = 4;
         TypingWord[_index - 1] = data | (isCaps ? CAPS_MASK : 0);
         hData[0] = GET(TypingWord[_index - 1]);
+        saveWord();
         return;
     }
     hCode = vWillProcess;

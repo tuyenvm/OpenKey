@@ -164,6 +164,9 @@ wstring OpenKeyHelper::getFullPath() {
 }
 
 wstring OpenKeyHelper::getClipboardText(const int& type) {
+	if (!IsClipboardFormatAvailable(type)) {
+		return _T("");
+	}
 	// Try opening the clipboard
 	if (!OpenClipboard(nullptr)) {
 		return _T("");
@@ -172,6 +175,7 @@ wstring OpenKeyHelper::getClipboardText(const int& type) {
 	// Get handle of clipboard object for ANSI text
 	HANDLE hData = GetClipboardData(type);
 	if (hData == nullptr) {
+		CloseClipboard();
 		return _T("");
 	}
 
