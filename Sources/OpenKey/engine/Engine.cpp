@@ -65,7 +65,8 @@ static Uint16 ProcessingChar[][11] = {
                                 (keyCode == KEY_1 || keyCode == KEY_2 || keyCode == KEY_3 || keyCode == KEY_4 || keyCode == KEY_5) : \
                                 (keyCode == KEY_S || keyCode == KEY_F || keyCode == KEY_R || keyCode == KEY_J || keyCode == KEY_X))
 #define IS_BRACKET_KEY(key) (key == KEY_LEFT_BRACKET || key == KEY_RIGHT_BRACKET)
-#define IS_TBT_STANDALONE_KEY(key) (key == KEY_6 || key == KEY_7 || key == KEY_8 || key == KEY_9)
+#define IS_TBT_NUMBER_STANDALONE_KEY(key) (key == KEY_6 || key == KEY_7 || key == KEY_8 || key == KEY_9)
+#define IS_TBT_STANDALONE_KEY(key) (IS_TBT_NUMBER_STANDALONE_KEY(key) || IS_BRACKET_KEY(key))
 #define IS_TBT_CONSONANT_CONTEXT(key) (isLetterKey(key) && IS_CONSONANT(key))
 
 #define VSI vowelStartIndex
@@ -137,6 +138,8 @@ static bool _willTempOffEngine = false;
 //function prototype
 void findAndCalculateVowel(const bool& forGrammar=false);
 void insertMark(const Uint32& markMask, const bool& canModifyFlag=true);
+void insertKey(const Uint16& keyCode, const bool& isCaps, const bool& isCheckSpelling=true);
+void saveWord();
 
 static std::wstring_convert<std::codecvt_utf8_utf16<wchar_t>> converter;
 wstring utf8ToWideString(const string& str) {
@@ -191,12 +194,62 @@ bool isLetterKey(const Uint16& data) {
     }
 }
 
-bool shouldKeepTBTNumberKeyRaw(const Uint16& data) {
+bool shouldKeepTBTStandaloneKeyRaw(const Uint16& data) {
     if (vInputType != vTuBinhTranDonGian || !IS_TBT_STANDALONE_KEY(data))
         return false;
     if (_specialChar.size() > 0)
         return true;
     return _index > 0 && !IS_TBT_CONSONANT_CONTEXT(CHR(_index - 1));
+}
+
+bool getTBTStandaloneRawKey(const Uint32& value, Uint16& rawKey) {
+    if (!(value & STANDALONE_MASK))
+        return false;
+
+    Uint16 key = (Uint16)(value & CHAR_MASK);
+    Uint32 mark = value & (TONE_MASK | TONEW_MASK);
+    if (key == KEY_A && mark == TONE_MASK) {
+        rawKey = KEY_6;
+        return true;
+    }
+    if (key == KEY_E && mark == TONE_MASK) {
+        rawKey = KEY_7;
+        return true;
+    }
+    if (key == KEY_O && mark == TONE_MASK) {
+        rawKey = KEY_8;
+        return true;
+    }
+    if (key == KEY_A && mark == TONEW_MASK) {
+        rawKey = KEY_9;
+        return true;
+    }
+    if (key == KEY_U && mark == TONEW_MASK) {
+        rawKey = KEY_LEFT_BRACKET;
+        return true;
+    }
+    if (key == KEY_O && mark == TONEW_MASK) {
+        rawKey = KEY_RIGHT_BRACKET;
+        return true;
+    }
+    return false;
+}
+
+bool restoreTBTStandaloneThenInsertRaw(const Uint16& data, const bool& isCaps) {
+    Uint16 previousRawKey;
+    if (_index == 0 || !getTBTStandaloneRawKey(TypingWord[_index - 1], previousRawKey))
+        return false;
+
+    hCode = vWillProcess;
+    hBPC = 1;
+    hNCC = 2;
+    hExt = 3;
+    TypingWord[_index - 1] = previousRawKey | (TypingWord[_index - 1] & CAPS_MASK);
+    hData[1] = TypingWord[_index - 1];
+    insertKey(data, isCaps);
+    hData[0] = TypingWord[_index - 1];
+    saveWord();
+    return true;
 }
 
 void setKeyData(const Byte& index, const Uint16& keyCode, const bool& isCaps) {
@@ -383,7 +436,7 @@ void checkGrammar(const int& deltaBackSpace) {
     }
 }
 
-void insertKey(const Uint16& keyCode, const bool& isCaps, const bool& isCheckSpelling=true) {
+void insertKey(const Uint16& keyCode, const bool& isCaps, const bool& isCheckSpelling) {
     if (_index >= MAX_BUFF) {
         _longWordHelper.push_back(TypingWord[0]); //save long word
         //left shift
@@ -1086,6 +1139,10 @@ bool isSpecialKeyCustom(Uint16 keyCode) {
 }
 
 void checkForStandaloneCharTBT(const Uint16& data, const bool& isCaps, const Uint32& keyWillReverse, const Uint32& maskToAdd) {
+    if (shouldKeepTBTStandaloneKeyRaw(data) && restoreTBTStandaloneThenInsertRaw(data, isCaps)) {
+        return;
+    }
+
     if (_index > 0 && CHR(_index - 1) == keyWillReverse && (TypingWord[_index - 1] & maskToAdd) && (TypingWord[_index - 1] & STANDALONE_MASK)) {
         hCode = vWillProcess;
         hBPC = 1;
@@ -1096,7 +1153,7 @@ void checkForStandaloneCharTBT(const Uint16& data, const bool& isCaps, const Uin
         saveWord();
         return;
     }
-    if (shouldKeepTBTNumberKeyRaw(data)) {
+    if (shouldKeepTBTStandaloneKeyRaw(data)) {
         hCode = vDoNothing;
         hBPC = 0;
         hNCC = 0;
@@ -1287,11 +1344,15 @@ void handleMainKey(const Uint16& data, const bool& isCaps) {
     }
     
     if (data == KEY_LEFT_BRACKET) { //standalone key [
+        if (shouldKeepTBTStandaloneKeyRaw(data) && restoreTBTStandaloneThenInsertRaw(data, isCaps))
+            return;
         checkForStandaloneChar(data, isCaps, (vInputType == vTuBinhTranDonGian) ? KEY_U : KEY_O);
         return;
     }
     
     if (data == KEY_RIGHT_BRACKET) { //standalone key ]
+        if (shouldKeepTBTStandaloneKeyRaw(data) && restoreTBTStandaloneThenInsertRaw(data, isCaps))
+            return;
         checkForStandaloneChar(data, isCaps, (vInputType == vTuBinhTranDonGian) ? KEY_O : KEY_U);
         return;
     }
@@ -1565,12 +1626,11 @@ void vKeyHandleEvent(const vKeyEvent& event,
 
     bool isTBTOrCustomNumberAction = (vInputType == vTuBinhTranDonGian || vInputType == vTuDinhNghia) &&
                                      IS_TBT_STANDALONE_KEY(data);
-    bool isRawTBTNumberAction = shouldKeepTBTNumberKeyRaw(data);
     bool isNumberBreak = (IS_NUMBER_KEY(data) && capsStatus == 1) && !isTBTOrCustomNumberAction;
     bool isNumberAtStartBreak = (_index == 0 && IS_NUMBER_KEY(data)) && !isTBTOrCustomNumberAction;
 
     if (isNumberBreak
-        || otherControlKey || isWordBreak(event, state, data) || isNumberAtStartBreak || isTriggerModifier || isRawTBTNumberAction) {
+        || otherControlKey || isWordBreak(event, state, data) || isNumberAtStartBreak || isTriggerModifier) {
         hCode = vDoNothing;
         hBPC = 0;
         hNCC = 0;
