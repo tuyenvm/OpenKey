@@ -122,6 +122,12 @@ INT_PTR MacroDialog::eventProc(HWND hDlg, UINT uMsg, WPARAM wParam, LPARAM lPara
 		case IDC_BUTTON_DELETE_ALL_MACRO:
 			onDeleteAllMacroButton();
 			break;
+		case IDC_BUTTON_SORT_NAME:
+			onSortNameButton();
+			break;
+		case IDC_BUTTON_SORT_CONTENT:
+			onSortContentButton();
+			break;
 		case IDC_BUTTON_IMPORT_MACRO:
 			onImportMacroButton();
 			break;
@@ -188,7 +194,9 @@ INT_PTR MacroDialog::eventProc(HWND hDlg, UINT uMsg, WPARAM wParam, LPARAM lPara
 
 			SetWindowPos(hAdd, NULL, width - 135, 28, 125, 22, SWP_NOZORDER);
 			SetWindowPos(hDel, NULL, width - 135, 54, 125, 22, SWP_NOZORDER);
-			SetWindowPos(hDeleteAll, NULL, 10, 60, 110, 22, SWP_NOZORDER);
+			SetWindowPos(hDeleteAll, NULL, 10, 54, 110, 22, SWP_NOZORDER);
+			if (hSortName) SetWindowPos(hSortName, NULL, 10, 80, 110, 22, SWP_NOZORDER);
+			if (hSortContent) SetWindowPos(hSortContent, NULL, width - 135, 80, 125, 22, SWP_NOZORDER);
 
 			int listHeight = height - 165;
 			if (listHeight < 50) listHeight = 50;
@@ -239,6 +247,11 @@ void MacroDialog::initDialog() {
 	hMacroContent = GetDlgItem(hDlg, IDC_EDIT_MACRO_CONTENT);
 	hAddButton = GetDlgItem(hDlg, IDC_BUTTON_ADD);
 	hAutoCaps = GetDlgItem(hDlg, IDC_CHECK_AUTO_CAPS);
+
+	hSortName = CreateWindowEx(0, _T("BUTTON"), _T("Sort Từ gõ tắt ↕"), WS_CHILD | WS_VISIBLE | BS_PUSHBUTTON, 0, 0, 0, 0, hDlg, (HMENU)IDC_BUTTON_SORT_NAME, hInstance, NULL);
+	hSortContent = CreateWindowEx(0, _T("BUTTON"), _T("Sort Nội dung ↕"), WS_CHILD | WS_VISIBLE | BS_PUSHBUTTON, 0, 0, 0, 0, hDlg, (HMENU)IDC_BUTTON_SORT_CONTENT, hInstance, NULL);
+	if (hSortName) SendMessage(hSortName, WM_SETFONT, (WPARAM)GetStockObject(DEFAULT_GUI_FONT), TRUE);
+	if (hSortContent) SendMessage(hSortContent, WM_SETFONT, (WPARAM)GetStockObject(DEFAULT_GUI_FONT), TRUE);
 
 	if (hMacroContent) {
 		SendMessage(hMacroContent, EM_SETLIMITTEXT, 0, 0);
@@ -291,6 +304,47 @@ void MacroDialog::updateColumnHeaders() {
 	SendMessage(listMacro, LVM_SETCOLUMN, 1, (LPARAM)&LvCol);
 }
 
+void MacroDialog::updateSortButtonTexts() {
+	if (hSortName) {
+		wstring txt = L"Sort Từ gõ tắt";
+		if (sortColumn == 0) {
+			txt += sortAscending ? L" ▲" : L" ▼";
+		} else {
+			txt += L" ↕";
+		}
+		SetWindowText(hSortName, txt.c_str());
+	}
+	if (hSortContent) {
+		wstring txt = L"Sort Nội dung";
+		if (sortColumn == 1) {
+			txt += sortAscending ? L" ▲" : L" ▼";
+		} else {
+			txt += L" ↕";
+		}
+		SetWindowText(hSortContent, txt.c_str());
+	}
+}
+
+void MacroDialog::onSortNameButton() {
+	if (sortColumn == 0) {
+		sortAscending = !sortAscending;
+	} else {
+		sortColumn = 0;
+		sortAscending = true;
+	}
+	fillData();
+}
+
+void MacroDialog::onSortContentButton() {
+	if (sortColumn == 1) {
+		sortAscending = !sortAscending;
+	} else {
+		sortColumn = 1;
+		sortAscending = true;
+	}
+	fillData();
+}
+
 struct MacroItemSort {
 	string text;
 	string content;
@@ -338,6 +392,7 @@ void MacroDialog::fillData() {
 	}
 
 	updateColumnHeaders();
+	updateSortButtonTexts();
 }
 
 void MacroDialog::saveAndReload() {

@@ -19,6 +19,7 @@ private:
 	HWND listMacro;
 	HWND hMacroName, hMacroContent;
 	HWND hAddButton, hAutoCaps;
+	HWND hSortName, hSortContent;
 	vector<vector<Uint32>> keys;
 	vector<string> macroText;
 	vector<string> macroContent;
@@ -35,6 +36,7 @@ protected:
 	void initDialog();
 private:
 	void updateColumnHeaders();
+	void updateSortButtonTexts();
 	void saveAndReload();
 	void insertItem(const int& index, LPTSTR macroName, LPTSTR macroContent);
 
@@ -42,6 +44,8 @@ private:
 	void onAddMacroButton();
 	void onDeleteMacroButton();
 	void onDeleteAllMacroButton();
+	void onSortNameButton();
+	void onSortContentButton();
 
 	void onImportMacroButton();
 	void onConvertEvKeyMacroButton();
