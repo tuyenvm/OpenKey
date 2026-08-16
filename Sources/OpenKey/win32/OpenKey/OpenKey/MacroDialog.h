@@ -22,6 +22,10 @@ private:
 	vector<vector<Uint32>> keys;
 	vector<string> macroText;
 	vector<string> macroContent;
+	vector<string> displayMacroText;
+	vector<string> displayMacroContent;
+	int sortColumn = -1;
+	bool sortAscending = true;
 public:
 	MacroDialog(const HINSTANCE & hInstance, const int & resourceId);
 	~MacroDialog();
@@ -30,6 +34,7 @@ protected:
 	INT_PTR eventProc(HWND hDlg, UINT uMsg, WPARAM wParam, LPARAM lParam);
 	void initDialog();
 private:
+	void updateColumnHeaders();
 	void saveAndReload();
 	void insertItem(const int& index, LPTSTR macroName, LPTSTR macroContent);
 
@@ -44,4 +49,3 @@ private:
 
 	void onCheckboxClicked(const HWND& hWnd);
 };
-

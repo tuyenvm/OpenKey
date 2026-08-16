@@ -15,6 +15,7 @@ redistribute your new version, it MUST be open source.
 #include "stdafx.h"
 #include "AppDelegate.h"
 #include <commdlg.h>
+#include <algorithm>
 
 #define MAX_MACRO_BUFFER 65536
 
@@ -165,7 +166,6 @@ INT_PTR MacroDialog::eventProc(HWND hDlg, UINT uMsg, WPARAM wParam, LPARAM lPara
 		int width = LOWORD(lParam);
 		int height = HIWORD(lParam);
 
-		// Get handles of the controls
 		HWND hList = GetDlgItem(hDlg, IDC_LIST_MACRO_DATA);
 		HWND hName = GetDlgItem(hDlg, IDC_EDIT_MACRO_NAME);
 		HWND hContent = GetDlgItem(hDlg, IDC_EDIT_MACRO_CONTENT);
@@ -179,54 +179,51 @@ INT_PTR MacroDialog::eventProc(HWND hDlg, UINT uMsg, WPARAM wParam, LPARAM lPara
 		HWND hTriggerLabel = GetDlgItem(hDlg, IDC_LABEL_MACRO_TRIGGERS);
 		HWND hTriggerCombo = GetDlgItem(hDlg, IDC_COMBO_MACRO_TRIGGERS);
 
-		// Layout constants based on original dialog (415 x 253 DLU ~ 622 x 380 pixels)
-		// We will adjust controls using SetWindowPos
 		if (hName && hContent && hAdd && hDel && hDeleteAll && hList && hImport && hConvertEvKey && hExport && hCaps && hTriggerCombo) {
-			// Top controls:
-			// Name: x=10, y=28, w=110, h=22
 			SetWindowPos(hName, NULL, 10, 28, 110, 22, SWP_NOZORDER);
 
-			// Content: x=130, y=28, w=width - 275, h=80
 			int contentWidth = width - 275;
 			if (contentWidth < 100) contentWidth = 100;
 			SetWindowPos(hContent, NULL, 130, 28, contentWidth, 80, SWP_NOZORDER);
 
-			// Add Button: x=width - 135, y=28, w=125, h=22
 			SetWindowPos(hAdd, NULL, width - 135, 28, 125, 22, SWP_NOZORDER);
-
-			// Delete Button: x=width - 135, y=54, w=125, h=22
 			SetWindowPos(hDel, NULL, width - 135, 54, 125, 22, SWP_NOZORDER);
 			SetWindowPos(hDeleteAll, NULL, 10, 60, 110, 22, SWP_NOZORDER);
 
-			// List Macro: x=10, y=120, w=width - 20, h=height - 165
 			int listHeight = height - 165;
 			if (listHeight < 50) listHeight = 50;
 			SetWindowPos(hList, NULL, 10, 120, width - 20, listHeight, SWP_NOZORDER);
 
-			// Bottom controls: y = height - 35
 			int bottomY = height - 35;
-			// Import: x=10, w=100, h=22
 			SetWindowPos(hImport, NULL, 10, bottomY, 100, 22, SWP_NOZORDER);
 			SetWindowPos(hExport, NULL, 120, bottomY, 100, 22, SWP_NOZORDER);
 			SetWindowPos(hConvertEvKey, NULL, 230, bottomY, 125, 22, SWP_NOZORDER);
 			SetWindowPos(hCaps, NULL, 365, bottomY, 130, 22, SWP_NOZORDER);
-			// Trigger Label: x=width - 250, w=60, h=22
 			if (hTriggerLabel) {
 				SetWindowPos(hTriggerLabel, NULL, width - 260, bottomY + 3, 60, 22, SWP_NOZORDER);
 			}
-			// Combo triggers: x=width - 195, w=185, h=22 (drop height is handled by OS)
 			SetWindowPos(hTriggerCombo, NULL, width - 195, bottomY - 3, 185, 22, SWP_NOZORDER);
 		}
 		return TRUE;
 	}
 	case WM_NOTIFY: {
-		switch (((LPNMHDR)lParam)->code) {
-		case LVN_ITEMCHANGED: {
-			NMLISTVIEW* pData = (NMLISTVIEW*)lParam;
-			if (pData->uNewState != 0)
-				onSelectItem(pData->iItem);
-		}
-			break;
+		LPNMHDR pNmhdr = (LPNMHDR)lParam;
+		if (pNmhdr->idFrom == IDC_LIST_MACRO_DATA) {
+			if (pNmhdr->code == LVN_COLUMNCLICK) {
+				LPNMLISTVIEW pNmlv = (LPNMLISTVIEW)lParam;
+				int col = pNmlv->iSubItem;
+				if (col == sortColumn) {
+					sortAscending = !sortAscending;
+				} else {
+					sortColumn = col;
+					sortAscending = true;
+				}
+				fillData();
+			} else if (pNmhdr->code == LVN_ITEMCHANGED) {
+				NMLISTVIEW* pData = (NMLISTVIEW*)lParam;
+				if (pData->uNewState & LVIS_SELECTED)
+					onSelectItem(pData->iItem);
+			}
 		}
 		break;
 	}
@@ -235,7 +232,6 @@ INT_PTR MacroDialog::eventProc(HWND hDlg, UINT uMsg, WPARAM wParam, LPARAM lPara
 }
 
 void MacroDialog::initDialog() {
-	//dialog icon
 	SET_DIALOG_ICON(IDI_APP_ICON);
 
 	listMacro = GetDlgItem(hDlg, IDC_LIST_MACRO_DATA);
@@ -244,7 +240,6 @@ void MacroDialog::initDialog() {
 	hAddButton = GetDlgItem(hDlg, IDC_BUTTON_ADD);
 	hAutoCaps = GetDlgItem(hDlg, IDC_CHECK_AUTO_CAPS);
 
-	// Set EM_SETLIMITTEXT to 0 for unlimited character limit in content edit box
 	if (hMacroContent) {
 		SendMessage(hMacroContent, EM_SETLIMITTEXT, 0, 0);
 	}
@@ -263,38 +258,95 @@ void MacroDialog::initDialog() {
 	LVCOLUMN LvCol;
 	memset(&LvCol, 0, sizeof(LvCol));
 	LvCol.mask = LVCF_FMT | LVCF_TEXT | LVCF_WIDTH | LVCF_SUBITEM;
-	LvCol.pszText = (LPWSTR)L"Macro Name";
+	LvCol.pszText = (LPWSTR)L"Từ gõ tắt";
 	LvCol.cx = 165;
 	
-	SendMessage(listMacro, LVM_SETEXTENDEDLISTVIEWSTYLE, LVS_EX_FULLROWSELECT, LVS_EX_FULLROWSELECT); // Set style
-	SendMessage(listMacro, LVM_INSERTCOLUMN, 0, (LPARAM)&LvCol); //macro name column
+	SendMessage(listMacro, LVM_SETEXTENDEDLISTVIEWSTYLE, LVS_EX_FULLROWSELECT, LVS_EX_FULLROWSELECT);
+	SendMessage(listMacro, LVM_INSERTCOLUMN, 0, (LPARAM)&LvCol);
 
-	LvCol.pszText = (LPWSTR)L"Macro Content";  
+	LvCol.pszText = (LPWSTR)L"Nội dung thay thế";  
 	LvCol.cx = 695;
-	SendMessage(listMacro, LVM_INSERTCOLUMN, 1, (LPARAM)&LvCol); //macro content column
+	SendMessage(listMacro, LVM_INSERTCOLUMN, 1, (LPARAM)&LvCol);
 
 	fillData();
 }
+
+void MacroDialog::updateColumnHeaders() {
+	LVCOLUMN LvCol;
+	memset(&LvCol, 0, sizeof(LvCol));
+	LvCol.mask = LVCF_TEXT;
+
+	wstring textHeader = L"Từ gõ tắt";
+	if (sortColumn == 0) {
+		textHeader += sortAscending ? L" ▲" : L" ▼";
+	}
+	LvCol.pszText = (LPWSTR)textHeader.c_str();
+	SendMessage(listMacro, LVM_SETCOLUMN, 0, (LPARAM)&LvCol);
+
+	wstring contentHeader = L"Nội dung thay thế";
+	if (sortColumn == 1) {
+		contentHeader += sortAscending ? L" ▲" : L" ▼";
+	}
+	LvCol.pszText = (LPWSTR)contentHeader.c_str();
+	SendMessage(listMacro, LVM_SETCOLUMN, 1, (LPARAM)&LvCol);
+}
+
+struct MacroItemSort {
+	string text;
+	string content;
+	wstring wideText;
+	wstring wideContent;
+};
 
 void MacroDialog::fillData() {
 	SendMessage(hAutoCaps, BM_SETCHECK, vAutoCapsMacro ? 1 : 0, 0);
 	SendMessage(listMacro, LVM_DELETEALLITEMS, 0, 0);
 	getAllMacro(keys, macroText, macroContent);
+
+	vector<MacroItemSort> items(macroText.size());
 	for (size_t i = 0; i < macroText.size(); i++) {
-		insertItem((int)i, (LPTSTR)utf8ToWideString(macroText[macroText.size() - 1 - i]).c_str(),
-					(LPTSTR)utf8ToWideString(macroContent[macroText.size() - 1 - i]).c_str());
+		items[i].text = macroText[i];
+		items[i].content = macroContent[i];
+		items[i].wideText = utf8ToWideString(macroText[i]);
+		items[i].wideContent = utf8ToWideString(macroContent[i]);
 	}
+
+	if (sortColumn == 0) {
+		std::sort(items.begin(), items.end(), [this](const MacroItemSort& a, const MacroItemSort& b) {
+			int cmp = _wcsicmp(a.wideText.c_str(), b.wideText.c_str());
+			return sortAscending ? (cmp < 0) : (cmp > 0);
+		});
+	} else if (sortColumn == 1) {
+		std::sort(items.begin(), items.end(), [this](const MacroItemSort& a, const MacroItemSort& b) {
+			int cmp = _wcsicmp(a.wideContent.c_str(), b.wideContent.c_str());
+			return sortAscending ? (cmp < 0) : (cmp > 0);
+		});
+	}
+
+	displayMacroText.clear();
+	displayMacroContent.clear();
+	displayMacroText.reserve(items.size());
+	displayMacroContent.reserve(items.size());
+
+	for (size_t i = 0; i < items.size(); i++) {
+		size_t idx = (sortColumn == -1) ? (items.size() - 1 - i) : i;
+		displayMacroText.push_back(items[idx].text);
+		displayMacroContent.push_back(items[idx].content);
+
+		insertItem((int)i, (LPTSTR)utf8ToWideString(items[idx].text).c_str(),
+					(LPTSTR)utf8ToWideString(items[idx].content).c_str());
+	}
+
+	updateColumnHeaders();
 }
 
 void MacroDialog::saveAndReload() {
-	//save
 	vector<Byte> macroData;
 	getMacroSaveData(macroData);
 	OpenKeyHelper::setRegBinary(_T("macroData"), macroData.data(), (int)macroData.size());
 
 	saveToFile(wideStringToUtf8(getMacroTextPath()));
 
-	//reload data
 	fillData();
 }
 
@@ -307,19 +359,19 @@ void MacroDialog::insertItem(const int& index, LPTSTR macroName, LPTSTR macroCon
 	data.iSubItem = 0;
 	data.pszText = macroName;
 
-	//insert macro name
 	SendMessage(listMacro, LVM_INSERTITEM, 0, (LPARAM)&data);
 
-	//insert content
 	data.iSubItem = 1;
 	data.pszText = macroContent;
 	SendMessage(listMacro, LVM_SETITEM, 0, (LPARAM)&data);
 }
 
 void MacroDialog::onSelectItem(const int & index) {
-	SetWindowText(hMacroName, utf8ToWideString(macroText[macroText.size() - 1 - index]).c_str());
-	SetWindowText(hMacroContent, utf8ToWideString(macroContent[macroText.size() - 1 - index]).c_str());
-	SetWindowText(hAddButton, BTN_UPDATE_TEXT);
+	if (index >= 0 && index < (int)displayMacroText.size()) {
+		SetWindowText(hMacroName, utf8ToWideString(displayMacroText[index]).c_str());
+		SetWindowText(hMacroContent, utf8ToWideString(displayMacroContent[index]).c_str());
+		SetWindowText(hAddButton, BTN_UPDATE_TEXT);
+	}
 }
 
 void MacroDialog::onAddMacroButton() {
