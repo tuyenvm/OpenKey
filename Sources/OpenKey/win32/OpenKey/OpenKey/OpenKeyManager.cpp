@@ -1,4 +1,4 @@
-﻿/*----------------------------------------------------------
+/*----------------------------------------------------------
 OpenKey - The Cross platform Open source Vietnamese Keyboard application.
 
 Copyright (C) 2019 Mai Vu Tuyen
@@ -18,6 +18,8 @@ static vector<LPCTSTR> _inputType = {
 	_T("Telex"),
 	_T("VNI"),
 	_T("Simple Telex"),
+	_T("Tư Bình Trần đơn giản"),
+	_T("Tự định nghĩa"),
 };
 
 static vector<LPCTSTR> _tableCode = {

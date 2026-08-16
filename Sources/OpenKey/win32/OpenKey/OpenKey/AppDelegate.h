@@ -17,12 +17,13 @@ redistribute your new version, it MUST be open source.
 #include "AboutDialog.h"
 #include "ConvertToolDialog.h"
 #include "MacroDialog.h"
+#include "CustomInputMethodDialog.h"
 
 class BaseDialog;
 class AppDelegate {
 private:
 	HINSTANCE hInstance;
-	BaseDialog* mainDialog = NULL, *aboutDialog = NULL, *macroDialog = NULL, *convertDialog = NULL;
+	BaseDialog* mainDialog = NULL, *aboutDialog = NULL, *macroDialog = NULL, *convertDialog = NULL, *customInputMethodDialog = NULL;
 private:
 	bool isDialogMsg(MSG &msg) const;
 	void checkUpdate();
@@ -43,6 +44,7 @@ public: //event
 
 	void onMacroTable();
 	void onConvertTool();
+	void onCustomInputMethodDialog();
 	void onQuickConvert();
 
 	void onInputType(const int& type);

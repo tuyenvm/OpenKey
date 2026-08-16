@@ -8,3 +8,9 @@
 /Sources/OpenKey/win32/OpenKey/OpenKey/x64/Debug
 /Sources/OpenKey/win32/OpenKey/OpenKey/x64/Release
 /Sources/OpenKey/win32/OpenKey/OpenKeyUpdate/x64/Release
+
+# Local agent/workflow files
+/workflow.md
+/build.cmd
+/.agents
+/.agents/

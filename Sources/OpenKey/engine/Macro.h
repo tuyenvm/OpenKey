@@ -56,6 +56,7 @@ bool addMacro(const string& macroText, const string& macroContent);
  * delete macro from memory
  */
 bool deleteMacro(const string& macroText);
+void clearMacro();
 
 /**
  * When table code changed, we have to call this function to reload all macroContentCode
@@ -71,5 +72,7 @@ void saveToFile(const string& path);
  * Load macro data from disk
  */
 void readFromFile(const string& path, const bool& append=true);
+int readFromFileCount(const string& path, const bool& append=true);
+int readEvKeyFromFileCount(const string& path, const bool& append=true);
 
 #endif /* Macro_h */

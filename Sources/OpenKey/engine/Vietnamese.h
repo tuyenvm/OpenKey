@@ -21,6 +21,7 @@ extern map<Uint16, vector<vector<Uint32>>> _vowelCombine;
 extern map<Uint16, vector<vector<Uint16>>> _vowelForMark;
 extern vector<vector<Uint16>> _consonantD;
 extern vector<vector<Uint16>> _consonantTable;
+extern vector<vector<Uint16>> _consonantTableTBT;
 extern vector<vector<Uint16>> _endConsonantTable;
 extern vector<Uint16> _standaloneWbad;
 extern vector<vector<Uint16>> _doubleWAllowed;
@@ -32,6 +33,7 @@ extern map<Uint32, vector<Uint16>> _quickTelex;
 extern map<Uint16, vector<Uint16>> _quickStartConsonant;
 extern map<Uint16, vector<Uint16>> _quickEndConsonant;
 extern map<Uint32, Uint32> _characterMap;
+extern map<Uint32, Uint32> _keyCodeToChar;
 
 extern Uint16 keyCodeToCharacter(const Uint32& keyCode);
 #endif /* Vietnamese_h */

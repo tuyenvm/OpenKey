@@ -34,7 +34,9 @@ enum vKeyInputType {
     vTelex = 0,
     vVNI,
     vSimpleTelex1,
-    vSimpleTelex2
+    vSimpleTelex2,
+    vTuBinhTranDonGian,
+    vTuDinhNghia
 };
 
 typedef unsigned char Byte;
@@ -71,6 +73,7 @@ struct vKeyHookState {
      * 2: Delete key
      * 3: Normal key
      * 4: Should not send empty character
+     * 6: Macro triggered by Space, send one trailing space
      */
     Byte extCode;
     
@@ -78,6 +81,11 @@ struct vKeyHookState {
     
     vector<Uint32> macroKey; //used for macro function; it is a key
     vector<Uint32> macroData; //used for macro function; it is keycode data
+};
+
+struct CustomRule {
+    Uint32 key;
+    int action;
 };
 
 #ifdef LINUX
@@ -131,6 +139,7 @@ struct vKeyHookState {
 //#define IS_MARK_KEY(keyCode) (keyCode == KEY_S || keyCode == KEY_F || keyCode == KEY_R || keyCode == KEY_J || keyCode == KEY_X)
 #define CHR(index) (Uint16)TypingWord[index]
 #define IS_SPECIALKEY(keyCode) \
+        (vInputType == vTuDinhNghia ? isSpecialKeyCustom(keyCode) : \
         (vInputType == vTelex ? \
             keyCode == KEY_W || keyCode == KEY_E || keyCode == KEY_R || keyCode == KEY_O || keyCode == KEY_LEFT_BRACKET || \
             keyCode == KEY_RIGHT_BRACKET || keyCode == KEY_A || keyCode == KEY_S || keyCode == KEY_D || keyCode == KEY_F || keyCode == KEY_J || \
@@ -143,7 +152,11 @@ struct vKeyHookState {
             keyCode == KEY_D || keyCode == KEY_F || keyCode == KEY_J ||   keyCode == KEY_Z || keyCode == KEY_X || keyCode == KEY_W \
         : (vInputType == vSimpleTelex2 ? \
             keyCode == KEY_W || keyCode == KEY_E || keyCode == KEY_R || keyCode == KEY_O || keyCode == KEY_A || keyCode == KEY_S || \
-            keyCode == KEY_D || keyCode == KEY_F || keyCode == KEY_J ||   keyCode == KEY_Z || keyCode == KEY_X || keyCode == KEY_W : false))))
+            keyCode == KEY_D || keyCode == KEY_F || keyCode == KEY_J ||   keyCode == KEY_Z || keyCode == KEY_X || keyCode == KEY_W \
+        : (vInputType == vTuBinhTranDonGian ? \
+            keyCode == KEY_1 || keyCode == KEY_2 || keyCode == KEY_3 || keyCode == KEY_4 || keyCode == KEY_5 || \
+            keyCode == KEY_6 || keyCode == KEY_7 || keyCode == KEY_8 || keyCode == KEY_9 || keyCode == KEY_0 || \
+            keyCode == KEY_Z || keyCode == KEY_D || keyCode == KEY_LEFT_BRACKET || keyCode == KEY_RIGHT_BRACKET : false))))))
 
 //is VNI or Unicode compound...
 #define IS_DOUBLE_CODE(code) (code == 2 || code == 3)

@@ -1,4 +1,4 @@
-﻿/*----------------------------------------------------------
+/*----------------------------------------------------------
 OpenKey - The Cross platform Open source Vietnamese Keyboard application.
 
 Copyright (C) 2019 Mai Vu Tuyen
@@ -31,6 +31,7 @@ int vUseMacro = 1;
 int vUseMacroInEnglishMode = 1;
 int vAutoCapsMacro = 0;
 int vSendKeyStepByStep = 1;
+int vMacroTriggerMask = 3;
 int vUseSmartSwitchKey = 1;
 int vUpperCaseFirstChar = 0;
 int vTempOffSpelling = 0;
@@ -158,6 +159,9 @@ void AppDelegate::closeDialog(BaseDialog * dialog) {
 	} else if (convertDialog == dialog) {
 		delete convertDialog;
 		convertDialog = NULL;
+	} else if (customInputMethodDialog == dialog) {
+		delete customInputMethodDialog;
+		customInputMethodDialog = NULL;
 	}
 }
 
@@ -254,6 +258,15 @@ void AppDelegate::onConvertTool() {
 		convertDialog->show();
 	} else {
 		convertDialog->bringOnTop();
+	}
+}
+
+void AppDelegate::onCustomInputMethodDialog() {
+	if (customInputMethodDialog == NULL) {
+		customInputMethodDialog = new CustomInputMethodDialog(hInstance, IDD_DIALOG_CUSTOM_INPUT);
+		customInputMethodDialog->show();
+	} else {
+		customInputMethodDialog->bringOnTop();
 	}
 }
 

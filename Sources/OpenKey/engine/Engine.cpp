@@ -12,6 +12,13 @@
 #include <list>
 #include "Macro.h"
 
+#ifndef VK_LSHIFT
+#define VK_LSHIFT 0xA0
+#define VK_RSHIFT 0xA1
+#define VK_LCONTROL 0xA2
+#define VK_RCONTROL 0xA3
+#endif
+
 static vector<Uint8> _charKeyCode = {
     KEY_BACKQUOTE, KEY_1, KEY_2, KEY_3, KEY_4, KEY_5, KEY_6, KEY_7, KEY_8, KEY_9, KEY_0, KEY_MINUS, KEY_EQUALS,
     KEY_LEFT_BRACKET, KEY_RIGHT_BRACKET, KEY_BACK_SLASH,
@@ -35,24 +42,32 @@ static Uint16 ProcessingChar[][11] = {
     {KEY_S, KEY_F, KEY_R, KEY_X, KEY_J, KEY_A, KEY_O, KEY_E, KEY_W, KEY_D, KEY_Z}, //Telex
     {KEY_1, KEY_2, KEY_3, KEY_4, KEY_5, KEY_6, KEY_6, KEY_7, KEY_8, KEY_9, KEY_0}, //VNI
     {KEY_S, KEY_F, KEY_R, KEY_X, KEY_J, KEY_A, KEY_O, KEY_E, KEY_W, KEY_D, KEY_Z}, //Simple Telex 1
-    {KEY_S, KEY_F, KEY_R, KEY_X, KEY_J, KEY_A, KEY_O, KEY_E, KEY_W, KEY_D, KEY_Z} //Simple Telex 2
+    {KEY_S, KEY_F, KEY_R, KEY_X, KEY_J, KEY_A, KEY_O, KEY_E, KEY_W, KEY_D, KEY_Z}, //Simple Telex 2
+    {KEY_1, KEY_2, KEY_3, KEY_4, KEY_5, KEY_6, KEY_8, KEY_7, KEY_9, KEY_D, KEY_0}, //Tu Binh Tran Don Gian
+    {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0}                                              //Tu Dinh Nghia
 };
 
-#define IS_KEY_Z(key) (ProcessingChar[vInputType][10] == key)
+#define IS_KEY_Z(key) (ProcessingChar[vInputType][10] == key || (vInputType == vTuBinhTranDonGian && key == KEY_Z))
 #define IS_KEY_D(key) (ProcessingChar[vInputType][9] == key)
-#define IS_KEY_W(key) ((vInputType != vVNI) ? ProcessingChar[vInputType][8] == key : \
-                                    (vInputType == vVNI ? (ProcessingChar[vInputType][8] == key || ProcessingChar[vInputType][7] == key) : false))
-#define IS_KEY_DOUBLE(key) ((vInputType != vVNI) ? (ProcessingChar[vInputType][5] == key || ProcessingChar[vInputType][6] == key || ProcessingChar[vInputType][7] == key) :\
-                                        (vInputType == vVNI ? ProcessingChar[vInputType][6] == key : false))
+#define IS_KEY_W(key) (vInputType == vTuBinhTranDonGian ? (key == KEY_9) : \
+                       ((vInputType != vVNI) ? ProcessingChar[vInputType][8] == key : \
+                                               (vInputType == vVNI ? (ProcessingChar[vInputType][8] == key || ProcessingChar[vInputType][7] == key) : false)))
+#define IS_KEY_DOUBLE(key) (vInputType == vTuBinhTranDonGian ? (key == KEY_6 || key == KEY_7 || key == KEY_8) : \
+                            ((vInputType != vVNI) ? (ProcessingChar[vInputType][5] == key || ProcessingChar[vInputType][6] == key || ProcessingChar[vInputType][7] == key) : \
+                                                    (vInputType == vVNI ? ProcessingChar[vInputType][6] == key : false)))
 #define IS_KEY_S(key) (ProcessingChar[vInputType][0] == key)
 #define IS_KEY_F(key) (ProcessingChar[vInputType][1] == key)
 #define IS_KEY_R(key) (ProcessingChar[vInputType][2] == key)
 #define IS_KEY_X(key) (ProcessingChar[vInputType][3] == key)
 #define IS_KEY_J(key) (ProcessingChar[vInputType][4] == key)
 
-#define IS_MARK_KEY(keyCode) (((vInputType != vVNI) && (keyCode == KEY_S || keyCode == KEY_F || keyCode == KEY_R || keyCode == KEY_J || keyCode == KEY_X)) || \
-                                        (vInputType == vVNI && (keyCode == KEY_1 || keyCode == KEY_2 || keyCode == KEY_3 || keyCode == KEY_5 || keyCode == KEY_4)))
+#define IS_MARK_KEY(keyCode) ((vInputType == vTuBinhTranDonGian || vInputType == vVNI) ? \
+                                (keyCode == KEY_1 || keyCode == KEY_2 || keyCode == KEY_3 || keyCode == KEY_4 || keyCode == KEY_5) : \
+                                (keyCode == KEY_S || keyCode == KEY_F || keyCode == KEY_R || keyCode == KEY_J || keyCode == KEY_X))
 #define IS_BRACKET_KEY(key) (key == KEY_LEFT_BRACKET || key == KEY_RIGHT_BRACKET)
+#define IS_TBT_NUMBER_STANDALONE_KEY(key) (key == KEY_6 || key == KEY_7 || key == KEY_8 || key == KEY_9)
+#define IS_TBT_STANDALONE_KEY(key) (IS_TBT_NUMBER_STANDALONE_KEY(key) || IS_BRACKET_KEY(key))
+#define IS_TBT_CONSONANT_CONTEXT(key) (isLetterKey(key) && IS_CONSONANT(key))
 
 #define VSI vowelStartIndex
 #define VEI vowelEndIndex
@@ -68,6 +83,7 @@ static Uint16 ProcessingChar[][11] = {
 
 //Data to sendback to main program
 vKeyHookState HookState;
+vector<CustomRule> customRules;
 
 //private data
 /**
@@ -122,6 +138,12 @@ static bool _willTempOffEngine = false;
 //function prototype
 void findAndCalculateVowel(const bool& forGrammar=false);
 void insertMark(const Uint32& markMask, const bool& canModifyFlag=true);
+void insertKey(const Uint16& keyCode, const bool& isCaps, const bool& isCheckSpelling=true);
+void saveWord();
+bool canApplyTBTStandaloneInVowel(const Uint16& data);
+void reverseLastStandaloneChar(const Uint32& keyCode, const bool& isCaps);
+void insertW(const Uint16& data, const bool& isCaps);
+void checkForStandaloneChar(const Uint16& data, const bool& isCaps, const Uint32& keyWillReverse);
 
 static std::wstring_convert<std::codecvt_utf8_utf16<wchar_t>> converter;
 wstring utf8ToWideString(const string& str) {
@@ -162,6 +184,207 @@ bool isMacroBreakCode(const int& data) {
     return false;
 }
 
+static bool isMacroTriggerKey(const Uint16& data) {
+    if (data == KEY_SPACE && (vMacroTriggerMask & 0x01)) return true;
+    if ((data == KEY_RETURN || data == KEY_ENTER) && (vMacroTriggerMask & 0x02)) return true;
+    if (data == VK_LSHIFT && (vMacroTriggerMask & 0x04)) return true;
+    if (data == VK_RSHIFT && (vMacroTriggerMask & 0x08)) return true;
+    if (data == VK_LCONTROL && (vMacroTriggerMask & 0x10)) return true;
+    if (data == VK_RCONTROL && (vMacroTriggerMask & 0x20)) return true;
+    return false;
+}
+
+static bool canAppendCurrentKeyToMacro(const Uint16& data, const bool& isCaps) {
+    return data != KEY_SPACE && keyCodeToCharacter(data | (isCaps ? CAPS_MASK : 0)) != 0;
+}
+
+static bool findMacroMatch(vector<Uint32> key, vector<Uint32>& macroData, Byte& backspaceCount) {
+    if (findMacro(key, macroData)) {
+        backspaceCount = (Byte)key.size();
+        return true;
+    }
+    return false;
+}
+
+bool isLetterKey(const Uint16& data) {
+    switch (data) {
+        case KEY_A: case KEY_B: case KEY_C: case KEY_D: case KEY_E:
+        case KEY_F: case KEY_G: case KEY_H: case KEY_I: case KEY_J:
+        case KEY_K: case KEY_L: case KEY_M: case KEY_N: case KEY_O:
+        case KEY_P: case KEY_Q: case KEY_R: case KEY_S: case KEY_T:
+        case KEY_U: case KEY_V: case KEY_W: case KEY_X: case KEY_Y:
+        case KEY_Z:
+            return true;
+        default:
+            return false;
+    }
+}
+
+bool isTBTConsonantContextAt(const int& index) {
+    if (index < 0)
+        return false;
+    Uint16 key = CHR(index);
+    if (IS_TBT_CONSONANT_CONTEXT(key))
+        return true;
+    return index > 0 && ((key == KEY_I && CHR(index - 1) == KEY_G) || (key == KEY_U && CHR(index - 1) == KEY_Q));
+}
+
+bool shouldKeepTBTStandaloneKeyRaw(const Uint16& data) {
+    if (vInputType != vTuBinhTranDonGian || !IS_TBT_STANDALONE_KEY(data))
+        return false;
+    if (_specialChar.size() > 0)
+        return true;
+    return _index > 0 && !isTBTConsonantContextAt(_index - 1) && !canApplyTBTStandaloneInVowel(data);
+}
+
+bool isSpellingConsonant(const Uint16& data) {
+    if (vInputType == vTuBinhTranDonGian)
+        return IS_TBT_CONSONANT_CONTEXT(data);
+    return IS_CONSONANT(data);
+}
+
+bool getTBTStandaloneRawKey(const Uint32& value, Uint16& rawKey) {
+    if (!(value & STANDALONE_MASK))
+        return false;
+
+    Uint16 key = (Uint16)(value & CHAR_MASK);
+    Uint32 mark = value & (TONE_MASK | TONEW_MASK);
+    if (key == KEY_A && mark == TONE_MASK) {
+        rawKey = KEY_6;
+        return true;
+    }
+    if (key == KEY_E && mark == TONE_MASK) {
+        rawKey = KEY_7;
+        return true;
+    }
+    if (key == KEY_O && mark == TONE_MASK) {
+        rawKey = KEY_8;
+        return true;
+    }
+    if (key == KEY_A && mark == TONEW_MASK) {
+        rawKey = KEY_9;
+        return true;
+    }
+    if (key == KEY_U && mark == TONEW_MASK) {
+        rawKey = KEY_LEFT_BRACKET;
+        return true;
+    }
+    if (key == KEY_O && mark == TONEW_MASK) {
+        rawKey = KEY_RIGHT_BRACKET;
+        return true;
+    }
+    return false;
+}
+
+bool getTBTStandaloneValue(const Uint16& data, Uint32& value) {
+    switch (data) {
+        case KEY_6:
+            value = KEY_A | TONE_MASK;
+            return true;
+        case KEY_7:
+            value = KEY_E | TONE_MASK;
+            return true;
+        case KEY_8:
+            value = KEY_O | TONE_MASK;
+            return true;
+        case KEY_9:
+            value = KEY_A | TONEW_MASK;
+            return true;
+        case KEY_LEFT_BRACKET:
+            value = KEY_U | TONEW_MASK;
+            return true;
+        case KEY_RIGHT_BRACKET:
+            value = KEY_O | TONEW_MASK;
+            return true;
+        default:
+            return false;
+    }
+}
+
+bool canApplyTBTStandaloneInVowel(const Uint16& data) {
+    Uint32 target;
+    if (!getTBTStandaloneValue(data, target) || _index == 0)
+        return false;
+
+    vector<Uint32> seq;
+    for (int pos = _index - 1; pos >= 0; pos--) {
+        Uint16 key = CHR(pos);
+        if (!isLetterKey(key) || isSpellingConsonant(key))
+            break;
+        seq.insert(seq.begin(), key | (TypingWord[pos] & (TONE_MASK | TONEW_MASK)));
+    }
+    seq.push_back(target);
+    if (seq.size() < 2)
+        return false;
+
+    vector<vector<Uint32>>& vowelSet = _vowelCombine[(Uint16)(seq[0] & CHAR_MASK)];
+    for (const auto& vowel : vowelSet) {
+        if (seq.size() > vowel.size() - 1)
+            continue;
+        bool matches = true;
+        for (size_t pos = 0; pos < seq.size(); pos++) {
+            if (vowel[pos + 1] != seq[pos]) {
+                matches = false;
+                break;
+            }
+        }
+        if (matches)
+            return true;
+    }
+    return false;
+}
+
+bool canTBTStandaloneStartVowel(const Uint32& value) {
+    if (!(value & STANDALONE_MASK))
+        return false;
+    Uint32 key = (value & CHAR_MASK) | (value & (TONE_MASK | TONEW_MASK));
+    for (const auto& vowelEntry : _vowelCombine) {
+        for (const auto& vowel : vowelEntry.second) {
+            if (vowel.size() > 2 && vowel[1] == key)
+                return true;
+        }
+    }
+    return false;
+}
+
+void insertCustomW(const Uint16& data, const bool& isCaps, const bool& allowStandaloneAtStart) {
+    findAndCalculateVowel();
+    if (vowelCount > 0) {
+        insertW(KEY_W, isCaps);
+    } else if (_index == 0 && allowStandaloneAtStart) {
+        insertKey(data, isCaps, false);
+        reverseLastStandaloneChar(KEY_U, isCaps);
+    } else if (_index > 0) {
+        checkForStandaloneChar(data, isCaps, KEY_U);
+    } else {
+        insertKey(data, isCaps);
+    }
+}
+
+bool restoreTBTStandaloneThenInsertRaw(const Uint16& data, const bool& isCaps) {
+    Uint16 previousRawKey;
+    if (_index == 0 || !getTBTStandaloneRawKey(TypingWord[_index - 1], previousRawKey))
+        return false;
+
+    hCode = vWillProcess;
+    hBPC = 1;
+    hExt = 3;
+    TypingWord[_index - 1] = previousRawKey | (TypingWord[_index - 1] & CAPS_MASK);
+    if (previousRawKey == data) {
+        hNCC = 1;
+        hData[0] = TypingWord[_index - 1];
+        saveWord();
+        return true;
+    }
+
+    hNCC = 2;
+    hData[1] = TypingWord[_index - 1];
+    insertKey(data, isCaps);
+    hData[0] = TypingWord[_index - 1];
+    saveWord();
+    return true;
+}
+
 void setKeyData(const Byte& index, const Uint16& keyCode, const bool& isCaps) {
     if (index < 0 || index >= MAX_BUFF)
         return;
@@ -184,16 +407,17 @@ void checkSpelling(const bool& forceCheckVowel=false) {
     
     if (_spellingEndIndex > 0) {
         j = 0;
+        vector<vector<Uint16>>& consonantTable = (vInputType == vTuBinhTranDonGian) ? _consonantTableTBT : _consonantTable;
         //Check first consonant
-        if (IS_CONSONANT(CHR(0))) {
-            for (i = 0; i < _consonantTable.size(); i++) {
+        if (isSpellingConsonant(CHR(0))) {
+            for (i = 0; i < consonantTable.size(); i++) {
                 _spellingFlag = false;
-                if (_spellingEndIndex < _consonantTable[i].size())
+                if (_spellingEndIndex < consonantTable[i].size())
                     _spellingFlag = true;
-                for (j = 0; j < _consonantTable[i].size(); j++) {
+                for (j = 0; j < consonantTable[i].size(); j++) {
                     if (_spellingEndIndex > j &&
-                        (_consonantTable[i][j] & ~(vQuickStartConsonant ? END_CONSONANT_MASK : 0)) != CHR(j) &&
-                        (_consonantTable[i][j] & ~(vAllowConsonantZFWJ ? CONSONANT_ALLOW_MASK : 0)) != CHR(j)) {
+                        (consonantTable[i][j] & ~(vQuickStartConsonant ? END_CONSONANT_MASK : 0)) != CHR(j) &&
+                        (consonantTable[i][j] & ~(vAllowConsonantZFWJ ? CONSONANT_ALLOW_MASK : 0)) != CHR(j)) {
                         _spellingFlag = true;
                         break;
                     }
@@ -217,11 +441,11 @@ void checkSpelling(const bool& forceCheckVowel=false) {
             k = k + 1;
             j = k;
             VSI = k;
-        } else if (_index >= 2 && CHR(0) == KEY_G && CHR(1) == KEY_I && IS_CONSONANT(CHR(2))) {
+        } else if (_index >= 2 && CHR(0) == KEY_G && CHR(1) == KEY_I && isSpellingConsonant(CHR(2))) {
             VSI = k = j = 1; //Sep 28th: fix gìn
         }
         for (l = 0; l < 3; l++) {
-            if (k < _spellingEndIndex && !IS_CONSONANT(CHR(k))) {
+            if (k < _spellingEndIndex && !isSpellingConsonant(CHR(k))) {
                 k++;
                 VEI = k;
             }
@@ -239,13 +463,13 @@ void checkSpelling(const bool& forceCheckVowel=false) {
                             break;
                         }
                     }
-                    if (_spellingFlag || (k < _spellingEndIndex && !vowelSet[l][0]) || (j + ii - 1 < _spellingEndIndex && !IS_CONSONANT(CHR(j + ii - 1))))
+                    if (_spellingFlag || (k < _spellingEndIndex && !vowelSet[l][0]) || (j + ii - 1 < _spellingEndIndex && !isSpellingConsonant(CHR(j + ii - 1))))
                         continue;
                     
                     _spellingVowelOK = true;
                     break;
                 }
-            } else if (!IS_CONSONANT(CHR(j))) {
+            } else if (!isSpellingConsonant(CHR(j))) {
                 _spellingVowelOK = true;
             }
             
@@ -346,7 +570,7 @@ void checkGrammar(const int& deltaBackSpace) {
     }
 }
 
-void insertKey(const Uint16& keyCode, const bool& isCaps, const bool& isCheckSpelling=true) {
+void insertKey(const Uint16& keyCode, const bool& isCaps, const bool& isCheckSpelling) {
     if (_index >= MAX_BUFF) {
         _longWordHelper.push_back(TypingWord[0]); //save long word
         //left shift
@@ -463,6 +687,7 @@ void startNewSession() {
     _hasHandledMacro = false;
     _hasHandleQuickConsonant = false;
     _longWordHelper.clear();
+    hMacroKey.clear();
 }
 
 void checkCorrectVowel(vector<vector<Uint16>>& charset, int& i, int& k, const Uint16& markKey) {
@@ -1039,6 +1264,48 @@ void checkForStandaloneChar(const Uint16& data, const bool& isCaps, const Uint32
     insertKey(data, isCaps);
 }
 
+bool isSpecialKeyCustom(Uint16 keyCode) {
+    for (const auto& rule : customRules) {
+        if ((rule.key & CHAR_MASK) == keyCode) {
+            return true;
+        }
+    }
+    return false;
+}
+
+void checkForStandaloneCharTBT(const Uint16& data, const bool& isCaps, const Uint32& keyWillReverse, const Uint32& maskToAdd) {
+    if (shouldKeepTBTStandaloneKeyRaw(data) && restoreTBTStandaloneThenInsertRaw(data, isCaps)) {
+        return;
+    }
+
+    if (_index > 0 && CHR(_index - 1) == keyWillReverse && (TypingWord[_index - 1] & maskToAdd) && (TypingWord[_index - 1] & STANDALONE_MASK)) {
+        hCode = vWillProcess;
+        hBPC = 1;
+        hNCC = 1;
+        hExt = 4;
+        TypingWord[_index - 1] = data | (isCaps ? CAPS_MASK : 0); // No STANDALONE_MASK
+        hData[0] = GET(TypingWord[_index - 1]);
+        saveWord();
+        return;
+    }
+    if (shouldKeepTBTStandaloneKeyRaw(data)) {
+        hCode = vDoNothing;
+        hBPC = 0;
+        hNCC = 0;
+        hExt = 3;
+        insertKey(data, isCaps);
+        return;
+    }
+    hCode = vWillProcess;
+    hBPC = 0;
+    hNCC = 1;
+    hExt = 4;
+    TypingWord[_index] = (keyWillReverse | maskToAdd | STANDALONE_MASK | (isCaps ? CAPS_MASK : 0));
+    hData[0] = GET(TypingWord[_index]);
+    _index++;
+    saveWord();
+}
+
 void upperCaseFirstCharacter() {
     if (!(TypingWord[0] & CAPS_MASK)) {
         hCode = vWillProcess;
@@ -1062,13 +1329,166 @@ void handleMainKey(const Uint16& data, const bool& isCaps) {
         return;
     }
     
+    // Tư Bình Trần và Tự Định Nghĩa standalone keys
+    if (vInputType == vTuBinhTranDonGian) {
+        if (data == KEY_6) {
+            checkForStandaloneCharTBT(data, isCaps, KEY_A, TONE_MASK);
+            return;
+        }
+        if (data == KEY_7) {
+            checkForStandaloneCharTBT(data, isCaps, KEY_E, TONE_MASK);
+            return;
+        }
+        if (data == KEY_8) {
+            checkForStandaloneCharTBT(data, isCaps, KEY_O, TONE_MASK);
+            return;
+        }
+        if (data == KEY_9) {
+            checkForStandaloneCharTBT(data, isCaps, KEY_A, TONEW_MASK);
+            return;
+        }
+    }
+    
+    if (vInputType == vTuDinhNghia) {
+        Uint32 lookupKey = data | (isCaps ? CAPS_MASK : 0);
+        for (const auto& rule : customRules) {
+            if (rule.key == lookupKey) {
+                int action = rule.action;
+                
+                auto hasChar = [](Uint16 targetKey) -> bool {
+                    for (int ii = _index - 1; ii >= 0; ii--) {
+                        if (CHR(ii) == targetKey) return true;
+                    }
+                    return false;
+                };
+
+                auto hasAnyChar = [&](const vector<Uint16>& targets) -> bool {
+                    for (Uint16 t : targets) {
+                        if (hasChar(t)) return true;
+                    }
+                    return false;
+                };
+
+                bool applicable = false;
+                if (action >= 1 && action <= 5) {
+                    vowelCount = 0;
+                    findAndCalculateVowel();
+                    applicable = (vowelCount > 0);
+                } else if (action == 6) {
+                    vowelCount = 0;
+                    findAndCalculateVowel();
+                    applicable = (vowelCount > 0 && (CHR(VEI) == KEY_A || CHR(VEI) == KEY_E || CHR(VEI) == KEY_O));
+                } else if (action == 7) {
+                    applicable = hasChar(KEY_A);
+                } else if (action == 8) {
+                    applicable = hasChar(KEY_E);
+                } else if (action == 9) {
+                    applicable = hasChar(KEY_O);
+                } else if (action == 10) {
+                    applicable = hasAnyChar({KEY_A, KEY_U, KEY_O});
+                } else if (action == 11) {
+                    applicable = hasChar(KEY_U) && hasChar(KEY_O);
+                } else if (action == 12) {
+                    applicable = hasChar(KEY_U);
+                } else if (action == 13) {
+                    applicable = hasChar(KEY_O);
+                } else if (action == 14) {
+                    applicable = hasChar(KEY_A);
+                } else if (action == 15) {
+                    applicable = hasChar(KEY_D);
+                } else {
+                    applicable = true;
+                }
+
+                if (applicable) {
+                    if (action == 0) {
+                        removeMark();
+                        if (!isChanged) insertKey(data, isCaps);
+                        return;
+                    }
+                    if (action >= 1 && action <= 5) {
+                        Uint32 masks[] = { MARK1_MASK, MARK2_MASK, MARK3_MASK, MARK4_MASK, MARK5_MASK };
+                        insertMark(masks[action - 1]);
+                        return;
+                    }
+                    if (action == 6) {
+                        findAndCalculateVowel();
+                        if (vowelCount > 0) {
+                            Uint32 lastVowel = CHR(VEI);
+                            if (lastVowel == KEY_A || lastVowel == KEY_E || lastVowel == KEY_O) {
+                                insertAOE(lastVowel, isCaps);
+                            }
+                        }
+                        return;
+                    }
+                    if (action == 7) { insertAOE(KEY_A, isCaps); return; }
+                    if (action == 8) { insertAOE(KEY_E, isCaps); return; }
+                    if (action == 9) { insertAOE(KEY_O, isCaps); return; }
+                    if (action == 10) { insertCustomW(data, isCaps, false); return; }
+                    if (action == 11) { insertCustomW(data, isCaps, false); return; }
+                    if (action == 12) {
+                        findAndCalculateVowel();
+                        if (vowelCount > 0 && CHR(VEI) == KEY_U) {
+                            insertW(KEY_U, isCaps);
+                        }
+                        return;
+                    }
+                    if (action == 13) {
+                        findAndCalculateVowel();
+                        if (vowelCount > 0 && CHR(VEI) == KEY_O) {
+                            insertW(KEY_O, isCaps);
+                        }
+                        return;
+                    }
+                    if (action == 14) {
+                        findAndCalculateVowel();
+                        if (vowelCount > 0 && CHR(VEI) == KEY_A) {
+                            insertW(KEY_A, isCaps);
+                        }
+                        return;
+                    }
+                    if (action == 15) {
+                        insertD(data, isCaps);
+                        return;
+                    }
+                    if (action == 16 || action == 17) {
+                        insertCustomW(data, isCaps, action == 16);
+                        return;
+                    }
+                    if (action == 18) {
+                        insertKey(data, isCaps);
+                        return;
+                    }
+                    if (action == 19) { checkForStandaloneCharTBT(data, false, KEY_A, TONEW_MASK); return; }
+                    if (action == 20) { checkForStandaloneCharTBT(data, true, KEY_A, TONEW_MASK | CAPS_MASK); return; }
+                    if (action == 21) { checkForStandaloneCharTBT(data, false, KEY_A, TONE_MASK); return; }
+                    if (action == 22) { checkForStandaloneCharTBT(data, true, KEY_A, TONE_MASK | CAPS_MASK); return; }
+                    if (action == 23) { checkForStandaloneCharTBT(data, false, KEY_D, TONE_MASK); return; }
+                    if (action == 24) { checkForStandaloneCharTBT(data, true, KEY_D, TONE_MASK | CAPS_MASK); return; }
+                    if (action == 25) { checkForStandaloneCharTBT(data, false, KEY_E, TONE_MASK); return; }
+                    if (action == 26) { checkForStandaloneCharTBT(data, true, KEY_E, TONE_MASK | CAPS_MASK); return; }
+                    if (action == 27) { checkForStandaloneCharTBT(data, false, KEY_O, TONE_MASK); return; }
+                    if (action == 28) { checkForStandaloneCharTBT(data, true, KEY_O, TONE_MASK | CAPS_MASK); return; }
+                    if (action == 29) { checkForStandaloneCharTBT(data, false, KEY_O, TONEW_MASK); return; }
+                    if (action == 30) { checkForStandaloneCharTBT(data, true, KEY_O, TONEW_MASK | CAPS_MASK); return; }
+                    if (action == 31) { checkForStandaloneCharTBT(data, false, KEY_U, TONEW_MASK); return; }
+                    if (action == 32) { checkForStandaloneCharTBT(data, true, KEY_U, TONEW_MASK | CAPS_MASK); return; }
+                }
+            }
+        }
+    }
+    
     if (data == KEY_LEFT_BRACKET) { //standalone key [
-        checkForStandaloneChar(data, isCaps, KEY_O);
+        if (shouldKeepTBTStandaloneKeyRaw(data) && restoreTBTStandaloneThenInsertRaw(data, isCaps))
+            return;
+        checkForStandaloneChar(data, isCaps, (vInputType == vTuBinhTranDonGian) ? KEY_U : KEY_O);
         return;
     }
     
-    if (data == KEY_RIGHT_BRACKET) { //standalone key }
-        checkForStandaloneChar(data, isCaps, KEY_U);
+    if (data == KEY_RIGHT_BRACKET) { //standalone key ]
+        if (shouldKeepTBTStandaloneKeyRaw(data) && restoreTBTStandaloneThenInsertRaw(data, isCaps))
+            return;
+        checkForStandaloneChar(data, isCaps, (vInputType == vTuBinhTranDonGian) ? KEY_O : KEY_U);
         return;
     }
     
@@ -1151,7 +1571,14 @@ void handleMainKey(const Uint16& data, const bool& isCaps) {
         }
     }
     
-    keyForAEO = ((vInputType != vVNI) ? data : ((data == KEY_7 || data == KEY_8 ? KEY_W : (data == KEY_6 ? TypingWord[VEI] : data))));
+    keyForAEO = (vInputType == vTuBinhTranDonGian) ? 
+                    (data == KEY_6 ? KEY_A : 
+                     (data == KEY_7 ? KEY_E : 
+                      (data == KEY_8 ? KEY_O : 
+                       (data == KEY_9 ? KEY_W : data)))) :
+                ((vInputType != vVNI) ? data : 
+                    ((data == KEY_7 || data == KEY_8 ? KEY_W : 
+                      (data == KEY_6 ? TypingWord[VEI] : data))));
     vector<vector<Uint16>>& charset = _vowel[keyForAEO];
     isCorect = false;
     isChanged = false;
@@ -1283,16 +1710,22 @@ bool checkQuickConsonant() {
 
 void vEnglishMode(const vKeyEventState& state, const Uint16& data, const bool& isCaps, const bool& otherControlKey) {
     hCode = vDoNothing;
+    hExt = 0;
     if (state == vKeyEventState::MouseDown || (otherControlKey && !isCaps)) {
         hMacroKey.clear();
         _willTempOffEngine = false;
-    } else if (data == KEY_SPACE) {
-        if (!_hasHandledMacro && findMacro(hMacroKey, hMacroData)) {
+    } else if (data == KEY_SPACE || data == KEY_RETURN || data == KEY_ENTER || data == VK_LSHIFT || data == VK_RSHIFT || data == VK_LCONTROL || data == VK_RCONTROL) {
+        Byte macroBackspace = 0;
+        if (isMacroTriggerKey(data) && !_hasHandledMacro && findMacroMatch(hMacroKey, hMacroData, macroBackspace)) {
             hCode = vReplaceMaro;
-            hBPC = (Byte)hMacroKey.size();
+            hBPC = macroBackspace;
         }
         hMacroKey.clear();
         _willTempOffEngine = false;
+    } else if (isMacroBreakCode(data)) {
+        if (canAppendCurrentKeyToMacro(data, isCaps)) {
+            hMacroKey.push_back(data | (isCaps ? CAPS_MASK : 0));
+        }
     } else if (data == KEY_DELETE) {
         if (hMacroKey.size() > 0) {
             hMacroKey.pop_back();
@@ -1318,18 +1751,33 @@ void vKeyHandleEvent(const vKeyEvent& event,
                      const bool& otherControlKey) {
     _isCaps = (capsStatus == 1 || //shift
                capsStatus == 2); //caps lock
-    if ((IS_NUMBER_KEY(data) && capsStatus == 1)
-        || otherControlKey || isWordBreak(event, state, data) || (_index == 0 && IS_NUMBER_KEY(data))) {
+               
+    bool isTriggerModifier = (data == VK_LSHIFT && (vMacroTriggerMask & 0x04)) ||
+                             (data == VK_RSHIFT && (vMacroTriggerMask & 0x08)) ||
+                             (data == VK_LCONTROL && (vMacroTriggerMask & 0x10)) ||
+                             (data == VK_RCONTROL && (vMacroTriggerMask & 0x20));
+
+    bool isTBTOrCustomNumberAction = (vInputType == vTuBinhTranDonGian || vInputType == vTuDinhNghia) &&
+                                     IS_TBT_STANDALONE_KEY(data);
+    bool isNumberBreak = (IS_NUMBER_KEY(data) && capsStatus == 1) && !isTBTOrCustomNumberAction;
+    bool isNumberAtStartBreak = (_index == 0 && IS_NUMBER_KEY(data)) && !isTBTOrCustomNumberAction;
+
+    if (isNumberBreak
+        || otherControlKey || isWordBreak(event, state, data) || isNumberAtStartBreak || isTriggerModifier) {
         hCode = vDoNothing;
         hBPC = 0;
         hNCC = 0;
         hExt = 1; //word break
         
         //check macro feature
-        if (vUseMacro && isMacroBreakCode(data) && !_hasHandledMacro && findMacro(hMacroKey, hMacroData)) {
-            hCode = vReplaceMaro;
-            hBPC = (Byte)hMacroKey.size();
-            _hasHandledMacro = true;
+        if (vUseMacro && isMacroTriggerKey(data) && !_hasHandledMacro) {
+            Byte macroBackspace = 0;
+            if (findMacroMatch(hMacroKey, hMacroData, macroBackspace)) {
+                hCode = vReplaceMaro;
+                hBPC = macroBackspace;
+                hExt = 5;
+                _hasHandledMacro = true;
+            }
         } else if ((vQuickStartConsonant || vQuickEndConsonant) && !tempDisableKey && isMacroBreakCode(data)) {
             checkQuickConsonant();
         } else if (vRestoreIfWrongSpelling && isWordBreak(event, state, data)) { //restore key if wrong spelling with break-key
@@ -1353,7 +1801,9 @@ void vKeyHandleEvent(const vKeyEvent& event,
                 saveWord();
             }
             _specialChar.push_back(data | (_isCaps ? CAPS_MASK : 0));
-            hExt = 3;//normal word
+            if (hExt != 5) {
+                hExt = 3;//normal word
+            }
         }
         
         if (hCode == vDoNothing) {
@@ -1366,7 +1816,7 @@ void vKeyHandleEvent(const vKeyEvent& event,
         
         //insert key for macro function
         if (vUseMacro) {
-            if (_isCharKeyCode) {
+            if (_isCharKeyCode && hExt != 5) {
                 hMacroKey.push_back(data | (_isCaps ? CAPS_MASK : 0));
             } else {
                 hMacroKey.clear();
@@ -1385,10 +1835,12 @@ void vKeyHandleEvent(const vKeyEvent& event,
         if (!tempDisableKey && vCheckSpelling) {
             checkSpelling(true); //force check spelling
         }
-        if (vUseMacro && !_hasHandledMacro && findMacro(hMacroKey, hMacroData)) { //macro
+        Byte macroBackspace = 0;
+        if (vUseMacro && (vMacroTriggerMask & 0x01) && !_hasHandledMacro && findMacroMatch(hMacroKey, hMacroData, macroBackspace)) { //macro
             hCode = vReplaceMaro;
-            hBPC = (Byte)hMacroKey.size();
-            _spaceCount++;
+            hBPC = macroBackspace;
+            hExt = 6;
+            _spaceCount = 0;
             _hasHandledMacro = true;
         } else if ((vQuickStartConsonant || vQuickEndConsonant) && !tempDisableKey && checkQuickConsonant()) {
             _spaceCount++;
@@ -1516,18 +1968,7 @@ void vKeyHandleEvent(const vKeyEvent& event,
         
         //insert or replace key for macro feature
         if (vUseMacro) {
-            if (hCode == vDoNothing) {
-                hMacroKey.push_back(data | (_isCaps ? CAPS_MASK : 0));
-            } else if (hCode == vWillProcess || hCode == vRestore) {
-                for (i = 0; i < hBPC; i++) {
-                    if (hMacroKey.size() > 0) {
-                        hMacroKey.pop_back();
-                    }
-                }
-                for (i = _index - hBPC; i < hNCC + (_index - hBPC); i++) {
-                    hMacroKey.push_back(TypingWord[i]);
-                }
-            }
+            hMacroKey.push_back(data | (_isCaps ? CAPS_MASK : 0));
         }
         
         if (vUpperCaseFirstChar) {
@@ -1538,7 +1979,19 @@ void vKeyHandleEvent(const vKeyEvent& event,
         }
         
         //case [ ]
-        if (IS_BRACKET_KEY(data) && (( IS_BRACKET_KEY((Uint16)hData[0])) || vInputType == vSimpleTelex1 || vInputType == vSimpleTelex2)) {
+        bool isCustomStandalone = false;
+        if (vInputType == vTuDinhNghia) {
+            Uint32 lookupKey = data | (_isCaps ? CAPS_MASK : 0);
+            for (const auto& r : customRules) {
+                if (r.key == lookupKey && r.action >= 19) {
+                    isCustomStandalone = true;
+                    break;
+                }
+            }
+        }
+        bool isTBTStandalone = (vInputType == vTuBinhTranDonGian) && IS_TBT_STANDALONE_KEY(data) && !shouldKeepTBTStandaloneKeyRaw(data) && !canTBTStandaloneStartVowel(TypingWord[_index - 1]);
+        if ((IS_BRACKET_KEY(data) && (( IS_BRACKET_KEY( (((Uint16)hData[0] & ~CAPS_MASK)) )) || vInputType == vSimpleTelex1 || vInputType == vSimpleTelex2)) ||
+            ((isTBTStandalone || isCustomStandalone) && ((((Uint16)hData[0] & ~CAPS_MASK)) == data))) {
             if (_index - (hCode == vWillProcess ? hBPC : 0) > 0) {
                 _index--;
                 saveWord();

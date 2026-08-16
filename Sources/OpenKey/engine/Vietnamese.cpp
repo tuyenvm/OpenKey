@@ -367,6 +367,35 @@ vector<vector<Uint16>> _consonantTable = {
     { KEY_J | END_CONSONANT_MASK},
 };
 
+vector<vector<Uint16>> _consonantTableTBT = {
+    { KEY_N, KEY_G, KEY_H },
+    { KEY_P, KEY_H },
+    { KEY_T, KEY_H },
+    { KEY_T, KEY_R },
+    { KEY_G, KEY_I },
+    { KEY_C, KEY_H },
+    { KEY_N, KEY_H },
+    { KEY_N, KEY_G},
+    { KEY_K, KEY_H },
+    { KEY_G, KEY_H },
+    { KEY_G },
+    { KEY_C },
+    { KEY_Q },
+    { KEY_K },
+    { KEY_T },
+    { KEY_R },
+    { KEY_H },
+    { KEY_B },
+    { KEY_M },
+    { KEY_V },
+    { KEY_N },
+    { KEY_L },
+    { KEY_X },
+    { KEY_P },
+    { KEY_S },
+    { KEY_D },
+};
+
 vector<vector<Uint16>> _endConsonantTable = {
     { KEY_T }, { KEY_P }, { KEY_C }, { KEY_N }, { KEY_M },
     { KEY_G | END_CONSONANT_MASK }, { KEY_K | END_CONSONANT_MASK }, { KEY_H | END_CONSONANT_MASK },

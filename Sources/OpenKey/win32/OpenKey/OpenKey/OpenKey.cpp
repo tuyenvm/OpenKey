@@ -11,8 +11,10 @@ which is released under GPL license.
 You can fork, modify, improve this program. If you
 redistribute your new version, it MUST be open source.
 -----------------------------------------------------------*/
+#define _CRT_SECURE_NO_WARNINGS
 #include "stdafx.h"
 #include "AppDelegate.h"
+#include <fstream>
 
 #pragma comment(lib, "imm32")
 #define IMC_GETOPENSTATUS 0x0005
@@ -25,7 +27,7 @@ redistribute your new version, it MUST be open source.
 #define MASK_WIN				0x20
 #define MASK_SCROLL				0x40
 
-#define OTHER_CONTROL_KEY (_flag & MASK_ALT) || (_flag & MASK_CONTROL)
+#define OTHER_CONTROL_KEY (_flag & MASK_ALT) || (_flag & MASK_CONTROL) || (_flag & MASK_WIN)
 #define DYNA_DATA(macro, pos) (macro ? pData->macroData[pos] : pData->charData[pos])
 #define EMPTY_HOTKEY 0xFE0000FE
 
@@ -67,6 +69,20 @@ static bool _hasJustUsedHotKey = false;
 static INPUT backspaceEvent[2];
 static INPUT keyEvent[2];
 
+static wstring getExecuteFolderPath() {
+	wstring path = OpenKeyHelper::getExecutePath();
+	size_t pos = path.find_last_of(L"\\/");
+	if (pos != wstring::npos) {
+		path = path.substr(0, pos);
+	}
+	return path;
+}
+
+static bool fileExists(const wstring& path) {
+	ifstream file(wideStringToUtf8(path).c_str(), ios::in | ios::binary);
+	return file.is_open();
+}
+
 LRESULT CALLBACK keyboardHookProcess(int nCode, WPARAM wParam, LPARAM lParam);
 LRESULT CALLBACK mouseHookProcess(int nCode, WPARAM wParam, LPARAM lParam);
 VOID CALLBACK winEventProcCallback(HWINEVENTHOOK hWinEventHook, DWORD dwEvent, HWND hwnd, LONG idObject, LONG idChild, DWORD dwEventThread, DWORD dwmsEventTime);
@@ -92,6 +108,7 @@ void OpenKeyInit() {
 	APP_GET_DATA(vUseMacroInEnglishMode, 0);
 	APP_GET_DATA(vAutoCapsMacro, 0);
 	APP_GET_DATA(vSendKeyStepByStep, 1);
+	APP_GET_DATA(vMacroTriggerMask, 3);
 	APP_GET_DATA(vUseGrayIcon, 0);
 	APP_GET_DATA(vShowOnStartUp, 1);
 	APP_GET_DATA(vRunWithWindows, 1);
@@ -152,15 +169,33 @@ void OpenKeyInit() {
 	if (GetKeyState(VK_CAPITAL) == 1) _flag |= MASK_CAPITAL;
 	if (GetKeyState(VK_SCROLL) < 0) _flag |= MASK_SCROLL;
 
-	//init and load macro data
-	DWORD macroDataSize;
-	BYTE* macroData = OpenKeyHelper::getRegBinary(_T("macroData"), macroDataSize);
-	initMacroMap((Byte*)macroData, (int)macroDataSize);
+	//init and load macro data from text file, fallback to old text/binary data
+	wstring macroPath = getExecuteFolderPath() + L"\\openkeymacro.txt";
+	wstring oldMacroPath = getExecuteFolderPath() + L"\\openkeymacro.md";
+	if (fileExists(macroPath)) {
+		readFromFile(wideStringToUtf8(macroPath), false);
+	} else if (fileExists(oldMacroPath)) {
+		readFromFile(wideStringToUtf8(oldMacroPath), false);
+		saveToFile(wideStringToUtf8(macroPath));
+	} else {
+		DWORD macroDataSize;
+		BYTE* macroData = OpenKeyHelper::getRegBinary(_T("macroData"), macroDataSize);
+		initMacroMap((Byte*)macroData, (int)macroDataSize);
+		saveToFile(wideStringToUtf8(macroPath));
+	}
 
 	//init and load smart switch key data
 	DWORD smartSwitchKeySize;
 	BYTE* data = OpenKeyHelper::getRegBinary(_T("smartSwitchKey"), smartSwitchKeySize);
 	initSmartSwitchKey((Byte*)data, (int)smartSwitchKeySize);
+
+	//load custom rules
+	DWORD customRulesSize = 0;
+	BYTE* customRulesData = OpenKeyHelper::getRegBinary(_T("customRules"), customRulesSize);
+	if (customRulesData && customRulesSize > 0) {
+		customRules.assign((CustomRule*)customRulesData, (CustomRule*)customRulesData + (customRulesSize / sizeof(CustomRule)));
+		free(customRulesData);
+	}
 
 	//init hook
 	HINSTANCE hInstance = GetModuleHandle(NULL);
@@ -272,7 +307,7 @@ static void SendBackspace() {
 		SendMessage(HWND_BROADCAST, WM_CHAR, VK_BACK, 0L);
 		SendMessage(HWND_BROADCAST, WM_CHAR, VK_BACK, 0L);
 	}
-	if (IS_DOUBLE_CODE(vCodeTable)) { //VNI or Unicode Compound
+	if (IS_DOUBLE_CODE(vCodeTable) && !_syncKey.empty()) { //VNI or Unicode Compound
 		if (_syncKey.back() > 1) {
 			/*if (!(vCodeTable == 3 && containUnicodeCompoundApp(FRONT_APP))) {
 				SendInput(2, backspaceEvent, sizeof(INPUT));
@@ -301,8 +336,8 @@ static void SendEmptyCharacter() {
 static void SendNewCharString(const bool& dataFromMacro = false) {
 	_j = 0;
 	_newCharSize = dataFromMacro ? (Uint16)pData->macroData.size() : pData->newCharCount;
-	if (_newCharString.size() < _newCharSize) {
-		_newCharString.resize(_newCharSize);
+	if (_newCharString.size() < _newCharSize + 2) {
+		_newCharString.resize(_newCharSize + 2);
 	}
 	_willSendControlKey = false;
 	
@@ -313,26 +348,56 @@ static void SendNewCharString(const bool& dataFromMacro = false) {
 
 			_tempChar = DYNA_DATA(dataFromMacro, _k);
 			if (_tempChar & PURE_CHARACTER_MASK) {
-				_newCharString[_j++] = _tempChar;
-				if (IS_DOUBLE_CODE(vCodeTable)) {
-					InsertKeyLength(1);
+				Uint32 pureChar = _tempChar & ~PURE_CHARACTER_MASK;
+				if (pureChar <= 0xFFFF) {
+					if (_newCharString.size() < _j + 2) {
+						_newCharString.resize(_j + 2);
+					}
+					_newCharString[_j++] = (Uint16)pureChar;
+					if (IS_DOUBLE_CODE(vCodeTable)) {
+						InsertKeyLength(1);
+					}
+				} else {
+					Uint16 high = (Uint16)(((pureChar - 0x10000) >> 10) + 0xD800);
+					Uint16 low = (Uint16)(((pureChar - 0x10000) & 0x3FF) + 0xDC00);
+					if (_newCharString.size() < _j + 3) {
+						_newCharString.resize(_j + 3);
+					}
+					_newCharString[_j++] = high;
+					_newCharString[_j++] = low;
+					_newCharSize++;
+					if (IS_DOUBLE_CODE(vCodeTable)) {
+						InsertKeyLength(2);
+					}
 				}
 			} else if (!(_tempChar & CHAR_CODE_MASK)) {
 				if (IS_DOUBLE_CODE(vCodeTable)) //VNI
 					InsertKeyLength(1);
+				if (_newCharString.size() < _j + 2) {
+					_newCharString.resize(_j + 2);
+				}
 				_newCharString[_j++] = keyCodeToCharacter(_tempChar);
 			} else {
 				_newChar = _tempChar;
 				if (vCodeTable == 0) {  //unicode 2 bytes code
+					if (_newCharString.size() < _j + 2) {
+						_newCharString.resize(_j + 2);
+					}
 					_newCharString[_j++] = _newChar;
 				} else if (vCodeTable == 1 || vCodeTable == 2 || vCodeTable == 4) { //others such as VNI Windows, TCVN3: 1 byte code
 					_newCharHi = HIBYTE(_newChar);
 					_newChar = LOBYTE(_newChar);
+					if (_newCharString.size() < _j + 2) {
+						_newCharString.resize(_j + 2);
+					}
 					_newCharString[_j++] = _newChar;
 
 					if (_newCharHi > 32) {
 						if (vCodeTable == 2) //VNI
 							InsertKeyLength(2);
+						if (_newCharString.size() < _j + 2) {
+							_newCharString.resize(_j + 2);
+						}
 						_newCharString[_j++] = _newCharHi;
 						_newCharSize++;
 					}
@@ -345,9 +410,15 @@ static void SendNewCharString(const bool& dataFromMacro = false) {
 					_newChar &= 0x1FFF;
 
 					InsertKeyLength(_newCharHi > 0 ? 2 : 1);
+					if (_newCharString.size() < _j + 2) {
+						_newCharString.resize(_j + 2);
+					}
 					_newCharString[_j++] = _newChar;
 					if (_newCharHi > 0) {
 						_newCharSize++;
+						if (_newCharString.size() < _j + 2) {
+							_newCharString.resize(_j + 2);
+						}
 						_newCharString[_j++] = _unicodeCompoundMark[_newCharHi - 1];
 					}
 
@@ -359,6 +430,9 @@ static void SendNewCharString(const bool& dataFromMacro = false) {
 	if (pData->code == vRestore || pData->code == vRestoreAndStartNewSession) { //if is restore
 		if (keyCodeToCharacter(_keycode) != 0) {
 			_newCharSize++;
+			if (_newCharString.size() < _j + 2) {
+				_newCharString.resize(_j + 2);
+			}
 			_newCharString[_j++] = keyCodeToCharacter(_keycode | ((_flag & MASK_SHIFT) || (_flag & MASK_CAPITAL) ? CAPS_MASK : 0));
 		} else {
 			_willSendControlKey = true;
@@ -368,10 +442,16 @@ static void SendNewCharString(const bool& dataFromMacro = false) {
 		startNewSession();
 	}
 
-	OpenKeyHelper::setClipboardText((LPCTSTR)_newCharString.data(), _newCharSize + 1, CF_UNICODETEXT);
+	if (_newCharString.size() < _j + 1) {
+		_newCharString.resize(_j + 1);
+	}
+	_newCharString[_j] = 0;
 
-	//Send shift + insert
-	SendCombineKey(KEY_LEFT_SHIFT, VK_INSERT, 0, KEYEVENTF_EXTENDEDKEY);
+	if (!dataFromMacro) {
+		OpenKeyHelper::setClipboardText((LPCTSTR)_newCharString.data(), _j + 1, CF_UNICODETEXT);
+		//Send shift + insert
+		SendCombineKey(KEY_LEFT_SHIFT, VK_INSERT, 0, KEYEVENTF_EXTENDEDKEY);
+	}
 	
 	//the case when hCode is vRestore or vRestoreAndStartNewSession,
 	//the word is invalid and last key is control key such as TAB, LEFT ARROW, RIGHT ARROW,...
@@ -413,15 +493,28 @@ void switchLanguage() {
 	startNewSession();
 }
 
-static void SendPureCharacter(const Uint16& ch) {
-	if (ch < 128)
-		SendKeyCode(ch);
-	else {
-		prepareUnicodeEvent(keyEvent[0], ch, true);
-		prepareUnicodeEvent(keyEvent[1], ch, false);
+static void SendPureCharacter(const Uint32& ch) {
+	Uint32 pureChar = ch & ~PURE_CHARACTER_MASK;
+	if (pureChar <= 0xFFFF) {
+		prepareUnicodeEvent(keyEvent[0], (Uint16)pureChar, true);
+		prepareUnicodeEvent(keyEvent[1], (Uint16)pureChar, false);
 		SendInput(2, keyEvent, sizeof(INPUT));
 		if (IS_DOUBLE_CODE(vCodeTable)) {
 			InsertKeyLength(1);
+		}
+	} else {
+		Uint16 high = (Uint16)(((pureChar - 0x10000) >> 10) + 0xD800);
+		Uint16 low = (Uint16)(((pureChar - 0x10000) & 0x3FF) + 0xDC00);
+		
+		prepareUnicodeEvent(keyEvent[0], high, true);
+		prepareUnicodeEvent(keyEvent[1], high, false);
+		SendInput(2, keyEvent, sizeof(INPUT));
+		
+		prepareUnicodeEvent(keyEvent[0], low, true);
+		prepareUnicodeEvent(keyEvent[1], low, false);
+		SendInput(2, keyEvent, sizeof(INPUT));
+		if (IS_DOUBLE_CODE(vCodeTable)) {
+			InsertKeyLength(2);
 		}
 	}
 }
@@ -439,19 +532,60 @@ static void handleMacro() {
 			SendBackspace();
 		}
 	}
-	//send real data
-	if (!vSendKeyStepByStep) {
+
+	// Backup clipboard
+	wstring backupText = OpenKeyHelper::getClipboardText(CF_UNICODETEXT);
+
+	// Send real data to clipboard
+	int setRetry = 5;
+	while (setRetry-- > 0) {
 		SendNewCharString(true);
-	} else {
-		for (int i = 0; i < pData->macroData.size(); i++) {
-			if (pData->macroData[i] & PURE_CHARACTER_MASK) {
-				SendPureCharacter(pData->macroData[i]);
-			} else {
-				SendKeyCode(pData->macroData[i]);
+		// Dynamic wait: Ensure the clipboard content has updated to the macro text before pasting
+		wstring macroString = (wchar_t*)_newCharString.data();
+		bool match = false;
+		for (int retry = 0; retry < 15; ++retry) {
+			wstring currentClip = OpenKeyHelper::getClipboardText(CF_UNICODETEXT);
+			if (currentClip == macroString) {
+				match = true;
+				break;
 			}
+			Sleep(10);
+		}
+		if (match) break;
+		Sleep(15);
+	}
+
+	// Send shift + insert to paste
+	SendCombineKey(KEY_LEFT_SHIFT, VK_INSERT, 0, KEYEVENTF_EXTENDEDKEY);
+
+	// Wait for target application to process the paste message before restoring clipboard
+	Sleep(120);
+
+	// Restore clipboard with dynamic retry to handle clipboard locks
+	if (!backupText.empty()) {
+		int retry = 5;
+		while (retry-- > 0) {
+			HGLOBAL hMem = GlobalAlloc(GMEM_MOVEABLE, (backupText.length() + 1) * sizeof(WCHAR));
+			if (hMem) {
+				memcpy(GlobalLock(hMem), backupText.c_str(), (backupText.length() + 1) * sizeof(WCHAR));
+				GlobalUnlock(hMem);
+				if (OpenClipboard(0)) {
+					EmptyClipboard();
+					SetClipboardData(CF_UNICODETEXT, hMem);
+					CloseClipboard();
+					break;
+				}
+				GlobalFree(hMem);
+			}
+			Sleep(10);
 		}
 	}
-	SendKeyCode(_keycode | (_flag & MASK_SHIFT ? CAPS_MASK : 0));
+
+	if (pData->extCode == 6) {
+		SendKeyCode(KEY_SPACE);
+	} else if (pData->extCode != 5) {
+		SendKeyCode(_keycode | (_flag & MASK_SHIFT ? CAPS_MASK : 0));
+	}
 }
 
 static bool SetModifierMask(const Uint16& vkCode) {
@@ -512,6 +646,19 @@ LRESULT CALLBACK keyboardHookProcess(int nCode, WPARAM wParam, LPARAM lParam) {
 		//LOG(L"Key up: %d\n", keyboardData->vkCode);
 		UnsetModifierMask((Uint16)keyboardData->vkCode);
 	}
+	
+	bool isTriggerModifier = false;
+	if (vUseMacro) {
+		if (keyboardData->vkCode == VK_LSHIFT && (vMacroTriggerMask & 0x04)) isTriggerModifier = true;
+		else if (keyboardData->vkCode == VK_RSHIFT && (vMacroTriggerMask & 0x08)) isTriggerModifier = true;
+		else if (keyboardData->vkCode == VK_LCONTROL && (vMacroTriggerMask & 0x10)) isTriggerModifier = true;
+		else if (keyboardData->vkCode == VK_RCONTROL && (vMacroTriggerMask & 0x20)) isTriggerModifier = true;
+	}
+
+	if (isTriggerModifier) {
+		_isFlagKey = false;
+	}
+
 	if (!_isFlagKey && wParam != WM_KEYUP && wParam != WM_SYSKEYUP)
 		_keycode = (Uint16)keyboardData->vkCode;
 
@@ -571,6 +718,7 @@ LRESULT CALLBACK keyboardHookProcess(int nCode, WPARAM wParam, LPARAM lParam) {
 
 			if (pData->code == vReplaceMaro) { //handle macro in english mode
 				handleMacro();
+				startNewSession();
 				return NULL;
 			}
 		}
@@ -641,6 +789,7 @@ LRESULT CALLBACK keyboardHookProcess(int nCode, WPARAM wParam, LPARAM lParam) {
 			}
 		} else if (pData->code == vReplaceMaro) { //MACRO
 			handleMacro();
+			startNewSession();
 		}
 		return -1; //consume event
 	}

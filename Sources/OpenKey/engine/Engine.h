@@ -52,6 +52,8 @@ extern int vLanguage;
  * 1: VNI
  */
 extern int vInputType;
+extern vector<CustomRule> customRules;
+bool isSpecialKeyCustom(Uint16 keyCode);
 
 /**
  * 0: No
@@ -112,6 +114,8 @@ extern int vFixRecommendBrowser;
  * Macro on or off
  */
 extern int vUseMacro;
+
+extern int vMacroTriggerMask;
 
 /**
  * Still use macro if you are in english mode

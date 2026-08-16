@@ -27,6 +27,9 @@ static HKEY hKey;
 static LPCTSTR _runOnStartupKeyPath = _T("Software\\Microsoft\\Windows\\CurrentVersion\\Run");
 static TCHAR _executePath[MAX_PATH];
 static bool _hasGetPath = false;
+static bool _hasCheckedPortable = false;
+static bool _isPortable = false;
+static TCHAR _portablePath[MAX_PATH];
 
 static DWORD _cacheProcessId = 0, _tempProcessId = 0;
 static HWND _tempWnd;
@@ -40,6 +43,37 @@ int CF_RTF = RegisterClipboardFormat(_T("Rich Text Format"));
 int CF_HTML = RegisterClipboardFormat(_T("HTML Format"));
 int CF_OPENKEY = RegisterClipboardFormat(_T("OpenKey Format"));
 
+static LPCTSTR getPortablePath() {
+	if (!_hasCheckedPortable) {
+		lstrcpy(_portablePath, OpenKeyHelper::getExecutePath());
+		TCHAR* slash = _tcsrchr(_portablePath, '\\');
+		if (slash) {
+			*(slash + 1) = 0;
+			lstrcat(_portablePath, _T(".portable"));
+			DWORD attr = GetFileAttributes(_portablePath);
+			if (attr == INVALID_FILE_ATTRIBUTES) {
+				CreateDirectory(_portablePath, NULL);
+				attr = GetFileAttributes(_portablePath);
+			}
+			_isPortable = attr != INVALID_FILE_ATTRIBUTES && (attr & FILE_ATTRIBUTE_DIRECTORY);
+		}
+		_hasCheckedPortable = true;
+	}
+	return _portablePath;
+}
+
+static bool isPortableMode() {
+	getPortablePath();
+	return _isPortable;
+}
+
+static void getPortableConfigPath(LPCTSTR key, LPCTSTR ext, LPTSTR outPath) {
+	lstrcpy(outPath, getPortablePath());
+	lstrcat(outPath, _T("\\"));
+	lstrcat(outPath, key);
+	lstrcat(outPath, ext);
+}
+
 void OpenKeyHelper::openKey() {
 	LONG nError = RegOpenKeyEx(HKEY_CURRENT_USER, sk, NULL, KEY_ALL_ACCESS, &hKey);
 	if (nError == ERROR_FILE_NOT_FOUND) 	{
@@ -51,12 +85,25 @@ void OpenKeyHelper::openKey() {
 }
 
 void OpenKeyHelper::setRegInt(LPCTSTR key, const int & val) {
+	if (isPortableMode()) {
+		TCHAR path[MAX_PATH];
+		getPortableConfigPath(_T("settings"), _T(".ini"), path);
+		TCHAR value[32];
+		wsprintf(value, _T("%d"), val);
+		WritePrivateProfileString(_T("OpenKey"), key, value, path);
+		return;
+	}
 	openKey();
 	RegSetValueEx(hKey, key, 0, REG_DWORD, (LPBYTE)&val, sizeof(val));
 	RegCloseKey(hKey);
 }
 
 int OpenKeyHelper::getRegInt(LPCTSTR key, const int & defaultValue) {
+	if (isPortableMode()) {
+		TCHAR path[MAX_PATH];
+		getPortableConfigPath(_T("settings"), _T(".ini"), path);
+		return GetPrivateProfileInt(_T("OpenKey"), key, defaultValue, path);
+	}
 	openKey();
 	int val = defaultValue;
 	DWORD size = sizeof(val);
@@ -68,12 +115,47 @@ int OpenKeyHelper::getRegInt(LPCTSTR key, const int & defaultValue) {
 }
 
 void OpenKeyHelper::setRegBinary(LPCTSTR key, const BYTE * pData, const int & size) {
+	if (isPortableMode()) {
+		TCHAR path[MAX_PATH];
+		getPortableConfigPath(key, _T(".bin"), path);
+		HANDLE file = CreateFile(path, GENERIC_WRITE, 0, NULL, CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL, NULL);
+		if (file != INVALID_HANDLE_VALUE) {
+			DWORD written = 0;
+			WriteFile(file, pData, size, &written, NULL);
+			CloseHandle(file);
+		}
+		return;
+	}
 	openKey();
 	RegSetValueEx(hKey, key, 0, REG_BINARY, pData, size);
 	RegCloseKey(hKey);
 }
 
 BYTE * OpenKeyHelper::getRegBinary(LPCTSTR key, DWORD& outSize) {
+	if (isPortableMode()) {
+		if (_regData) {
+			delete[] _regData;
+			_regData = NULL;
+		}
+		TCHAR path[MAX_PATH];
+		getPortableConfigPath(key, _T(".bin"), path);
+		HANDLE file = CreateFile(path, GENERIC_READ, FILE_SHARE_READ, NULL, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, NULL);
+		if (file == INVALID_HANDLE_VALUE) {
+			outSize = 0;
+			return NULL;
+		}
+		DWORD size = GetFileSize(file, NULL);
+		_regData = new BYTE[size];
+		DWORD read = 0;
+		if (!ReadFile(file, _regData, size, &read, NULL)) {
+			delete[] _regData;
+			_regData = NULL;
+			size = 0;
+		}
+		CloseHandle(file);
+		outSize = size;
+		return _regData;
+	}
 	openKey();
 	if (_regData) {
 		delete[] _regData;
@@ -92,6 +174,9 @@ BYTE * OpenKeyHelper::getRegBinary(LPCTSTR key, DWORD& outSize) {
 }
 
 void OpenKeyHelper::registerRunOnStartup(const int& val) {
+	if (isPortableMode()) {
+		return;
+	}
 	if (val) {
 		if (vRunAsAdmin) {
 			string path = wideStringToUtf8(getFullPath());
@@ -164,20 +249,34 @@ wstring OpenKeyHelper::getFullPath() {
 }
 
 wstring OpenKeyHelper::getClipboardText(const int& type) {
-	// Try opening the clipboard
-	if (!OpenClipboard(nullptr)) {
+	if (!IsClipboardFormatAvailable(type)) {
+		return _T("");
+	}
+	// Try opening the clipboard with retry
+	int retry = 5;
+	bool opened = false;
+	while (retry-- > 0) {
+		if (OpenClipboard(nullptr)) {
+			opened = true;
+			break;
+		}
+		Sleep(10);
+	}
+	if (!opened) {
 		return _T("");
 	}
 
 	// Get handle of clipboard object for ANSI text
 	HANDLE hData = GetClipboardData(type);
 	if (hData == nullptr) {
+		CloseClipboard();
 		return _T("");
 	}
 
 	// Lock the handle to get the actual text pointer
 	wchar_t * pszText = static_cast<wchar_t*>(GlobalLock(hData));
 	if (pszText == nullptr) {
+		CloseClipboard();
 		return _T("");
 	}
 
@@ -195,12 +294,20 @@ wstring OpenKeyHelper::getClipboardText(const int& type) {
 
 void OpenKeyHelper::setClipboardText(LPCTSTR data, const int & len, const int& type) {
 	HGLOBAL hMem = GlobalAlloc(GMEM_MOVEABLE, len * sizeof(WCHAR));
+	if (!hMem) return;
 	memcpy(GlobalLock(hMem), data, len * sizeof(WCHAR));
 	GlobalUnlock(hMem);
-	OpenClipboard(0);
-	EmptyClipboard();
-	SetClipboardData(type, hMem);
-	CloseClipboard();
+	int retry = 5;
+	while (retry-- > 0) {
+		if (OpenClipboard(0)) {
+			EmptyClipboard();
+			SetClipboardData(type, hMem);
+			CloseClipboard();
+			return;
+		}
+		Sleep(10);
+	}
+	GlobalFree(hMem);
 }
 
 bool OpenKeyHelper::quickConvert() {
@@ -307,7 +414,7 @@ wstring OpenKeyHelper::getVersionString() {
 
 wstring OpenKeyHelper::getContentOfUrl(LPCTSTR url){
 	WCHAR path[MAX_PATH];
-	GetTempPath2(MAX_PATH, path);
+	GetTempPath(MAX_PATH, path);
 	wsprintf(path, TEXT("%s\\_OpenKey.tempf"), path);
 	HRESULT res = URLDownloadToFile(NULL, url, path, 0, NULL);
 	

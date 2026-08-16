@@ -67,12 +67,12 @@
 #define KEY_RIGHT_SHIFT                         161
 #define KEY_DOT                                 VK_OEM_PERIOD
 
-#define KEY_BACKQUOTE                           220
+#define KEY_BACKQUOTE                           192
 #define KEY_MINUS                               189
 #define KEY_EQUALS                              187
-#define KEY_BACK_SLASH                          222
+#define KEY_BACK_SLASH                          220
 #define KEY_SEMICOLON                           186
-#define KEY_QUOTE                               192
+#define KEY_QUOTE                               222
 #define KEY_COMMA                               VK_OEM_COMMA
 #define KEY_SLASH                               191
 

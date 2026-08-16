@@ -555,17 +555,7 @@ extern "C" {
             }
         }
         //send real data
-        if (!vSendKeyStepByStep) {
-            SendNewCharString(true);
-        } else {
-            for (int i = 0; i < pData->macroData.size(); i++) {
-                if (pData->macroData[i] & PURE_CHARACTER_MASK) {
-                    SendPureCharacter(pData->macroData[i]);
-                } else {
-                    SendKeyCode(pData->macroData[i]);
-                }
-            }
-        }
+        SendNewCharString(true);
         SendKeyCode(_keycode | (_flag & kCGEventFlagMaskShift ? CAPS_MASK : 0));
     }
 
