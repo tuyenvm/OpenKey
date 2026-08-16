@@ -248,10 +248,8 @@ void MacroDialog::initDialog() {
 	hAddButton = GetDlgItem(hDlg, IDC_BUTTON_ADD);
 	hAutoCaps = GetDlgItem(hDlg, IDC_CHECK_AUTO_CAPS);
 
-	hSortName = CreateWindowEx(0, _T("BUTTON"), _T("Sort Từ gõ tắt ↕"), WS_CHILD | WS_VISIBLE | BS_PUSHBUTTON, 0, 0, 0, 0, hDlg, (HMENU)IDC_BUTTON_SORT_NAME, hInstance, NULL);
-	hSortContent = CreateWindowEx(0, _T("BUTTON"), _T("Sort Nội dung ↕"), WS_CHILD | WS_VISIBLE | BS_PUSHBUTTON, 0, 0, 0, 0, hDlg, (HMENU)IDC_BUTTON_SORT_CONTENT, hInstance, NULL);
-	if (hSortName) SendMessage(hSortName, WM_SETFONT, (WPARAM)GetStockObject(DEFAULT_GUI_FONT), TRUE);
-	if (hSortContent) SendMessage(hSortContent, WM_SETFONT, (WPARAM)GetStockObject(DEFAULT_GUI_FONT), TRUE);
+	hSortName = GetDlgItem(hDlg, IDC_BUTTON_SORT_NAME);
+	hSortContent = GetDlgItem(hDlg, IDC_BUTTON_SORT_CONTENT);
 
 	if (hMacroContent) {
 		SendMessage(hMacroContent, EM_SETLIMITTEXT, 0, 0);
@@ -282,6 +280,10 @@ void MacroDialog::initDialog() {
 	SendMessage(listMacro, LVM_INSERTCOLUMN, 1, (LPARAM)&LvCol);
 
 	fillData();
+
+	RECT rc;
+	GetClientRect(hDlg, &rc);
+	SendMessage(hDlg, WM_SIZE, SIZE_RESTORED, MAKELPARAM(rc.right - rc.left, rc.bottom - rc.top));
 }
 
 void MacroDialog::updateColumnHeaders() {
