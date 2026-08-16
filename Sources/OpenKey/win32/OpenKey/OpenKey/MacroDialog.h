@@ -25,7 +25,7 @@ private:
 	vector<string> macroContent;
 	vector<string> displayMacroText;
 	vector<string> displayMacroContent;
-	int sortColumn = -1;
+	int sortColumn = 0;
 	bool sortAscending = true;
 public:
 	MacroDialog(const HINSTANCE & hInstance, const int & resourceId);

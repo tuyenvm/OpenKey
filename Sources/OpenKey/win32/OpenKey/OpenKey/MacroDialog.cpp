@@ -155,10 +155,59 @@ INT_PTR MacroDialog::eventProc(HWND hDlg, UINT uMsg, WPARAM wParam, LPARAM lPara
 					TCHAR buffer[128];
 					GetWindowText(hMacroName, buffer, 128);
 					wstring name = buffer;
-					if (hasMacro(wideStringToUtf8(name))) {
+					string u8Name = wideStringToUtf8(name);
+					
+					int matchIndex = -1;
+					if (!u8Name.empty()) {
+						string lowerName = u8Name;
+						for (char &c : lowerName) c = tolower((unsigned char)c);
+
+						// 1. Exact match first
+						for (size_t i = 0; i < displayMacroText.size(); i++) {
+							string itemLower = displayMacroText[i];
+							for (char &c : itemLower) c = tolower((unsigned char)c);
+							if (itemLower == lowerName) {
+								matchIndex = (int)i;
+								break;
+							}
+						}
+						// 2. Prefix match if no exact match
+						if (matchIndex == -1) {
+							for (size_t i = 0; i < displayMacroText.size(); i++) {
+								string itemLower = displayMacroText[i];
+								for (char &c : itemLower) c = tolower((unsigned char)c);
+								if (itemLower.find(lowerName) == 0) {
+									matchIndex = (int)i;
+									break;
+								}
+							}
+						}
+					}
+
+					if (matchIndex != -1) {
+						LVITEM lviClear;
+						memset(&lviClear, 0, sizeof(lviClear));
+						lviClear.stateMask = LVIS_SELECTED | LVIS_FOCUSED;
+						lviClear.state = 0;
+						SendMessage(listMacro, LVM_SETITEMSTATE, (WPARAM)-1, (LPARAM)&lviClear);
+
+						LVITEM lvi;
+						memset(&lvi, 0, sizeof(lvi));
+						lvi.stateMask = LVIS_SELECTED | LVIS_FOCUSED;
+						lvi.state = LVIS_SELECTED | LVIS_FOCUSED;
+						SendMessage(listMacro, LVM_SETITEMSTATE, matchIndex, (LPARAM)&lvi);
+						SendMessage(listMacro, LVM_ENSUREVISIBLE, matchIndex, FALSE);
+						SetWindowText(hMacroContent, utf8ToWideString(displayMacroContent[matchIndex]).c_str());
 						SetWindowText(hAddButton, BTN_UPDATE_TEXT);
 					} else {
-						SetWindowText(hAddButton, BTN_ADD_TEXT);
+						if (!u8Name.empty() && hasMacro(u8Name)) {
+							SetWindowText(hAddButton, BTN_UPDATE_TEXT);
+						} else {
+							SetWindowText(hAddButton, BTN_ADD_TEXT);
+							if (u8Name.empty()) {
+								SetWindowText(hMacroContent, _T(""));
+							}
+						}
 					}
 				}
 			} else if (HIWORD(wParam) == BN_CLICKED) {

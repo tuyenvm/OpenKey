@@ -203,17 +203,6 @@ static bool findMacroMatch(vector<Uint32> key, vector<Uint32>& macroData, Byte& 
         backspaceCount = (Byte)key.size();
         return true;
     }
-
-    vector<Uint32> collapsedKey;
-    for (size_t index = 0; index < key.size(); index++) {
-        if (collapsedKey.empty() || collapsedKey.back() != key[index]) {
-            collapsedKey.push_back(key[index]);
-        }
-    }
-    if (collapsedKey.size() != key.size() && findMacro(collapsedKey, macroData)) {
-        backspaceCount = (Byte)collapsedKey.size();
-        return true;
-    }
     return false;
 }
 
