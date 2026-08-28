@@ -77,6 +77,14 @@ static CFRunLoopSourceRef runLoopSource;
     return YES;
 }
 
+// Called from OpenKeyCallback when macOS reports that it turned our tap off.
+// Only this file owns `eventTap`, so re-enabling has to happen here.
+void OpenKeyReEnableEventTap(void) {
+    if (eventTap) {
+        CGEventTapEnable(eventTap, true);
+    }
+}
+
 +(BOOL)stopEventTap {
     if (_isInited) { //release all object
         CFRunLoopRemoveSource(CFRunLoopGetCurrent(), runLoopSource, kCFRunLoopCommonModes);
