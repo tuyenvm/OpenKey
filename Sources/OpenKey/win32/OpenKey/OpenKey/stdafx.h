@@ -34,6 +34,14 @@ redistribute your new version, it MUST be open source.
 #include <string>
 #include <vector>
 
+#define MASK_SHIFT				0x01
+#define MASK_CONTROL			0x02
+#define MASK_ALT				0x04
+#define MASK_CAPITAL			0x08
+#define MASK_NUMLOCK			0x10
+#define MASK_WIN				0x20
+#define MASK_SCROLL				0x40
+
 #include <shellapi.h>
 #include <Commctrl.h>
 #include <psapi.h>
@@ -58,6 +66,7 @@ extern wchar_t _logBuffer[1024];
 #define APP_CLASS _T("OpenKeyVietnameseInputMethod")
 
 extern void saveSmartSwitchKeyData();
+extern void ShowCaretOverlay(bool isVietnamese);
 
 extern int vLanguage;
 extern int vInputType;
@@ -87,3 +96,6 @@ extern int vRememberCode;
 extern int vOtherLanguage;
 extern int vTempOffOpenKey;
 extern int vFixChromiumBrowser;
+extern int vShortcutModifier;
+extern int vShortcutF4CodeTable;
+extern int vShortcutEnableMask;

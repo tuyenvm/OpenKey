@@ -64,29 +64,28 @@ void MainControlDialog::initDialog() {
     TabCtrl_InsertItem(hTab, 0, &tci);
     tci.pszText = (LPWSTR)_T("Gõ tắt");
     TabCtrl_InsertItem(hTab, 1, &tci);
-    tci.pszText = (LPWSTR)_T("Hệ thống");
+    tci.pszText = (LPWSTR)_T("Phím tắt");
     TabCtrl_InsertItem(hTab, 2, &tci);
-    tci.pszText = (LPWSTR)_T("Thông tin");
+    tci.pszText = (LPWSTR)_T("Hệ thống");
     TabCtrl_InsertItem(hTab, 3, &tci);
-    RECT r;
-    TabCtrl_GetItemRect(hTab, 0, &r);
-    TabCtrl_SetItemSize(hTab, r.right - r.left, (r.bottom - r.top) * 1.428f);
+    tci.pszText = (LPWSTR)_T("Thông tin");
+    TabCtrl_InsertItem(hTab, 4, &tci);
 
     //create tab page
     hTabPage1 = CreateDialogParam(hIns, MAKEINTRESOURCE(IDD_DIALOG_TAB_GENERAL), hDlg, tabPageEventProc, (LPARAM)this);
     hTabPage2 = CreateDialogParam(hIns, MAKEINTRESOURCE(IDD_DIALOG_TAB_MACRO), hDlg, tabPageEventProc, (LPARAM)this);
+    hTabPageShortcut = CreateDialogParam(hIns, MAKEINTRESOURCE(IDD_DIALOG_TAB_SHORTCUT), hDlg, tabPageEventProc, (LPARAM)this);
     hTabPage3 = CreateDialogParam(hIns, MAKEINTRESOURCE(IDD_DIALOG_TAB_SYSTEM), hDlg, tabPageEventProc, (LPARAM)this);
     hTabPage4 = CreateDialogParam(hIns, MAKEINTRESOURCE(IDD_DIALOG_TAB_INFO), hDlg, tabPageEventProc, (LPARAM)this);
-    RECT rc;//find tab control's rectangle
-    GetWindowRect(hTab, &rc);
-    POINT offset = { 0 };
-    ScreenToClient(hDlg, &offset);
-    OffsetRect(&rc, offset.x, offset.y); //convert to client coordinates
-    rc.top += (LONG)((r.bottom - r.top) * 1.428f);
-    SetWindowPos(hTabPage1, 0, rc.left + 1, rc.top + 3, rc.right - rc.left - 5, rc.bottom - rc.top - 5, SWP_HIDEWINDOW);
-    SetWindowPos(hTabPage2, 0, rc.left + 1, rc.top + 3, rc.right - rc.left - 5, rc.bottom - rc.top - 6, SWP_HIDEWINDOW);
-    SetWindowPos(hTabPage3, 0, rc.left + 1, rc.top + 3, rc.right - rc.left - 5, rc.bottom - rc.top - 6, SWP_HIDEWINDOW);
-    SetWindowPos(hTabPage4, 0, rc.left + 1, rc.top + 3, rc.right - rc.left - 5, rc.bottom - rc.top - 6, SWP_HIDEWINDOW);
+    RECT rc;
+    GetClientRect(hTab, &rc);
+    TabCtrl_AdjustRect(hTab, FALSE, &rc);
+    MapWindowPoints(hTab, hDlg, (LPPOINT)&rc, 2);
+    SetWindowPos(hTabPage1, 0, rc.left, rc.top, rc.right - rc.left, rc.bottom - rc.top, SWP_HIDEWINDOW);
+    SetWindowPos(hTabPage2, 0, rc.left, rc.top, rc.right - rc.left, rc.bottom - rc.top, SWP_HIDEWINDOW);
+    SetWindowPos(hTabPageShortcut, 0, rc.left, rc.top, rc.right - rc.left, rc.bottom - rc.top, SWP_HIDEWINDOW);
+    SetWindowPos(hTabPage3, 0, rc.left, rc.top, rc.right - rc.left, rc.bottom - rc.top, SWP_HIDEWINDOW);
+    SetWindowPos(hTabPage4, 0, rc.left, rc.top, rc.right - rc.left, rc.bottom - rc.top, SWP_HIDEWINDOW);
     onTabIndexChanged();
 
     checkCtrl = GetDlgItem(hDlg, IDC_CHECK_SWITCH_KEY_CTRL);
@@ -169,9 +168,31 @@ void MainControlDialog::initDialog() {
     checkMacroAutoCaps = GetDlgItem(hTabPage2, IDC_CHECK_AUTO_CAPS);
     createToolTip(checkMacroAutoCaps, IDS_STRING_MACRO_AUTO_CAP);
 
+    /*------------end tab 2----------------*/
+
+    checkShortcutCtrl = GetDlgItem(hTabPageShortcut, IDC_CHECK_SHORTCUT_CTRL);
+    checkShortcutShift = GetDlgItem(hTabPageShortcut, IDC_CHECK_SHORTCUT_SHIFT);
+    checkShortcutAlt = GetDlgItem(hTabPageShortcut, IDC_CHECK_SHORTCUT_ALT);
+    checkShortcutWin = GetDlgItem(hTabPageShortcut, IDC_CHECK_SHORTCUT_WIN);
+
+    checkShortcutF1 = GetDlgItem(hTabPageShortcut, IDC_CHECK_SHORTCUT_F1);
+    checkShortcutF2 = GetDlgItem(hTabPageShortcut, IDC_CHECK_SHORTCUT_F2);
+    checkShortcutF3 = GetDlgItem(hTabPageShortcut, IDC_CHECK_SHORTCUT_F3);
+    checkShortcutF4 = GetDlgItem(hTabPageShortcut, IDC_CHECK_SHORTCUT_F4);
+    comboBoxShortcutF4Code = GetDlgItem(hTabPageShortcut, IDC_COMBO_SHORTCUT_F4_CODE);
+    for (int i = 0; i < tableCode.size(); i++) {
+        SendMessage(comboBoxShortcutF4Code, CB_ADDSTRING, i, reinterpret_cast<LPARAM>(tableCode[i]));
+    }
+
+    checkShortcutF5 = GetDlgItem(hTabPageShortcut, IDC_CHECK_SHORTCUT_F5);
+    checkShortcutF8 = GetDlgItem(hTabPageShortcut, IDC_CHECK_SHORTCUT_F8);
+    checkShortcutF9 = GetDlgItem(hTabPageShortcut, IDC_CHECK_SHORTCUT_F9);
+    checkShortcutF11 = GetDlgItem(hTabPageShortcut, IDC_CHECK_SHORTCUT_F11);
+    checkShortcutF12 = GetDlgItem(hTabPageShortcut, IDC_CHECK_SHORTCUT_F12);
+
     hUpdateButton = GetDlgItem(hDlg, IDC_BUTTON_CHECK_UPDATE);
 
-    /*------------end tab 2----------------*/
+    /*------------end tab shortcut----------*/
 
     checkModernIcon = GetDlgItem(hTabPage3, IDC_CHECK_MODERN_ICON);
     createToolTip(checkModernIcon, IDS_STRING_MODERN_ICON);
@@ -376,6 +397,25 @@ void MainControlDialog::fillData() {
     SendMessage(checkUseClipboard, BM_SETCHECK, vSendKeyStepByStep ? 0 : 1, 0);
     SendMessage(checkFixChromium, BM_SETCHECK, vFixChromiumBrowser ? 1 : 0, 0);
 
+    //tab shortcut
+    SendMessage(checkShortcutCtrl, BM_SETCHECK, (vShortcutModifier & MASK_CONTROL) ? 1 : 0, 0);
+    SendMessage(checkShortcutShift, BM_SETCHECK, (vShortcutModifier & MASK_SHIFT) ? 1 : 0, 0);
+    SendMessage(checkShortcutAlt, BM_SETCHECK, (vShortcutModifier & MASK_ALT) ? 1 : 0, 0);
+    SendMessage(checkShortcutWin, BM_SETCHECK, (vShortcutModifier & MASK_WIN) ? 1 : 0, 0);
+
+    SendMessage(checkShortcutF1, BM_SETCHECK, (vShortcutEnableMask & (1 << 1)) ? 1 : 0, 0);
+    SendMessage(checkShortcutF2, BM_SETCHECK, (vShortcutEnableMask & (1 << 2)) ? 1 : 0, 0);
+    SendMessage(checkShortcutF3, BM_SETCHECK, (vShortcutEnableMask & (1 << 3)) ? 1 : 0, 0);
+    SendMessage(checkShortcutF4, BM_SETCHECK, (vShortcutEnableMask & (1 << 4)) ? 1 : 0, 0);
+    SendMessage(comboBoxShortcutF4Code, CB_SETCURSEL, vShortcutF4CodeTable, 0);
+    EnableWindow(comboBoxShortcutF4Code, (vShortcutEnableMask & (1 << 4)) != 0);
+
+    SendMessage(checkShortcutF5, BM_SETCHECK, (vShortcutEnableMask & (1 << 5)) ? 1 : 0, 0);
+    SendMessage(checkShortcutF8, BM_SETCHECK, (vShortcutEnableMask & (1 << 8)) ? 1 : 0, 0);
+    SendMessage(checkShortcutF9, BM_SETCHECK, (vShortcutEnableMask & (1 << 9)) ? 1 : 0, 0);
+    SendMessage(checkShortcutF11, BM_SETCHECK, (vShortcutEnableMask & (1 << 11)) ? 1 : 0, 0);
+    SendMessage(checkShortcutF12, BM_SETCHECK, (vShortcutEnableMask & (1 << 12)) ? 1 : 0, 0);
+
     EnableWindow(checkRestoreIfWrongSpelling, vCheckSpelling);
     EnableWindow(checkAllowZWJF, vCheckSpelling);
     EnableWindow(checkTempOffSpelling, vCheckSpelling);
@@ -410,6 +450,9 @@ void MainControlDialog::onComboBoxSelected(const HWND& hCombobox, const int& com
             setAppInputMethodStatus(OpenKeyHelper::getFrontMostAppExecuteName(), vLanguage | (vCodeTable << 1));
             saveSmartSwitchKeyData();
         }
+    }
+    else if (hCombobox == comboBoxShortcutF4Code) {
+        APP_SET_DATA(vShortcutF4CodeTable, (int)SendMessage(hCombobox, CB_GETCURSEL, 0, 0));
     }
     SystemTrayHelper::updateData();
 }
@@ -591,6 +634,85 @@ void MainControlDialog::onCheckboxClicked(const HWND& hWnd) {
         val = (int)SendMessage(hWnd, BM_GETCHECK, 0, 0);
         APP_SET_DATA(vFixChromiumBrowser, val ? 1 : 0);
     }
+    else if (hWnd == checkShortcutCtrl) {
+        val = (int)SendMessage(hWnd, BM_GETCHECK, 0, 0);
+        if (val) vShortcutModifier |= MASK_CONTROL;
+        else vShortcutModifier &= ~MASK_CONTROL;
+        APP_SET_DATA(vShortcutModifier, vShortcutModifier);
+    }
+    else if (hWnd == checkShortcutShift) {
+        val = (int)SendMessage(hWnd, BM_GETCHECK, 0, 0);
+        if (val) vShortcutModifier |= MASK_SHIFT;
+        else vShortcutModifier &= ~MASK_SHIFT;
+        APP_SET_DATA(vShortcutModifier, vShortcutModifier);
+    }
+    else if (hWnd == checkShortcutAlt) {
+        val = (int)SendMessage(hWnd, BM_GETCHECK, 0, 0);
+        if (val) vShortcutModifier |= MASK_ALT;
+        else vShortcutModifier &= ~MASK_ALT;
+        APP_SET_DATA(vShortcutModifier, vShortcutModifier);
+    }
+    else if (hWnd == checkShortcutWin) {
+        val = (int)SendMessage(hWnd, BM_GETCHECK, 0, 0);
+        if (val) vShortcutModifier |= MASK_WIN;
+        else vShortcutModifier &= ~MASK_WIN;
+        APP_SET_DATA(vShortcutModifier, vShortcutModifier);
+    }
+    else if (hWnd == checkShortcutF1) {
+        val = (int)SendMessage(hWnd, BM_GETCHECK, 0, 0);
+        if (val) vShortcutEnableMask |= (1 << 1);
+        else vShortcutEnableMask &= ~(1 << 1);
+        APP_SET_DATA(vShortcutEnableMask, vShortcutEnableMask);
+    }
+    else if (hWnd == checkShortcutF2) {
+        val = (int)SendMessage(hWnd, BM_GETCHECK, 0, 0);
+        if (val) vShortcutEnableMask |= (1 << 2);
+        else vShortcutEnableMask &= ~(1 << 2);
+        APP_SET_DATA(vShortcutEnableMask, vShortcutEnableMask);
+    }
+    else if (hWnd == checkShortcutF3) {
+        val = (int)SendMessage(hWnd, BM_GETCHECK, 0, 0);
+        if (val) vShortcutEnableMask |= (1 << 3);
+        else vShortcutEnableMask &= ~(1 << 3);
+        APP_SET_DATA(vShortcutEnableMask, vShortcutEnableMask);
+    }
+    else if (hWnd == checkShortcutF4) {
+        val = (int)SendMessage(hWnd, BM_GETCHECK, 0, 0);
+        if (val) vShortcutEnableMask |= (1 << 4);
+        else vShortcutEnableMask &= ~(1 << 4);
+        APP_SET_DATA(vShortcutEnableMask, vShortcutEnableMask);
+        EnableWindow(comboBoxShortcutF4Code, val != 0);
+    }
+    else if (hWnd == checkShortcutF5) {
+        val = (int)SendMessage(hWnd, BM_GETCHECK, 0, 0);
+        if (val) vShortcutEnableMask |= (1 << 5);
+        else vShortcutEnableMask &= ~(1 << 5);
+        APP_SET_DATA(vShortcutEnableMask, vShortcutEnableMask);
+    }
+    else if (hWnd == checkShortcutF8) {
+        val = (int)SendMessage(hWnd, BM_GETCHECK, 0, 0);
+        if (val) vShortcutEnableMask |= (1 << 8);
+        else vShortcutEnableMask &= ~(1 << 8);
+        APP_SET_DATA(vShortcutEnableMask, vShortcutEnableMask);
+    }
+    else if (hWnd == checkShortcutF9) {
+        val = (int)SendMessage(hWnd, BM_GETCHECK, 0, 0);
+        if (val) vShortcutEnableMask |= (1 << 9);
+        else vShortcutEnableMask &= ~(1 << 9);
+        APP_SET_DATA(vShortcutEnableMask, vShortcutEnableMask);
+    }
+    else if (hWnd == checkShortcutF11) {
+        val = (int)SendMessage(hWnd, BM_GETCHECK, 0, 0);
+        if (val) vShortcutEnableMask |= (1 << 11);
+        else vShortcutEnableMask &= ~(1 << 11);
+        APP_SET_DATA(vShortcutEnableMask, vShortcutEnableMask);
+    }
+    else if (hWnd == checkShortcutF12) {
+        val = (int)SendMessage(hWnd, BM_GETCHECK, 0, 0);
+        if (val) vShortcutEnableMask |= (1 << 12);
+        else vShortcutEnableMask &= ~(1 << 12);
+        APP_SET_DATA(vShortcutEnableMask, vShortcutEnableMask);
+    }
     SystemTrayHelper::updateData();
 }
 
@@ -626,8 +748,9 @@ void MainControlDialog::onTabIndexChanged() {
     int index = TabCtrl_GetCurSel(hTab);
     ShowWindow(hTabPage1, (index == 0) ? SW_SHOW : SW_HIDE);
     ShowWindow(hTabPage2, (index == 1) ? SW_SHOW : SW_HIDE);
-    ShowWindow(hTabPage3, (index == 2) ? SW_SHOW : SW_HIDE);
-    ShowWindow(hTabPage4, (index == 3) ? SW_SHOW : SW_HIDE);
+    ShowWindow(hTabPageShortcut, (index == 2) ? SW_SHOW : SW_HIDE);
+    ShowWindow(hTabPage3, (index == 3) ? SW_SHOW : SW_HIDE);
+    ShowWindow(hTabPage4, (index == 4) ? SW_SHOW : SW_HIDE);
 }
 
 void MainControlDialog::onUpdateButton() {

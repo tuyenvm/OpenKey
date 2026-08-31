@@ -38,6 +38,8 @@ public: //event
 	void onDefaultConfig();
 
 	void onToggleVietnamese();
+	void onSetVietnameseLanguage(int lang);
+	void onResetOpenKey();
 	void onToggleCheckSpelling();
 	void onToggleUseSmartSwitchKey();
 	void onToggleUseMacro();

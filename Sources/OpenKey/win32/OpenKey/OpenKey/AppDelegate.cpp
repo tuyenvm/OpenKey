@@ -52,6 +52,9 @@ int vRunAsAdmin = 0;
 int vCheckNewVersion = 0;
 //beta feature
 int vFixChromiumBrowser = 0; //new on version 2.0
+int vShortcutModifier = (MASK_CONTROL | MASK_ALT); // default Ctrl + Alt (0x06)
+int vShortcutF4CodeTable = 2; // default VNI Windows
+int vShortcutEnableMask = 0x0FFF; // all enabled by default
 
 bool AppDelegate::isDialogMsg(MSG & msg) const {
 	return (mainDialog != NULL && IsDialogMessage(mainDialog->getHwnd(), &msg)) ||
@@ -202,6 +205,9 @@ void AppDelegate::onDefaultConfig() {
 	APP_SET_DATA(vTempOffOpenKey, 0);
 	APP_SET_DATA(vFixChromiumBrowser, 0);
 	APP_SET_DATA(vBlockBackslash, 0);
+	APP_SET_DATA(vShortcutModifier, (MASK_CONTROL | MASK_ALT));
+	APP_SET_DATA(vShortcutF4CodeTable, 2);
+	APP_SET_DATA(vShortcutEnableMask, 0x0FFF);
 
 	if (mainDialog) {
 		mainDialog->fillData();
@@ -210,7 +216,12 @@ void AppDelegate::onDefaultConfig() {
 }
 
 void AppDelegate::onToggleVietnamese() {
-	APP_SET_DATA(vLanguage, vLanguage ? 0 : 1);
+	onSetVietnameseLanguage(vLanguage ? 0 : 1);
+}
+
+void AppDelegate::onSetVietnameseLanguage(int lang) {
+	APP_SET_DATA(vLanguage, lang ? 1 : 0);
+	ShowCaretOverlay(vLanguage == 1);
 	if (HAS_BEEP(vSwitchKeyStatus)) {
 		Beep(vLanguage ? 1000 : 400, 80);
 		Beep(vLanguage ? 1400 : 300, 80);
@@ -218,11 +229,25 @@ void AppDelegate::onToggleVietnamese() {
 	if (mainDialog) {
 		mainDialog->fillData();
 	}
+	SystemTrayHelper::updateData();
 	
 	if (vUseSmartSwitchKey) {
 		string& exe = OpenKeyHelper::getLastAppExecuteName();
 		setAppInputMethodStatus(exe, vLanguage | (vCodeTable << 1));
 		saveSmartSwitchKeyData();
+	}
+}
+
+void AppDelegate::onResetOpenKey() {
+	OpenKeyManager::freeEngine();
+	OpenKeyManager::initEngine();
+	if (mainDialog) {
+		mainDialog->fillData();
+	}
+	SystemTrayHelper::updateData();
+	if (HAS_BEEP(vSwitchKeyStatus)) {
+		Beep(1200, 60);
+		Beep(1500, 60);
 	}
 }
 

@@ -16,7 +16,7 @@ redistribute your new version, it MUST be open source.
 
 class MainControlDialog : public BaseDialog {
 private:
-	HWND hTab, hTabPage1, hTabPage2, hTabPage3, hTabPage4;
+	HWND hTab, hTabPage1, hTabPage2, hTabPageShortcut, hTabPage3, hTabPage4;
 	HWND comboBoxInputType;
 	HWND comboBoxTableCode;
 	HWND checkCtrl, checkAlt, checkWin, checkShift, textSwitchKey, checkBeep;
@@ -27,6 +27,9 @@ private:
 	HWND checkSmartSwitchKey, checkCapsFirstChar, checkQuickTelex, checkUseMacro, checkUseMacroInEnglish;
 	HWND checkCreateDesktopShortcut, checkCheckNewVersion, checkRunAsAdmin, checkSupportMetroApp, checkMacroAutoCaps;
 	HWND checkFixChromium, checkRememberTableCode, checkTempOffOpenKey, checkAllowOtherLanguages, checkBlockBackslash;
+	HWND checkShortcutCtrl, checkShortcutShift, checkShortcutAlt, checkShortcutWin;
+	HWND checkShortcutF1, checkShortcutF2, checkShortcutF3, checkShortcutF4, comboBoxShortcutF4Code;
+	HWND checkShortcutF5, checkShortcutF8, checkShortcutF9, checkShortcutF11, checkShortcutF12;
 	HWND hUpdateButton;
 private:
 	void initDialog();

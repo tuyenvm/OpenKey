@@ -1919,7 +1919,7 @@ void vKeyHandleEvent(const vKeyEvent& event,
             }
         }
     }
-    bool isNumberBreak = ((IS_NUMBER_KEY(data) && capsStatus == 1) || isTBTNumberBreak) && !isTBTOrCustomNumberAction;
+    bool isNumberBreak = ((IS_NUMBER_KEY(data) && (capsStatus == 1 || isNumpadKey)) || isTBTNumberBreak) && !isTBTOrCustomNumberAction;
     bool isNumberAtStartBreak = (_index == 0 && IS_NUMBER_KEY(data)) && !isTBTOrCustomNumberAction;
     bool isCtrlKey = (data == VK_LCONTROL || data == VK_RCONTROL || data == VK_CONTROL);
     bool hasCtrlModifier = otherControlKey || isCtrlKey;

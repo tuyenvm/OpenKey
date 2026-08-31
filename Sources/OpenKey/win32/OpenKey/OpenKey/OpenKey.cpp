@@ -136,7 +136,7 @@ static void InitCaretOverlay() {
 	}
 }
 
-static void ShowCaretOverlay(bool isVietnamese) {
+void ShowCaretOverlay(bool isVietnamese) {
 	if (!hOverlayWnd) InitCaretOverlay();
 	if (!hOverlayWnd) return;
 
@@ -309,6 +309,9 @@ void OpenKeyInit() {
 	APP_GET_DATA(vTempOffOpenKey, 0);
 	APP_GET_DATA(vFixChromiumBrowser, 0);
 	APP_GET_DATA(vBlockBackslash, 0);
+	APP_GET_DATA(vShortcutModifier, (MASK_CONTROL | MASK_ALT));
+	APP_GET_DATA(vShortcutF4CodeTable, 2);
+	APP_GET_DATA(vShortcutEnableMask, 0x0FFF);
 
 	//init convert tool
 	APP_GET_DATA(convertToolDontAlertWhenCompleted, 0);
@@ -946,9 +949,7 @@ LRESULT CALLBACK keyboardHookProcess(int nCode, WPARAM wParam, LPARAM lParam) {
 
 	if (!_isFlagKey && wParam != WM_KEYUP && wParam != WM_SYSKEYUP) {
 		_keycode = (Uint16)keyboardData->vkCode;
-		if (_keycode >= VK_NUMPAD0 && _keycode <= VK_NUMPAD9) {
-			_keycode = KEY_0 + (_keycode - VK_NUMPAD0);
-		} else if (_keycode == VK_DECIMAL) {
+		if (_keycode == VK_DECIMAL) {
 			_keycode = KEY_DOT;
 		} else if (_keycode == VK_DIVIDE) {
 			_keycode = KEY_SLASH;
@@ -974,12 +975,70 @@ LRESULT CALLBACK keyboardHookProcess(int nCode, WPARAM wParam, LPARAM lParam) {
 			return -1;
 		}
 		// Cycle Case shortcut: Shift + F3 or Ctrl + Alt + U
-		if ((_keycode == VK_F3 && (_flag & MASK_SHIFT)) ||
+		if ((_keycode == VK_F3 && (_flag & MASK_SHIFT) && ((vShortcutModifier & MASK_SHIFT) == 0 || (_flag & vShortcutModifier) != vShortcutModifier)) ||
 			((_keycode == 'U' || _keycode == 'u') && (_flag & MASK_CONTROL) && (_flag & MASK_ALT))) {
 			OpenKeyHelper::cycleCase();
 			_hasJustUsedHotKey = true;
 			_keycode = 0;
 			return -1;
+		}
+
+		// Tab Phím tắt (F1-F12 with customizable modifier)
+		if (vShortcutModifier != 0 && (_flag & vShortcutModifier) == vShortcutModifier) {
+			if (_keycode == VK_F1 && (vShortcutEnableMask & (1 << 1))) { // F1: Bật TV
+				AppDelegate::getInstance()->onSetVietnameseLanguage(1);
+				_hasJustUsedHotKey = true;
+				_keycode = 0;
+				return -1;
+			}
+			if (_keycode == VK_F2 && (vShortcutEnableMask & (1 << 2))) { // F2: Tắt TV
+				AppDelegate::getInstance()->onSetVietnameseLanguage(0);
+				_hasJustUsedHotKey = true;
+				_keycode = 0;
+				return -1;
+			}
+			if (_keycode == VK_F3 && (vShortcutEnableMask & (1 << 3))) { // F3: Unicode
+				AppDelegate::getInstance()->onTableCode(0);
+				_hasJustUsedHotKey = true;
+				_keycode = 0;
+				return -1;
+			}
+			if (_keycode == VK_F4 && (vShortcutEnableMask & (1 << 4))) { // F4: Custom CodeTable (mặc định VNI Windows)
+				AppDelegate::getInstance()->onTableCode(vShortcutF4CodeTable);
+				_hasJustUsedHotKey = true;
+				_keycode = 0;
+				return -1;
+			}
+			if (_keycode == VK_F5 && (vShortcutEnableMask & (1 << 5))) { // F5: Cài đặt
+				AppDelegate::getInstance()->createMainDialog();
+				_hasJustUsedHotKey = true;
+				_keycode = 0;
+				return -1;
+			}
+			if (_keycode == VK_F8 && (vShortcutEnableMask & (1 << 8))) { // F8: Bảng gõ tắt
+				AppDelegate::getInstance()->onMacroTable();
+				_hasJustUsedHotKey = true;
+				_keycode = 0;
+				return -1;
+			}
+			if (_keycode == VK_F9 && (vShortcutEnableMask & (1 << 9))) { // F9: Bật/Tắt gõ tắt
+				AppDelegate::getInstance()->onToggleUseMacro();
+				_hasJustUsedHotKey = true;
+				_keycode = 0;
+				return -1;
+			}
+			if (_keycode == VK_F11 && (vShortcutEnableMask & (1 << 11))) { // F11: Loại trừ app
+				AppDelegate::getInstance()->onToggleUseSmartSwitchKey();
+				_hasJustUsedHotKey = true;
+				_keycode = 0;
+				return -1;
+			}
+			if (_keycode == VK_F12 && (vShortcutEnableMask & (1 << 12))) { // F12: Reset OpenKey
+				AppDelegate::getInstance()->onResetOpenKey();
+				_hasJustUsedHotKey = true;
+				_keycode = 0;
+				return -1;
+			}
 		}
 		if (GET_SWITCH_KEY(vSwitchKeyStatus) != _keycode && GET_SWITCH_KEY(convertToolHotKey) != _keycode) {
 			_lastFlag = 0;
@@ -1045,6 +1104,9 @@ LRESULT CALLBACK keyboardHookProcess(int nCode, WPARAM wParam, LPARAM lParam) {
 				Uint8 savedExt = pData->extCode;
 				handleMacro();
 				startNewSession();
+				if (isGame && (savedExt == 8 || _keycode == VK_RETURN)) {
+					_inGameChatTyping = false;
+				}
 				if (savedExt == 7) {
 					return CallNextHookEx(hKeyboardHook, nCode, wParam, lParam);
 				}
@@ -1085,12 +1147,11 @@ LRESULT CALLBACK keyboardHookProcess(int nCode, WPARAM wParam, LPARAM lParam) {
 				if (vFixChromiumBrowser && 
 					std::find(_chromiumBrowser.begin(), _chromiumBrowser.end(), OpenKeyHelper::getLastAppExecuteName()) != _chromiumBrowser.end()) {
 					SendCombineKey(KEY_LEFT_SHIFT, KEY_LEFT, 0, KEYEVENTF_EXTENDEDKEY);
-					if (pData->backspaceCount == 1)
-						pData->backspaceCount--;
+					SendBackspace();
 				} else {
 					SendEmptyCharacter();
-					pData->backspaceCount++;
 				}
+				pData->backspaceCount++;
 			}
 			
 			//send backspace
@@ -1126,6 +1187,9 @@ LRESULT CALLBACK keyboardHookProcess(int nCode, WPARAM wParam, LPARAM lParam) {
 			Uint8 savedExt = pData->extCode;
 			handleMacro();
 			startNewSession();
+			if (isGame && (savedExt == 8 || _keycode == VK_RETURN)) {
+				_inGameChatTyping = false;
+			}
 			if (savedExt == 7 || isTriggerModifier) {
 				return CallNextHookEx(hKeyboardHook, nCode, wParam, lParam);
 			}
