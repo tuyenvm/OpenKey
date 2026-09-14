@@ -68,6 +68,9 @@ extern "C" {
     CGKeyCode _keycode;
     CGEventFlags _flag, _lastFlag = 0, _privateFlag;
     CGEventTapProxy _proxy;
+
+    //defined in OpenKeyManager.m
+    extern void OpenKeyReEnableEventTap(void);
     
     Uint16 _newCharString[MAX_UNICODE_STRING];
     Uint16 _newCharSize;
@@ -599,6 +602,14 @@ extern "C" {
      * MAIN Callback.
      */
     CGEventRef OpenKeyCallback(CGEventTapProxy proxy, CGEventType type, CGEventRef event, void *refcon) {
+        //macOS turns the tap off if this callback misses its deadline (heavy system load)
+        //or after certain user input, and tells us through these two pseudo event types.
+        //Without re-enabling here, OpenKey silently stops converting until it is relaunched.
+        if (type == kCGEventTapDisabledByTimeout || type == kCGEventTapDisabledByUserInput) {
+            OpenKeyReEnableEventTap();
+            return event;
+        }
+
         //dont handle my event
         if (CGEventGetIntegerValueField(event, kCGEventSourceStateID) == CGEventSourceGetSourceStateID(myEventSource)) {
             return event;
