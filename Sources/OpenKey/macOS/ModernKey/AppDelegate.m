@@ -18,11 +18,13 @@
 #import "MJAccessibilityUtils.h"
 
 AppDelegate* appDelegate;
+extern NSString* _frontMostApp;
 extern ViewController* viewController;
 extern void OnTableCodeChange(void);
 extern void OnInputMethodChanged(void);
 extern void RequestNewSession(void);
 extern void OnActiveAppChanged(void);
+extern void OnActiveAppChangedWithBundleId(NSString* bundleId);
 
 //see document in Engine.h
 int vLanguage = 1;
@@ -32,7 +34,7 @@ int vCodeTable = 0;
 int vCheckSpelling = 1;
 int vUseModernOrthography = 1;
 int vQuickTelex = 0;
-#define DEFAULT_SWITCH_STATUS 0x7A000206 //default option + z
+#define DEFAULT_SWITCH_STATUS 0x7A000106 //default ctrl + z
 int vSwitchKeyStatus = DEFAULT_SWITCH_STATUS;
 int vRestoreIfWrongSpelling = 0;
 int vFixRecommendBrowser = 1;
@@ -159,6 +161,11 @@ extern bool convertToolDontAlertWhenCompleted;
         NSBeep();
 
     [self createStatusBarMenu];
+    
+    NSRunningApplication *frontApp = [[NSWorkspace sharedWorkspace] frontmostApplication];
+    if (frontApp != nil && frontApp.bundleIdentifier != nil) {
+        _frontMostApp = frontApp.bundleIdentifier;
+    }
     
     //init
     dispatch_async(dispatch_get_main_queue(), ^{
@@ -291,7 +298,7 @@ extern bool convertToolDontAlertWhenCompleted;
     vFreeMark = 0; [[NSUserDefaults standardUserDefaults] setInteger:vFreeMark forKey:@"FreeMark"];
     vCheckSpelling = 1; [[NSUserDefaults standardUserDefaults] setInteger:vCheckSpelling forKey:@"Spelling"];
     vCodeTable = 0; [[NSUserDefaults standardUserDefaults] setInteger:vCodeTable forKey:@"CodeTable"];
-    vSwitchKeyStatus = DEFAULT_SWITCH_STATUS; [[NSUserDefaults standardUserDefaults] setInteger:vCodeTable forKey:@"SwitchKeyStatus"];
+    vSwitchKeyStatus = DEFAULT_SWITCH_STATUS; [[NSUserDefaults standardUserDefaults] setInteger:vSwitchKeyStatus forKey:@"SwitchKeyStatus"];
     vQuickTelex = 0; [[NSUserDefaults standardUserDefaults] setInteger:vQuickTelex forKey:@"QuickTelex"];
     vUseModernOrthography = 0; [[NSUserDefaults standardUserDefaults] setInteger:vUseModernOrthography forKey:@"ModernOrthography"];
     vRestoreIfWrongSpelling = 0; [[NSUserDefaults standardUserDefaults] setInteger:vRestoreIfWrongSpelling forKey:@"RestoreIfInvalidWord"];
@@ -320,8 +327,28 @@ extern bool convertToolDontAlertWhenCompleted;
 }
 
 -(void)setRunOnStartup:(BOOL)val {
-    CFStringRef appId = (__bridge CFStringRef)@"com.tuyenmai.OpenKeyHelper";
-    SMLoginItemSetEnabled(appId, val);
+    if (@available(macOS 13.0, *)) {
+        SMAppService *service = [SMAppService mainAppService];
+        NSError *error = nil;
+        if (val) {
+            if (service.status != SMAppServiceStatusEnabled) {
+                BOOL success = [service registerAndReturnError:&error];
+                if (!success || error != nil) {
+                    NSLog(@"[OpenKey] SMAppService register error: %@", error);
+                }
+            }
+        } else {
+            if (service.status == SMAppServiceStatusEnabled) {
+                BOOL success = [service unregisterAndReturnError:&error];
+                if (!success || error != nil) {
+                    NSLog(@"[OpenKey] SMAppService unregister error: %@", error);
+                }
+            }
+        }
+    } else {
+        CFStringRef appId = (__bridge CFStringRef)@"com.tuyenmai.OpenKeyHelper";
+        SMLoginItemSetEnabled(appId, val);
+    }
 }
 
 -(void)setGrayIcon:(BOOL)val {
@@ -396,8 +423,10 @@ extern bool convertToolDontAlertWhenCompleted;
     
     NSInteger intSwitchKeyStatus = [[NSUserDefaults standardUserDefaults] integerForKey:@"SwitchKeyStatus"];
     vSwitchKeyStatus = (int)intSwitchKeyStatus;
-    if (vSwitchKeyStatus == 0)
-        vSwitchKeyStatus = DEFAULT_SWITCH_STATUS;
+    if (vSwitchKeyStatus == 0 || vSwitchKeyStatus == 0x7A000206) {
+        vSwitchKeyStatus = DEFAULT_SWITCH_STATUS; // default ctrl + z
+        [[NSUserDefaults standardUserDefaults] setInteger:vSwitchKeyStatus forKey:@"SwitchKeyStatus"];
+    }
     
     NSInteger intCode = [[NSUserDefaults standardUserDefaults] integerForKey:@"CodeTable"];
     [mnuUnicode setState:NSControlStateValueOff];
@@ -417,27 +446,22 @@ extern bool convertToolDontAlertWhenCompleted;
         [mnuVietnameseLocaleCP1258 setState:NSControlStateValueOn];
     }
     vCodeTable = (int)intCode;
-    
-    //
-    NSInteger intRunOnStartup = [[NSUserDefaults standardUserDefaults] integerForKey:@"RunOnStartup"];
-    [self setRunOnStartup:intRunOnStartup ? YES : NO];
-
 }
 
--(void)onImputMethodChanged:(BOOL)willNotify {
-    NSInteger intInputMethod = [[NSUserDefaults standardUserDefaults] integerForKey:@"InputMethod"];
-    if (intInputMethod == 0)
-        intInputMethod = 1;
-    else
-        intInputMethod = 0;
-    vLanguage = (int)intInputMethod;
-    [[NSUserDefaults standardUserDefaults] setInteger:intInputMethod forKey:@"InputMethod"];
+-(void)setInputMethod:(int)targetLanguage willNotify:(BOOL)willNotify {
+    vLanguage = targetLanguage;
+    [[NSUserDefaults standardUserDefaults] setInteger:targetLanguage forKey:@"InputMethod"];
 
     [self fillData];
     [viewController fillData];
     
     if (willNotify)
         OnInputMethodChanged();
+}
+
+-(void)onImputMethodChanged:(BOOL)willNotify {
+    int nextLanguage = (vLanguage == 0) ? 1 : 0;
+    [self setInputMethod:nextLanguage willNotify:willNotify];
 }
 
 #pragma mark -StatusBar menu action
@@ -547,8 +571,20 @@ extern bool convertToolDontAlertWhenCompleted;
 }
 
 -(void)activeAppChanged: (NSNotification*)note {
+    NSRunningApplication *app = [note.userInfo objectForKey:NSWorkspaceApplicationKey];
+    NSString *bundleId = app.bundleIdentifier;
+    if (bundleId == nil) {
+        bundleId = app.localizedName;
+    }
+    if (bundleId != nil) {
+        _frontMostApp = bundleId;
+    }
     if (vUseSmartSwitchKey && [OpenKeyManager isInited]) {
-        OnActiveAppChanged();
+        if (bundleId != nil) {
+            OnActiveAppChangedWithBundleId(bundleId);
+        } else {
+            OnActiveAppChanged();
+        }
     }
 }
 

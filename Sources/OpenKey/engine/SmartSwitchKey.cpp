@@ -51,7 +51,32 @@ void getSmartSwitchKeySaveData(vector<Byte>& outData) {
     }
 }
 
+static bool isDefaultEnglishApp(const string& bundleId) {
+    static const vector<string> defaultEnApps = {
+        "com.apple.Terminal",
+        "com.googlecode.iterm2",
+        "com.microsoft.VSCode",
+        "com.microsoft.VSCodeInsiders",
+        "com.sublimetext.3",
+        "com.sublimetext.4",
+        "com.apple.dt.Xcode",
+        "dev.zed.Zed",
+        "com.mitchellh.ghostty",
+        "io.alacritty",
+        "org.alacritty",
+        "com.github.wez.wezterm",
+        "net.kovidgoyal.kitty"
+    };
+    for (size_t i = 0; i < defaultEnApps.size(); i++) {
+        if (bundleId == defaultEnApps[i] || bundleId.rfind("com.jetbrains.", 0) == 0) {
+            return true;
+        }
+    }
+    return false;
+}
+
 int getAppInputMethodStatus(const string& bundleId, const int& currentInputMethod) {
+    if (bundleId.empty()) return currentInputMethod;
     if (_cacheKey.compare(bundleId) == 0) {
         return _cacheData;
     }
@@ -61,13 +86,18 @@ int getAppInputMethodStatus(const string& bundleId, const int& currentInputMetho
         return _cacheData;
     }
     _cacheKey = bundleId;
-    _cacheData = currentInputMethod;
+    if (isDefaultEnglishApp(bundleId)) {
+        _cacheData = 0; // Default English for developer / terminal apps
+    } else {
+        _cacheData = currentInputMethod >= 0 ? currentInputMethod : 1; // Default Vietnamese for normal apps
+    }
     _smartSwitchKeyData[bundleId] = _cacheData;
-    return -1;
+    return _cacheData;
 }
 
 void setAppInputMethodStatus(const string& bundleId, const int& language) {
-    _smartSwitchKeyData[bundleId] = language;
+    if (bundleId.empty()) return;
+    _smartSwitchKeyData[bundleId] = (Int8)language;
     _cacheKey = bundleId;
-    _cacheData = language;
+    _cacheData = (Int8)language;
 }

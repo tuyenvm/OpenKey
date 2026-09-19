@@ -10,6 +10,30 @@ Bộ gõ tiếng Việt mới cho macOS, sử dụng kỹ thuật `Backspace`. L
 
 ### Lưu ý, khi sử dụng OpenKey, bạn nên tắt hẳn bộ gõ khác vì 2 chương trình bộ gõ sẽ xung đột nhau, dẫn đến thao tác không chính xác.
 
+---
+
+## ⚡ Bản cập nhật tối ưu hóa (Optimized Fork by [@hungmtuci](https://github.com/hungmtuci))
+
+> Bản phân phối này là bản fork từ dự án gốc **OpenKey** của tác giả **Mai Vũ Tuyên ([@tuyenvm](https://github.com/tuyenvm))**, được phát triển và tối ưu theo giấy phép GPLv3 nhằm khắc phục một số vấn đề trên các phiên bản macOS hiện đại (macOS 13+ Ventura, Sonoma, Sequoia).
+
+### 🛠️ Các cải tiến & tối ưu kỹ thuật chính:
+1. **Khắc phục triệt để lỗi đơ phím trên Apple Mail & WebKit (`PostBackspaceEvent`):**
+   - Thay thế các sự kiện Backspace dùng lại tĩnh bằng cơ chế cấp phát động và giải phóng ngay, tránh hỏng sequence number và timestamp nội bộ của WindowServer.
+2. **Watchdog Timer (0.5s) bảo vệ EventTap:**
+   - Tự động phát hiện và kích hoạt lại `CGEventTap` ngay lập tức nếu bị macOS tạm ngắt (do timeout hoặc chuyển đổi ngữ cảnh).
+3. **Loại bỏ sự kiện kéo chuột (`MouseDragged` 120Hz):**
+   - Giảm tải hoàn toàn WindowServer IPC, khử độ trễ và tránh timeout của EventTap.
+4. **Hiện đại hóa khởi động cùng hệ thống (`SMAppService`):**
+   - Sử dụng chuẩn `SMAppService.mainAppService` trên macOS 13+, minh bạch trong System Settings ➔ Login Items.
+   - Loại bỏ lời gọi `setRunOnStartup` dư thừa trong hàm `fillData` khi đổi ngôn ngữ.
+5. **Smart Switch Key mở rộng:**
+   - Mặc định Tiếng Anh cho các công cụ lập trình & terminal hiện đại (*VS Code, Xcode, Zed, Ghostty, iTerm2, Alacritty, WezTerm, Kitty, JetBrains IDEs...*).
+6. **Hệ thống Build Native & Link-Time Optimization (LTO):**
+   - Hỗ trợ biên dịch độc lập không phụ thuộc Xcode GUI qua `build_macos.sh` / `Makefile`.
+   - Kích hoạt Clang `-O3 -flto` và `-Wl,-dead_strip` giúp nhị phân siêu gọn nhẹ (~337 KB) và phản hồi tức thì.
+
+---
+
 ![Giao diện](https://raw.githubusercontent.com/tuyenvm/tuyenvm.github.io/master/images/openkey-main-control.png "Main UI")
 ![Giao diện](https://raw.githubusercontent.com/tuyenvm/tuyenvm.github.io/master/images/openkey-main-control-2.png "Main UI")
 ![Giao diện](https://raw.githubusercontent.com/tuyenvm/tuyenvm.github.io/master/images/openkey-main-control-3.png "Main UI")

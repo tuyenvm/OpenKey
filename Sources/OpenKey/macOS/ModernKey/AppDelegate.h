@@ -13,6 +13,7 @@
 
 @interface AppDelegate : NSObject <NSApplicationDelegate>
 
+-(void)setInputMethod:(int)targetLanguage willNotify:(BOOL)willNotify;
 -(void)onImputMethodChanged:(BOOL)willNotify;
 -(void)onInputMethodSelected;
 
