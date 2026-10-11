@@ -401,13 +401,15 @@ bool checkHotKey(int hotKeyData, bool checkKeyCode = true) {
 void switchLanguage() {
 	if (vLanguage == 0)
 		vLanguage = 1;
+	else if (vLanguage == 1)
+		vLanguage = 2; //German
 	else
 		vLanguage = 0;
 	if (HAS_BEEP(vSwitchKeyStatus))
 		MessageBeep(MB_OK);
 	AppDelegate::getInstance()->onInputMethodChangedFromHotKey();
 	if (vUseSmartSwitchKey) {
-		setAppInputMethodStatus(OpenKeyHelper::getFrontMostAppExecuteName(), vLanguage | (vCodeTable << 1));
+		setAppInputMethodStatus(OpenKeyHelper::getFrontMostAppExecuteName(), vLanguage | (vCodeTable << 2));
 		saveSmartSwitchKeyData();
 	}
 	startNewSession();
@@ -452,6 +454,32 @@ static void handleMacro() {
 		}
 	}
 	SendKeyCode(_keycode | (_flag & MASK_SHIFT ? CAPS_MASK : 0));
+}
+
+static void handleGermanKey() {
+	//fix autocomplete
+	if (vFixRecommendBrowser) {
+		SendEmptyCharacter();
+		pData->backspaceCount++;
+	}
+
+	//send backspace to remove the base letter
+	if (pData->backspaceCount > 0 && pData->backspaceCount < MAX_BUFF) {
+		for (_i = 0; _i < pData->backspaceCount; _i++) {
+			SendBackspace();
+		}
+	}
+
+	//send the umlaut character
+	if (!vSendKeyStepByStep) {
+		SendNewCharString();
+	} else {
+		if (pData->newCharCount > 0 && pData->newCharCount <= MAX_BUFF) {
+			for (int i = pData->newCharCount - 1; i >= 0; i--) {
+				SendKeyCode(pData->charData[i]);
+			}
+		}
+	}
 }
 
 static bool SetModifierMask(const Uint16& vkCode) {
@@ -577,6 +605,22 @@ LRESULT CALLBACK keyboardHookProcess(int nCode, WPARAM wParam, LPARAM lParam) {
 		return CallNextHookEx(hKeyboardHook, nCode, wParam, lParam);
 	}
 
+	//if is in german mode
+	if (vLanguage == 2) {
+		if (wParam == WM_KEYDOWN || wParam == WM_SYSKEYDOWN) {
+			vGermanMode(vKeyEventState::KeyDown,
+				_keycode,
+				(_flag & MASK_SHIFT) || (_flag & MASK_CAPITAL),
+				OTHER_CONTROL_KEY);
+
+			if (pData->code == vWillProcess) { //umlaut character
+				handleGermanKey();
+				return -1; //consume event
+			}
+		}
+		return CallNextHookEx(hKeyboardHook, nCode, wParam, lParam);
+	}
+
 	//handle keyboard
 	if (wParam == WM_KEYDOWN || wParam == WM_SYSKEYDOWN) {
 		//send event signal to Engine
@@ -662,7 +706,11 @@ LRESULT CALLBACK mouseHookProcess(int nCode, WPARAM wParam, LPARAM lParam) {
 	case WM_XBUTTONUP:
 	case WM_NCXBUTTONUP:
 		//send event signal to Engine
-		vKeyHandleEvent(vKeyEvent::Mouse, vKeyEventState::MouseDown, 0);
+		if (vLanguage == 2) {
+			vGermanMode(vKeyEventState::MouseDown, 0, false, false);
+		} else {
+			vKeyHandleEvent(vKeyEvent::Mouse, vKeyEventState::MouseDown, 0);
+		}
 		if (IS_DOUBLE_CODE(vCodeTable)) { //VNI
 			_syncKey.clear();
 		}
@@ -677,18 +725,22 @@ VOID CALLBACK winEventProcCallback(HWINEVENTHOOK hWinEventHook, DWORD dwEvent, H
 		string& exe = OpenKeyHelper::getFrontMostAppExecuteName();
 		if (exe.compare("explorer.exe") == 0) //dont apply with windows explorer
 			return;
-		_languageTemp = getAppInputMethodStatus(exe, vLanguage | (vCodeTable << 1));
+		_languageTemp = getAppInputMethodStatus(exe, vLanguage | (vCodeTable << 2));
 		vTempOffEngine(false);
-		if (vUseSmartSwitchKey && (_languageTemp & 0x01) != vLanguage) {
+		if (_languageTemp != -1 && (_languageTemp & 0x03) == 3 && _languageTemp <= 9) {
+			//legacy data (old bit layout: 1-bit language + code table shifted 1)
+			_languageTemp = (_languageTemp & 0x01) | ((_languageTemp >> 1) << 2);
+		}
+		if (vUseSmartSwitchKey && (_languageTemp & 0x03) != vLanguage) {
 			if (_languageTemp != -1) {
-				vLanguage = _languageTemp;
+				vLanguage = _languageTemp & 0x03;
 				AppDelegate::getInstance()->onInputMethodChangedFromHotKey();
 			} else {
 				saveSmartSwitchKeyData();
 			}
 		}
 		startNewSession();
-		if (vRememberCode && (_languageTemp >> 1) != vCodeTable) { //for remember table code feature
+		if (vRememberCode && (_languageTemp >> 2) != vCodeTable) { //for remember table code feature
 			if (_languageTemp != -1) {
 				AppDelegate::getInstance()->onTableCode(_languageTemp >> 1);
 			} else {

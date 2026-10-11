@@ -205,14 +205,27 @@ void AppDelegate::onDefaultConfig() {
 }
 
 void AppDelegate::onToggleVietnamese() {
-	APP_SET_DATA(vLanguage, vLanguage ? 0 : 1);
+	APP_SET_DATA(vLanguage, vLanguage == 0 ? 1 : (vLanguage == 1 ? 2 : 0));
 	if (mainDialog) {
 		mainDialog->fillData();
 	}
-	
+
 	if (vUseSmartSwitchKey) {
 		string& exe = OpenKeyHelper::getLastAppExecuteName();
-		setAppInputMethodStatus(exe, vLanguage | (vCodeTable << 1));
+		setAppInputMethodStatus(exe, vLanguage | (vCodeTable << 2));
+		saveSmartSwitchKeyData();
+	}
+}
+
+void AppDelegate::onSetLanguage(const int& language) {
+	APP_SET_DATA(vLanguage, language == 1 ? 1 : (language == 2 ? 2 : 0));
+	if (mainDialog) {
+		mainDialog->fillData();
+	}
+
+	if (vUseSmartSwitchKey) {
+		string& exe = OpenKeyHelper::getLastAppExecuteName();
+		setAppInputMethodStatus(exe, vLanguage | (vCodeTable << 2));
 		saveSmartSwitchKeyData();
 	}
 }
@@ -281,7 +294,7 @@ void AppDelegate::onTableCode(const int & code) {
 		mainDialog->fillData();
 	}
 	if (vRememberCode) {
-		setAppInputMethodStatus(OpenKeyHelper::getFrontMostAppExecuteName(), vLanguage | (vCodeTable << 1));
+		setAppInputMethodStatus(OpenKeyHelper::getFrontMostAppExecuteName(), vLanguage | (vCodeTable << 2));
 		saveSmartSwitchKeyData();
 	}
 }

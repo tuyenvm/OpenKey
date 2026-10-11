@@ -153,6 +153,12 @@
     <Image Include="StatusEng.ico">
       <Filter>Resource Files</Filter>
     </Image>
+    <Image Include="StatusGer.ico">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="StatusGer10.ico">
+      <Filter>Resource Files</Filter>
+    </Image>
     <Image Include="StatusViet10.ico">
       <Filter>Resource Files</Filter>
     </Image>

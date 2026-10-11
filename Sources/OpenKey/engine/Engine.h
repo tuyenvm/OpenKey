@@ -44,6 +44,7 @@
 /*
  * 0: English
  * 1: Vietnamese
+ * 2: German (umlaut: a+1=ä, o+1=ö, u+1=ü, s+1=ß)
  */
 extern int vLanguage;
 
@@ -220,6 +221,12 @@ void startNewSession();
  * do some task in english mode (use for macro)
  */
 void vEnglishMode(const vKeyEventState& state, const Uint16& data, const bool& isCaps, const bool& otherControlKey);
+
+/**
+ * German umlaut typing mode (a+1=ä, o+1=ö, u+1=ü, s+1=ß)
+ * Call this for every key/mouse event while vLanguage == 2
+ */
+void vGermanMode(const vKeyEventState& state, const Uint16& data, const bool& isCaps, const bool& otherControlKey);
 
 /**
  * temporarily turn off spell checking

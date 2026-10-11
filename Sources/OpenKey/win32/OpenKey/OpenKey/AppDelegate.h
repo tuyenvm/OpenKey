@@ -47,6 +47,7 @@ public: //event
 
 	void onInputType(const int& type);
 	void onTableCode(const int& code);
+	void onSetLanguage(const int& language); //0: English; 1: Vietnamese; 2: German
 
 	void onControlPanel();
 	void onOpenKeyAbout();

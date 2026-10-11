@@ -22,6 +22,10 @@ redistribute your new version, it MUST be open source.
 #define POPUP_SMART_SWITCH 902
 #define POPUP_USE_MACRO 903
 
+#define POPUP_LANG_VIET 904
+#define POPUP_LANG_ENG 905
+#define POPUP_LANG_GER 906
+
 #define POPUP_TELEX 910
 #define POPUP_VNI 911
 #define POPUP_SIMPLE_TELEX 912
@@ -49,11 +53,15 @@ redistribute your new version, it MUST be open source.
 static HMENU popupMenu;
 //static HMENU menuInputType;
 static HMENU otherCode;
+static HMENU languageMenu;
 
 static NOTIFYICONDATA nid;
 
 map<UINT, LPCTSTR> menuData = {
 	{POPUP_VIET_ON_OFF, _T("Bật Tiếng Việt")},
+	{POPUP_LANG_VIET, _T("Tiếng Việt")},
+	{POPUP_LANG_ENG, _T("Tiếng Anh")},
+	{POPUP_LANG_GER, _T("Tiếng Đức (ä ö ü ß)")},
 	{POPUP_SPELLING, _T("Bật kiểm tra chính tả")},
 	{POPUP_SMART_SWITCH, _T("Bật loại trừ ứng dụng thông minh")},
 	{POPUP_USE_MACRO, _T("Bật gõ tắt")},
@@ -80,7 +88,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam) 
 	case WM_CREATE:
 		taskbarCreated = RegisterWindowMessage(_T("TaskbarCreated"));
 		break;
-	case WM_USER+2019:
+		case WM_USER+2019:
 		AppDelegate::getInstance()->onControlPanel();
 		break;
 	case WM_TRAYMESSAGE: {
@@ -106,6 +114,15 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam) 
 			switch (commandId) {
 			case POPUP_VIET_ON_OFF:
 				AppDelegate::getInstance()->onToggleVietnamese();
+				break;
+			case POPUP_LANG_VIET:
+				AppDelegate::getInstance()->onSetLanguage(1);
+				break;
+			case POPUP_LANG_ENG:
+				AppDelegate::getInstance()->onSetLanguage(0);
+				break;
+			case POPUP_LANG_GER:
+				AppDelegate::getInstance()->onSetLanguage(2);
 				break;
 			case POPUP_SPELLING:
 				AppDelegate::getInstance()->onToggleCheckSpelling();
@@ -202,6 +219,13 @@ HWND SystemTrayHelper::createFakeWindow(const HINSTANCE & hIns) {
 void SystemTrayHelper::createPopupMenu() {
 	popupMenu = CreatePopupMenu();
 	AppendMenu(popupMenu, MF_CHECKED, POPUP_VIET_ON_OFF, menuData[POPUP_VIET_ON_OFF]);
+
+	languageMenu = CreatePopupMenu();
+	AppendMenu(languageMenu, MF_CHECKED, POPUP_LANG_VIET, menuData[POPUP_LANG_VIET]);
+	AppendMenu(languageMenu, MF_CHECKED, POPUP_LANG_ENG, menuData[POPUP_LANG_ENG]);
+	AppendMenu(languageMenu, MF_CHECKED, POPUP_LANG_GER, menuData[POPUP_LANG_GER]);
+	AppendMenu(popupMenu, MF_POPUP, (UINT_PTR)languageMenu, _T("Ngôn ngữ"));
+
 	AppendMenu(popupMenu, MF_SEPARATOR, 0, 0);
 	AppendMenu(popupMenu, MF_CHECKED, POPUP_SPELLING, menuData[POPUP_SPELLING]);
 	AppendMenu(popupMenu, MF_CHECKED, POPUP_SMART_SWITCH, menuData[POPUP_SMART_SWITCH]);
@@ -241,9 +265,13 @@ void SystemTrayHelper::createPopupMenu() {
 
 static void loadTrayIcon() {
 	int icon = 0;
-	if (vLanguage) {
+	if (vLanguage == 1) {
 		icon = vUseGrayIcon ? IDI_ICON_STATUS_VIET_10 : IDI_ICON_STATUS_VIET;
 		LoadString(GetModuleHandle(0), IDS_TRAY_TITLE_2, nid.szTip, 128);
+	}
+	else if (vLanguage == 2) {
+		icon = vUseGrayIcon ? IDI_ICON_STATUS_GER_10 : IDI_ICON_STATUS_GER;
+		LoadString(GetModuleHandle(0), IDS_TRAY_TITLE_3, nid.szTip, 128);
 	}
 	else {
 		icon = vUseGrayIcon ? IDI_ICON_STATUS_ENG_10 : IDI_ICON_STATUS_ENG;
@@ -256,7 +284,10 @@ void SystemTrayHelper::updateData() {
 	loadTrayIcon();
 	Shell_NotifyIcon(NIM_MODIFY, &nid);
 
-	MODIFY_MENU(popupMenu, POPUP_VIET_ON_OFF, vLanguage);
+	MODIFY_MENU(popupMenu, POPUP_VIET_ON_OFF, vLanguage == 1);
+	MODIFY_MENU(languageMenu, POPUP_LANG_VIET, vLanguage == 1);
+	MODIFY_MENU(languageMenu, POPUP_LANG_ENG, vLanguage == 0);
+	MODIFY_MENU(languageMenu, POPUP_LANG_GER, vLanguage == 2);
 	MODIFY_MENU(popupMenu, POPUP_SPELLING, vCheckSpelling);
 	MODIFY_MENU(popupMenu, POPUP_SMART_SWITCH, vUseSmartSwitchKey);
 	MODIFY_MENU(popupMenu, POPUP_USE_MACRO, vUseMacro);

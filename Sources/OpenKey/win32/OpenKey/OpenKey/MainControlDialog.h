@@ -20,7 +20,7 @@ private:
 	HWND comboBoxInputType;
 	HWND comboBoxTableCode;
 	HWND checkCtrl, checkAlt, checkWin, checkShift, textSwitchKey, checkBeep;
-	HWND checkVietnamese, checkEnglish;
+	HWND checkVietnamese, checkEnglish, checkGerman;
 	HWND checkModernOrthorgraphy, checkFixRecommendBrowser, checkShowOnStartup, checkRunWithWindows,
 		checkSpelling, checkRestoreIfWrongSpelling, checkUseClipboard, checkModernIcon,
 		checkAllowZWJF, checkTempOffSpelling, checkQuickStartConsonant, checkQuickEndConsonant;

@@ -119,6 +119,25 @@ static bool _useSpellCheckingBefore;
 static bool _hasHandleQuickConsonant;
 static bool _willTempOffEngine = false;
 
+/**
+ * German umlaut mode
+ * a + 1 -> ä; o + 1 -> ö; u + 1 -> ü; s + 1 -> ß
+ * Keeps the last typed letter (with caps state) of the current word.
+ * CAPS_MASK bit is used to remember whether the base letter was capitalized.
+ */
+static Uint32 _germanLastKey = 0;
+
+static Uint32 germanUmlautChar(const Uint32& lastKey) {
+    bool isCaps = (lastKey & CAPS_MASK) != 0;
+    switch (lastKey & CHAR_MASK) {
+        case KEY_A: return isCaps ? 0xC4 : 0xE4; //Ä : ä
+        case KEY_O: return isCaps ? 0xD6 : 0xF6; //Ö : ö
+        case KEY_U: return isCaps ? 0xDC : 0xFC; //Ü : ü
+        case KEY_S: return isCaps ? 0x1E9E : 0xDF; //ẞ : ß
+    }
+    return 0;
+}
+
 //function prototype
 void findAndCalculateVowel(const bool& forGrammar=false);
 void insertMark(const Uint32& markMask, const bool& canModifyFlag=true);
@@ -463,6 +482,7 @@ void startNewSession() {
     _hasHandledMacro = false;
     _hasHandleQuickConsonant = false;
     _longWordHelper.clear();
+    _germanLastKey = 0;
 }
 
 void checkCorrectVowel(vector<vector<Uint16>>& charset, int& i, int& k, const Uint16& markKey) {
@@ -1308,6 +1328,47 @@ void vEnglishMode(const vKeyEventState& state, const Uint16& data, const bool& i
             if (!_willTempOffEngine)
                 hMacroKey.push_back(data | (isCaps ? CAPS_MASK : 0));
         }
+    }
+}
+
+void vGermanMode(const vKeyEventState& state, const Uint16& data, const bool& isCaps, const bool& otherControlKey) {
+    hCode = vDoNothing;
+    hBPC = 0;
+    hNCC = 0;
+    hExt = 3; //normal key
+
+    if (state == vKeyEventState::MouseDown || state == vKeyEventState::MouseUp || otherControlKey) {
+        _germanLastKey = 0;
+        hExt = 1; //word break
+        return;
+    }
+
+    if (data == KEY_DELETE) { //backspace
+        _germanLastKey = 0;
+        hExt = 2; //delete key
+        return;
+    }
+
+    if (data == KEY_1) { //umlaut trigger key
+        if (_germanLastKey != 0) {
+            Uint32 ch = germanUmlautChar(_germanLastKey);
+            if (ch != 0) {
+                hCode = vWillProcess;
+                hBPC = 1; //remove the base letter
+                hNCC = 1;
+                hData[0] = CHAR_CODE_MASK | ch;
+                _germanLastKey = 0;
+                return;
+            }
+        }
+        _germanLastKey = 0; //'1' can not be combined
+        return;
+    }
+
+    if (data >= KEY_A && data <= KEY_Z) { //letter key
+        _germanLastKey = data | (isCaps ? CAPS_MASK : 0);
+    } else {
+        _germanLastKey = 0; //any other key breaks the combination
     }
 }
 

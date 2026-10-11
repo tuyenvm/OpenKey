@@ -112,6 +112,9 @@ void MainControlDialog::initDialog() {
     checkEnglish = GetDlgItem(hDlg, IDC_RADIO_METHOD_ENGLISH);
     createToolTip(checkEnglish, IDS_STRING_ENG);
 
+    checkGerman = GetDlgItem(hDlg, IDC_RADIO_METHOD_GERMAN);
+    createToolTip(checkGerman, IDS_STRING_GER);
+
     /*--------end common---------*/
 
     checkModernOrthorgraphy = GetDlgItem(hTabPage1, IDC_CHECK_MODERN_ORTHORGRAPHY);
@@ -334,8 +337,9 @@ void MainControlDialog::fillData() {
     setSwitchKeyText(textSwitchKey, (vSwitchKeyStatus >> 24) & 0xFF);
     SendMessage(checkBeep, BM_SETCHECK, HAS_BEEP(vSwitchKeyStatus) ? 1 : 0, 0);
 
-    SendMessage(checkVietnamese, BM_SETCHECK, vLanguage, 0);
-    SendMessage(checkEnglish, BM_SETCHECK, !vLanguage, 0);
+    SendMessage(checkVietnamese, BM_SETCHECK, vLanguage == 1, 0);
+    SendMessage(checkEnglish, BM_SETCHECK, vLanguage == 0, 0);
+    SendMessage(checkGerman, BM_SETCHECK, vLanguage == 2, 0);
 
     SendMessage(checkModernOrthorgraphy, BM_SETCHECK, vUseModernOrthography ? 1 : 0, 0);
     SendMessage(checkFixRecommendBrowser, BM_SETCHECK, vFixRecommendBrowser ? 1 : 0, 0);
@@ -392,7 +396,7 @@ void MainControlDialog::onComboBoxSelected(const HWND& hCombobox, const int& com
     else if (hCombobox == comboBoxTableCode) {
         APP_SET_DATA(vCodeTable, (int)SendMessage(hCombobox, CB_GETCURSEL, 0, 0));
         if (vRememberCode) {
-            setAppInputMethodStatus(OpenKeyHelper::getFrontMostAppExecuteName(), vLanguage | (vCodeTable << 1));
+            setAppInputMethodStatus(OpenKeyHelper::getFrontMostAppExecuteName(), vLanguage | (vCodeTable << 2));
             saveSmartSwitchKeyData();
         }
     }
@@ -433,18 +437,32 @@ void MainControlDialog::onCheckboxClicked(const HWND& hWnd) {
     }
     else if (hWnd == checkVietnamese) {
         val = (int)SendMessage(checkVietnamese, BM_GETCHECK, 0, 0);
-        APP_SET_DATA(vLanguage, val ? 1 : 0);
-        if (vUseSmartSwitchKey) {
-            setAppInputMethodStatus(OpenKeyHelper::getFrontMostAppExecuteName(), vLanguage | (vCodeTable << 1));
-            saveSmartSwitchKeyData();
+        if (val) {
+            APP_SET_DATA(vLanguage, 1);
+            if (vUseSmartSwitchKey) {
+                setAppInputMethodStatus(OpenKeyHelper::getFrontMostAppExecuteName(), vLanguage | (vCodeTable << 2));
+                saveSmartSwitchKeyData();
+            }
         }
     }
     else if (hWnd == checkEnglish) {
-        val = (int)SendMessage(checkVietnamese, BM_GETCHECK, 0, 0);
-        APP_SET_DATA(vLanguage, val ? 1 : 0);
-        if (vUseSmartSwitchKey) {
-            setAppInputMethodStatus(OpenKeyHelper::getFrontMostAppExecuteName(), vLanguage | (vCodeTable << 1));
-            saveSmartSwitchKeyData();
+        val = (int)SendMessage(checkEnglish, BM_GETCHECK, 0, 0);
+        if (val) {
+            APP_SET_DATA(vLanguage, 0);
+            if (vUseSmartSwitchKey) {
+                setAppInputMethodStatus(OpenKeyHelper::getFrontMostAppExecuteName(), vLanguage | (vCodeTable << 2));
+                saveSmartSwitchKeyData();
+            }
+        }
+    }
+    else if (hWnd == checkGerman) {
+        val = (int)SendMessage(checkGerman, BM_GETCHECK, 0, 0);
+        if (val) {
+            APP_SET_DATA(vLanguage, 2);
+            if (vUseSmartSwitchKey) {
+                setAppInputMethodStatus(OpenKeyHelper::getFrontMostAppExecuteName(), vLanguage | (vCodeTable << 2));
+                saveSmartSwitchKeyData();
+            }
         }
     }
     else if (hWnd == checkModernOrthorgraphy) {

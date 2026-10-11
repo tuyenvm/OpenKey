@@ -42,6 +42,10 @@ IDI_ICON_STATUS_VIET_10 ICON                    "StatusViet10.ico"
 
 IDI_ICON_STATUS_ENG_10  ICON                    "StatusEng10.ico"
 
+IDI_ICON_STATUS_GER     ICON                    "StatusGer.ico"
+
+IDI_ICON_STATUS_GER_10  ICON                    "StatusGer10.ico"
+
 IDI_ICON_OK_BUTTON      ICON                    "OKButton.ico"
 
 IDI_ICON_EXIT_BUTTON    ICON                    "ExitButton.ico"
@@ -129,6 +133,7 @@ BEGIN
     LTEXT           "Chế độ gõ:",IDC_STATIC,14,60,36,8
     CONTROL         "Tiếng Việt",IDC_RADIO_METHOD_VIETNAMESE,"Button",BS_AUTORADIOBUTTON,64,59,47,10
     CONTROL         "Tiếng Anh",IDC_RADIO_METHOD_ENGLISH,"Button",BS_AUTORADIOBUTTON,158,59,48,10
+    CONTROL         "Tiếng Đức",IDC_RADIO_METHOD_GERMAN,"Button",BS_AUTORADIOBUTTON,226,59,48,10
     DEFPUSHBUTTON   "Đóng",IDBUTTON_OK,200,234,71,20
     PUSHBUTTON      "Tắt OpenKey",IDBUTTON_EXIT,26,234,71,20
     CONTROL         "",IDC_TAB_CONTROL,"SysTabControl32",TCS_FIXEDWIDTH,7,89,283,140
@@ -448,6 +453,7 @@ BEGIN
     IDS_APP_TITLE           "OpenKey"
     IDS_TRAY_TITLE          "Bấm vào đây để bật gõ Tiếng Việt"
     IDS_TRAY_TITLE_2        "Bấm vào đây để tắt gõ Tiếng Việt"
+    IDS_TRAY_TITLE_3        "Đang gõ Tiếng Đức (ä ö ü ß)"
     IDS_STRING_CONVERT_COMPLETED 
                             "Chuyển mã thành công!\nKết quả đã được lưu trong Clipboard!"
     IDS_MAIN_DIALOG_TITLE   "OpenKey %s - Bộ gõ Tiếng Việt"
@@ -508,6 +514,7 @@ BEGIN
     IDS_STRING_BEEP         "Kêu tiếng bíp mỗi khi chuyển chế độ gõ, không áp dụng với Loại trừ ứng dụng thông minh"
     IDS_STRING_VIET         "Bật chế độ gõ Tiếng Việt"
     IDS_STRING_ENG          "Bật chế độ gõ Tiếng Anh"
+    IDS_STRING_GER          "Bật chế độ gõ Tiếng Đức: a+1=ä, o+1=ö, u+1=ü, s+1=ß"
     IDS_STRING_CODE         "Chọn bảng mã cần gõ"
     IDS_STRING_INPUT        "Chọn kiểu gõ quen thuộc của bạn"
     IDS_STRING_MACRO        "Bật tính năng gõ tắt"
