@@ -7,7 +7,11 @@
 //
 
 #import "MacroViewController.h"
+#if __has_include("Engine.h")
 #include "Engine.h"
+#elif __has_include("../../engine/Engine.h")
+#include "../../engine/Engine.h"
+#endif
 
 #define MACRO_ADD_TEXT @"Thêm"
 #define MACRO_EDIT_TEXT @"Sửa"
@@ -21,6 +25,8 @@
     vector<string> macroText;
     vector<string> macroContent;
 }
+
+@synthesize macroContent = _macroContent;
 
 - (void)viewDidLoad {
     [super viewDidLoad];

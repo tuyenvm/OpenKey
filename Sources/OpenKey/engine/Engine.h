@@ -217,6 +217,14 @@ void vKeyHandleEvent(const vKeyEvent& event,
 void startNewSession();
 
 /**
+ * Get current word index and load external word into engine
+ */
+Byte getCurrentWordIndex();
+bool isCurrentWordActive();
+bool loadCurrentTypingWord(const std::vector<Uint32>& wordData);
+void getCurrentTypingWord(std::vector<Uint32>& outData);
+
+/**
  * do some task in english mode (use for macro)
  */
 void vEnglishMode(const vKeyEventState& state, const Uint16& data, const bool& isCaps, const bool& otherControlKey);

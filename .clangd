@@ -1,0 +1,10 @@
+CompileFlags:
+  Add:
+    - "-isysroot"
+    - "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk"
+    - "-I${workspaceFolder}/Sources/OpenKey/engine"
+    - "-I${workspaceFolder}/Sources/OpenKey/macOS/ModernKey"
+    - "-x"
+    - "objective-c++"
+    - "-std=c++11"
+    - "-fobjc-arc"
