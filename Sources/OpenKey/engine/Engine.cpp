@@ -465,6 +465,36 @@ void startNewSession() {
     _longWordHelper.clear();
 }
 
+Byte getCurrentWordIndex() {
+    return _index;
+}
+
+bool isCurrentWordActive() {
+    return _index > 0 && _spaceCount == 0;
+}
+
+bool loadCurrentTypingWord(const std::vector<Uint32>& wordData) {
+    if (wordData.empty() || wordData.size() >= MAX_BUFF) return false;
+    startNewSession();
+    _index = (Byte)wordData.size();
+    for (size_t idx = 0; idx < wordData.size(); idx++) {
+        TypingWord[idx] = wordData[idx];
+        KeyStates[idx] = (wordData[idx] & CHAR_MASK) | (wordData[idx] & CAPS_MASK);
+    }
+    _stateIndex = _index;
+    _spellingEndIndex = _index;
+    findAndCalculateVowel();
+    return true;
+}
+
+void getCurrentTypingWord(std::vector<Uint32>& outData) {
+    outData.clear();
+    outData.reserve(_index);
+    for (Byte i = 0; i < _index; i++) {
+        outData.push_back(TypingWord[i]);
+    }
+}
+
 void checkCorrectVowel(vector<vector<Uint16>>& charset, int& i, int& k, const Uint16& markKey) {
     //ignore "qu" case
     if (_index >= 2 && CHR(_index-1) == KEY_U && CHR(_index-2) == KEY_Q) {
@@ -669,9 +699,9 @@ void handleModernMark() {
                 CHR(VSI+2) == KEY_M || CHR(VSI+2) == KEY_N ||
                 CHR(VSI+2) == KEY_O || CHR(VSI+2) == KEY_U ||
                 CHR(VSI+2) == KEY_I || CHR(VSI+2) == KEY_C ||
-                (VSI+3 < _index && CHR(VSI+2) == KEY_C && CHR(VSI+2) == KEY_H) ||
-                (VSI+3 < _index && CHR(VSI+2) == KEY_N && CHR(VSI+2) == KEY_H) ||
-                (VSI+3 < _index && CHR(VSI+2) == KEY_N && CHR(VSI+2) == KEY_G)) {
+                (VSI+3 < _index && CHR(VSI+2) == KEY_C && CHR(VSI+3) == KEY_H) ||
+                (VSI+3 < _index && CHR(VSI+2) == KEY_N && CHR(VSI+3) == KEY_H) ||
+                (VSI+3 < _index && CHR(VSI+2) == KEY_N && CHR(VSI+3) == KEY_G)) {
                 
                 VWSM = VSI + 1;
                 hBPC = _index - VWSM;
@@ -799,9 +829,8 @@ void insertMark(const Uint32& markMask, const bool& canModifyFlag) {
             }
             hData[kk--] = GET(TypingWord[ii]);
         }
-        
-        hBPC = _index - VSI;
     }
+    hBPC = _index - VSI;
     hNCC = hBPC;
 }
 
