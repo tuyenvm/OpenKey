@@ -1556,3 +1556,173 @@ void vKeyHandleEvent(const vKeyEvent& event,
     //cout<<"backspace "<<(int)hBPC<<endl;
     //cout<<"new char "<<(int)hNCC<<endl<<endl;
 }
+/*==========================================================================================================*/
+
+/*
+ * Seed the engine with a word that is already on the screen (right before the caret).
+ * Nothing above is changed: the word is replayed, key by key, through vKeyHandleEvent, so every state
+ * (TypingWord, KeyStates, macro key, spelling...) is the one a typed word would have left.
+ * The result is then compared with the real text, so the engine never holds a word that is different
+ * from what is on the screen.
+ */
+#define SEED_MAX_WORD 10
+
+struct SeedChar {
+    Uint16 baseKey;
+    Uint32 tone; //0, TONE_MASK or TONEW_MASK
+    Uint32 mark; //0 or one of MARK1_MASK...MARK5_MASK
+    bool caps;
+};
+
+static map<Uint32, SeedChar> _seedCharMap; //Unicode character -> how it is made up (code table 0)
+
+static bool seedToneAllowed(const Uint16& baseKey, const Uint32& tone) {
+    switch (baseKey) {
+        case KEY_A:
+        case KEY_O:
+            return true; //â ă, ô ơ
+        case KEY_E:
+            return tone != TONEW_MASK; //ê
+        case KEY_U:
+            return tone != TONE_MASK; //ư
+        case KEY_D:
+            return tone == TONE_MASK; //đ
+        default:
+            return tone == 0; //i, y
+    }
+}
+
+static void initSeedCharMap() {
+    static const Uint16 baseKeys[] = {KEY_A, KEY_E, KEY_I, KEY_O, KEY_U, KEY_Y, KEY_D};
+    static const Uint32 tones[] = {0, TONE_MASK, TONEW_MASK};
+    static const Uint32 marks[] = {0, MARK1_MASK, MARK2_MASK, MARK3_MASK, MARK4_MASK, MARK5_MASK};
+    _seedCharMap.clear();
+    for (Uint16 baseKey : baseKeys) {
+        for (Uint32 tone : tones) {
+            for (Uint32 mark : marks) {
+                for (int caps = 0; caps < 2; caps++) {
+                    if (!seedToneAllowed(baseKey, tone) || (tone == 0 && mark == 0))
+                        continue; //plain letters come from _characterMap
+                    if (baseKey == KEY_D && mark != 0)
+                        continue;
+                    //ask the forward function what this combination looks like on the screen
+                    Uint32 code = getCharacterCode(baseKey | tone | mark | (caps ? CAPS_MASK : 0));
+                    if (!(code & CHAR_CODE_MASK))
+                        continue; //no such character
+                    Uint32 shown = code & ~CHAR_CODE_MASK;
+                    if (shown != 0)
+                        _seedCharMap[shown] = {baseKey, tone, mark, caps != 0};
+                }
+            }
+        }
+    }
+}
+
+static bool seedIsLetter(const Uint32& ch) {
+    return (ch >= 'a' && ch <= 'z') || (ch >= 'A' && ch <= 'Z') || _seedCharMap.find(ch) != _seedCharMap.end();
+}
+
+//same reset as a mouse click, plus what a click does not touch
+static void seedReset() {
+    startNewSession();
+    _spaceCount = 0;
+    _specialChar.clear();
+    _typingStates.clear();
+    _upperCaseStatus = 0;
+    _willTempOffEngine = false;
+    vCheckSpelling = _useSpellCheckingBefore;
+    hMacroKey.clear();
+}
+
+static bool seedFail() {
+    seedReset();
+    return false;
+}
+
+bool vSeedTypingWord(const Uint32* chars, const int& count) {
+    if (vCodeTable != 0)
+        return false; //the text on the screen is only plain Unicode for table 0
+    if (_seedCharMap.empty())
+        initSeedCharMap();
+
+    seedReset();
+    if (chars == NULL || count <= 0)
+        return false;
+
+    //the word is the run of letters right before the caret
+    int wordStart = count;
+    while (wordStart > 0 && seedIsLetter(chars[wordStart - 1]))
+        wordStart--;
+    int wordLength = count - wordStart;
+    if (wordLength == 0 || wordLength > SEED_MAX_WORD)
+        return false;
+
+    //keys that would have typed it (key code, CAPS_MASK when upper case)
+    vector<Uint32> seedKeys;
+    Uint32 markKey = 0;
+    for (int pos = wordStart; pos < count; pos++) {
+        Uint16 baseKey;
+        Uint32 tone = 0, mark = 0;
+        bool caps;
+        if (chars[pos] < 0x80) {
+            map<Uint32, Uint32>::iterator letter = _characterMap.find(chars[pos]);
+            if (letter == _characterMap.end())
+                return seedFail();
+            baseKey = letter->second & CHAR_MASK;
+            caps = (letter->second & CAPS_MASK) != 0;
+        } else {
+            map<Uint32, SeedChar>::iterator made = _seedCharMap.find(chars[pos]);
+            if (made == _seedCharMap.end())
+                return seedFail();
+            baseKey = made->second.baseKey;
+            tone = made->second.tone;
+            mark = made->second.mark;
+            caps = made->second.caps;
+        }
+        const Uint32 capsFlag = caps ? CAPS_MASK : 0;
+        seedKeys.push_back(baseKey | capsFlag);
+
+        if (tone == TONE_MASK) { //â ê ô đ
+            if (vInputType == vVNI)
+                seedKeys.push_back((baseKey == KEY_D ? KEY_9 : KEY_6) | capsFlag);
+            else
+                seedKeys.push_back(baseKey | capsFlag);
+        } else if (tone == TONEW_MASK) { //ă ơ ư
+            if (vInputType == vVNI)
+                seedKeys.push_back((baseKey == KEY_A ? KEY_8 : KEY_7) | capsFlag);
+            else
+                seedKeys.push_back(KEY_W | capsFlag);
+        }
+
+        if (mark != 0) {
+            if (markKey != 0)
+                return seedFail(); //two marks in one word
+            Uint32 markIndex = mark == MARK1_MASK ? 0 : (mark == MARK2_MASK ? 1 : (mark == MARK3_MASK ? 2 : (mark == MARK4_MASK ? 3 : 4)));
+            markKey = ProcessingChar[vInputType][markIndex];
+        }
+    }
+    if (markKey != 0)
+        seedKeys.push_back(markKey); //typed last, like most people do
+
+    for (size_t pos = 0; pos < seedKeys.size(); pos++) {
+        vKeyHandleEvent(vKeyEvent::Keyboard, vKeyEventState::KeyDown, (Uint16)(seedKeys[pos] & CHAR_MASK),
+                        (seedKeys[pos] & CAPS_MASK) ? 1 : 0, false);
+    }
+
+    //the engine must now hold exactly what is on the screen
+    if (_index != wordLength || _longWordHelper.size() > 0)
+        return seedFail();
+    for (int pos = 0; pos < wordLength; pos++) {
+        const Uint32 data = TypingWord[pos];
+        Uint32 shown;
+        if (data & (MARK_MASK | TONE_MASK | TONEW_MASK)) {
+            Uint32 code = getCharacterCode(data);
+            shown = (code & CHAR_CODE_MASK) ? (code & ~CHAR_CODE_MASK) : 0;
+        } else {
+            shown = keyCodeToCharacter(data & (CHAR_MASK | CAPS_MASK));
+        }
+        if (shown != chars[wordStart + pos])
+            return seedFail();
+    }
+    return true;
+}

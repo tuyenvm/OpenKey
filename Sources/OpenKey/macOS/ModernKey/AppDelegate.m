@@ -23,6 +23,7 @@ extern void OnTableCodeChange(void);
 extern void OnInputMethodChanged(void);
 extern void RequestNewSession(void);
 extern void OnActiveAppChanged(void);
+extern void OnActiveAppForSeed(void);
 
 //see document in Engine.h
 int vLanguage = 1;
@@ -53,6 +54,10 @@ int vTempOffOpenKey = 0; //new on version 2.0
 int vShowIconOnDock = 0; //new on version 2.0
 
 int vPerformLayoutCompat = 0;
+
+//continue the word under the caret after a click or a change of window: read the text with Accessibility,
+//and when the app does not answer, select it and copy it instead (see SelectionProbe)
+int vSeedFromCaret = 0;
 
 //beta feature
 int vFixChromiumBrowser = 0; //new on version 2.0
@@ -311,6 +316,7 @@ extern bool convertToolDontAlertWhenCompleted;
     vShowIconOnDock = 0;[[NSUserDefaults standardUserDefaults] setInteger:vShowIconOnDock forKey:@"vShowIconOnDock"];
     vFixChromiumBrowser = 0;[[NSUserDefaults standardUserDefaults] setInteger:vFixChromiumBrowser forKey:@"vFixChromiumBrowser"];
     vPerformLayoutCompat = 0;[[NSUserDefaults standardUserDefaults] setInteger:vPerformLayoutCompat forKey:@"vPerformLayoutCompat"];
+    vSeedFromCaret = 0;[[NSUserDefaults standardUserDefaults] setInteger:vSeedFromCaret forKey:@"vSeedFromCaret"];
 
     [[NSUserDefaults standardUserDefaults] setInteger:1 forKey:@"GrayIcon"];
     [[NSUserDefaults standardUserDefaults] setInteger:1 forKey:@"RunOnStartup"];
@@ -549,6 +555,9 @@ extern bool convertToolDontAlertWhenCompleted;
 -(void)activeAppChanged: (NSNotification*)note {
     if (vUseSmartSwitchKey && [OpenKeyManager isInited]) {
         OnActiveAppChanged();
+    }
+    if (vSeedFromCaret && [OpenKeyManager isInited]) {
+        OnActiveAppForSeed();
     }
 }
 

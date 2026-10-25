@@ -38,6 +38,7 @@ extern int vShowIconOnDock;
 extern int vAutoCapsMacro;
 extern int vFixChromiumBrowser;
 extern int vPerformLayoutCompat;
+extern int vSeedFromCaret;
 
 @implementation ViewController {
     __weak IBOutlet NSButton *CustomSwitchCommand;
@@ -72,10 +73,13 @@ extern int vPerformLayoutCompat;
     for (NSButton* button in tabbuttons) {
         tabButtonBackgroundRect = NSUnionRect(tabButtonBackgroundRect, button.frame);
     }
-    tabButtonBackgroundRect = NSInsetRect(tabButtonBackgroundRect, -2, -2);
+    //the pill of a tab button is 22 points high inside its 32 point frame, so 7 points show above and below it;
+    //give the sides the same room, and round the corners like the tab buttons do (5 points)
+    tabButtonBackgroundRect = NSInsetRect(tabButtonBackgroundRect, -7, -2);
     tabButtonBackground = [[NSView alloc] initWithFrame:tabButtonBackgroundRect];
     [tabButtonBackground setWantsLayer:YES];
     tabButtonBackground.layer.backgroundColor = [[NSColor windowBackgroundColor] CGColor];
+    tabButtonBackground.layer.cornerRadius = 5;
     [self.view addSubview:tabButtonBackground];
     tabViewRect = self.tabviewPrimary.frame;
     for (NSBox* b in tabviews) {
@@ -83,7 +87,8 @@ extern int vPerformLayoutCompat;
     }
     
     [self showTab:0];
-    
+    [self roundBottomButtonsIn:self.view];
+
     NSArray* inputTypeData = [[NSArray alloc] initWithObjects:@"Telex", @"VNI", @"Simple Telex 1", @"Simple Telex 2", nil];
     NSArray* codeData = [OpenKeyManager getTableCodes];
     
@@ -103,6 +108,25 @@ extern int vPerformLayoutCompat;
     [[NSBundle mainBundle] objectForInfoDictionaryKey: @"CFBundleShortVersionString"],
     [[NSBundle mainBundle] objectForInfoDictionaryKey: @"CFBundleVersion"],
     [OpenKeyManager getBuildDate]] ;
+}
+
+//The buttons "Kết thúc", "Mặc định" and "OK" use the square bezel, which stretches to any height (the bezels with
+//round corners are fixed at about 22 points). Round them by clipping the corners and draw the border again along
+//the rounded outline, else it would be cut off at the corners.
+- (void)roundBottomButtonsIn:(NSView*)parent {
+    for (NSView* view in parent.subviews) {
+        if ([view isKindOfClass:[NSButton class]]) {
+            NSButton* button = (NSButton*)view;
+            if (button.action == @selector(onTerminateApp:) || button.action == @selector(onDefaultConfig:) || button.action == @selector(onOK:)) {
+                button.wantsLayer = YES;
+                button.layer.cornerRadius = 8;
+                button.layer.masksToBounds = YES;
+                button.layer.borderWidth = 1;
+                button.layer.borderColor = [[NSColor tertiaryLabelColor] CGColor];
+            }
+        }
+        [self roundBottomButtonsIn:view];
+    }
 }
 
 - (void)viewDidAppear {
@@ -289,6 +313,11 @@ extern int vPerformLayoutCompat;
 - (IBAction)onPerformLayoutCompat:(id)sender {
     NSInteger val = [self setCustomValue:sender keyToSet:@"vPerformLayoutCompat"];
     vPerformLayoutCompat = (int)val;
+}
+
+- (IBAction)onSeedFromCaret:(id)sender {
+    NSInteger val = [self setCustomValue:sender keyToSet:@"vSeedFromCaret"];
+    vSeedFromCaret = (int)val;
 }
 
 - (NSInteger)setCustomValue:(NSButton*)sender keyToSet:(NSString*) key {
@@ -478,7 +507,10 @@ extern int vPerformLayoutCompat;
     
     value = [[NSUserDefaults standardUserDefaults] integerForKey:@"vPerformLayoutCompat"];
     self.PerformLayoutCompat.state = value ? NSControlStateValueOn : NSControlStateValueOff;
-    
+
+    value = [[NSUserDefaults standardUserDefaults] integerForKey:@"vSeedFromCaret"];
+    self.SeedFromCaret.state = value ? NSControlStateValueOn : NSControlStateValueOff;
+
     CustomSwitchControl.state = (vSwitchKeyStatus & 0x100) ? NSControlStateValueOn : NSControlStateValueOff;
     CustomSwitchOption.state = (vSwitchKeyStatus & 0x200) ? NSControlStateValueOn : NSControlStateValueOff;
     CustomSwitchCommand.state = (vSwitchKeyStatus & 0x400) ? NSControlStateValueOn : NSControlStateValueOff;

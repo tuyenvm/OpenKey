@@ -1291,7 +1291,7 @@
                                 <color key="fillColor" name="alternatingContentBackgroundColor" catalog="System" colorSpace="catalog"/>
                             </box>
                             <button verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="9es-j9-ycr">
-                                <rect key="frame" x="56" y="991" width="122" height="32"/>
+                                <rect key="frame" x="48" y="991" width="113" height="32"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                 <buttonCell key="cell" type="push" title="Bộ gõ" bezelStyle="rounded" alignment="center" state="on" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="EIw-eF-As9">
                                     <behavior key="behavior" lightByBackground="YES" lightByGray="YES" changeBackground="YES" changeGray="YES"/>
@@ -1302,7 +1302,7 @@
                                 </connections>
                             </button>
                             <button verticalHuggingPriority="750" fixedFrame="YES" tag="1" translatesAutoresizingMaskIntoConstraints="NO" id="Cap-1w-6zw">
-                                <rect key="frame" x="165" y="991" width="122" height="32"/>
+                                <rect key="frame" x="165" y="991" width="113" height="32"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                 <buttonCell key="cell" type="push" title="Gõ tắt" bezelStyle="rounded" alignment="center" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="3HE-Ri-YgG">
                                     <behavior key="behavior" lightByBackground="YES" lightByGray="YES" changeBackground="YES" changeGray="YES"/>
@@ -1313,7 +1313,7 @@
                                 </connections>
                             </button>
                             <button verticalHuggingPriority="750" fixedFrame="YES" tag="2" translatesAutoresizingMaskIntoConstraints="NO" id="IvI-Lw-i3r">
-                                <rect key="frame" x="274" y="991" width="122" height="32"/>
+                                <rect key="frame" x="282" y="991" width="113" height="32"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                 <buttonCell key="cell" type="push" title="Hệ thống" bezelStyle="rounded" alignment="center" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="bjR-Nl-uME">
                                     <behavior key="behavior" lightByBackground="YES" lightByGray="YES" changeBackground="YES" changeGray="YES"/>
@@ -1324,7 +1324,7 @@
                                 </connections>
                             </button>
                             <button verticalHuggingPriority="750" fixedFrame="YES" tag="3" translatesAutoresizingMaskIntoConstraints="NO" id="PUi-0E-KN1">
-                                <rect key="frame" x="383" y="991" width="122" height="32"/>
+                                <rect key="frame" x="399" y="991" width="113" height="32"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                 <buttonCell key="cell" type="push" title="Thông tin" bezelStyle="rounded" alignment="center" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="Oai-eX-aF2">
                                     <behavior key="behavior" lightByBackground="YES" lightByGray="YES" changeBackground="YES" changeGray="YES"/>
@@ -1530,6 +1530,18 @@
                                                 <action selector="onPerformLayoutCompat:" target="XfG-lQ-9wD" id="ezk-tK-MWB"/>
                                             </connections>
                                         </button>
+                                        <button verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="SfC-aR-1Xk" userLabel="Seed From Caret">
+                                            <rect key="frame" x="18" y="-10" width="480" height="18"/>
+                                            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                            <string key="toolTip">(Thử nghiệm) Sau khi bấm chuột, đổi ứng dụng/cửa sổ hoặc di chuyển con trỏ, OpenKey đọc tối đa 10 chữ trước con trỏ (bằng Accessibility) để gõ tiếp dấu cho từ đang dở thay vì bắt đầu lại. Chỉ hoạt động với bảng mã Unicode. Với Chrome và các ứng dụng Electron, OpenKey bật Accessibility của ứng dụng đó nên có thể tốn thêm tài nguyên. Nếu ứng dụng không cho đọc bằng Accessibility, OpenKey tự bôi đen các chữ trước con trỏ, sao chép rồi trả lại con trỏ và clipboard (chỉ khi con trỏ chuột là I-beam hoặc bạn vừa gõ chữ trong ứng dụng đó; không dùng cho Terminal, Finder, Excel...). Cách này có thể làm vùng chọn nháy lên trong chốc lát.</string>
+                                            <buttonCell key="cell" type="check" title="Gõ tiếp dấu cho từ vừa gõ sau khi bấm chuột / đổi cửa sổ (beta)" bezelStyle="regularSquare" imagePosition="left" state="on" inset="2" id="Sc2-Ct-9Lm">
+                                                <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
+                                                <font key="font" metaFont="system"/>
+                                            </buttonCell>
+                                            <connections>
+                                                <action selector="onSeedFromCaret:" target="XfG-lQ-9wD" id="SfA-cT-3Nq"/>
+                                            </connections>
+                                        </button>
                                         <button toolTip="Bấm vào đây để kiểm tra phiên bản mới của OpenKey" verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="ZuJ-Ke-7Qg">
                                             <rect key="frame" x="279" y="47" width="154" height="32"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
@@ -1698,6 +1710,7 @@
                         <outlet property="FreeMarkButton" destination="f8B-EV-EE1" id="u6V-zD-Xqg"/>
                         <outlet property="OtherLanguage" destination="uew-J8-1eo" id="LFp-j1-L5Z"/>
                         <outlet property="PerformLayoutCompat" destination="FLh-VP-qtU" id="PZj-VV-FRE"/>
+                        <outlet property="SeedFromCaret" destination="SfC-aR-1Xk" id="SfO-uT-7Pz"/>
                         <outlet property="QuickEndConsonant" destination="2k8-6T-Cyn" id="Yj2-m5-Nbj"/>
                         <outlet property="QuickStartConsonant" destination="V4i-Pw-iL5" id="ing-Db-5XB"/>
                         <outlet property="QuickTelex" destination="LNA-pk-XQM" id="Iso-f9-PzK"/>

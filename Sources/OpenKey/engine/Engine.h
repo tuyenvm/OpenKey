@@ -217,6 +217,16 @@ void vKeyHandleEvent(const vKeyEvent& event,
 void startNewSession();
 
 /**
+ * Fill the engine with the word that is already on the screen right before the caret, so the user can
+ * keep adding marks to it as if it had just been typed.
+ * chars: code points (NFC) of the text before the caret; only the last word of it is used.
+ * Only works for the Unicode code table. The word is replayed through vKeyHandleEvent, so all engine
+ * states are the ones a typed word would have left. Returns false, and leaves the engine empty, when the
+ * word can not be mapped back exactly (too long, not a word, typed with other settings...).
+ */
+bool vSeedTypingWord(const Uint32* chars, const int& count);
+
+/**
  * do some task in english mode (use for macro)
  */
 void vEnglishMode(const vKeyEventState& state, const Uint16& data, const bool& isCaps, const bool& otherControlKey);

@@ -8,9 +8,13 @@
 #import <Cocoa/Cocoa.h>
 #import <Carbon/Carbon.h>
 #import <Foundation/Foundation.h>
+#include <atomic>
+#import <os/log.h>
 #import "Engine.h"
 #import "AppDelegate.h"
 #import "ViewController.h"
+#import "AXTextContext.h"
+#import "SelectionProbe.h"
 
 #define FRONT_APP [[NSWorkspace sharedWorkspace] frontmostApplication].bundleIdentifier
 #define OTHER_CONTROL_KEY (_flag & kCGEventFlagMaskCommand) || (_flag & kCGEventFlagMaskControl) || \
@@ -46,6 +50,10 @@ extern AppDelegate* appDelegate;
 extern int vSendKeyStepByStep;
 extern int vFixChromiumBrowser;
 extern int vPerformLayoutCompat;
+extern int vSeedFromCaret;
+
+//bumped by every key and click; a read of the text around the caret that started before it is out of date
+static std::atomic<int> _seedGeneration(0);
 
 extern "C" {
     //app which must sent special empty character
@@ -113,7 +121,9 @@ extern "C" {
         LOAD_DATA(vFixChromiumBrowser, vFixChromiumBrowser);
         
         LOAD_DATA(vPerformLayoutCompat, vPerformLayoutCompat);
-        
+
+        LOAD_DATA(vSeedFromCaret, vSeedFromCaret);
+
         myEventSource = CGEventSourceCreate(kCGEventSourceStatePrivate);
         pData = (vKeyHookState*)vKeyInit();
 
@@ -153,6 +163,164 @@ extern "C" {
         }
     }
     
+    /*
+     * Continue a word that is already on the screen. After a click, a change of window or a move of the
+     * caret OpenKey starts over, so a mark can not be added to the word you were typing. Here the text right
+     * before the caret is read (Accessibility) and the engine takes over its last word.
+     * The read talks to another process, so it never runs in the event tap callback: it runs on its own
+     * queue a moment after the event (the caret has moved by then) and its result is dropped when something
+     * was typed or clicked in the meantime.
+     */
+    dispatch_queue_t _seedQueue = nil;
+
+    //keys that move the caret, or the focus, without a click
+    bool IsCaretMoveKey(CGKeyCode keycode, CGEventFlags flag) {
+        switch (keycode) {
+            case kVK_LeftArrow:
+            case kVK_RightArrow:
+            case kVK_UpArrow:
+            case kVK_DownArrow:
+            case kVK_Home:
+            case kVK_End:
+            case kVK_PageUp:
+            case kVK_PageDown:
+            case kVK_Tab: //next field
+                return true;
+            case kVK_ANSI_Grave: //Command + ` goes to another window of the app
+                return (flag & kCGEventFlagMaskCommand) != 0;
+            default:
+                return false;
+        }
+    }
+
+    void ApplyContextSeed(pid_t pid, NSString* before) {
+        if (!vSeedFromCaret || vLanguage == 0 || vCodeTable != 0)
+            return;
+        if ([[NSWorkspace sharedWorkspace] frontmostApplication].processIdentifier != pid)
+            return;
+        NSData* codePoints = [before dataUsingEncoding:NSUTF32LittleEndianStringEncoding];
+        bool seeded = vSeedTypingWord((const Uint32*)codePoints.bytes, (int)(codePoints.length / sizeof(Uint32)));
+        if ([[NSUserDefaults standardUserDefaults] boolForKey:@"vSeedFromCaretLog"]) {
+            os_log(OS_LOG_DEFAULT, "seed %{public}@ applied: %lu characters read, word %{public}s",
+                   [[NSWorkspace sharedWorkspace] frontmostApplication].bundleIdentifier, (unsigned long)before.length, seeded ? "seeded" : "not seeded");
+        }
+    }
+
+    /*
+     * When the app does not answer the Accessibility API, the text can still be read by selecting it, see
+     * SelectionProbe. That sends keys to the app, so it only runs where something says that a text field has
+     * the focus: the pointer was an I-beam when the button went up, or the user typed in that app and has not
+     * clicked on anything else since.
+     */
+    NSMutableDictionary* _textEvidence = nil; //process id -> YES / NO
+    bool _mouseDragged = false;
+
+    void SetTextEvidence(bool value) {
+        if (!vSeedFromCaret)
+            return;
+        if (_textEvidence == nil)
+            _textEvidence = [NSMutableDictionary new];
+        _textEvidence[@([[NSWorkspace sharedWorkspace] frontmostApplication].processIdentifier)] = @(value);
+    }
+
+    bool HasTextEvidence() {
+        if (!vSeedFromCaret)
+            return false;
+        return [_textEvidence[@([[NSWorkspace sharedWorkspace] frontmostApplication].processIdentifier)] boolValue];
+    }
+
+    bool IsIBeamCursor() {
+        NSCursor* current = [NSCursor currentSystemCursor];
+        NSCursor* iBeam = [NSCursor IBeamCursor];
+        if (current == nil)
+            return false;
+        return [current isEqual:iBeam] || [[current.image TIFFRepresentation] isEqualToData:[iBeam.image TIFFRepresentation]];
+    }
+
+    void ProbeContext(pid_t pid, NSString* bundleId, int generation) {
+        if (!SelectionProbeAllowedFor(bundleId) || SelectionProbeIsRunning())
+            return;
+        SelectionProbeStart(myEventSource, pid, AX_CONTEXT_LENGTH, ^(NSString* before) {
+            if ([[NSUserDefaults standardUserDefaults] boolForKey:@"vSeedFromCaretLog"]) {
+                os_log(OS_LOG_DEFAULT, "seed %{public}@ selection probe -> %{public}s", bundleId, before != nil ? "read" : "nothing read");
+            }
+            if (before != nil && generation == _seedGeneration.load()) {
+                ApplyContextSeed(pid, before);
+            }
+        });
+    }
+
+    //hasPoint: the read follows a click at `point` (screen coordinates), so the field that has the focus has to be
+    //the clicked one. The app moves its focus a moment after the click: reading too early would give the text of
+    //the field that had the focus before, and seeding it would make the first word typed in the new field fail.
+    //confirm: read twice and apply only when both reads agree (the focus may still be moving)
+    void ScheduleContextRead(int delayMs, int generation, int retriesLeft, bool mayProbe, bool hasPoint, CGPoint point, bool confirm) {
+        NSRunningApplication* front = [[NSWorkspace sharedWorkspace] frontmostApplication];
+        if (front == nil || [front.bundleIdentifier isEqualToString:OPENKEY_BUNDLE])
+            return;
+        pid_t pid = front.processIdentifier;
+        NSString* bundleId = front.bundleIdentifier;
+        if (_seedQueue == nil)
+            _seedQueue = dispatch_queue_create("com.tuyenmai.openkey.seed", DISPATCH_QUEUE_SERIAL);
+
+        dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)delayMs * NSEC_PER_MSEC), _seedQueue, ^{
+            if (generation != _seedGeneration.load())
+                return; //typed or clicked again
+            NSString *before = nil, *after = nil;
+            CGPoint clicked = point;
+            AXContextStatus status = AXReadCaretContext(pid, bundleId, hasPoint ? &clicked : NULL, &before, &after);
+            if (status == AXContextOK && confirm) {
+                //after a key or a change of window the focus may still be moving: the same answer twice in a row is a settled one
+                usleep(70 * 1000);
+                NSString *before2 = nil, *after2 = nil;
+                AXContextStatus again = AXReadCaretContext(pid, bundleId, NULL, &before2, &after2);
+                if (again != AXContextOK || ![before isEqualToString:before2] || ![after isEqualToString:after2])
+                    status = AXContextNotYet;
+            }
+            dispatch_async(dispatch_get_main_queue(), ^{
+                if (generation != _seedGeneration.load())
+                    return;
+                if ((status == AXContextRetry || status == AXContextNotYet) && retriesLeft > 0) {
+                    //Retry: the app is building its accessibility tree; NotYet: the focus is still moving
+                    ScheduleContextRead(status == AXContextRetry ? 350 : 80, generation, retriesLeft - 1, mayProbe, hasPoint, point, confirm);
+                } else if (status == AXContextOK) {
+                    ApplyContextSeed(pid, before);
+                } else if (status == AXContextUnavailable && mayProbe && vSeedFromCaret) {
+                    ProbeContext(pid, bundleId, generation);
+                }
+            });
+        });
+    }
+
+    //mayProbe: something says that a text field has the focus, so the selection fallback may be used
+    //point: where the user clicked (NULL for a key or a change of window)
+    void ScheduleContextSeedFor(int delayMs, bool mayProbe, const CGPoint* point, bool confirm) {
+        if (!vSeedFromCaret || vLanguage == 0 || vCodeTable != 0 || SelectionProbeIsRunning())
+            return;
+        ScheduleContextRead(delayMs, _seedGeneration.load(), 4, mayProbe, point != NULL, point != NULL ? *point : CGPointZero, confirm);
+    }
+
+    //after a key that moves the caret or the focus (Tab, arrows...)
+    void ScheduleContextSeed(int delayMs) {
+        ScheduleContextSeedFor(delayMs, HasTextEvidence(), NULL, true);
+    }
+
+    /*
+     * Another app has just been activated (Command+Tab, the Dock...). OpenKey sees no key and no click for it:
+     * Command+Tab is taken by the system. Without this the engine would still hold the word typed in the other
+     * app, the first word typed here would be joined to it, would not be a word any more, and would get no marks;
+     * Backspace would not help, since the old word stays in the engine, only a click or a Command key would.
+     * So the engine starts over right away, as for a click. The word before the caret is then read and given
+     * back to the engine when that works, which it can not for an app that does not answer or for a text that is
+     * typed straight away.
+     */
+    void OnActiveAppForSeed() {
+        if (!vSeedFromCaret || vLanguage == 0)
+            return;
+        RequestNewSession();
+        ScheduleContextSeedFor(150, HasTextEvidence(), NULL, false);
+    }
+
     void queryFrontMostApp() {
         if ([[[NSWorkspace sharedWorkspace] frontmostApplication].bundleIdentifier compare:OPENKEY_BUNDLE] != 0) {
             _frontMostApp = [[NSWorkspace sharedWorkspace] frontmostApplication].bundleIdentifier;
@@ -603,7 +771,20 @@ extern "C" {
         if (CGEventGetIntegerValueField(event, kCGEventSourceStateID) == CGEventSourceGetSourceStateID(myEventSource)) {
             return event;
         }
-        
+
+        //a probe is selecting the text before the caret: what is typed now would replace it, so keep the keys
+        //until it is done (they are posted again then); a click makes the probe stop moving the caret
+        if (SelectionProbeIsRunning()) {
+            if ((type == kCGEventKeyDown || type == kCGEventKeyUp) && !SelectionProbeIsReplay(event) && SelectionProbeHoldEvent(event))
+                return NULL;
+            if (type == kCGEventLeftMouseDown || type == kCGEventRightMouseDown)
+                SelectionProbeAbort();
+        }
+        if (type == kCGEventLeftMouseDown)
+            _mouseDragged = false;
+        else if (type == kCGEventLeftMouseDragged)
+            _mouseDragged = true;
+
         _flag = CGEventGetFlags(event);
         _keycode = (CGKeyCode)CGEventGetIntegerValueField(event, kCGKeyboardEventKeycode);
         
@@ -660,6 +841,19 @@ extern "C" {
             }
         }
 
+        //the button is up: the caret has moved by now, so continue the word that is under it
+        if (type == kCGEventLeftMouseUp) {
+            //when nothing can be read from the app, only an I-beam pointer under a plain click says there is text
+            bool plainClick = !_mouseDragged && CGEventGetIntegerValueField(event, kCGMouseEventClickState) == 1 &&
+                              !(_flag & (kCGEventFlagMaskShift | kCGEventFlagMaskCommand | kCGEventFlagMaskControl | kCGEventFlagMaskAlternate));
+            bool onText = vSeedFromCaret && plainClick && IsIBeamCursor();
+            if (vSeedFromCaret && plainClick)
+                SetTextEvidence(onText);
+            CGPoint clickedAt = CGEventGetLocation(event);
+            ScheduleContextSeedFor(40, onText, &clickedAt, false);
+            return event;
+        }
+
         // Also check correct event hooked
         if ((type != kCGEventKeyDown) && (type != kCGEventKeyUp) &&
             (type != kCGEventLeftMouseDown) && (type != kCGEventRightMouseDown) &&
@@ -686,6 +880,7 @@ extern "C" {
         
         //handle mouse
         if (type == kCGEventLeftMouseDown || type == kCGEventRightMouseDown || type == kCGEventLeftMouseDragged || type == kCGEventRightMouseDragged) {
+            _seedGeneration++;
             RequestNewSession();
             return event;
         }
@@ -711,6 +906,14 @@ extern "C" {
         
         //handle keyboard
         if (type == kCGEventKeyDown) {
+            //anything typed makes an older read of the text around the caret out of date
+            _seedGeneration++;
+            if (IsCaretMoveKey(_keycode, _flag)) {
+                ScheduleContextSeed(60);
+            } else if (vSeedFromCaret && !(_flag & (kCGEventFlagMaskCommand | kCGEventFlagMaskControl))) {
+                SetTextEvidence(true); //text is being typed in this app
+            }
+
             //send event signal to Engine
             vKeyHandleEvent(vKeyEvent::Keyboard,
                             vKeyEventState::KeyDown,

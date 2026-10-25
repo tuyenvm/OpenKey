@@ -43,6 +43,8 @@
 		23E2E49F2314FD3A006CCC3E /* Engine.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 23E2E49A2314FD3A006CCC3E /* Engine.cpp */; };
 		23E2E4A02314FD3A006CCC3E /* Vietnamese.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 23E2E49B2314FD3A006CCC3E /* Vietnamese.cpp */; };
 		23F512852336386200397988 /* MJAccessibilityUtils.m in Sources */ = {isa = PBXBuildFile; fileRef = 23F512832336386200397988 /* MJAccessibilityUtils.m */; };
+		5EED000000000000000000A1 /* AXTextContext.m in Sources */ = {isa = PBXBuildFile; fileRef = 5EED000000000000000000A2 /* AXTextContext.m */; };
+		5EED000000000000000000B1 /* SelectionProbe.m in Sources */ = {isa = PBXBuildFile; fileRef = 5EED000000000000000000B2 /* SelectionProbe.m */; };
 		A534F32629D8B78100296F25 /* Carbon.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 23874B0F220160A500000BC8 /* Carbon.framework */; };
 /* End PBXBuildFile section */
 
@@ -134,6 +136,10 @@
 		23E2E49C2314FD3A006CCC3E /* SmartSwitchKey.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SmartSwitchKey.h; sourceTree = "<group>"; };
 		23F512832336386200397988 /* MJAccessibilityUtils.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MJAccessibilityUtils.m; sourceTree = "<group>"; };
 		23F512842336386200397988 /* MJAccessibilityUtils.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MJAccessibilityUtils.h; sourceTree = "<group>"; };
+		5EED000000000000000000A2 /* AXTextContext.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = AXTextContext.m; sourceTree = "<group>"; };
+		5EED000000000000000000A3 /* AXTextContext.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AXTextContext.h; sourceTree = "<group>"; };
+		5EED000000000000000000B2 /* SelectionProbe.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SelectionProbe.m; sourceTree = "<group>"; };
+		5EED000000000000000000B3 /* SelectionProbe.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SelectionProbe.h; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -202,6 +208,10 @@
 				232DB1DF21FAED280049A0B5 /* Resources */,
 				23F512842336386200397988 /* MJAccessibilityUtils.h */,
 				23F512832336386200397988 /* MJAccessibilityUtils.m */,
+				5EED000000000000000000A3 /* AXTextContext.h */,
+				5EED000000000000000000A2 /* AXTextContext.m */,
+				5EED000000000000000000B3 /* SelectionProbe.h */,
+				5EED000000000000000000B2 /* SelectionProbe.m */,
 				232EDA5721F1B33E0085D362 /* AppDelegate.h */,
 				232EDA5821F1B33E0085D362 /* AppDelegate.m */,
 				232EDA5A21F1B33E0085D362 /* ViewController.h */,
@@ -408,6 +418,8 @@
 				232EDA5C21F1B33E0085D362 /* ViewController.m in Sources */,
 				23E2E49E2314FD3A006CCC3E /* SmartSwitchKey.cpp in Sources */,
 				23F512852336386200397988 /* MJAccessibilityUtils.m in Sources */,
+				5EED000000000000000000A1 /* AXTextContext.m in Sources */,
+				5EED000000000000000000B1 /* SelectionProbe.m in Sources */,
 				2389467D21FDDB920030A13B /* OpenKeyManager.m in Sources */,
 				23E2E4A02314FD3A006CCC3E /* Vietnamese.cpp in Sources */,
 				2374A1302216720E005B0375 /* AboutViewController.m in Sources */,
