@@ -523,6 +523,8 @@ extern "C" {
             return false;
         if (HAS_SHIFT(hotKeyData) ^ GET_BOOL(_lastFlag & kCGEventFlagMaskShift))
             return false;
+        if (HAS_FN(hotKeyData) ^ GET_BOOL(_lastFlag & kCGEventFlagMaskSecondaryFn))
+            return false;
         if (checkKeyCode) {
             if (GET_SWITCH_KEY(hotKeyData) != _keycode)
                 return false;

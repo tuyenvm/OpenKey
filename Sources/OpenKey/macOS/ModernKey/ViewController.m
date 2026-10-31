@@ -44,6 +44,7 @@ extern int vPerformLayoutCompat;
     __weak IBOutlet NSButton *CustomSwitchOption;
     __weak IBOutlet NSButton *CustomSwitchControl;
     __weak IBOutlet NSButton *CustomSwitchShift;
+    __weak IBOutlet NSButton *CustomSwitchFn;
     __weak IBOutlet MyTextField *CustomSwitchKey;
     __weak IBOutlet NSButton *CustomBeepSound;
     NSArray* tabviews, *tabbuttons;
@@ -266,6 +267,13 @@ extern int vPerformLayoutCompat;
     [[NSUserDefaults standardUserDefaults] setInteger:vSwitchKeyStatus forKey:@"SwitchKeyStatus"];
 }
 
+- (IBAction)onFnSwitchKey:(NSButton *)sender {
+    NSInteger val = [self setCustomValue:sender keyToSet:nil];
+    vSwitchKeyStatus &= (~0x1000);
+    vSwitchKeyStatus |= val << 12;
+    [[NSUserDefaults standardUserDefaults] setInteger:vSwitchKeyStatus forKey:@"SwitchKeyStatus"];
+}
+
 -(void)onMyTextFieldKeyChange:(unsigned short)keyCode character:(unsigned short)character {
     vSwitchKeyStatus &= 0xFFFFFF00;
     vSwitchKeyStatus |= keyCode;
@@ -483,6 +491,7 @@ extern int vPerformLayoutCompat;
     CustomSwitchOption.state = (vSwitchKeyStatus & 0x200) ? NSControlStateValueOn : NSControlStateValueOff;
     CustomSwitchCommand.state = (vSwitchKeyStatus & 0x400) ? NSControlStateValueOn : NSControlStateValueOff;
     CustomSwitchShift.state = (vSwitchKeyStatus & 0x800) ? NSControlStateValueOn : NSControlStateValueOff;
+    CustomSwitchFn.state = (vSwitchKeyStatus & 0x1000) ? NSControlStateValueOn : NSControlStateValueOff;
     CustomBeepSound.state = (vSwitchKeyStatus & 0x8000) ? NSControlStateValueOn : NSControlStateValueOff;
     [CustomSwitchKey setTextByChar:((vSwitchKeyStatus>>24) & 0xFF)];
     
