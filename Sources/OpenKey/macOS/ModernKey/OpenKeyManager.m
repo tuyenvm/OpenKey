@@ -71,9 +71,11 @@ static CFRunLoopSourceRef runLoopSource;
     // Add to the current run loop.
     CFRunLoopAddSource(CFRunLoopGetCurrent(), runLoopSource, kCFRunLoopCommonModes);
     
-    // Enable the event tap.
+    // Enable the event tap. The source is on the main run loop, which
+    // NSApplication is already running — calling CFRunLoopRun() here would
+    // start a nested loop that blocks AppKit from processing UI events.
     CGEventTapEnable(eventTap, true);
-    
+
     return YES;
 }
 

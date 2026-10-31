@@ -113,13 +113,13 @@ extern bool convertToolDontAlertWhenCompleted;
 
 - (void)applicationDidFinishLaunching:(NSNotification *)aNotification {
     appDelegate = self;
-    
+
     [self registerSupportedNotification];
-    
+
     //set quick tooltip
     [[NSUserDefaults standardUserDefaults] setObject: [NSNumber numberWithInt: 50]
                                               forKey: @"NSInitialToolTipDelay"];
-    
+
     //check whether this app has been launched before that or not
     //Only check instances owned by current user (for multi-user/Fast User Switching support)
     uid_t currentUID = getuid();
@@ -144,22 +144,22 @@ extern bool convertToolDontAlertWhenCompleted;
         [NSApp terminate:nil];
         return;
     }
-    
+
     // check if user granted Accessabilty permission
     if (!MJAccessibilityIsEnabled()) {
         [self askPermission];
         return;
     }
-    
+
     vShowIconOnDock = (int)[[NSUserDefaults standardUserDefaults] integerForKey:@"vShowIconOnDock"];
     if (vShowIconOnDock)
         [NSApp setActivationPolicy: NSApplicationActivationPolicyRegular];
-    
+
     if (vSwitchKeyStatus & 0x8000)
         NSBeep();
 
     [self createStatusBarMenu];
-    
+
     //init
     dispatch_async(dispatch_get_main_queue(), ^{
         if (![OpenKeyManager initEventTap]) {
@@ -495,12 +495,24 @@ extern bool convertToolDontAlertWhenCompleted;
     if (_mainWC == nil) {
         _mainWC = [[NSStoryboard storyboardWithName:@"Main" bundle:nil] instantiateControllerWithIdentifier:@"OpenKey"];
     }
-    //[OpenKeyManager showDockIcon:YES];
     if ([_mainWC.window isVisible]) {
+        [NSApp activateIgnoringOtherApps:YES];
         return;
     }
+    [NSApp activateIgnoringOtherApps:YES];
     [_mainWC.window makeKeyAndOrderFront:nil];
     [_mainWC.window setLevel:NSFloatingWindowLevel];
+
+    // Center on the primary screen — saved frames from prior multi-display
+    // setups can land the window off-screen.
+    [_mainWC.window setFrameAutosaveName:@""];
+    NSScreen *primary = [NSScreen screens].firstObject ?: [NSScreen mainScreen];
+    NSRect visible = primary.visibleFrame;
+    NSRect frame = _mainWC.window.frame;
+    NSPoint origin = NSMakePoint(
+        visible.origin.x + (visible.size.width - frame.size.width) / 2,
+        visible.origin.y + (visible.size.height - frame.size.height) / 2);
+    [_mainWC.window setFrameOrigin:origin];
 }
 
 -(void) onMacroSelected {
@@ -508,9 +520,11 @@ extern bool convertToolDontAlertWhenCompleted;
         _macroWC = [[NSStoryboard storyboardWithName:@"Main" bundle:nil] instantiateControllerWithIdentifier:@"MacroWindow"];
     }
     //[OpenKeyManager showDockIcon:YES];
-    if ([_macroWC.window isVisible])
+    if ([_macroWC.window isVisible]) {
+        [NSApp activateIgnoringOtherApps:YES];
         return;
-    
+    }
+    [NSApp activateIgnoringOtherApps:YES];
     [_macroWC.window makeKeyAndOrderFront:nil];
     [_macroWC.window setLevel:NSFloatingWindowLevel];
 }
@@ -520,9 +534,11 @@ extern bool convertToolDontAlertWhenCompleted;
         _aboutWC = [[NSStoryboard storyboardWithName:@"Main" bundle:nil] instantiateControllerWithIdentifier:@"AboutWindow"];
     }
     //[OpenKeyManager showDockIcon:YES];
-    if ([_aboutWC.window isVisible])
+    if ([_aboutWC.window isVisible]) {
+        [NSApp activateIgnoringOtherApps:YES];
         return;
-
+    }
+    [NSApp activateIgnoringOtherApps:YES];
     [_aboutWC.window makeKeyAndOrderFront:nil];
     [_aboutWC.window setLevel:NSFloatingWindowLevel];
 }
