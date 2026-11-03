@@ -75,10 +75,27 @@ map<UINT, LPCTSTR> menuData = {
 
 LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam) {
 	static UINT taskbarCreated;
+	const UINT_PTR HOOK_HEALTH_TIMER = 1;  // Timer ID for hook health check
 
 	switch (message) {
 	case WM_CREATE:
 		taskbarCreated = RegisterWindowMessage(_T("TaskbarCreated"));
+		// Register for session change notifications to handle lock/unlock
+		WTSRegisterSessionNotification(hWnd, NOTIFY_FOR_THIS_SESSION);
+		// Set up a 10-second timer to periodically fix stuck keyboard hooks
+		SetTimer(hWnd, HOOK_HEALTH_TIMER, 10000, NULL);
+		break;
+	case WM_WTSSESSION_CHANGE:
+		// Reinitialize keyboard hooks on session unlock (wParam == WTS_SESSION_UNLOCK)
+		if (wParam == WTS_SESSION_UNLOCK) {
+			OpenKeyManager::reinitHooks();
+		}
+		break;
+	case WM_TIMER:
+		// Periodic hook health check - reinitialize hooks to fix random stuck issues
+		if (wParam == HOOK_HEALTH_TIMER) {
+			OpenKeyManager::reinitHooks();
+		}
 		break;
 	case WM_USER+2019:
 		AppDelegate::getInstance()->onControlPanel();
@@ -91,75 +108,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam) 
 			AppDelegate::getInstance()->onToggleVietnamese();
 			SystemTrayHelper::updateData();
 		} else if (lParam == WM_RBUTTONDOWN) {
-			POINT curPoint;
-			GetCursorPos(&curPoint);
-			SetForegroundWindow(hWnd);
-			UINT commandId = TrackPopupMenu(
-				popupMenu,
-				TPM_RETURNCMD | TPM_NONOTIFY,
-				curPoint.x,
-				curPoint.y,
-				0,
-				hWnd,
-				NULL
-			);
-			switch (commandId) {
-			case POPUP_VIET_ON_OFF:
-				AppDelegate::getInstance()->onToggleVietnamese();
-				break;
-			case POPUP_SPELLING:
-				AppDelegate::getInstance()->onToggleCheckSpelling();
-				break;
-			case POPUP_SMART_SWITCH:
-				AppDelegate::getInstance()->onToggleUseSmartSwitchKey();
-				break;
-			case POPUP_USE_MACRO:
-				AppDelegate::getInstance()->onToggleUseMacro();
-				break;
-			case POPUP_MACRO_TABLE:
-				AppDelegate::getInstance()->onMacroTable();
-				break;
-			case POPUP_CONVERT_TOOL:
-				AppDelegate::getInstance()->onConvertTool();
-				break;
-			case POPUP_QUICK_CONVERT:
-				AppDelegate::getInstance()->onQuickConvert();
-				break;
-			case POPUP_TELEX:
-				AppDelegate::getInstance()->onInputType(0);
-				break;
-			case POPUP_VNI:
-				AppDelegate::getInstance()->onInputType(1);
-				break;
-			case POPUP_SIMPLE_TELEX:
-				AppDelegate::getInstance()->onInputType(2);
-				break;
-			case POPUP_UNICODE:
-				AppDelegate::getInstance()->onTableCode(0);
-				break;
-			case POPUP_TCVN3:
-				AppDelegate::getInstance()->onTableCode(1);
-				break;
-			case POPUP_VNI_WINDOWS:
-				AppDelegate::getInstance()->onTableCode(2);
-				break;
-			case POPUP_UNICODE_COMPOUND:
-				AppDelegate::getInstance()->onTableCode(3);
-				break;
-			case POPUP_VN_LOCALE_1258:
-				AppDelegate::getInstance()->onTableCode(4);
-				break;
-			case POPUP_CONTROL_PANEL:
-				AppDelegate::getInstance()->onControlPanel();
-				break;
-			case POPUP_ABOUT_OPENKEY:
-				AppDelegate::getInstance()->onOpenKeyAbout();
-				break;
-			case POPUP_OPENKEY_EXIT:
-				AppDelegate::getInstance()->onOpenKeyExit();
-				break;
-			}
-			SystemTrayHelper::updateData();
+			AppDelegate::getInstance()->onControlPanel();
 		}
 	}
 	break;
@@ -168,6 +117,12 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam) 
 		if (message == taskbarCreated) {
 			Shell_NotifyIcon(NIM_ADD, &nid);
 		}
+		return DefWindowProc(hWnd, message, wParam, lParam);
+	case WM_DESTROY:
+		// Unregister session change notifications
+		WTSUnRegisterSessionNotification(hWnd);
+		// Kill the health check timer
+		KillTimer(hWnd, HOOK_HEALTH_TIMER);
 		return DefWindowProc(hWnd, message, wParam, lParam);
 	}
 	return 0;
@@ -243,11 +198,11 @@ static void loadTrayIcon() {
 	int icon = 0;
 	if (vLanguage) {
 		icon = vUseGrayIcon ? IDI_ICON_STATUS_VIET_10 : IDI_ICON_STATUS_VIET;
-		LoadString(GetModuleHandle(0), IDS_TRAY_TITLE_2, nid.szTip, 128);
+		lstrcpyn(nid.szTip, vUILanguage ? _T("Bấm vào đây để tắt gõ Tiếng Việt") : _T("Click to turn off Vietnamese typing"), 128);
 	}
 	else {
 		icon = vUseGrayIcon ? IDI_ICON_STATUS_ENG_10 : IDI_ICON_STATUS_ENG;
-		LoadString(GetModuleHandle(0), IDS_TRAY_TITLE, nid.szTip, 128);
+		lstrcpyn(nid.szTip, vUILanguage ? _T("Bấm vào đây để bật gõ Tiếng Việt") : _T("Click to turn on Vietnamese typing"), 128);
 	}
 	nid.hIcon = LoadIcon(GetModuleHandle(0), MAKEINTRESOURCE(icon));
 }
