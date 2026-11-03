@@ -99,6 +99,7 @@ void OpenKeyReinitHooks() {
 }
 
 void OpenKeyInit() {
+	APP_GET_DATA(vUILanguage, PRIMARYLANGID(GetUserDefaultUILanguage()) == LANG_VIETNAMESE ? 1 : 0);
 	APP_GET_DATA(vLanguage, 1);
 	APP_GET_DATA(vInputType, 0);
 	vFreeMark = 0;
