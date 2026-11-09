@@ -206,9 +206,28 @@ BEGIN
     CONTROL         "Tự ghi nhớ bảng mã theo ứng dụng",IDC_CHECK_SMART_SWITCH_CODE,
                     "Button",BS_AUTOCHECKBOX | WS_TABSTOP,7,88,130,10
     CONTROL         "Cho phép gõ trong các ngôn ngữ khác",IDC_CHECK_OTHER_LANGUAGES,
-                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,7,106,204,10
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,7,106,140,10
     CONTROL         "Tạm tắt OpenKey bằng phím Alt",IDC_CHECK_TEMP_OFF_OPEN_KEY,
                     "Button",BS_AUTOCHECKBOX | WS_TABSTOP,151,88,123,10
+    PUSHBUTTON      "DS ứng dụng loại trừ...",IDC_BUTTON_SMART_SWITCH_LIST,151,104,95,14
+END
+
+IDD_DIALOG_SMART_SWITCH DIALOGEX 0, 0, 385, 248
+STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | DS_CENTER | WS_POPUP | WS_CAPTION | WS_SYSMENU
+CAPTION "Quản lý ứng dụng Tắt/Bật Tiếng Việt - OpenKey"
+FONT 8, "MS Shell Dlg", 400, 0, 0x1
+BEGIN
+    LTEXT           "Tên chương trình (nhập tên như cmd.exe hoặc chọn từ danh sách):",IDC_STATIC,7,6,230,8
+    COMBOBOX        IDC_COMBO_APP_NAME,7,18,142,120,CBS_DROPDOWN | CBS_AUTOHSCROLL | WS_VSCROLL | WS_TABSTOP
+    PUSHBUTTON      "Chọn file...",IDC_BUTTON_BROWSE_APP,153,18,48,14
+    PUSHBUTTON      "+ Tắt TV",IDC_BUTTON_ADD_ENG,205,18,56,14
+    PUSHBUTTON      "+ Bật TV",IDC_BUTTON_ADD_VIET,264,18,54,14
+    PUSHBUTTON      "- Xóa",IDC_BUTTON_DELETE_APP,321,18,57,14
+    CONTROL         "",IDC_LIST_APP_DATA,"SysListView32",LVS_REPORT | LVS_SINGLESEL | LVS_ALIGNLEFT | WS_BORDER | WS_TABSTOP,7,39,371,182
+    PUSHBUTTON      "Thêm mặc định (CMD, PowerShell...)",IDC_BUTTON_ADD_DEFAULT_APPS,7,227,132,14
+    CONTROL         "Bật loại trừ ứng dụng thông minh",IDC_CHECK_SMART_SWITCH_KEY,
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,148,229,128,10
+    DEFPUSHBUTTON   "Đóng",IDOK,320,227,58,14
 END
 
 IDD_DIALOG_TAB_MACRO DIALOGEX 0, 0, 299, 177
@@ -524,6 +543,7 @@ END
 STRINGTABLE
 BEGIN
     IDS_STRING_FIX_CHROMIUM "Sửa lỗi bị đúp từ trên các trình duyệt Chromium bao gồm Google Chrome, Brave, Microsoft Edge. Tính năng này đang được thử nghiệm. Cần bật tính năng ""Sửa lỗi gợi ý"" để hỗ trợ tính năng này."
+    IDS_STRING_SMART_SWITCH_LIST "Mở danh sách quản lý các chương trình tự động tắt/bật gõ Tiếng Việt (ví dụ: cmd.exe, powershell.exe,...)"
 END
 
 #endif    // English (United States) resources

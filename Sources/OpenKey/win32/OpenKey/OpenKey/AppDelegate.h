@@ -17,12 +17,13 @@ redistribute your new version, it MUST be open source.
 #include "AboutDialog.h"
 #include "ConvertToolDialog.h"
 #include "MacroDialog.h"
+#include "ExcludedAppsDialog.h"
 
 class BaseDialog;
 class AppDelegate {
 private:
 	HINSTANCE hInstance;
-	BaseDialog* mainDialog = NULL, *aboutDialog = NULL, *macroDialog = NULL, *convertDialog = NULL;
+	BaseDialog* mainDialog = NULL, *aboutDialog = NULL, *macroDialog = NULL, *convertDialog = NULL, *excludedAppsDialog = NULL;
 private:
 	bool isDialogMsg(MSG &msg) const;
 	void checkUpdate();
@@ -42,6 +43,7 @@ public: //event
 	void onToggleUseMacro();
 
 	void onMacroTable();
+	void onSmartSwitchTable();
 	void onConvertTool();
 	void onQuickConvert();
 

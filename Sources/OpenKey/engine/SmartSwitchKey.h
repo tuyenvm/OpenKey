@@ -11,6 +11,7 @@
 
 #include "DataType.h"
 #include <string>
+#include <vector>
 
 using namespace std;
 
@@ -34,5 +35,20 @@ int getAppInputMethodStatus(const string& bundleId, const int& currentInputMetho
  * Set default language for this @bundleId
  */
 void setAppInputMethodStatus(const string& bundleId, const int& language);
+
+/**
+ * Remove @bundleId from smart switch key map
+ */
+bool removeAppInputMethodStatus(const string& bundleId);
+
+/**
+ * Get all saved apps and their input method status
+ */
+void getAllSmartSwitchKey(vector<string>& bundleIds, vector<int>& statuses);
+
+/**
+ * Add default excluded command-line apps (cmd.exe, powershell.exe, etc.) as English mode (0)
+ */
+void initDefaultExcludedApps();
 
 #endif /* SmartSwitchKey_h */
