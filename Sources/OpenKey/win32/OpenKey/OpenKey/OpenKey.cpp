@@ -61,6 +61,7 @@ static Uint32 _tempChar;
 static string macroText, macroContent;
 static int _languageTemp = 0; //use for smart switch key
 static vector<Byte> savedSmartSwitchKeyData; ////use for smart switch key
+static HWND _lastForegroundWnd = NULL;
 
 static bool _hasJustUsedHotKey = false;
 
@@ -70,6 +71,7 @@ static INPUT keyEvent[2];
 LRESULT CALLBACK keyboardHookProcess(int nCode, WPARAM wParam, LPARAM lParam);
 LRESULT CALLBACK mouseHookProcess(int nCode, WPARAM wParam, LPARAM lParam);
 VOID CALLBACK winEventProcCallback(HWINEVENTHOOK hWinEventHook, DWORD dwEvent, HWND hwnd, LONG idObject, LONG idChild, DWORD dwEventThread, DWORD dwmsEventTime);
+static void checkSmartSwitchForForeground();
 
 void OpenKeyFree() {
 	UnhookWindowsHookEx(hMouseHook);
@@ -161,6 +163,12 @@ void OpenKeyInit() {
 	DWORD smartSwitchKeySize;
 	BYTE* data = OpenKeyHelper::getRegBinary(_T("smartSwitchKey"), smartSwitchKeySize);
 	initSmartSwitchKey((Byte*)data, (int)smartSwitchKeySize);
+	int vInitDefaultExcluded = OpenKeyHelper::getRegInt(_T("vInitDefaultExcluded"), 0);
+	if (!vInitDefaultExcluded || smartSwitchKeySize == 0) {
+		initDefaultExcludedApps();
+		OpenKeyHelper::setRegInt(_T("vInitDefaultExcluded"), 1);
+		saveSmartSwitchKeyData();
+	}
 
 	//init hook
 	HINSTANCE hInstance = GetModuleHandle(NULL);
@@ -498,6 +506,10 @@ LRESULT CALLBACK keyboardHookProcess(int nCode, WPARAM wParam, LPARAM lParam) {
 	
 	//ignore if IME pad is open when typing Japanese/Chinese...
 	HWND hWnd = GetForegroundWindow();
+	if (hWnd != NULL && hWnd != _lastForegroundWnd) {
+		_lastForegroundWnd = hWnd;
+		checkSmartSwitchForForeground();
+	}
 	HWND hIME = ImmGetDefaultIMEWnd(hWnd);
 	LRESULT isImeON = SendMessage(hIME, WM_IME_CONTROL, IMC_GETOPENSTATUS, 0);
 	if (isImeON) {
@@ -671,33 +683,43 @@ LRESULT CALLBACK mouseHookProcess(int nCode, WPARAM wParam, LPARAM lParam) {
 	return CallNextHookEx(hMouseHook, nCode, wParam, lParam);
 }
 
-VOID CALLBACK winEventProcCallback(HWINEVENTHOOK hWinEventHook, DWORD dwEvent, HWND hwnd, LONG idObject, LONG idChild, DWORD dwEventThread, DWORD dwmsEventTime) {
+static void checkSmartSwitchForForeground() {
 	//smart switch key
 	if (vUseSmartSwitchKey || vRememberCode) {
+		HWND fgWnd = GetForegroundWindow();
+		if (fgWnd == NULL) return;
+		DWORD fgPid = 0;
+		GetWindowThreadProcessId(fgWnd, &fgPid);
+		if (fgPid == 0 || fgPid == GetCurrentProcessId())
+			return;
+
 		string& exe = OpenKeyHelper::getFrontMostAppExecuteName();
-		if (exe.compare("explorer.exe") == 0) //dont apply with windows explorer
+		if (exe.compare("explorer.exe") == 0 ||
+			exe.compare("TheOpenKeyProject") == 0 ||
+			exe.compare("UnknownProgram") == 0)
 			return;
 		_languageTemp = getAppInputMethodStatus(exe, vLanguage | (vCodeTable << 1));
 		vTempOffEngine(false);
-		if (vUseSmartSwitchKey && (_languageTemp & 0x01) != vLanguage) {
-			if (_languageTemp != -1) {
-				vLanguage = _languageTemp;
+		if (_languageTemp == -1) {
+			saveSmartSwitchKeyData();
+		} else {
+			if (vUseSmartSwitchKey && (_languageTemp & 0x01) != vLanguage) {
+				vLanguage = (_languageTemp & 0x01);
 				AppDelegate::getInstance()->onInputMethodChangedFromHotKey();
-			} else {
-				saveSmartSwitchKeyData();
+			}
+			if (vRememberCode && (_languageTemp >> 1) != vCodeTable) { //for remember table code feature
+				AppDelegate::getInstance()->onTableCode(_languageTemp >> 1);
 			}
 		}
 		startNewSession();
-		if (vRememberCode && (_languageTemp >> 1) != vCodeTable) { //for remember table code feature
-			if (_languageTemp != -1) {
-				AppDelegate::getInstance()->onTableCode(_languageTemp >> 1);
-			} else {
-				saveSmartSwitchKeyData();
-			}
-		}
 		if (vSupportMetroApp && exe.compare("ApplicationFrameHost.exe") == 0) {//Metro App
 			SendMessage(HWND_BROADCAST, WM_CHAR, VK_BACK, 0L);
 			SendMessage(HWND_BROADCAST, WM_CHAR, VK_BACK, 0L);
 		}
 	}
+}
+
+VOID CALLBACK winEventProcCallback(HWINEVENTHOOK hWinEventHook, DWORD dwEvent, HWND hwnd, LONG idObject, LONG idChild, DWORD dwEventThread, DWORD dwmsEventTime) {
+	_lastForegroundWnd = GetForegroundWindow();
+	checkSmartSwitchForForeground();
 }

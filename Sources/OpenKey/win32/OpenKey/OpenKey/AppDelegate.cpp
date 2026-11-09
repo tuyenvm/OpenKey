@@ -56,6 +56,7 @@ bool AppDelegate::isDialogMsg(MSG & msg) const {
 	return (mainDialog != NULL && IsDialogMessage(mainDialog->getHwnd(), &msg)) ||
 		(macroDialog != NULL && IsDialogMessage(macroDialog->getHwnd(), &msg)) || 
 		(convertDialog != NULL && IsDialogMessage(convertDialog->getHwnd(), &msg)) || 
+		(excludedAppsDialog != NULL && IsDialogMessage(excludedAppsDialog->getHwnd(), &msg)) ||
 		(aboutDialog != NULL && IsDialogMessage(aboutDialog->getHwnd(), &msg));
 }
 
@@ -158,6 +159,9 @@ void AppDelegate::closeDialog(BaseDialog * dialog) {
 	} else if (convertDialog == dialog) {
 		delete convertDialog;
 		convertDialog = NULL;
+	} else if (excludedAppsDialog == dialog) {
+		delete excludedAppsDialog;
+		excludedAppsDialog = NULL;
 	}
 }
 
@@ -165,6 +169,9 @@ void AppDelegate::onInputMethodChangedFromHotKey() {
 	APP_SET_DATA(vLanguage, vLanguage);
 	if (mainDialog) {
 		mainDialog->fillData();
+	}
+	if (excludedAppsDialog) {
+		excludedAppsDialog->fillData();
 	}
 	SystemTrayHelper::updateData();
 }
@@ -198,8 +205,14 @@ void AppDelegate::onDefaultConfig() {
 	APP_SET_DATA(vTempOffOpenKey, 0);
 	APP_SET_DATA(vFixChromiumBrowser, 0);
 
+	initDefaultExcludedApps();
+	saveSmartSwitchKeyData();
+
 	if (mainDialog) {
 		mainDialog->fillData();
+	}
+	if (excludedAppsDialog) {
+		excludedAppsDialog->fillData();
 	}
 	SystemTrayHelper::updateData();
 }
@@ -214,6 +227,9 @@ void AppDelegate::onToggleVietnamese() {
 		string& exe = OpenKeyHelper::getLastAppExecuteName();
 		setAppInputMethodStatus(exe, vLanguage | (vCodeTable << 1));
 		saveSmartSwitchKeyData();
+		if (excludedAppsDialog) {
+			excludedAppsDialog->fillData();
+		}
 	}
 }
 
@@ -230,6 +246,9 @@ void AppDelegate::onToggleUseSmartSwitchKey() {
 	if (mainDialog) {
 		mainDialog->fillData();
 	}
+	if (excludedAppsDialog) {
+		excludedAppsDialog->fillData();
+	}
 }
 
 void AppDelegate::onToggleUseMacro() {
@@ -245,6 +264,15 @@ void AppDelegate::onMacroTable() {
 		macroDialog->show();
 	} else {
 		macroDialog->bringOnTop();
+	}
+}
+
+void AppDelegate::onSmartSwitchTable() {
+	if (excludedAppsDialog == NULL) {
+		excludedAppsDialog = new ExcludedAppsDialog(hInstance, IDD_DIALOG_SMART_SWITCH);
+		excludedAppsDialog->show();
+	} else {
+		excludedAppsDialog->bringOnTop();
 	}
 }
 

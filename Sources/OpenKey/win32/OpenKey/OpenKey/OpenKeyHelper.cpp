@@ -123,24 +123,39 @@ LPTSTR OpenKeyHelper::getExecutePath() {
 
 string& OpenKeyHelper::getFrontMostAppExecuteName() {
 	_tempWnd = GetForegroundWindow();
+	if (_tempWnd == NULL) {
+		return _exeNameUtf8;
+	}
+	_tempProcessId = 0;
 	GetWindowThreadProcessId(_tempWnd, &_tempProcessId);
+	if (_tempProcessId == 0 || _tempProcessId == GetCurrentProcessId()) {
+		return _exeNameUtf8;
+	}
 	if (_tempProcessId == _cacheProcessId) {
 		return _exeNameUtf8;
 	}
-	_cacheProcessId = _tempProcessId;
-	_proc = OpenProcess(PROCESS_QUERY_INFORMATION | PROCESS_VM_READ, FALSE, _tempProcessId);
-	GetProcessImageFileName((HMODULE)_proc, _exePath, 1024);
-	CloseHandle(_proc);
+	_exePath[0] = 0;
+	_proc = OpenProcess(PROCESS_QUERY_LIMITED_INFORMATION, FALSE, _tempProcessId);
+	if (!_proc) {
+		_proc = OpenProcess(PROCESS_QUERY_INFORMATION | PROCESS_VM_READ, FALSE, _tempProcessId);
+	}
+	if (_proc) {
+		GetProcessImageFileName((HMODULE)_proc, _exePath, 1024);
+		CloseHandle(_proc);
+	}
 	
 	if (wcscmp(_exePath, _T("")) == 0) {
 		return _unknownProgram;
 	}
-	_exeName = _tcsrchr(_exePath, '\\') + 1;
-	if (wcscmp(_exeName, _T("OpenKey64.exe")) == 0 ||
-		wcscmp(_exeName, _T("OpenKey32.exe")) == 0 || 
-		wcscmp(_exeName, _T("explorer.exe")) == 0) {
+	LPCTSTR slash = _tcsrchr(_exePath, '\\');
+	_exeName = slash ? (slash + 1) : _exePath;
+	if (_tcsicmp(_exeName, _T("OpenKey64.exe")) == 0 ||
+		_tcsicmp(_exeName, _T("OpenKey32.exe")) == 0 ||
+		_tcsicmp(_exeName, _T("OpenKey.exe")) == 0 ||
+		_tcsicmp(_exeName, _T("explorer.exe")) == 0) {
 		return _exeNameUtf8;
 	}
+	_cacheProcessId = _tempProcessId;
 	int size_needed = WideCharToMultiByte(CP_UTF8, 0, _exeName, (int)lstrlen(_exeName), NULL, 0, NULL, NULL);
 	std::string strTo(size_needed, 0);
 	WideCharToMultiByte(CP_UTF8, 0, _exeName, (int)lstrlen(_exeName), &strTo[0], size_needed, NULL, NULL);

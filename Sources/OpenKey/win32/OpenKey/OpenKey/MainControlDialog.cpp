@@ -147,6 +147,8 @@ void MainControlDialog::initDialog() {
     checkTempOffOpenKey = GetDlgItem(hTabPage1, IDC_CHECK_TEMP_OFF_OPEN_KEY);
     createToolTip(checkTempOffOpenKey, IDS_STRING_TEMP_OFF_OPENKEY);
 
+    createToolTip(GetDlgItem(hTabPage1, IDC_BUTTON_SMART_SWITCH_LIST), IDS_STRING_SMART_SWITCH_LIST);
+
     /*------------end tab 1----------------*/
 
     checkQuickStartConsonant = GetDlgItem(hTabPage2, IDC_CHECK_QUICK_START_CONSONANT);
@@ -235,6 +237,9 @@ INT_PTR MainControlDialog::eventProc(HWND hDlg, UINT uMsg, WPARAM wParam, LPARAM
         }
         case IDC_BUTTON_MACRO_TABLE:
             AppDelegate::getInstance()->onMacroTable();
+            break;
+        case IDC_BUTTON_SMART_SWITCH_LIST:
+            AppDelegate::getInstance()->onSmartSwitchTable();
             break;
         case IDC_BUTTON_CHECK_UPDATE:
             onUpdateButton();

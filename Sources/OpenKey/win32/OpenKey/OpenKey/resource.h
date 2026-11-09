@@ -182,6 +182,16 @@
 #define IDS_STRING_START_CONSONANT      1066
 #define IDS_STRING_END_CONSONANT        1067
 #define IDC_CHECK_OTHER_LANGUAGES       1068
+#define IDD_DIALOG_SMART_SWITCH         151
+#define IDS_STRING_SMART_SWITCH_LIST    152
+#define IDC_BUTTON_SMART_SWITCH_LIST    1069
+#define IDC_COMBO_APP_NAME              1070
+#define IDC_BUTTON_BROWSE_APP           1071
+#define IDC_BUTTON_ADD_ENG              1072
+#define IDC_BUTTON_ADD_VIET             1073
+#define IDC_BUTTON_DELETE_APP           1074
+#define IDC_LIST_APP_DATA               1075
+#define IDC_BUTTON_ADD_DEFAULT_APPS     1076
 #define IDC_STATIC                      -1
 
 // Next default values for new objects
