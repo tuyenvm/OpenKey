@@ -37,6 +37,7 @@ redistribute your new version, it MUST be open source.
 #include <shellapi.h>
 #include <Commctrl.h>
 #include <psapi.h>
+#include <wtsapi32.h>
 
 #include "resource.h"
 
@@ -59,6 +60,7 @@ extern wchar_t _logBuffer[1024];
 
 extern void saveSmartSwitchKeyData();
 
+extern int vUILanguage; //0: English, 1: Vietnamese
 extern int vLanguage;
 extern int vInputType;
 extern int vFreeMark;

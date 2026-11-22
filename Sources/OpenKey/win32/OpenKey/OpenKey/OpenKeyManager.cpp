@@ -51,6 +51,12 @@ void OpenKeyManager::freeEngine() {
 	OpenKeyFree();
 }
 
+void OpenKeyManager::reinitHooks() {
+	// Reinitialize keyboard hooks after session unlock
+	extern void OpenKeyReinitHooks();
+	OpenKeyReinitHooks();
+}
+
 bool OpenKeyManager::checkUpdate(string& newVersion) {
 	wstring dataW = OpenKeyHelper::getContentOfUrl(L"https://raw.githubusercontent.com/tuyenvm/OpenKey/master/version.json");
 	string data = wideStringToUtf8(dataW);

@@ -16,6 +16,7 @@ redistribute your new version, it MUST be open source.
 static AppDelegate* _instance;
 
 //see document in Engine.h
+int vUILanguage = 0;
 int vLanguage = 1;
 int vInputType = 0;
 int vFreeMark = 0;
@@ -112,9 +113,6 @@ int AppDelegate::run(HINSTANCE hInstance) {
 	SystemTrayHelper::createSystemTrayIcon(hInstance);
 	SystemTrayHelper::updateData();
 
-	//create main control
-	if (vShowOnStartUp)
-		createMainDialog();
 	MessageBeep(MB_OK);
 
 	//check update
@@ -297,6 +295,12 @@ void AppDelegate::onOpenKeyAbout() {
 	} else {
 		aboutDialog->bringOnTop();
 	}
+}
+
+void AppDelegate::onOpenKeyRestart() {
+	wstring path = OpenKeyHelper::getFullPath();
+	ShellExecute(0, L"open", path.c_str(), 0, 0, SW_SHOWNORMAL);
+	onOpenKeyExit();
 }
 
 void AppDelegate::onOpenKeyExit() {

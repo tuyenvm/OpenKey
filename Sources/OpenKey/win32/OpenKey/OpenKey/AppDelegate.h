@@ -50,5 +50,6 @@ public: //event
 
 	void onControlPanel();
 	void onOpenKeyAbout();
+	void onOpenKeyRestart();
 	void onOpenKeyExit();
 };

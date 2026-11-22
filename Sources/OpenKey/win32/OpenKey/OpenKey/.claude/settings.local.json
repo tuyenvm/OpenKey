@@ -1,0 +1,8 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(cd C:\\\\Users\\\\vankh\\\\Documents\\\\Sources\\\\OpenKey:*)",
+      "Bash(curl:*)"
+    ]
+  }
+}

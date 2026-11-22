@@ -8,6 +8,7 @@
 #define IDBUTTON_OK                     2
 #define IDOK3                           3
 #define IDBUTTON_EXIT                   3
+#define IDBUTTON_RESTART                4
 #define IDD_OPENKEY_DIALOG              102
 #define IDS_APP_TITLE                   103
 #define IDD_ABOUTBOX                    103
@@ -163,6 +164,10 @@
 #define IDC_CHECK_SUPPORT_METRO         1050
 #define IDC_CHECK_CHECK_CREATE_SHORTCUT 1050
 #define IDC_BUTTON_CHECK_UPDATE         1051
+#define IDC_RADIO_UI_EN                 1052
+#define IDC_RADIO_UI_VI                 1053
+#define IDC_STATIC_SHORTCUT             1054
+#define IDC_STATIC_LANGUAGE             1055
 #define IDS_STRING_CTRL                 1052
 #define IDC_CHECK_FIX_CHROMIUM          1052
 #define IDS_STRING_ALT                  1053
@@ -191,7 +196,7 @@
 #define _APS_NO_MFC                     1
 #define _APS_NEXT_RESOURCE_VALUE        149
 #define _APS_NEXT_COMMAND_VALUE         32771
-#define _APS_NEXT_CONTROL_VALUE         1052
+#define _APS_NEXT_CONTROL_VALUE         1056
 #define _APS_NEXT_SYMED_VALUE           110
 #endif
 #endif
