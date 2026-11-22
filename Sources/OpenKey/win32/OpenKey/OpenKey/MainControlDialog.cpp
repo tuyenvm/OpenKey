@@ -45,6 +45,7 @@ void MainControlDialog::applyLanguage() {
     SetWindowText(checkBeep, vi ? _T("Kêu Beep") : _T("Beep"));
     SetWindowText(checkRunWithWindows, vi ? _T("Khởi động cùng Windows") : _T("Start with Windows"));
     SetDlgItemText(hDlg, IDC_STATIC_LANGUAGE, vi ? _T("Ngôn ngữ") : _T("Language"));
+    SetDlgItemText(hDlg, IDBUTTON_RESTART, vi ? _T("Khởi động lại") : _T("Restart"));
     SetDlgItemText(hDlg, IDBUTTON_EXIT, vi ? _T("Tắt OpenKey") : _T("Exit OpenKey"));
 }
 
@@ -59,6 +60,9 @@ INT_PTR MainControlDialog::eventProc(HWND hDlg, UINT uMsg, WPARAM wParam, LPARAM
         switch (wmId) {
         case IDBUTTON_OK: //sent by the window close button (IDCANCEL)
             AppDelegate::getInstance()->closeDialog(this);
+            break;
+        case IDBUTTON_RESTART:
+            AppDelegate::getInstance()->onOpenKeyRestart();
             break;
         case IDBUTTON_EXIT:
             AppDelegate::getInstance()->onOpenKeyExit();

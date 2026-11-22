@@ -8,6 +8,7 @@
 #define IDBUTTON_OK                     2
 #define IDOK3                           3
 #define IDBUTTON_EXIT                   3
+#define IDBUTTON_RESTART                4
 #define IDD_OPENKEY_DIALOG              102
 #define IDS_APP_TITLE                   103
 #define IDD_ABOUTBOX                    103

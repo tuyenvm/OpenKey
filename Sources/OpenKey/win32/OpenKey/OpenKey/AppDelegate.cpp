@@ -297,6 +297,12 @@ void AppDelegate::onOpenKeyAbout() {
 	}
 }
 
+void AppDelegate::onOpenKeyRestart() {
+	wstring path = OpenKeyHelper::getFullPath();
+	ShellExecute(0, L"open", path.c_str(), 0, 0, SW_SHOWNORMAL);
+	onOpenKeyExit();
+}
+
 void AppDelegate::onOpenKeyExit() {
 	OpenKeyManager::freeEngine();
 	SystemTrayHelper::removeSystemTray();
