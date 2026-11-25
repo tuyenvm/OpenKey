@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		A10000000000000000000001 /* RustBridge.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A10000000000000000000002 /* RustBridge.cpp */; };
 		23136D92231FBD49000764E6 /* ConvertToolViewController.mm in Sources */ = {isa = PBXBuildFile; fileRef = 23136D91231FBD49000764E6 /* ConvertToolViewController.mm */; };
 		232DB1E421FAED290049A0B5 /* StatusHighlighted.png in Resources */ = {isa = PBXBuildFile; fileRef = 232DB1E021FAED280049A0B5 /* StatusHighlighted.png */; };
 		232DB1E521FAED290049A0B5 /* Status.png in Resources */ = {isa = PBXBuildFile; fileRef = 232DB1E121FAED280049A0B5 /* Status.png */; };
@@ -59,6 +60,7 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		A10000000000000000000002 /* RustBridge.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; name = RustBridge.cpp; path = "../engine-rust/RustBridge.cpp"; sourceTree = SOURCE_ROOT; };
 		23136D90231FBD49000764E6 /* ConvertToolViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ConvertToolViewController.h; sourceTree = "<group>"; };
 		23136D91231FBD49000764E6 /* ConvertToolViewController.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = ConvertToolViewController.mm; sourceTree = "<group>"; };
 		232DB1E021FAED280049A0B5 /* StatusHighlighted.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = StatusHighlighted.png; sourceTree = "<group>"; };
@@ -177,6 +179,7 @@
 		232EDA4B21F1B33E0085D362 = {
 			isa = PBXGroup;
 			children = (
+				A10000000000000000000002 /* RustBridge.cpp */,
 				23E2E4932314FD3A006CCC3E /* engine */,
 				2344220522F42F70009E47D4 /* OpenKey.entitlements */,
 				232EDA5621F1B33E0085D362 /* ModernKey */,
@@ -323,6 +326,7 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = 232EDA6821F1B33F0085D362 /* Build configuration list for PBXNativeTarget "OpenKey" */;
 			buildPhases = (
+				A10000000000000000000003 /* Build Rust engine */,
 				232EDA5021F1B33E0085D362 /* Sources */,
 				232EDA5121F1B33E0085D362 /* Frameworks */,
 				232EDA5221F1B33E0085D362 /* Resources */,
@@ -399,24 +403,35 @@
 		};
 /* End PBXResourcesBuildPhase section */
 
+/* Begin PBXShellScriptBuildPhase section */
+		A10000000000000000000003 /* Build Rust engine */ = {
+			isa = PBXShellScriptBuildPhase;
+			alwaysOutOfDate = 1;
+			buildActionMask = 2147483647;
+			files = ();
+			inputPaths = ();
+			name = "Build Rust engine";
+			outputPaths = ("$(BUILT_PRODUCTS_DIR)/libopenkey_engine.a");
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "\"$SRCROOT/../../../scripts/build-rust-macos.sh\"";
+		};
+/* End PBXShellScriptBuildPhase section */
+
 /* Begin PBXSourcesBuildPhase section */
 		232EDA5021F1B33E0085D362 /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				23E2E49F2314FD3A006CCC3E /* Engine.cpp in Sources */,
+				A10000000000000000000001 /* RustBridge.cpp in Sources */,
 				232EDA5C21F1B33E0085D362 /* ViewController.m in Sources */,
-				23E2E49E2314FD3A006CCC3E /* SmartSwitchKey.cpp in Sources */,
 				23F512852336386200397988 /* MJAccessibilityUtils.m in Sources */,
 				2389467D21FDDB920030A13B /* OpenKeyManager.m in Sources */,
-				23E2E4A02314FD3A006CCC3E /* Vietnamese.cpp in Sources */,
 				2374A1302216720E005B0375 /* AboutViewController.m in Sources */,
 				23CA6D1722F0439100804D6E /* MyTextField.m in Sources */,
 				232EDA6421F1B33F0085D362 /* main.m in Sources */,
 				2345899A22F720D7003E0923 /* MacroViewController.mm in Sources */,
 				2371AAEF22FA85B200CA1B57 /* OpenKey.mm in Sources */,
-				23E2E49D2314FD3A006CCC3E /* Macro.cpp in Sources */,
-				233C4A70231F937900DD7052 /* ConvertTool.cpp in Sources */,
 				23136D92231FBD49000764E6 /* ConvertToolViewController.mm in Sources */,
 				232EDA5921F1B33E0085D362 /* AppDelegate.m in Sources */,
 			);
@@ -575,15 +590,20 @@
 				CURRENT_PROJECT_VERSION = 48;
 				DEVELOPMENT_TEAM = 8S7348QV8Q;
 				HEADER_SEARCH_PATHS = "";
+				LIBRARY_SEARCH_PATHS = ("$(inherited)", "$(BUILT_PRODUCTS_DIR)");
+				ENABLE_USER_SCRIPT_SANDBOXING = NO;
 				INFOPLIST_FILE = ModernKey/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/../Frameworks",
 				);
-				MACOSX_DEPLOYMENT_TARGET = 10.10;
+				MACOSX_DEPLOYMENT_TARGET = 10.14;
 				MARKETING_VERSION = 2.0.4;
 				OTHER_LDFLAGS = (
-					"-lc++\n-lc++",
+					"$(inherited)",
+					"-lc++",
+					"-lopenkey_engine",
+					"-liconv",
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = com.tuyenmai.openkey;
 				PRODUCT_NAME = "$(TARGET_NAME)";
@@ -601,15 +621,20 @@
 				CURRENT_PROJECT_VERSION = 48;
 				DEVELOPMENT_TEAM = 8S7348QV8Q;
 				HEADER_SEARCH_PATHS = "";
+				LIBRARY_SEARCH_PATHS = ("$(inherited)", "$(BUILT_PRODUCTS_DIR)");
+				ENABLE_USER_SCRIPT_SANDBOXING = NO;
 				INFOPLIST_FILE = ModernKey/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/../Frameworks",
 				);
-				MACOSX_DEPLOYMENT_TARGET = 10.10;
+				MACOSX_DEPLOYMENT_TARGET = 10.14;
 				MARKETING_VERSION = 2.0.4;
 				OTHER_LDFLAGS = (
-					"-lc++\n-lc++",
+					"$(inherited)",
+					"-lc++",
+					"-lopenkey_engine",
+					"-liconv",
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = com.tuyenmai.openkey;
 				PRODUCT_NAME = "$(TARGET_NAME)";
