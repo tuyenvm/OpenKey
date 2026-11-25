@@ -29,14 +29,59 @@ static BOOL _isInited = NO;
 static CFMachPortRef      eventTap;
 static CGEventMask        eventMask;
 static CFRunLoopSourceRef runLoopSource;
+static NSTimer           *tapWatchdogTimer;
 
 +(BOOL)isInited {
     return _isInited;
 }
 
++(BOOL)isEventTapEnabled {
+    return _isInited && eventTap != NULL && CFMachPortIsValid(eventTap) && CGEventTapIsEnabled(eventTap);
+}
+
++(void)reenableEventTap {
+    if (eventTap != NULL && CFMachPortIsValid(eventTap)) {
+        CGEventTapEnable(eventTap, true);
+    } else if (_isInited) {
+        dispatch_async(dispatch_get_main_queue(), ^{
+            [self stopEventTap];
+            [self initEventTap];
+        });
+    }
+}
+
++(void)ensureEventTapActive {
+    if (!_isInited) {
+        return;
+    }
+    if (eventTap == NULL || !CFMachPortIsValid(eventTap)) {
+        [self stopEventTap];
+        [self initEventTap];
+        return;
+    }
+    if (!CGEventTapIsEnabled(eventTap)) {
+        CGEventTapEnable(eventTap, true);
+    }
+}
+
++(void)startTapWatchdog {
+    if (tapWatchdogTimer != nil) {
+        [tapWatchdogTimer invalidate];
+        tapWatchdogTimer = nil;
+    }
+    tapWatchdogTimer = [NSTimer scheduledTimerWithTimeInterval:5.0
+                                                       repeats:YES
+                                                         block:^(NSTimer * _Nonnull timer) {
+        [OpenKeyManager ensureEventTapActive];
+    }];
+    tapWatchdogTimer.tolerance = 1.0;
+}
+
 +(BOOL)initEventTap {
-    if (_isInited)
+    if (_isInited) {
+        [self ensureEventTapActive];
         return true;
+    }
     
     //init modernKey
     OpenKeyInit();
@@ -50,12 +95,26 @@ static CFRunLoopSourceRef runLoopSource;
                  (1 << kCGEventLeftMouseDragged) |
                  (1 << kCGEventRightMouseDragged));
     
-    eventTap = CGEventTapCreate(kCGSessionEventTap,
+    // Register at kCGAnnotatedSessionEventTap so replacement events posted via
+    // CGEventTapPostEvent enter the stream AFTER kCGSessionEventTap listeners
+    // (such as Chrome Remote Desktop's LocalKeyboardInputMonitorMac), preventing
+    // remote desktop hosts from misclassifying Vietnamese accented output as
+    // local physical keyboard activity.
+    eventTap = CGEventTapCreate(kCGAnnotatedSessionEventTap,
                                 kCGHeadInsertEventTap,
-                                0,
+                                kCGEventTapOptionDefault,
                                 eventMask,
                                 OpenKeyCallback,
                                 NULL);
+    if (!eventTap) {
+        // Fallback to tail of session tap if annotated tap creation is denied.
+        eventTap = CGEventTapCreate(kCGSessionEventTap,
+                                    kCGTailAppendEventTap,
+                                    kCGEventTapOptionDefault,
+                                    eventMask,
+                                    OpenKeyCallback,
+                                    NULL);
+    }
     
     if (!eventTap) {
         
@@ -74,18 +133,30 @@ static CFRunLoopSourceRef runLoopSource;
     // Enable the event tap.
     CGEventTapEnable(eventTap, true);
     
+    // Periodically verify the tap stays enabled after OOM/sleep/system stalls.
+    [self startTapWatchdog];
+    
     return YES;
 }
 
 +(BOOL)stopEventTap {
+    if (tapWatchdogTimer != nil) {
+        [tapWatchdogTimer invalidate];
+        tapWatchdogTimer = nil;
+    }
     if (_isInited) { //release all object
-        CFRunLoopRemoveSource(CFRunLoopGetCurrent(), runLoopSource, kCFRunLoopCommonModes);
-        CFRelease(runLoopSource);
-        runLoopSource = nil;
+        if (runLoopSource != NULL) {
+            CFRunLoopRemoveSource(CFRunLoopGetCurrent(), runLoopSource, kCFRunLoopCommonModes);
+            CFRelease(runLoopSource);
+            runLoopSource = NULL;
+        }
         
-        CFMachPortInvalidate(eventTap);
-        CFRelease(eventTap);
-        eventTap = nil;
+        if (eventTap != NULL) {
+            CGEventTapEnable(eventTap, false);
+            CFMachPortInvalidate(eventTap);
+            CFRelease(eventTap);
+            eventTap = NULL;
+        }
         
         _isInited = false;
     }

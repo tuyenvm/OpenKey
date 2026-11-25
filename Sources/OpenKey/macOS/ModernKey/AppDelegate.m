@@ -23,6 +23,7 @@ extern void OnTableCodeChange(void);
 extern void OnInputMethodChanged(void);
 extern void RequestNewSession(void);
 extern void OnActiveAppChanged(void);
+extern void queryFrontMostApp(void);
 
 //see document in Engine.h
 int vLanguage = 1;
@@ -89,6 +90,7 @@ extern bool convertToolDontAlertWhenCompleted;
     NSMenuItem* mnuVietnameseLocaleCP1258;
     
     NSMenuItem* mnuQuickConvert;
+    id<NSObject> _latencyActivity;
 }
 
 -(void)askPermission {
@@ -160,6 +162,12 @@ extern bool convertToolDontAlertWhenCompleted;
 
     [self createStatusBarMenu];
     
+    // Prevent macOS App Nap / low-QoS throttling so the CGEventTap stays
+    // responsive under memory pressure and avoids WindowServer tap timeouts.
+    _latencyActivity = [[NSProcessInfo processInfo]
+        beginActivityWithOptions:(NSActivityUserInitiatedAllowingIdleSystemSleep | NSActivityLatencyCritical)
+                          reason:@"Low-latency Vietnamese keyboard input tap"];
+
     //init
     dispatch_async(dispatch_get_main_queue(), ^{
         if (![OpenKeyManager initEventTap]) {
@@ -195,7 +203,11 @@ extern bool convertToolDontAlertWhenCompleted;
 }
 
 - (void)applicationWillTerminate:(NSNotification *)aNotification {
-    // Insert code here to tear down your application
+    [OpenKeyManager stopEventTap];
+    if (_latencyActivity != nil) {
+        [[NSProcessInfo processInfo] endActivity:_latencyActivity];
+        _latencyActivity = nil;
+    }
 }
 
 -(void) createStatusBarMenu {
@@ -535,7 +547,11 @@ extern bool convertToolDontAlertWhenCompleted;
 
 #pragma mark Reset OpenKey after mac computer awake
 -(void)receiveWakeNote: (NSNotification*)note {
-    [OpenKeyManager initEventTap];
+    if ([OpenKeyManager isInited]) {
+        [OpenKeyManager ensureEventTapActive];
+    } else {
+        [OpenKeyManager initEventTap];
+    }
 }
 
 -(void)receiveSleepNote: (NSNotification*)note {
@@ -547,8 +563,12 @@ extern bool convertToolDontAlertWhenCompleted;
 }
 
 -(void)activeAppChanged: (NSNotification*)note {
-    if (vUseSmartSwitchKey && [OpenKeyManager isInited]) {
-        OnActiveAppChanged();
+    if ([OpenKeyManager isInited]) {
+        if (vUseSmartSwitchKey) {
+            OnActiveAppChanged();
+        } else {
+            queryFrontMostApp();
+        }
     }
 }
 
