@@ -46,6 +46,8 @@ static NSTimer *healthTimer;
     return eventTap && CFMachPortIsValid(eventTap) && CGEventTapIsEnabled(eventTap);
 }
 
++(BOOL)isPaused { return userDisabled; }
+
 +(void)recoverEventTap {
     if (userDisabled || !MJAccessibilityIsEnabled() || IsSecureEventInputEnabled()) return;
     if (eventTap && CFMachPortIsValid(eventTap)) {
@@ -63,6 +65,13 @@ static NSTimer *healthTimer;
     return userDisabled ? NO : [self initEventTap];
 }
 
++(void)prepareEngine {
+    if (!engineInitialized) {
+        OpenKeyInit();
+        engineInitialized = YES;
+    }
+}
+
 +(BOOL)initEventTap {
     if (!MJAccessibilityIsEnabled()) return NO;
     userDisabled = NO; // Only an explicit initialization/retry clears an intentional pause.
@@ -71,10 +80,7 @@ static NSTimer *healthTimer;
         return [self isActive];
     }
     [self stopEventTap];
-    if (!engineInitialized) {
-        OpenKeyInit();
-        engineInitialized = YES;
-    }
+    [self prepareEngine];
     eventMask = CGEventMaskBit(kCGEventKeyDown) | CGEventMaskBit(kCGEventKeyUp) |
                 CGEventMaskBit(kCGEventFlagsChanged) | CGEventMaskBit(kCGEventLeftMouseDown) |
                 CGEventMaskBit(kCGEventRightMouseDown);

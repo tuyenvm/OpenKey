@@ -14,3 +14,7 @@ clang++ -std=c++17 -fobjc-arc -Wno-deprecated-declarations -I Sources/OpenKey/en
 clang -fobjc-arc -Wno-deprecated-declarations scripts/macos-tap-tests.m \
     -framework Cocoa -framework Carbon -o "$TEST_DIR/lifecycle"
 "$TEST_DIR/lifecycle"
+
+clang -fobjc-arc -Wno-deprecated-declarations scripts/macos-settings-tests.m \
+    -framework Cocoa -framework Carbon -o "$TEST_DIR/settings"
+"$TEST_DIR/settings"

@@ -42,7 +42,7 @@ The data and algorithms derive from OpenKey and retain GPL-3.0 licensing and att
 
 ## Review checkpoint
 
-This milestone changes the engine and its build integration only. The draft now also includes milestone 3 event-tap recovery, Spotlight/terminal routing and field-boundary resets. Permissions/setup UI, app rules, Globe switching, signing and notarization remain deferred. No live-app typing or macOS permission grant is claimed by the automated checks.
+This milestone changes the engine and its build integration only. The draft now also includes milestone 3 event-tap recovery, Spotlight/terminal routing and field-boundary resets. Milestone 4 now adds setup/settings, permissions, app rules and optional Globe switching. Signing and notarization remain deferred. No live-app typing or macOS permission grant is claimed by the automated checks.
 
 ## Milestone 3 reliability checkpoint
 
@@ -68,4 +68,22 @@ Additional milestone 3 computer checks:
 - **Inconclusive:** Spotlight did not visibly open through computer-use Command-Space, even after temporarily enabling its disabled shortcut with user approval. The shortcut was restored to disabled and verified. Spotlight dismissal/typing routing remains unverified.
 - **Blocked:** the computer-use tool denied Terminal access; no alternate route was used. Remote-desktop input remains untested.
 
-VNI, Unicode, Option-Z, smart switching and browser-workaround settings were restored. The live-authorized app was `/Users/hai/Downloads/OpenKey-milestone-3/OpenKey.app`; it predates the final explicit-pause-on-wake adjustment. That adjustment has native lifecycle coverage, but the final review artifact still needs a live run. Milestone 4 has not started; this remains a draft review checkpoint, not a merge-ready live-validation claim.
+VNI, Unicode, Option-Z, smart switching and browser-workaround settings were restored. The live-authorized app was `/Users/hai/Downloads/OpenKey-milestone-3/OpenKey.app`; it predates the final explicit-pause-on-wake adjustment. That adjustment has native lifecycle coverage, but the final review artifact still needs a live run. Those results remain a draft checkpoint, not a merge-ready live-validation claim.
+
+
+## Milestone 4 user-experience checkpoint
+
+The menu-bar control panel and app reopen now show native AppKit tabs for setup, everyday typing options and application rules. The original settings remain available through **Cài đặt nâng cao**.
+
+- Engine/preferences initialize independently of the keyboard tap, so existing macros and remembered data are available safely before permission. Missing Accessibility permission leaves OpenKey running and opens setup. An explicit button requests permission and opens the system Accessibility panel; the setup window checks status once per second and attempts connection after approval. Revocation stops interception. An intentional pause survives automatic checks and requires the retry button.
+- Setup explains system-wide keyboard access, recommends macOS ABC to avoid competing input methods, and offers a physical typing test field with Telex/VNI examples. Status reports permission, secure input, pause, active tap or connection failure; it does not claim that a connected tap proves typing compatibility.
+- Everyday controls expose language, input method, encoding and remembering language per app. New installations/reset defaults leave launch-at-login off; existing saved preferences are retained.
+- App rules use bundle identifiers in the separate `AppLanguageRules` preference: English (0), Vietnamese (1), or remember (2). Fixed rules override the switch shortcut; remember works even with global remembering off. Removing a rule restores global behavior. Existing macro and smart-switch persistence formats remain unchanged.
+- `GlobeSwitch` defaults off. A standalone Fn/Globe release toggles language; Fn plus another key/modifier, repeated down events and interrupted gestures do not toggle. Events retain native delivery. Users must manually set macOS's Globe action to Do Nothing to avoid conflicts; OpenKey never changes that OS shortcut.
+- The settings window uses standard window styling and recenters if its saved position is entirely off-screen.
+
+Validation: `sh scripts/check-macos-input.sh` now also runs isolated settings tests for permission approval/revocation, explicit pause/retry and rule persistence. Native callback tests cover fixed/inherited/remembered app languages and Fn gesture boundaries. Xcode 27.2 builds both arm64 and x86_64 with deployment target 12.0. Computer use verified all three tabs and adding, changing and removing a TextEdit rule in the isolated settings preview. The preview uses fake permission/tap adapters and a separate preference domain; it does not establish live typing or real TCC approval behavior.
+
+The final milestone-4 app has not been launched or granted Accessibility. Physical Globe behavior, real permission approval and end-to-end app-rule typing still need review testing, alongside the outstanding milestone-3 live checks. Updates, login-item API migration, signing/notarization workflow and release verification remain milestone 5.
+
+Platform references: [Apple Accessibility trust check](https://developer.apple.com/documentation/applicationservices/1459186-axisprocesstrustedwithoptions) (permission prompting is asynchronous), [modifier flag documentation](https://developer.apple.com/documentation/appkit/nsevent/modifierflags-swift.struct/function?language=objc). Fn handling also checks the physical `kVK_Function` keycode, so other keys carrying the function flag do not count as standalone Fn taps.

@@ -22,6 +22,9 @@ void RefreshInputContext(void) {}
 NSString *ConvertUtil(NSString *str) {return str;}
 CGEventRef OpenKeyCallback(CGEventTapProxy proxy,CGEventType type,CGEventRef event,void *refcon) {return event;}
 int main(void) {@autoreleasepool {
+    trusted=NO;[OpenKeyManager prepareEngine];
+    assert(initializations==1 && creates==0 && ![OpenKeyManager initEventTap]);
+    trusted=YES;
     assert([OpenKeyManager initEventTap]);assert(initializations==1 && creates==1);
     enabled=NO;[OpenKeyManager recoverEventTap];assert(enabled);
     [OpenKeyManager handleTapDisabledByUser];enabled=NO;

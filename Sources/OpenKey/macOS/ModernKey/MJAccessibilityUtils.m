@@ -10,6 +10,7 @@
 
 
 #import "MJAccessibilityUtils.h"
+#import <AppKit/AppKit.h>
 // #import "HSLogger.h"
 
 extern Boolean AXAPIEnabled(void);
@@ -32,11 +33,6 @@ BOOL MJAccessibilityIsEnabled(void) {
 }
 
 void MJAccessibilityOpenPanel(void) {
-    if (AXIsProcessTrustedWithOptions != NULL) {
-        AXIsProcessTrustedWithOptions((__bridge CFDictionaryRef)@{(__bridge id)kAXTrustedCheckOptionPrompt: @YES});
-    }
-    else {
-        static NSString* script = @"tell application \"System Preferences\"\nactivate\nset current pane to pane \"com.apple.preference.universalaccess\"\nend tell";
-        [[[NSAppleScript alloc] initWithSource:script] executeAndReturnError:nil];
-    }
+    AXIsProcessTrustedWithOptions((__bridge CFDictionaryRef)@{(__bridge id)kAXTrustedCheckOptionPrompt: @YES});
+    [[NSWorkspace sharedWorkspace] openURL:[NSURL URLWithString:@"x-apple.systempreferences:com.apple.preference.security?Privacy_Accessibility"]];
 }

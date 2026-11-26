@@ -18,6 +18,8 @@
 -(void)setInputLanguage:(int)language;
 
 -(void)askPermission;
+-(void)onControlPanelSelected;
+-(void)onAdvancedSettings;
 
 -(void)onInputTypeSelectedIndex:(int)index;
 -(void)onCodeTableChanged:(int)index;

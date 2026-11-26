@@ -16,6 +16,7 @@
 #import "ViewController.h"
 #import "OpenKeyManager.h"
 #import "MJAccessibilityUtils.h"
+#import "SettingsWindowController.h"
 
 AppDelegate* appDelegate;
 extern ViewController* viewController;
@@ -67,6 +68,7 @@ extern bool convertToolDontAlertWhenCompleted;
 
 
 @implementation AppDelegate {
+    SettingsWindowController *_settingsWC;
     NSWindowController *_mainWC;
     NSWindowController *_macroWC;
     NSWindowController *_convertWC;
@@ -93,23 +95,7 @@ extern bool convertToolDontAlertWhenCompleted;
 }
 
 -(void)askPermission {
-    NSAlert *alert = [[NSAlert alloc] init];
-    [alert setMessageText: [NSString stringWithFormat:@"OpenKey cần bạn cấp quyền để có thể hoạt động!"]];
-    [alert setInformativeText:@"Vui lòng chạy lại ứng dụng sau khi cấp quyền."];
-
-    [alert addButtonWithTitle:@"Không"];
-    [alert addButtonWithTitle:@"Cấp quyền"];
-
-    [alert.window makeKeyAndOrderFront:nil];
-    [alert.window setLevel:NSStatusWindowLevel];
-
-    NSModalResponse res = [alert runModal];
-
-    if (res == 1001) {
-        MJAccessibilityOpenPanel();
-    }
-
-    [NSApp terminate:0];
+    [self onControlPanelSelected];
 }
 
 - (void)applicationDidFinishLaunching:(NSNotification *)aNotification {
@@ -146,11 +132,6 @@ extern bool convertToolDontAlertWhenCompleted;
         return;
     }
     
-    // check if user granted Accessabilty permission
-    if (!MJAccessibilityIsEnabled()) {
-        [self askPermission];
-        return;
-    }
     
     vShowIconOnDock = (int)[[NSUserDefaults standardUserDefaults] integerForKey:@"vShowIconOnDock"];
     if (vShowIconOnDock)
@@ -166,6 +147,7 @@ extern bool convertToolDontAlertWhenCompleted;
         if (![OpenKeyManager initEventTap]) {
             [self onControlPanelSelected];
         } else {
+            OnActiveAppChanged();
             NSInteger showui = [[NSUserDefaults standardUserDefaults] integerForKey:@"ShowUIOnStartup"];
             if (showui == 1) {
                 [self onControlPanelSelected];
@@ -179,6 +161,8 @@ extern bool convertToolDontAlertWhenCompleted;
         [self loadDefaultConfig];
     }
     [[NSUserDefaults standardUserDefaults] setInteger:1 forKey:@"NonFirstTime"];
+    // Settings and macros remain usable before Accessibility is granted.
+    [OpenKeyManager prepareEngine];
     
     //check update if enable
     NSInteger dontCheckUpdate = [[NSUserDefaults standardUserDefaults] integerForKey:@"DontCheckUpdate"];
@@ -314,7 +298,7 @@ extern bool convertToolDontAlertWhenCompleted;
     vPerformLayoutCompat = 0;[[NSUserDefaults standardUserDefaults] setInteger:vPerformLayoutCompat forKey:@"vPerformLayoutCompat"];
 
     [[NSUserDefaults standardUserDefaults] setInteger:1 forKey:@"GrayIcon"];
-    [[NSUserDefaults standardUserDefaults] setInteger:1 forKey:@"RunOnStartup"];
+    [[NSUserDefaults standardUserDefaults] setInteger:0 forKey:@"RunOnStartup"];
 
     [self fillData];
     [viewController fillData];
@@ -364,6 +348,7 @@ extern bool convertToolDontAlertWhenCompleted;
 
 - (void) fillData {
     //fill data
+    vUseSmartSwitchKey = (int)[[NSUserDefaults standardUserDefaults] integerForKey:@"UseSmartSwitchKey"];
     NSInteger intInputMethod = [[NSUserDefaults standardUserDefaults] integerForKey:@"InputMethod"];
     NSInteger grayIcon = [[NSUserDefaults standardUserDefaults] integerForKey:@"GrayIcon"];
     if (intInputMethod == 1) {
@@ -450,6 +435,9 @@ extern bool convertToolDontAlertWhenCompleted;
 
 #pragma mark -StatusBar menu action
 - (void)onInputMethodSelected {
+    NSDictionary *rules = [[NSUserDefaults standardUserDefaults] dictionaryForKey:@"AppLanguageRules"];
+    NSNumber *rule = rules[[NSWorkspace sharedWorkspace].frontmostApplication.bundleIdentifier ?: @""];
+    if ([rule isKindOfClass:NSNumber.class] && (rule.integerValue == 0 || rule.integerValue == 1)) return;
     [self onImputMethodChanged:YES];
 }
 
@@ -500,6 +488,13 @@ extern bool convertToolDontAlertWhenCompleted;
 }
 
 -(void) onControlPanelSelected {
+    if (!_settingsWC) _settingsWC = [[SettingsWindowController alloc] init];
+    [_settingsWC showWindow:nil];
+    [_settingsWC.window makeKeyAndOrderFront:nil];
+    [NSApp activateIgnoringOtherApps:YES];
+}
+
+-(void)onAdvancedSettings {
     if (_mainWC == nil) {
         _mainWC = [[NSStoryboard storyboardWithName:@"Main" bundle:nil] instantiateControllerWithIdentifier:@"OpenKey"];
     }
@@ -556,8 +551,7 @@ extern bool convertToolDontAlertWhenCompleted;
 
 -(void)activeAppChanged: (NSNotification*)note {
     if ([OpenKeyManager isInited]) {
-        RefreshInputContext();
-        if (vUseSmartSwitchKey) OnActiveAppChanged();
+        OnActiveAppChanged();
     }
 }
 

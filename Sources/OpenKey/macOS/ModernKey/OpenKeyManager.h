@@ -15,9 +15,11 @@ typedef void (^CheckNewVersionCallback)(void);
 
 @interface OpenKeyManager : NSObject
 +(BOOL)isInited;
++(void)prepareEngine;
 +(BOOL)initEventTap;
 +(BOOL)stopEventTap;
 +(BOOL)isActive;
++(BOOL)isPaused;
 +(BOOL)resumeEventTap;
 +(void)recoverEventTap;
 +(void)handleTapDisabledByUser;
