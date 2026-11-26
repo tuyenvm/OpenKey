@@ -15,6 +15,9 @@ clang -fobjc-arc -Wno-deprecated-declarations scripts/macos-tap-tests.m \
     -framework Cocoa -framework Carbon -o "$TEST_DIR/lifecycle"
 "$TEST_DIR/lifecycle"
 
-clang -fobjc-arc -Wno-deprecated-declarations scripts/macos-settings-tests.m \
-    -framework Cocoa -framework Carbon -o "$TEST_DIR/settings"
+clang -fobjc-arc -c Sources/OpenKey/macOS/ModernKey/MyTextField.m -o "$TEST_DIR/keyfield.o"
+clang++ -std=c++17 -fobjc-arc -Wno-deprecated-declarations -I Sources/OpenKey/engine \
+    scripts/macos-settings-tests.mm Sources/OpenKey/engine-rust/RustBridge.cpp "$TEST_DIR/keyfield.o" \
+    Sources/OpenKey/engine-rust/target/release/libopenkey_engine.a \
+    -framework Cocoa -framework Carbon -liconv -o "$TEST_DIR/settings"
 "$TEST_DIR/settings"

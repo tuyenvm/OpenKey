@@ -7,7 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-        A41000000000000000000001 /* SettingsWindowController.m in Sources */ = {isa = PBXBuildFile; fileRef = A41000000000000000000002 /* SettingsWindowController.m */; };
+        A41000000000000000000001 /* SettingsWindowController.mm in Sources */ = {isa = PBXBuildFile; fileRef = A41000000000000000000002 /* SettingsWindowController.mm */; };
 		A10000000000000000000001 /* RustBridge.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A10000000000000000000002 /* RustBridge.cpp */; };
 		23136D92231FBD49000764E6 /* ConvertToolViewController.mm in Sources */ = {isa = PBXBuildFile; fileRef = 23136D91231FBD49000764E6 /* ConvertToolViewController.mm */; };
 		232DB1E421FAED290049A0B5 /* StatusHighlighted.png in Resources */ = {isa = PBXBuildFile; fileRef = 232DB1E021FAED280049A0B5 /* StatusHighlighted.png */; };
@@ -61,7 +61,7 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
-        A41000000000000000000002 /* SettingsWindowController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = SettingsWindowController.m; sourceTree = "<group>"; };
+        A41000000000000000000002 /* SettingsWindowController.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = SettingsWindowController.mm; sourceTree = "<group>"; };
         A41000000000000000000003 /* SettingsWindowController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = SettingsWindowController.h; sourceTree = "<group>"; };
 		A10000000000000000000002 /* RustBridge.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; name = RustBridge.cpp; path = "../engine-rust/RustBridge.cpp"; sourceTree = SOURCE_ROOT; };
 		23136D90231FBD49000764E6 /* ConvertToolViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ConvertToolViewController.h; sourceTree = "<group>"; };
@@ -209,7 +209,7 @@
 				23F512842336386200397988 /* MJAccessibilityUtils.h */,
 				23F512832336386200397988 /* MJAccessibilityUtils.m */,
 				232EDA5721F1B33E0085D362 /* AppDelegate.h */,
-				A41000000000000000000002 /* SettingsWindowController.m */,
+				A41000000000000000000002 /* SettingsWindowController.mm */,
 				A41000000000000000000003 /* SettingsWindowController.h */,
 				232EDA5821F1B33E0085D362 /* AppDelegate.m */,
 				232EDA5A21F1B33E0085D362 /* ViewController.h */,
@@ -438,7 +438,7 @@
 				2345899A22F720D7003E0923 /* MacroViewController.mm in Sources */,
 				2371AAEF22FA85B200CA1B57 /* OpenKey.mm in Sources */,
 				23136D92231FBD49000764E6 /* ConvertToolViewController.mm in Sources */,
-				A41000000000000000000001 /* SettingsWindowController.m in Sources */,
+				A41000000000000000000001 /* SettingsWindowController.mm in Sources */,
 				232EDA5921F1B33E0085D362 /* AppDelegate.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

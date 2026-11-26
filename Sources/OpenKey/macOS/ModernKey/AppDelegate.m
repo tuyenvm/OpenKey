@@ -69,10 +69,6 @@ extern bool convertToolDontAlertWhenCompleted;
 
 @implementation AppDelegate {
     SettingsWindowController *_settingsWC;
-    NSWindowController *_mainWC;
-    NSWindowController *_macroWC;
-    NSWindowController *_convertWC;
-    NSWindowController *_aboutWC;
     
     NSStatusItem *statusItem;
     NSMenu *theMenu;
@@ -467,14 +463,8 @@ extern bool convertToolDontAlertWhenCompleted;
 }
 
 -(void)onConvertTool {
-    if (_convertWC == nil) {
-        _convertWC = [[NSStoryboard storyboardWithName:@"Main" bundle:nil] instantiateControllerWithIdentifier:@"ConvertWindow"];
-    }
-    //[OpenKeyManager showDockIcon:YES];
-    if ([_convertWC.window isVisible])
-        return;
-    [_convertWC.window makeKeyAndOrderFront:nil];
-    [_convertWC.window setLevel:NSFloatingWindowLevel];
+    [self onControlPanelSelected];
+    [_settingsWC showPage:@"conversion"];
 }
 
 -(void)onQuickConvert {
@@ -494,40 +484,14 @@ extern bool convertToolDontAlertWhenCompleted;
     [NSApp activateIgnoringOtherApps:YES];
 }
 
--(void)onAdvancedSettings {
-    if (_mainWC == nil) {
-        _mainWC = [[NSStoryboard storyboardWithName:@"Main" bundle:nil] instantiateControllerWithIdentifier:@"OpenKey"];
-    }
-    //[OpenKeyManager showDockIcon:YES];
-    if ([_mainWC.window isVisible]) {
-        return;
-    }
-    [_mainWC.window makeKeyAndOrderFront:nil];
-    [_mainWC.window setLevel:NSFloatingWindowLevel];
-}
-
 -(void) onMacroSelected {
-    if (_macroWC == nil) {
-        _macroWC = [[NSStoryboard storyboardWithName:@"Main" bundle:nil] instantiateControllerWithIdentifier:@"MacroWindow"];
-    }
-    //[OpenKeyManager showDockIcon:YES];
-    if ([_macroWC.window isVisible])
-        return;
-    
-    [_macroWC.window makeKeyAndOrderFront:nil];
-    [_macroWC.window setLevel:NSFloatingWindowLevel];
+    [self onControlPanelSelected];
+    [_settingsWC showPage:@"macros"];
 }
 
 -(void) onAboutSelected {
-    if (_aboutWC == nil) {
-        _aboutWC = [[NSStoryboard storyboardWithName:@"Main" bundle:nil] instantiateControllerWithIdentifier:@"AboutWindow"];
-    }
-    //[OpenKeyManager showDockIcon:YES];
-    if ([_aboutWC.window isVisible])
-        return;
-
-    [_aboutWC.window makeKeyAndOrderFront:nil];
-    [_aboutWC.window setLevel:NSFloatingWindowLevel];
+    [self onControlPanelSelected];
+    [_settingsWC showPage:@"about"];
 }
 
 #pragma mark -Short key event

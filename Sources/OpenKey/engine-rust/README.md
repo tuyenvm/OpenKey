@@ -73,7 +73,7 @@ VNI, Unicode, Option-Z, smart switching and browser-workaround settings were res
 
 ## Milestone 4 user-experience checkpoint
 
-The menu-bar control panel and app reopen now show native AppKit tabs for setup, everyday typing options and application rules. The original settings remain available through **Cài đặt nâng cao**.
+The menu-bar control panel and app reopen now show one AppKit sidebar window. All visible settings, macro editing and clipboard conversion are migrated into it; there is no Advanced Settings link or active route to the legacy windows.
 
 - Engine/preferences initialize independently of the keyboard tap, so existing macros and remembered data are available safely before permission. Missing Accessibility permission leaves OpenKey running and opens setup. An explicit button requests permission and opens the system Accessibility panel; the setup window checks status once per second and attempts connection after approval. Revocation stops interception. An intentional pause survives automatic checks and requires the retry button.
 - Setup explains system-wide keyboard access, recommends macOS ABC to avoid competing input methods, and offers a physical typing test field with Telex/VNI examples. Status reports permission, secure input, pause, active tap or connection failure; it does not claim that a connected tap proves typing compatibility.
@@ -100,3 +100,16 @@ The review artifact at `/Users/hai/Downloads/OpenKey-milestone-4/OpenKey.app` wa
 - **Inconclusive:** injected setup-field VNI `a1` and Telex `as` remained literal. Physical Fn/Globe behavior, real permission revocation/retry and secure-input status were not exercised in this live session; native checks cover those paths.
 
 Cleanup restored VNI, Unicode, Vietnamese, the original Option-Z configuration and global remembering; the temporary TextEdit rule was removed and Globe switching left off. Saved macro bytes were unchanged. macOS ABC was selected by the user for the physical checks; the earlier active system source was not recorded. The authorized milestone-4 app remains running. No production implementation changed during this follow-up, and milestone 5 has not started. The PR remains draft pending review of the remembered-choice failure.
+
+
+### Milestone 4 interface revision
+
+The first tabbed UI was rejected during review. The replacement uses a resizable native sidebar window with nine searchable pages: typing, shortcuts, application rules, macros, compatibility, conversion, system, permissions and about. Grouped rows align labels and controls, use system switches and semantic colors, and keep help text short. The sidebar uses the platform split-view sidebar, SF Symbols on supported systems, and an inset rounded selection.
+
+All previously visible control-panel options are directly available, including spelling dependencies, accent placement, quick consonants, both shortcuts and their modifiers, per-app language/encoding preferences, compatibility flags, login/display preferences and update-check controls. Macro add/edit/delete/import/export and clipboard conversion options are in the same window. Import retains the choice to merge or replace existing macros. Menu actions for macros, conversion and about select those pages; the old storyboard window-controller instantiation routes are removed. Legacy controller source/storyboard definitions remain in the repository but have no active settings-window route.
+
+Validation: native input/lifecycle/settings checks pass. Isolated settings checks now exercise migrated spelling preference/dependent controls, shortcut modifiers, conversion case options, macro creation and search, along with prior permission and app-rule persistence checks. The Release build contains arm64 and x86_64. Computer use inspected typing, shortcuts, macro editing and conversion/search in an isolated layout preview; the final sidebar selection was visually checked after sizing/selection corrections.
+
+The separate review artifact is `/Users/hai/Downloads/OpenKey-milestone-4-redesign/OpenKey.app` (locally ad-hoc signed, not notarized). The authorized previous milestone-4 typing app was left running; the new artifact has not been live-authorized or typing-tested. The open settings preview uses fake permission/tap adapters and separate preferences. Earlier physical typing results apply to the previous artifact. The reported remembered-language restore failure remains unresolved, and milestone 5 has not started.
+
+AppKit references: [sidebar materials](https://developer.apple.com/documentation/AppKit/NSVisualEffectView?language=objc), [native source-list metrics](https://developer.apple.com/documentation/appkit/nstableview/style-swift.enum/sourcelist?changes=__7).
