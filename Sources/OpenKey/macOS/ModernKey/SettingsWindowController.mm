@@ -18,15 +18,6 @@ extern "C" void OnSpellCheckingChanged(void);
 - (BOOL)isFlipped { return YES; }
 @end
 
-@interface OKSettingsSidebarRow : NSTableRowView
-@end
-@implementation OKSettingsSidebarRow
-- (void)drawSelectionInRect:(NSRect)dirtyRect {
-    [(self.emphasized ? NSColor.selectedContentBackgroundColor : NSColor.unemphasizedSelectedContentBackgroundColor) setFill];
-    [[NSBezierPath bezierPathWithRoundedRect:NSInsetRect(self.bounds, 6, 2) xRadius:7 yRadius:7] fill];
-}
-@end
-
 @implementation SettingsWindowController {
     NSTableView *_sidebar, *_rulesTable, *_macroTable;
     NSSearchField *_search;
@@ -179,15 +170,14 @@ static NSTextField *Text(NSString *text, CGFloat size, BOOL secondary) {
     NSSplitViewController *split = [NSSplitViewController new];
     NSViewController *side = [NSViewController new]; side.view = [NSView new];
     NSSplitViewItem *sidebarItem = [NSSplitViewItem sidebarWithViewController:side];
-    sidebarItem.minimumThickness = 210; sidebarItem.maximumThickness = 245;
+    sidebarItem.minimumThickness = 220; sidebarItem.maximumThickness = 260;
+    sidebarItem.preferredThicknessFraction = 0.25;
     sidebarItem.canCollapse = NO;
     NSViewController *main = [NSViewController new]; main.view = [NSView new];
     [split addSplitViewItem:sidebarItem];
     [split addSplitViewItem:[NSSplitViewItem splitViewItemWithViewController:main]];
     window.contentViewController = split;
     [window setContentSize:NSMakeSize(920, 680)];
-    NSTextField *brand = Text(@"OpenKey", 18, NO);
-    brand.font = [NSFont systemFontOfSize:18 weight:NSFontWeightSemibold];
     _search = [NSSearchField new]; _search.placeholderString = @"Tìm cài đặt"; _search.delegate = self;
     [_search setAccessibilityLabel:@"Tìm cài đặt"];
     NSScrollView *navigation = [NSScrollView new];
@@ -197,22 +187,21 @@ static NSTextField *Text(NSString *text, CGFloat size, BOOL secondary) {
     if (@available(macOS 11.0, *)) _sidebar.style = NSTableViewStyleSourceList;
     _sidebar.autoresizingMask = NSViewWidthSizable;
     _sidebar.columnAutoresizingStyle = NSTableViewLastColumnOnlyAutoresizingStyle;
-    _sidebar.rowHeight = 36; _sidebar.intercellSpacing = NSMakeSize(0, 4);
+    _sidebar.rowHeight = 30; _sidebar.intercellSpacing = NSMakeSize(0, 2);
     _sidebar.dataSource = self; _sidebar.delegate = self;
     [_sidebar setAccessibilityLabel:@"Các mục cài đặt"];
     NSTableColumn *column = [[NSTableColumn alloc] initWithIdentifier:@"navigation"];
     column.width = 180; column.minWidth = 140; [_sidebar addTableColumn:column]; navigation.documentView = _sidebar;
     _sidebarStatus = Text(@"", 11, YES);
-    for (NSView *view in @[brand, _search, navigation, _sidebarStatus]) {
+    for (NSView *view in @[_search, navigation, _sidebarStatus]) {
         [side.view addSubview:view]; view.translatesAutoresizingMaskIntoConstraints = NO;
     }
     [NSLayoutConstraint activateConstraints:@[
-        [brand.topAnchor constraintEqualToAnchor:side.view.topAnchor constant:54],
-        [brand.leadingAnchor constraintEqualToAnchor:side.view.leadingAnchor constant:20],
-        [_search.topAnchor constraintEqualToAnchor:brand.bottomAnchor constant:18],
-        [_search.leadingAnchor constraintEqualToAnchor:side.view.leadingAnchor constant:14],
-        [_search.trailingAnchor constraintEqualToAnchor:side.view.trailingAnchor constant:-14],
-        [navigation.topAnchor constraintEqualToAnchor:_search.bottomAnchor constant:16],
+        [_search.topAnchor constraintEqualToAnchor:side.view.topAnchor constant:58],
+        [_search.heightAnchor constraintEqualToConstant:28],
+        [_search.leadingAnchor constraintEqualToAnchor:side.view.leadingAnchor constant:10],
+        [_search.trailingAnchor constraintEqualToAnchor:side.view.trailingAnchor constant:-10],
+        [navigation.topAnchor constraintEqualToAnchor:_search.bottomAnchor constant:14],
         [navigation.leadingAnchor constraintEqualToAnchor:side.view.leadingAnchor constant:8],
         [navigation.trailingAnchor constraintEqualToAnchor:side.view.trailingAnchor constant:-8],
         [navigation.bottomAnchor constraintEqualToAnchor:_sidebarStatus.topAnchor constant:-16],
@@ -641,16 +630,33 @@ static NSTextField *Text(NSString *text, CGFloat size, BOOL secondary) {
         NSTableCellView *cell = [NSTableCellView new];
         NSTextField *label = [NSTextField labelWithString:page[@"title"]];
         NSImageView *image = [NSImageView new];
-        if (@available(macOS 11.0, *)) image.image = [NSImage imageWithSystemSymbolName:page[@"icon"] accessibilityDescription:nil];
-        cell.textField = label; cell.imageView = image;
-        [cell addSubview:label]; [cell addSubview:image];
-        label.translatesAutoresizingMaskIntoConstraints = image.translatesAutoresizingMaskIntoConstraints = NO;
+        NSBox *tile = [NSBox new];
+        tile.boxType = NSBoxCustom; tile.borderType = NSNoBorder; tile.cornerRadius = 4;
+        tile.contentViewMargins = NSZeroSize;
+        NSDictionary *colors = @{
+            @"typing":NSColor.systemBlueColor, @"shortcuts":NSColor.systemGrayColor,
+            @"apps":NSColor.systemBlueColor, @"macros":NSColor.systemOrangeColor,
+            @"compatibility":NSColor.systemGrayColor, @"conversion":NSColor.systemPurpleColor,
+            @"system":NSColor.systemGrayColor, @"setup":NSColor.systemBlueColor, @"about":NSColor.systemGrayColor
+        };
+        tile.fillColor = colors[page[@"id"]];
+        if (@available(macOS 11.0, *)) {
+            image.image = [NSImage imageWithSystemSymbolName:page[@"icon"] accessibilityDescription:nil];
+            image.contentTintColor = NSColor.whiteColor;
+        }
+        cell.textField = label;
+        [cell addSubview:label]; [cell addSubview:tile]; [tile.contentView addSubview:image];
+        label.translatesAutoresizingMaskIntoConstraints = tile.translatesAutoresizingMaskIntoConstraints = image.translatesAutoresizingMaskIntoConstraints = NO;
         [NSLayoutConstraint activateConstraints:@[
-            [image.leadingAnchor constraintEqualToAnchor:cell.leadingAnchor constant:8],
-            [image.centerYAnchor constraintEqualToAnchor:cell.centerYAnchor],
-            [image.widthAnchor constraintEqualToConstant:18], [image.heightAnchor constraintEqualToConstant:18],
-            [label.leadingAnchor constraintEqualToAnchor:image.trailingAnchor constant:10],
-            [label.centerYAnchor constraintEqualToAnchor:cell.centerYAnchor]
+            [tile.leadingAnchor constraintEqualToAnchor:cell.leadingAnchor constant:8],
+            [tile.centerYAnchor constraintEqualToAnchor:cell.centerYAnchor],
+            [tile.widthAnchor constraintEqualToConstant:20], [tile.heightAnchor constraintEqualToConstant:20],
+            [image.centerXAnchor constraintEqualToAnchor:tile.contentView.centerXAnchor],
+            [image.centerYAnchor constraintEqualToAnchor:tile.contentView.centerYAnchor],
+            [image.widthAnchor constraintEqualToConstant:14], [image.heightAnchor constraintEqualToConstant:14],
+            [label.leadingAnchor constraintEqualToAnchor:tile.trailingAnchor constant:8],
+            [label.centerYAnchor constraintEqualToAnchor:cell.centerYAnchor],
+            [label.trailingAnchor constraintLessThanOrEqualToAnchor:cell.trailingAnchor constant:-8]
         ]];
         return cell;
     }
@@ -670,9 +676,6 @@ static NSTextField *Text(NSString *text, CGFloat size, BOOL secondary) {
     [popup selectItemAtIndex:MAX(0, MIN(2, index))]; popup.identifier = bundleID;
     [popup setAccessibilityLabel:[NSString stringWithFormat:@"Quy tắc %@", bundleID]];
     return popup;
-}
-- (NSTableRowView *)tableView:(NSTableView *)tableView rowViewForRow:(NSInteger)row {
-    return tableView == _sidebar ? [OKSettingsSidebarRow new] : nil;
 }
 - (void)tableViewSelectionDidChange:(NSNotification *)notification {
     NSTableView *table = notification.object;
