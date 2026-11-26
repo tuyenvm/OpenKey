@@ -107,6 +107,7 @@ private struct NativeSettingsRow: View {
                         Text(segmented.label(forSegment: $0) ?? "").tag($0)
                     }
                 }.pickerStyle(.segmented).labelsHidden().fixedSize()
+                .disabled(!segmented.isEnabled)
             } label: { label }
         } else if let control = row["control"] as? NSView {
             LabeledContent { ExistingControl(control: control).fixedSize() } label: { label }

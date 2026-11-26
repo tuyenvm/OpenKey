@@ -22,7 +22,9 @@ static SettingsWindowController *previewController;
 BOOL MJAccessibilityIsEnabled(void) { return trusted; }
 void MJAccessibilityOpenPanel(void) {}
 static int languageSaves=0;
-void OnInputMethodChanged(void) { ++languageSaves; }
+static NSInteger settingsLanguageRule=-1;
+NSInteger SettingsLanguageRule(void) { return settingsLanguageRule; }
+void SetSettingsInputLanguage(int language) { vLanguage=language; ++languageSaves; }
 void OnActiveAppChanged(void) {}
 void RequestNewSession(void) {}
 void OnSpellCheckingChanged(void) { vSetCheckSpelling(); }
@@ -102,6 +104,8 @@ int main(void) { @autoreleasepool {
     language.selectedSegment=1;
     [controller changeLanguage:language];
     assert(vLanguage==0 && languageSaves==1); // Explicit settings choices must be remembered too.
+    settingsLanguageRule=1; [controller refresh]; assert(!language.enabled);
+    settingsLanguageRule=-1; [controller refresh]; assert(language.enabled);
     id spelling=[controller valueForKey:@"controls"][@"Spelling"];
     [spelling setState:NSControlStateValueOff]; [controller changeOption:spelling];
     assert(vCheckSpelling==0 && ![testDefaults boolForKey:@"Spelling"]);

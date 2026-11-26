@@ -91,6 +91,7 @@ extern "C" {
     vector<Byte> savedSmartSwitchKeyData; ////use for smart switch key
     
     NSString* _frontMostApp = @"UnknownApp";
+    NSString* _lastTypingApp = nil;
     
     void OpenKeyInit() {
         //load saved data
@@ -164,11 +165,20 @@ extern "C" {
         ResetInputSession();
     }
 
+    NSInteger AppLanguageRule(NSString *bundleID) {
+        id rule = [[[NSUserDefaults standardUserDefaults] dictionaryForKey:@"AppLanguageRules"] objectForKey:bundleID];
+        return [rule isKindOfClass:NSNumber.class] && [rule integerValue] >= 0 && [rule integerValue] <= 2 ? [rule integerValue] : -1;
+    }
+
     void queryFrontMostApp() {
         NSRunningApplication *app = [NSWorkspace sharedWorkspace].frontmostApplication;
         _frontMostApp = app.bundleIdentifier ?: @"UnknownApp";
-        id rule = [[[NSUserDefaults standardUserDefaults] dictionaryForKey:@"AppLanguageRules"] objectForKey:_frontMostApp];
-        _appLanguageRule = [rule isKindOfClass:NSNumber.class] && [rule integerValue] >= 0 && [rule integerValue] <= 2 ? [rule integerValue] : -1;
+        if (app.bundleIdentifier.length && ![_frontMostApp isEqual:OPENKEY_BUNDLE]) _lastTypingApp = _frontMostApp;
+        _appLanguageRule = AppLanguageRule(_frontMostApp);
+    }
+
+    NSInteger SettingsLanguageRule() {
+        return AppLanguageRule(_lastTypingApp ?: _frontMostApp);
     }
 
     void RefreshInputContext() {
@@ -225,6 +235,8 @@ extern "C" {
     }
     
     void ApplyAppLanguageSettings() {
+        // Opening settings must retain the typing app's mode, rather than recall OpenKey's own default memory.
+        if ([_frontMostApp isEqual:OPENKEY_BUNDLE] && _appLanguageRule == -1) return;
         if (_appLanguageRule == 0 || _appLanguageRule == 1) {
             [appDelegate setInputLanguage:(int)_appLanguageRule];
             ResetInputSession();
@@ -272,6 +284,25 @@ extern "C" {
         }
     }
     
+    void SetSettingsInputLanguage(int language) {
+        queryFrontMostApp();
+        NSString *target = _lastTypingApp ?: _frontMostApp;
+        NSInteger rule = AppLanguageRule(target);
+        if (rule == 0 || rule == 1) {
+            [appDelegate setInputLanguage:(int)rule];
+        } else {
+            [appDelegate setInputLanguage:language];
+            if (vUseSmartSwitchKey || rule == 2) {
+                int previous = getAppInputMethodStatus(target.UTF8String, vLanguage | (vCodeTable << 1));
+                // Changing language must not replace the target app's remembered encoding.
+                int encoding = previous < 0 ? vCodeTable << 1 : previous & ~1;
+                setAppInputMethodStatus(target.UTF8String, vLanguage | encoding);
+                saveSmartSwitchKeyData();
+            }
+        }
+        ResetInputSession();
+    }
+
     void OnSpellCheckingChanged() {
         vSetCheckSpelling();
     }

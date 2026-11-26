@@ -157,6 +157,26 @@ int main() {@autoreleasepool {
     vLanguage=0; OnInputMethodChanged();
     assert(getAppInputMethodStatus(testAppID.UTF8String,1)==1);
     [[NSUserDefaults standardUserDefaults] removeObjectForKey:@"AppLanguageRules"];
+    // Settings activation must not redirect a language choice away from the typing app.
+    testAppID=@"org.openkey.test.editor"; vUseSmartSwitchKey=1; vRememberCode=1;
+    setAppInputMethodStatus(testAppID.UTF8String,1|(3<<1));
+    setAppInputMethodStatus("org.openkey.test.unrelated",1);
+    OnActiveAppChanged();
+    testAppID=OPENKEY_BUNDLE; OnActiveAppChanged();
+    SetSettingsInputLanguage(0);
+    testAppID=@"org.openkey.test.editor"; OnActiveAppChanged();
+    assert(vLanguage==0 && vCodeTable==3);
+    assert(getAppInputMethodStatus("org.openkey.test.unrelated",1)==1);
+    // A per-app remember rule also works when global remembering is off.
+    [[NSUserDefaults standardUserDefaults] setObject:@{testAppID:@2} forKey:@"AppLanguageRules"];
+    vUseSmartSwitchKey=0;
+    testAppID=OPENKEY_BUNDLE; OnActiveAppChanged(); SetSettingsInputLanguage(1);
+    testAppID=@"org.openkey.test.editor"; OnActiveAppChanged(); assert(vLanguage==1);
+    [[NSUserDefaults standardUserDefaults] setObject:@{testAppID:@1} forKey:@"AppLanguageRules"];
+    testAppID=OPENKEY_BUNDLE; OnActiveAppChanged(); SetSettingsInputLanguage(0);
+    assert(vLanguage==1 && SettingsLanguageRule()==1);
+    [[NSUserDefaults standardUserDefaults] removeObjectForKey:@"AppLanguageRules"];
+    vUseSmartSwitchKey=0; vRememberCode=0; vCodeTable=0;
     vSwitchKeyStatus=0xFE0000FE;
     _appLanguageRule=-1;
     _globeSwitch=YES;

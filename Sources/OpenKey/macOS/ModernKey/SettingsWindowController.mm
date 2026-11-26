@@ -10,7 +10,8 @@
 extern AppDelegate *appDelegate;
 extern int vSendKeyStepByStep, vFixChromiumBrowser, vPerformLayoutCompat, vShowIconOnDock;
 extern "C" void OnActiveAppChanged(void);
-extern "C" void OnInputMethodChanged(void);
+extern "C" void SetSettingsInputLanguage(int language);
+extern "C" NSInteger SettingsLanguageRule(void);
 extern "C" void RequestNewSession(void);
 extern "C" void OnSpellCheckingChanged(void);
 
@@ -314,7 +315,7 @@ static NSTextField *Text(NSString *text, CGFloat size, BOOL secondary) {
     _encoding = [self popup:[OpenKeyManager getTableCodes] action:@selector(changeEncoding:)];
     [_inputType setAccessibilityLabel:@"Kiểu gõ"]; [_encoding setAccessibilityLabel:@"Bảng mã"];
     [self group:@"" rows:@[
-        [self row:@"Ngôn ngữ" detail:nil control:_language],
+        [self row:@"Ngôn ngữ" detail:@"Áp dụng khi quay lại ứng dụng vừa dùng. Quy tắc cố định được ưu tiên." control:_language],
         [self row:@"Kiểu gõ" detail:nil control:_inputType],
         [self row:@"Bảng mã" detail:@"Unicode dùng cho hầu hết ứng dụng." control:_encoding]
     ]];
@@ -583,6 +584,8 @@ static NSTextField *Text(NSString *text, CGFloat size, BOOL secondary) {
     if (_inputType && _inputType.indexOfSelectedItem != vInputType) [_inputType selectItemAtIndex:MAX(0, MIN(3, vInputType))];
     if (_encoding && _encoding.indexOfSelectedItem != vCodeTable) [_encoding selectItemAtIndex:MAX(0, MIN(4, vCodeTable))];
     _language.selectedSegment = vLanguage ? 0 : 1;
+    NSInteger languageRule = SettingsLanguageRule();
+    _language.enabled = languageRule != 0 && languageRule != 1;
     for (NSString *key in _controls) {
         id control = _controls[key]; BOOL value;
         if ([key hasPrefix:@"input."] || [key hasPrefix:@"convert."]) {
@@ -610,8 +613,8 @@ static NSTextField *Text(NSString *text, CGFloat size, BOOL secondary) {
 }
 - (void)retry:(id)sender { [OpenKeyManager initEventTap]; [self refresh]; }
 - (void)changeLanguage:(id)sender {
-    [appDelegate setInputLanguage:_language.selectedSegment == 0];
-    OnInputMethodChanged(); RequestNewSession(); [self refresh];
+    SetSettingsInputLanguage(_language.selectedSegment == 0);
+    [self refresh];
 }
 - (void)changeInputType:(id)sender {
     [appDelegate onInputTypeSelectedIndex:(int)_inputType.indexOfSelectedItem]; RequestNewSession(); [self refresh];

@@ -478,6 +478,7 @@ extern bool convertToolDontAlertWhenCompleted;
 }
 
 -(void) onControlPanelSelected {
+    RefreshInputContext(); // Capture the typing app before settings becomes frontmost.
     if (!_settingsWC) _settingsWC = [[SettingsWindowController alloc] init];
     [_settingsWC showWindow:nil];
     [_settingsWC.window makeKeyAndOrderFront:nil];
