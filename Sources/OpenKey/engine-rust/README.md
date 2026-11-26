@@ -84,6 +84,19 @@ The menu-bar control panel and app reopen now show native AppKit tabs for setup,
 
 Validation: `sh scripts/check-macos-input.sh` now also runs isolated settings tests for permission approval/revocation, explicit pause/retry and rule persistence. Native callback tests cover fixed/inherited/remembered app languages and Fn gesture boundaries. Xcode 27.2 builds both arm64 and x86_64 with deployment target 12.0. Computer use verified all three tabs and adding, changing and removing a TextEdit rule in the isolated settings preview. The preview uses fake permission/tap adapters and a separate preference domain; it does not establish live typing or real TCC approval behavior.
 
-The final milestone-4 app has not been launched or granted Accessibility. Physical Globe behavior, real permission approval and end-to-end app-rule typing still need review testing, alongside the outstanding milestone-3 live checks. Updates, login-item API migration, signing/notarization workflow and release verification remain milestone 5.
+The milestone-4 app has since been launched and authorized; see the live results below. Physical Globe behavior and the outstanding milestone-3 live checks still need review testing. Updates, login-item API migration, signing/notarization workflow and release verification remain milestone 5.
 
 Platform references: [Apple Accessibility trust check](https://developer.apple.com/documentation/applicationservices/1459186-axisprocesstrustedwithoptions) (permission prompting is asynchronous), [modifier flag documentation](https://developer.apple.com/documentation/appkit/nsevent/modifierflags-swift.struct/function?language=objc). Fn handling also checks the physical `kVK_Function` keycode, so other keys carrying the function flag do not count as standalone Fn taps.
+
+
+### Milestone 4 live computer-test results
+
+The review artifact at `/Users/hai/Downloads/OpenKey-milestone-4/OpenKey.app` was tested without rebuilding or replacing it.
+
+- **Passed:** missing permission left the app running with setup visible. The setup link opened the system access panel. After user-approved Touch ID and replacing the stale OpenKey permission entry with this artifact, the same process (PID 72189) reported an active keyboard connection without restart; diagnostics confirmed an enabled tap.
+- **Passed:** switching English/Vietnamese, Telex/VNI guidance, toggling the optional Globe preference back off, entering/exiting advanced settings, and adding/changing/removing a real TextEdit application rule.
+- **Passed with physical user input:** with macOS on ABC, fixed English left `a1` literal and Option-Z did not override English. Fixed Vietnamese produced `á` from `a1` and Option-Z did not override Vietnamese. TextEdit's document also visibly contained accented output.
+- **Failed/unresolved:** the user reported that TextEdit's “remember choice” rule did not restore English with global remembering off after selecting Vietnamese outside TextEdit. The exact failing step is not yet established; no production fix is claimed. The expanded native test exercises Option-Z, saving English, leaving for another app, changing the current language and restoring English with global remembering off; it passes with isolated preferences and mocked app identity/delegate.
+- **Inconclusive:** injected setup-field VNI `a1` and Telex `as` remained literal. Physical Fn/Globe behavior, real permission revocation/retry and secure-input status were not exercised in this live session; native checks cover those paths.
+
+Cleanup restored VNI, Unicode, Vietnamese, the original Option-Z configuration and global remembering; the temporary TextEdit rule was removed and Globe switching left off. Saved macro bytes were unchanged. macOS ABC was selected by the user for the physical checks; the earlier active system source was not recorded. The authorized milestone-4 app remains running. No production implementation changed during this follow-up, and milestone 5 has not started. The PR remains draft pending review of the remembered-choice failure.

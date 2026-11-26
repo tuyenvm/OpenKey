@@ -1,4 +1,37 @@
 // Native regression checks. Event posting is intercepted: this test sends no UI input.
+#import <Cocoa/Cocoa.h>
+static NSString *testAppID=@"org.openkey.test.rule";
+@interface TestRunningApp : NSObject
+@property(readonly) NSString *bundleIdentifier;
+@end
+@implementation TestRunningApp
+-(NSString *)bundleIdentifier { return testAppID; }
+@end
+@interface TestWorkspace : NSObject
++(instancetype)sharedWorkspace;
+@property(readonly) NSRunningApplication *frontmostApplication;
+@end
+@implementation TestWorkspace
++(instancetype)sharedWorkspace { static TestWorkspace *workspace=[TestWorkspace new];return workspace; }
+-(NSRunningApplication *)frontmostApplication { static TestRunningApp *app=[TestRunningApp new];return (NSRunningApplication *)app; }
+@end
+static NSString *testSuite;
+@interface TestDefaults : NSUserDefaults
++(instancetype)standardUserDefaults;
+@end
+@implementation TestDefaults
++(instancetype)standardUserDefaults {
+    static TestDefaults *prefs;
+    if (!prefs) {
+        testSuite=[@"org.openkey.native-tests." stringByAppendingString:NSUUID.UUID.UUIDString];
+        prefs=[[TestDefaults alloc] initWithSuiteName:testSuite];
+    }
+    return prefs;
+}
+@end
+#define NSWorkspace TestWorkspace
+#define NSUserDefaults TestDefaults
+extern "C" void TestCGEventTapPostEvent(CGEventTapProxy,CGEventRef);
 #define CGEventTapPostEvent TestCGEventTapPostEvent
 #include "../Sources/OpenKey/macOS/ModernKey/OpenKey.mm"
 #undef CGEventTapPostEvent
@@ -17,7 +50,7 @@ int vSendKeyStepByStep=0,vFixChromiumBrowser=0,vPerformLayoutCompat=0;
 @implementation AppDelegate
 -(void)setInputLanguage:(int)language { vLanguage=language; }
 -(void)onCodeTableChanged:(int)code { vCodeTable=code; }
--(void)onImputMethodChanged:(BOOL)notify {}
+-(void)onImputMethodChanged:(BOOL)notify { if (notify) OnInputMethodChanged(); }
 @end
 #pragma clang diagnostic pop
 static int recovered=0,paused=0;
@@ -90,6 +123,29 @@ int main() {@autoreleasepool {
     ApplyAppLanguageSettings();assert(vLanguage==0); // Inherit disabled global remembering.
     setAppInputMethodStatus("org.openkey.test.rule",1);
     _appLanguageRule=2;ApplyAppLanguageSettings();assert(vLanguage==1);
+    // Exercise the complete shortcut -> save -> leave -> restore path, not just a seeded lookup.
+    testAppID=@"org.openkey.test.remember";
+    [[NSUserDefaults standardUserDefaults] setObject:@{testAppID:@2} forKey:@"AppLanguageRules"];
+    setAppInputMethodStatus(testAppID.UTF8String,1);
+    vLanguage=1;vUseSmartSwitchKey=0;OnActiveAppChanged();
+    vSwitchKeyStatus=0x7A000206; // Option-Z, no beep.
+    auto shortcut=[&](CGEventType type,CGKeyCode key,CGEventFlags flags) {
+        CGEventRef event=CGEventCreateKeyboardEvent(NULL,key,true);
+        CGEventSetType(event,type);CGEventSetFlags(event,flags);
+        OpenKeyCallback(NULL,type,event,NULL);CFRelease(event);
+    };
+    shortcut(kCGEventFlagsChanged,kVK_Option,kCGEventFlagMaskAlternate);
+    shortcut(kCGEventKeyDown,kVK_ANSI_Z,kCGEventFlagMaskAlternate);
+    shortcut(kCGEventKeyUp,kVK_ANSI_Z,kCGEventFlagMaskAlternate);
+    shortcut(kCGEventFlagsChanged,kVK_Option,0);
+    assert(vLanguage==0);
+    assert(getAppInputMethodStatus(testAppID.UTF8String,1)==0);
+    testAppID=@"org.openkey.test.other";OnActiveAppChanged();
+    [appDelegate setInputLanguage:1];
+    testAppID=@"org.openkey.test.remember";OnActiveAppChanged();
+    assert(vLanguage==0);
+    [[NSUserDefaults standardUserDefaults] removeObjectForKey:@"AppLanguageRules"];
+    vSwitchKeyStatus=0xFE0000FE;
     _appLanguageRule=-1;
     _globeSwitch=YES;
     auto input=[&](CGEventType type,CGKeyCode key,CGEventFlags flags) {
@@ -115,5 +171,6 @@ int main() {@autoreleasepool {
     assert(posts.size()==4); // Empty tracking state must not dereference vector::back().
     for(auto event:posts)CFRelease(event);
     CFRelease(myEventSource);
+    [[NSUserDefaults standardUserDefaults] removePersistentDomainForName:testSuite];
     puts("Native input: timeout/user-disable, target routing, Unicode delivery, Spotlight ownership, app rules, standalone Fn and empty buffers passed");
 }}
