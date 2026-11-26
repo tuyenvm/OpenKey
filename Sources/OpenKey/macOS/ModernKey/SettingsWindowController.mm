@@ -21,7 +21,7 @@ extern "C" void OnSpellCheckingChanged(void);
 @implementation SettingsWindowController {
     NSTableView *_sidebar, *_rulesTable, *_macroTable;
     NSSearchField *_search;
-    NSTextField *_pageTitle, *_status, *_sidebarStatus, *_testHint, *_macroName, *_macroContent;
+    NSTextField *_status, *_sidebarStatus, *_testHint, *_macroName, *_macroContent;
     NSScrollView *_pageScroll;
     NSStackView *_content;
     NSButton *_retry;
@@ -152,8 +152,8 @@ static NSTextField *Text(NSString *text, CGFloat size, BOOL secondary) {
                   NSWindowStyleMaskResizable | NSWindowStyleMaskFullSizeContentView
         backing:NSBackingStoreBuffered defer:NO];
     self = [super initWithWindow:window]; if (!self) return nil;
-    window.title = @"OpenKey"; window.titleVisibility = NSWindowTitleHidden;
-    window.titlebarAppearsTransparent = YES; window.minSize = NSMakeSize(860, 600);
+    window.title = @"OpenKey";
+    window.minSize = NSMakeSize(860, 600);
     window.delegate = self; window.releasedWhenClosed = NO; [window center];
     _pages = @[
         @{@"id":@"typing", @"title":@"Gõ tiếng Việt", @"icon":@"keyboard", @"keywords":@"kiểu gõ bảng mã chính tả dấu telex vni phụ âm khôi phục hoa gõ nhanh z w j f"},
@@ -178,16 +178,22 @@ static NSTextField *Text(NSString *text, CGFloat size, BOOL secondary) {
     [split addSplitViewItem:[NSSplitViewItem splitViewItemWithViewController:main]];
     window.contentViewController = split;
     [window setContentSize:NSMakeSize(920, 680)];
+    NSToolbar *toolbar = [[NSToolbar alloc] initWithIdentifier:@"OpenKeySettings"];
+    toolbar.delegate = self; toolbar.allowsUserCustomization = NO;
+    toolbar.displayMode = NSToolbarDisplayModeIconOnly;
+    window.toolbar = toolbar;
+    if (@available(macOS 11.0, *)) window.toolbarStyle = NSWindowToolbarStyleUnified;
+    NSLayoutGuide *layout = window.contentLayoutGuide;
     _search = [NSSearchField new]; _search.placeholderString = @"Tìm cài đặt"; _search.delegate = self;
     [_search setAccessibilityLabel:@"Tìm cài đặt"];
     NSScrollView *navigation = [NSScrollView new];
     navigation.drawsBackground = NO; navigation.hasVerticalScroller = YES;
     _sidebar = [NSTableView new]; _sidebar.headerView = nil; _sidebar.backgroundColor = NSColor.clearColor;
-    _sidebar.selectionHighlightStyle = NSTableViewSelectionHighlightStyleSourceList;
     if (@available(macOS 11.0, *)) _sidebar.style = NSTableViewStyleSourceList;
+    else _sidebar.selectionHighlightStyle = NSTableViewSelectionHighlightStyleSourceList;
+    _sidebar.rowSizeStyle = NSTableViewRowSizeStyleDefault;
     _sidebar.autoresizingMask = NSViewWidthSizable;
     _sidebar.columnAutoresizingStyle = NSTableViewLastColumnOnlyAutoresizingStyle;
-    _sidebar.rowHeight = 30; _sidebar.intercellSpacing = NSMakeSize(0, 2);
     _sidebar.dataSource = self; _sidebar.delegate = self;
     [_sidebar setAccessibilityLabel:@"Các mục cài đặt"];
     NSTableColumn *column = [[NSTableColumn alloc] initWithIdentifier:@"navigation"];
@@ -197,30 +203,35 @@ static NSTextField *Text(NSString *text, CGFloat size, BOOL secondary) {
         [side.view addSubview:view]; view.translatesAutoresizingMaskIntoConstraints = NO;
     }
     [NSLayoutConstraint activateConstraints:@[
-        [_search.topAnchor constraintEqualToAnchor:side.view.topAnchor constant:58],
-        [_search.heightAnchor constraintEqualToConstant:28],
+        [_search.topAnchor constraintEqualToAnchor:layout.topAnchor constant:8],
         [_search.leadingAnchor constraintEqualToAnchor:side.view.leadingAnchor constant:10],
         [_search.trailingAnchor constraintEqualToAnchor:side.view.trailingAnchor constant:-10],
-        [navigation.topAnchor constraintEqualToAnchor:_search.bottomAnchor constant:14],
-        [navigation.leadingAnchor constraintEqualToAnchor:side.view.leadingAnchor constant:8],
-        [navigation.trailingAnchor constraintEqualToAnchor:side.view.trailingAnchor constant:-8],
+        [navigation.topAnchor constraintEqualToSystemSpacingBelowAnchor:_search.bottomAnchor multiplier:1],
+        [navigation.leadingAnchor constraintEqualToAnchor:side.view.leadingAnchor],
+        [navigation.trailingAnchor constraintEqualToAnchor:side.view.trailingAnchor],
         [navigation.bottomAnchor constraintEqualToAnchor:_sidebarStatus.topAnchor constant:-16],
         [_sidebarStatus.leadingAnchor constraintEqualToAnchor:side.view.leadingAnchor constant:20],
         [_sidebarStatus.bottomAnchor constraintEqualToAnchor:side.view.bottomAnchor constant:-20]
     ]];
-    _pageTitle = Text(@"", 20, NO); _pageTitle.font = [NSFont systemFontOfSize:20 weight:NSFontWeightSemibold];
     _pageScroll = [NSScrollView new]; _pageScroll.hasVerticalScroller = YES; _pageScroll.drawsBackground = NO;
-    for (NSView *view in @[_pageTitle, _pageScroll]) { [main.view addSubview:view]; view.translatesAutoresizingMaskIntoConstraints = NO; }
+    [main.view addSubview:_pageScroll]; _pageScroll.translatesAutoresizingMaskIntoConstraints = NO;
     [NSLayoutConstraint activateConstraints:@[
-        [_pageTitle.leadingAnchor constraintEqualToAnchor:main.view.leadingAnchor constant:28],
-        [_pageTitle.topAnchor constraintEqualToAnchor:main.view.topAnchor constant:51],
-        [_pageScroll.topAnchor constraintEqualToAnchor:_pageTitle.bottomAnchor constant:18],
+        [_pageScroll.topAnchor constraintEqualToAnchor:layout.topAnchor],
         [_pageScroll.leadingAnchor constraintEqualToAnchor:main.view.leadingAnchor],
         [_pageScroll.trailingAnchor constraintEqualToAnchor:main.view.trailingAnchor],
         [_pageScroll.bottomAnchor constraintEqualToAnchor:main.view.bottomAnchor]
     ]];
     [self showPage:MJAccessibilityIsEnabled() ? @"typing" : @"setup"];
     return self;
+}
+
+- (NSArray<NSToolbarItemIdentifier> *)toolbarDefaultItemIdentifiers:(NSToolbar *)toolbar {
+    if (@available(macOS 11.0, *))
+        return @[NSToolbarToggleSidebarItemIdentifier, NSToolbarSidebarTrackingSeparatorItemIdentifier, NSToolbarFlexibleSpaceItemIdentifier];
+    return @[NSToolbarFlexibleSpaceItemIdentifier];
+}
+- (NSArray<NSToolbarItemIdentifier> *)toolbarAllowedItemIdentifiers:(NSToolbar *)toolbar {
+    return [self toolbarDefaultItemIdentifiers:toolbar];
 }
 
 - (void)showPage:(NSString *)page {
@@ -235,7 +246,7 @@ static NSTextField *Text(NSString *text, CGFloat size, BOOL secondary) {
 
 - (void)renderPage:(NSString *)page {
     _currentPage = page;
-    for (NSDictionary *item in _pages) if ([item[@"id"] isEqual:page]) _pageTitle.stringValue = item[@"title"];
+    for (NSDictionary *item in _pages) if ([item[@"id"] isEqual:page]) self.window.title = item[@"title"];
     [_controls removeAllObjects];
     _inputType = _encoding = _fromCode = _toCode = _caseOption = nil;
     _language = nil; _inputKey = _convertKey = nil;
@@ -249,7 +260,7 @@ static NSTextField *Text(NSString *text, CGFloat size, BOOL secondary) {
         [document.widthAnchor constraintEqualToAnchor:_pageScroll.contentView.widthAnchor],
         [_content.leadingAnchor constraintEqualToAnchor:document.leadingAnchor constant:28],
         [_content.trailingAnchor constraintEqualToAnchor:document.trailingAnchor constant:-28],
-        [_content.topAnchor constraintEqualToAnchor:document.topAnchor constant:4],
+        [_content.topAnchor constraintEqualToAnchor:document.topAnchor constant:20],
         [_content.bottomAnchor constraintEqualToAnchor:document.bottomAnchor constant:-28]
     ]];
     if ([page isEqual:@"typing"]) [self typingPage];
@@ -260,7 +271,7 @@ static NSTextField *Text(NSString *text, CGFloat size, BOOL secondary) {
     else if ([page isEqual:@"conversion"]) [self conversionPage];
     else if ([page isEqual:@"system"]) [self systemPage];
     else if ([page isEqual:@"setup"]) [self setupPage];
-    else if ([page isEqual:@"empty"]) { _pageTitle.stringValue = @"Không tìm thấy cài đặt"; [self note:@"Thử tìm theo chức năng, chẳng hạn phím tắt, chính tả hoặc clipboard."]; }
+    else if ([page isEqual:@"empty"]) { self.window.title = @"Không tìm thấy cài đặt"; [self note:@"Thử tìm theo chức năng, chẳng hạn phím tắt, chính tả hoặc clipboard."]; }
     else [self aboutPage];
     [self refresh];
     [_pageScroll.contentView scrollToPoint:NSZeroPoint];
@@ -629,35 +640,26 @@ static NSTextField *Text(NSString *text, CGFloat size, BOOL secondary) {
         for (NSDictionary *item in _pages) if ([item[@"id"] isEqual:_visiblePages[row]]) page = item;
         NSTableCellView *cell = [NSTableCellView new];
         NSTextField *label = [NSTextField labelWithString:page[@"title"]];
-        NSImageView *image = [NSImageView new];
-        NSBox *tile = [NSBox new];
-        tile.boxType = NSBoxCustom; tile.borderType = NSNoBorder; tile.cornerRadius = 4;
-        tile.contentViewMargins = NSZeroSize;
+        NSImageView *image = [[NSImageView alloc] initWithFrame:NSMakeRect(0, 0, 20, 20)];
         NSDictionary *colors = @{
             @"typing":NSColor.systemBlueColor, @"shortcuts":NSColor.systemGrayColor,
             @"apps":NSColor.systemBlueColor, @"macros":NSColor.systemOrangeColor,
             @"compatibility":NSColor.systemGrayColor, @"conversion":NSColor.systemPurpleColor,
             @"system":NSColor.systemGrayColor, @"setup":NSColor.systemBlueColor, @"about":NSColor.systemGrayColor
         };
-        tile.fillColor = colors[page[@"id"]];
         if (@available(macOS 11.0, *)) {
-            image.image = [NSImage imageWithSystemSymbolName:page[@"icon"] accessibilityDescription:nil];
-            image.contentTintColor = NSColor.whiteColor;
+            NSImage *symbol = [NSImage imageWithSystemSymbolName:page[@"icon"] accessibilityDescription:nil];
+            if (@available(macOS 12.0, *))
+                symbol = [symbol imageWithSymbolConfiguration:[NSImageSymbolConfiguration configurationWithPaletteColors:@[NSColor.whiteColor]]];
+            NSColor *color = colors[page[@"id"]];
+            image.image = [NSImage imageWithSize:NSMakeSize(20, 20) flipped:NO drawingHandler:^BOOL(NSRect rect) {
+                [color setFill]; [[NSBezierPath bezierPathWithRoundedRect:rect xRadius:4 yRadius:4] fill];
+                [symbol drawInRect:NSInsetRect(rect, 3, 3)];
+                return YES;
+            }];
         }
-        cell.textField = label;
-        [cell addSubview:label]; [cell addSubview:tile]; [tile.contentView addSubview:image];
-        label.translatesAutoresizingMaskIntoConstraints = tile.translatesAutoresizingMaskIntoConstraints = image.translatesAutoresizingMaskIntoConstraints = NO;
-        [NSLayoutConstraint activateConstraints:@[
-            [tile.leadingAnchor constraintEqualToAnchor:cell.leadingAnchor constant:8],
-            [tile.centerYAnchor constraintEqualToAnchor:cell.centerYAnchor],
-            [tile.widthAnchor constraintEqualToConstant:20], [tile.heightAnchor constraintEqualToConstant:20],
-            [image.centerXAnchor constraintEqualToAnchor:tile.contentView.centerXAnchor],
-            [image.centerYAnchor constraintEqualToAnchor:tile.contentView.centerYAnchor],
-            [image.widthAnchor constraintEqualToConstant:14], [image.heightAnchor constraintEqualToConstant:14],
-            [label.leadingAnchor constraintEqualToAnchor:tile.trailingAnchor constant:8],
-            [label.centerYAnchor constraintEqualToAnchor:cell.centerYAnchor],
-            [label.trailingAnchor constraintLessThanOrEqualToAnchor:cell.trailingAnchor constant:-8]
-        ]];
+        cell.textField = label; cell.imageView = image;
+        [cell addSubview:label]; [cell addSubview:image];
         return cell;
     }
     if (tableView == _macroTable) {
