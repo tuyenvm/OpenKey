@@ -15,6 +15,7 @@
 
 -(void)onImputMethodChanged:(BOOL)willNotify;
 -(void)onInputMethodSelected;
+-(void)setInputLanguage:(int)language;
 
 -(void)askPermission;
 

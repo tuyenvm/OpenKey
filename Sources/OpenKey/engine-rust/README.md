@@ -42,4 +42,21 @@ The data and algorithms derive from OpenKey and retain GPL-3.0 licensing and att
 
 ## Review checkpoint
 
-This milestone changes the engine and its build integration only. Event-tap recovery, Spotlight/terminal compatibility, permissions/setup UI, app rules, Globe switching, signing and notarization are deferred to later milestones. No live-app typing or macOS permission grant is claimed by the automated checks.
+This milestone changes the engine and its build integration only. The draft now also includes milestone 3 event-tap recovery, Spotlight/terminal routing and field-boundary resets. Permissions/setup UI, app rules, Globe switching, signing and notarization remain deferred. No live-app typing or macOS permission grant is claimed by the automated checks.
+
+## Milestone 3 reliability checkpoint
+
+`sh scripts/check-macos-input.sh` tests the actual native callback and manager with event posting intercepted and a local Mach port (no global keyboard input):
+
+- Timeout notification dispatch and automatic recovery; explicit user/system disable stays paused.
+- Invalid port recreation without reinitializing the engine; permission revocation and stop release the tap/timer.
+- Secure input prevents recovery and bypasses composition.
+- Replacement events preserve the original target PID and serial number.
+- An external private event source composes VNI `a1` into `á`, while OpenKey’s own private-source events are ignored.
+- Spotlight selection replacement requires the event target to match Spotlight, preventing a fading window from changing another app’s editing strategy.
+- Terminal apps bypass the empty-character browser workaround; empty encoding-length tracking never dereferences `vector::back()`.
+- Rust field resets discard word, macro and editing history while preserving stored macros and application settings.
+
+The tap retains the established session location. Context/source changes refresh cached app and keyboard-language data outside the keystroke callback, and the copied keyboard source is released without releasing its borrowed properties.
+
+Live testing on macOS 27.0: the app launches after reapproving the local build and its event tap is present and enabled. Computer-use `pressKey`/`typeText` produced literal `a1`/`vie65t` in TextEdit; the cause has not been established, so live typing is **not marked passed**. A physical-keyboard `a1` check is pending. Original VNI, Unicode, Option-Z, smart switching and browser-workaround settings were restored after the test. Remote-desktop, sleep/wake, terminal and Spotlight end-to-end behavior still need live verification.

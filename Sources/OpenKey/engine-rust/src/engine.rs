@@ -105,6 +105,16 @@ fn macro_break(key: u32) -> bool {
 }
 
 impl Engine {
+    pub fn clear_composition(&mut self, config: Config) {
+        let macros = std::mem::take(&mut self.macros);
+        let apps = std::mem::take(&mut self.apps);
+        *self = Self::default();
+        self.cfg = config;
+        self.spelling_before = config.spelling != 0;
+        self.macros = macros;
+        self.apps = apps;
+    }
+
     pub fn reset(&mut self) {
         self.len = 0;
         self.raw.clear();

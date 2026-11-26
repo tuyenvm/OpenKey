@@ -285,3 +285,19 @@ pub unsafe extern "C" fn ok_buffer_free(buffer: Buffer) {
         }
     }
 }
+
+/// Clear a field/session boundary without discarding saved macros or app preferences.
+/// # Safety
+/// Handle and configuration must be live and exclusively accessible.
+#[no_mangle]
+pub unsafe extern "C" fn ok_engine_clear(engine: *mut Engine, config: *const Config) -> i32 {
+    if engine.is_null() || config.is_null() {
+        return 0;
+    }
+    let config = unsafe { *config };
+    if !config.valid() {
+        return 0;
+    }
+    unsafe { &mut *engine }.clear_composition(config);
+    1
+}

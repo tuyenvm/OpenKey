@@ -122,3 +122,9 @@ string convertUtil(const string& source) {
 #ifdef OPENKEY_FIXTURE_TEST
 void OpenKeyRustResetForTests() {engine.reset(ok_engine_create());hook=vKeyHookState{};}
 #endif
+
+extern "C" void OpenKeyResetComposition() {
+    vCheckSpelling=spellingBefore;
+    auto options=config();ok_engine_clear(engine.get(),&options);
+    hook=vKeyHookState{};
+}

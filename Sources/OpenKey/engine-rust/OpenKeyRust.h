@@ -21,6 +21,7 @@ OkEngine *ok_engine_create(void);
 void ok_engine_destroy(OkEngine *);
 int32_t ok_engine_process(OkEngine *, const OkConfig *, uint32_t event, uint32_t state,
                           uint32_t key, uint32_t caps, int32_t control, int32_t english, OkResult *);
+int32_t ok_engine_clear(OkEngine *, const OkConfig *);
 int32_t ok_engine_reset(OkEngine *, const OkConfig *, int32_t full);
 void ok_engine_option(OkEngine *, uint32_t action, int32_t value);
 uint32_t ok_character_code(uint32_t value, uint32_t code);

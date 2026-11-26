@@ -233,3 +233,34 @@ fn ffi_checks_inputs_and_matches_c_layout() {
         ok_engine_destroy(engine);
     }
 }
+
+#[test]
+fn field_boundary_discards_typing_and_macro_history_but_keeps_preferences() {
+    let mut engine = Engine::default();
+    let cfg = config(0, 0, 0, 128);
+    engine.cfg = cfg;
+    engine.reset();
+    engine.macros.add("btw", "by the way");
+    engine.apps.insert("com.apple.Notes".into(), 1);
+    for ch in "btw ".chars() {
+        let (k, caps) = key(ch);
+        engine.event(0, 0, k, caps, false);
+    }
+    engine.temporary_off = true;
+    engine.clear_composition(cfg);
+    assert_eq!(engine.hook.count, 0);
+    assert!(engine.hook.macro_key.is_empty());
+    assert!(engine.hook.macro_data.is_empty());
+    assert!(!engine.temporary_off);
+    assert!(engine.macros.0.contains_key("btw"));
+    assert_eq!(engine.apps["com.apple.Notes"], 1);
+    engine.event(0, 0, KEY_S, 0, false);
+    assert_eq!(engine.hook.code, 0); // No vowel from the previous text field to accent.
+    engine.clear_composition(cfg);
+    engine.english(0, KEY_B, false, false);
+    engine.english(0, KEY_T, false, false);
+    engine.clear_composition(cfg);
+    engine.english(0, KEY_W, false, false);
+    engine.english(0, KEY_SPACE, false, false);
+    assert_eq!(engine.hook.code, 0); // No cross-field expansion of btw.
+}

@@ -22,6 +22,7 @@ extern ViewController* viewController;
 extern void OnTableCodeChange(void);
 extern void OnInputMethodChanged(void);
 extern void RequestNewSession(void);
+extern void RefreshInputContext(void);
 extern void OnActiveAppChanged(void);
 
 //see document in Engine.h
@@ -424,6 +425,13 @@ extern bool convertToolDontAlertWhenCompleted;
 
 }
 
+-(void)setInputLanguage:(int)language {
+    vLanguage = language ? 1 : 0;
+    [[NSUserDefaults standardUserDefaults] setInteger:vLanguage forKey:@"InputMethod"];
+    [self fillData];
+    [viewController fillData];
+}
+
 -(void)onImputMethodChanged:(BOOL)willNotify {
     NSInteger intInputMethod = [[NSUserDefaults standardUserDefaults] integerForKey:@"InputMethod"];
     if (intInputMethod == 0)
@@ -535,7 +543,7 @@ extern bool convertToolDontAlertWhenCompleted;
 
 #pragma mark Reset OpenKey after mac computer awake
 -(void)receiveWakeNote: (NSNotification*)note {
-    [OpenKeyManager initEventTap];
+    [OpenKeyManager resumeEventTap];
 }
 
 -(void)receiveSleepNote: (NSNotification*)note {
@@ -547,12 +555,20 @@ extern bool convertToolDontAlertWhenCompleted;
 }
 
 -(void)activeAppChanged: (NSNotification*)note {
-    if (vUseSmartSwitchKey && [OpenKeyManager isInited]) {
-        OnActiveAppChanged();
+    if ([OpenKeyManager isInited]) {
+        RefreshInputContext();
+        if (vUseSmartSwitchKey) OnActiveAppChanged();
     }
 }
 
+-(void)inputSourceChanged:(NSNotification*)note {
+    if ([OpenKeyManager isInited]) RefreshInputContext();
+}
+
 -(void)registerSupportedNotification {
+    [[NSDistributedNotificationCenter defaultCenter] addObserver:self
+        selector:@selector(inputSourceChanged:)
+        name:(__bridge NSString *)kTISNotifySelectedKeyboardInputSourceChanged object:nil];
     [[[NSWorkspace sharedWorkspace] notificationCenter] addObserver: self
                                                            selector: @selector(receiveWakeNote:)
                                                                name: NSWorkspaceDidWakeNotification object: NULL];
