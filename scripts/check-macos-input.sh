@@ -15,9 +15,19 @@ clang -fobjc-arc -Wno-deprecated-declarations scripts/macos-tap-tests.m \
     -framework Cocoa -framework Carbon -o "$TEST_DIR/lifecycle"
 "$TEST_DIR/lifecycle"
 
-clang -fobjc-arc -c Sources/OpenKey/macOS/ModernKey/MyTextField.m -o "$TEST_DIR/keyfield.o"
-clang++ -std=c++17 -fobjc-arc -Wno-deprecated-declarations -I Sources/OpenKey/engine \
-    scripts/macos-settings-tests.mm Sources/OpenKey/engine-rust/RustBridge.cpp "$TEST_DIR/keyfield.o" \
+clang -fobjc-arc -Wno-deprecated-declarations -mmacosx-version-min=12.0 \
+    -c Sources/OpenKey/macOS/ModernKey/MyTextField.m -o "$TEST_DIR/keyfield.o"
+clang++ -std=c++17 -fobjc-arc -Wno-deprecated-declarations -mmacosx-version-min=12.0 \
+    -I Sources/OpenKey/engine -c scripts/macos-settings-tests.mm -o "$TEST_DIR/settings.o"
+clang++ -std=c++17 -Wno-deprecated-declarations -I Sources/OpenKey/engine -mmacosx-version-min=12.0 \
+    -c Sources/OpenKey/engine-rust/RustBridge.cpp -o "$TEST_DIR/bridge.o"
+xcrun swiftc -swift-version 5 -parse-as-library -emit-object -module-name OpenKeySettingsForm \
+    -target "$(uname -m)-apple-macos12.0" Sources/OpenKey/macOS/ModernKey/SettingsForm.swift -o "$TEST_DIR/form.o"
+xcrun swiftc -target "$(uname -m)-apple-macos12.0" \
+    "$TEST_DIR/settings.o" "$TEST_DIR/bridge.o" "$TEST_DIR/keyfield.o" "$TEST_DIR/form.o" \
     Sources/OpenKey/engine-rust/target/release/libopenkey_engine.a \
-    -framework Cocoa -framework Carbon -liconv -o "$TEST_DIR/settings"
+    -framework Cocoa -framework Carbon -lc++ -liconv -o "$TEST_DIR/settings"
 "$TEST_DIR/settings"
+if [ -n "${OPENKEY_SETTINGS_PREVIEW_PATH:-}" ]; then
+    cp "$TEST_DIR/settings" "$OPENKEY_SETTINGS_PREVIEW_PATH"
+fi

@@ -1,4 +1,5 @@
 #import "SettingsWindowController.h"
+#import "SettingsForm.h"
 #import "AppDelegate.h"
 #import "OpenKeyManager.h"
 #import "MJAccessibilityUtils.h"
@@ -33,6 +34,8 @@ extern "C" void OnSpellCheckingChanged(void);
     NSArray<NSDictionary *> *_pages;
     NSString *_currentPage;
     NSTimer *_timer;
+    NSMapTable<NSView *, NSDictionary *> *_formSpecs;
+    NSViewController *_formController;
     BOOL _wasTrusted;
     vector<vector<Uint32>> _macroKeys;
     vector<string> _macroNames, _macroContents;
@@ -59,6 +62,10 @@ static NSTextField *Text(NSString *text, CGFloat size, BOOL secondary) {
 
 - (NSView *)row:(NSString *)title detail:(NSString *)detail control:(NSView *)control {
     NSView *row = [NSView new];
+    if (@available(macOS 13.0, *)) {
+        [_formSpecs setObject:@{@"title":title, @"detail":detail ?: @"", @"control":control} forKey:row];
+        return row;
+    }
     NSStackView *labels = [self stack]; labels.spacing = 4;
     [labels addArrangedSubview:Text(title, 13, NO)];
     if (detail.length) [labels addArrangedSubview:Text(detail, 11, YES)];
@@ -83,6 +90,14 @@ static NSTextField *Text(NSString *text, CGFloat size, BOOL secondary) {
 }
 
 - (void)group:(NSString *)title rows:(NSArray<NSView *> *)rows {
+    if (@available(macOS 13.0, *)) {
+        NSMutableArray *specs = [NSMutableArray new];
+        for (NSView *row in rows) [specs addObject:[_formSpecs objectForKey:row]];
+        NSView *section = [NSView new];
+        [_formSpecs setObject:@{@"title":title, @"rows":specs} forKey:section];
+        [_content addArrangedSubview:section];
+        return;
+    }
     NSStackView *section = [self stack]; section.spacing = 8;
     if (title.length) {
         NSTextField *heading = Text(title, 12, YES);
@@ -248,6 +263,8 @@ static NSTextField *Text(NSString *text, CGFloat size, BOOL secondary) {
     _currentPage = page;
     for (NSDictionary *item in _pages) if ([item[@"id"] isEqual:page]) self.window.title = item[@"title"];
     [_controls removeAllObjects];
+    _formController = nil;
+    _formSpecs = [NSMapTable strongToStrongObjectsMapTable];
     _inputType = _encoding = _fromCode = _toCode = _caseOption = nil;
     _language = nil; _inputKey = _convertKey = nil;
     _status = _testHint = nil; _retry = nil;
@@ -273,6 +290,18 @@ static NSTextField *Text(NSString *text, CGFloat size, BOOL secondary) {
     else if ([page isEqual:@"setup"]) [self setupPage];
     else if ([page isEqual:@"empty"]) { self.window.title = @"Không tìm thấy cài đặt"; [self note:@"Thử tìm theo chức năng, chẳng hạn phím tắt, chính tả hoặc clipboard."]; }
     else [self aboutPage];
+    if (@available(macOS 13.0, *)) {
+        NSMutableArray *entries = [NSMutableArray new];
+        for (NSView *view in _content.arrangedSubviews)
+            [entries addObject:[_formSpecs objectForKey:view] ?: @{@"view":view}];
+        _formController = [[OKSettingsFormController alloc] initWithEntries:entries];
+        NSView *form = _formController.view;
+        _pageScroll.documentView = form; form.translatesAutoresizingMaskIntoConstraints = NO;
+        [NSLayoutConstraint activateConstraints:@[
+            [form.widthAnchor constraintEqualToAnchor:_pageScroll.contentView.widthAnchor],
+            [form.heightAnchor constraintEqualToAnchor:_pageScroll.contentView.heightAnchor]
+        ]];
+    }
     [self refresh];
     [_pageScroll.contentView scrollToPoint:NSZeroPoint];
 }
@@ -571,6 +600,7 @@ static NSTextField *Text(NSString *text, CGFloat size, BOOL secondary) {
     if (_fromCode) [_fromCode selectItemAtIndex:MIN(4, convertToolFromCode)];
     if (_toCode) [_toCode selectItemAtIndex:MIN(4, convertToolToCode)];
     if (_caseOption) [_caseOption selectItemAtIndex:convertToolToAllCaps ? 1 : convertToolToAllNonCaps ? 2 : convertToolToCapsFirstLetter ? 3 : convertToolToCapsEachWord ? 4 : 0];
+    if (@available(macOS 13.0, *)) [(OKSettingsFormController *)_formController refreshControls];
 }
 
 - (void)openAccessibility:(id)sender { MJAccessibilityOpenPanel(); }

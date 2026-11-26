@@ -1,6 +1,6 @@
 # Rust engine — macOS milestone 2
 
-The macOS app now links this dependency-free Rust static library instead of the five legacy C++ engine sources. Objective-C/AppKit still owns the UI and keyboard event tap. `RustBridge.cpp` adapts the existing Objective-C++ callers; composition, spelling, macros, encoding conversion and remembered app data run in Rust. Windows and Linux source/build files are unchanged.
+The macOS app now links this dependency-free Rust static library instead of the five legacy C++ engine sources. AppKit owns the window, sidebar and keyboard event tap; SwiftUI renders grouped settings forms on macOS 13 and later. `RustBridge.cpp` adapts the existing Objective-C++ callers; composition, spelling, macros, encoding conversion and remembered app data run in Rust. Windows and Linux source/build files are unchanged.
 
 ## Build and verify
 
@@ -119,3 +119,11 @@ The final window refinement uses an actual unified `NSToolbar` and the window's 
 Computer use verified the native title changing when selecting another page, the system-inset window buttons, native sidebar layout and active/inactive appearance in the isolated preview. The native checks and universal Release build pass. The latest review artifact is `/Users/hai/Downloads/OpenKey-milestone-4-AppKit/OpenKey.app` (ad-hoc signed, not notarized). It has not been live-authorized or typing-tested. The remembered-language restore failure remains unresolved, and milestone 5 has not started.
 
 Official references: [Apple's AppKit window structure guidance](https://developer.apple.com/videos/play/wwdc2025/310/), [native table row sizes](https://developer.apple.com/documentation/appkit/nstableview/rowsizestyle-swift.enum/default), [automatic cell layout](https://developer.apple.com/documentation/appkit/nstablecellview/rowsizestyle), [toolbar sidebar separator](https://developer.apple.com/documentation/appkit/nstoolbaritem/identifier/sidebartrackingseparator?changes=__11&language=objc).
+
+### Native grouped settings content
+
+On macOS 13 and later, the content uses SwiftUI `Form` with `.grouped` styling, `Section`, `LabeledContent`, native `Toggle` and `Picker`. The framework supplies row sizing, section spacing, backgrounds and dividers. Existing action handlers remain connected through the original controls; shortcut fields, tables and editors retain their AppKit implementations. Older systems retain the AppKit content fallback.
+
+The native input/lifecycle/settings checks and universal Release build pass. Computer use verified spelling dependencies, picker selection and macro add/delete in the isolated preview. The preview uses separate preferences and fake permission/tap adapters. The new review app is `/Users/hai/Downloads/OpenKey-milestone-4-native-form/OpenKey.app`; it is ad-hoc signed and has not been live-authorized or typing-tested. The remembered-language restore failure remains unresolved. Milestone 5 has not started.
+
+Apple references: [grouped form](https://developer.apple.com/documentation/swiftui/formstyle/grouped), [LabeledContent](https://developer.apple.com/documentation/swiftui/labeledcontent/).
