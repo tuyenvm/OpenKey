@@ -4,7 +4,39 @@ import SwiftUI
 @available(macOS 13.0, *)
 private final class SettingsFormModel: ObservableObject {
     let entries: [[String: Any]]
-    init(_ entries: [[String: Any]]) { self.entries = entries }
+    private var lastState: [AnyHashable] = []
+    init(_ entries: [[String: Any]]) {
+        self.entries = entries
+        lastState = controlState()
+    }
+
+    private func controlState() -> [AnyHashable] {
+        func state(_ view: NSView) -> [AnyHashable] {
+            if let control = view as? NSPopUpButton {
+                return [control.isEnabled, control.indexOfSelectedItem] + control.itemTitles.map(AnyHashable.init)
+            }
+            if let control = view as? NSSegmentedControl { return [control.isEnabled, control.selectedSegment] }
+            if let control = view as? NSSwitch { return [control.isEnabled, control.state.rawValue] }
+            if let control = view as? NSButton { return [control.isEnabled, control.state.rawValue, control.title] }
+            if let control = view as? NSTextField { return [control.isEnabled, control.stringValue] }
+            if let stack = view as? NSStackView { return stack.arrangedSubviews.flatMap(state) }
+            return []
+        }
+        return entries.flatMap { entry -> [AnyHashable] in
+            if let rows = entry["rows"] as? [[String: Any]] {
+                return rows.flatMap { ($0["control"] as? NSView).map(state) ?? [] }
+            }
+            return (entry["view"] as? NSView).map(state) ?? []
+        }
+    }
+
+    func refresh() -> Bool {
+        let next = controlState()
+        guard next != lastState else { return false }
+        lastState = next
+        objectWillChange.send()
+        return true
+    }
 
     func send(_ control: NSControl) {
         guard let action = control.action else { return }
@@ -131,5 +163,5 @@ final class SettingsFormController: NSViewController {
         view = NSHostingView(rootView: NativeSettingsForm(model: model))
     }
 
-    @objc func refreshControls() { model.objectWillChange.send() }
+    @objc func refreshControls() -> Bool { model.refresh() }
 }

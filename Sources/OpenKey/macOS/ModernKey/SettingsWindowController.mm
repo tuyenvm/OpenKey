@@ -10,6 +10,7 @@
 extern AppDelegate *appDelegate;
 extern int vSendKeyStepByStep, vFixChromiumBrowser, vPerformLayoutCompat, vShowIconOnDock;
 extern "C" void OnActiveAppChanged(void);
+extern "C" void OnInputMethodChanged(void);
 extern "C" void RequestNewSession(void);
 extern "C" void OnSpellCheckingChanged(void);
 
@@ -609,7 +610,8 @@ static NSTextField *Text(NSString *text, CGFloat size, BOOL secondary) {
 }
 - (void)retry:(id)sender { [OpenKeyManager initEventTap]; [self refresh]; }
 - (void)changeLanguage:(id)sender {
-    [appDelegate setInputLanguage:_language.selectedSegment == 0]; RequestNewSession(); [self refresh];
+    [appDelegate setInputLanguage:_language.selectedSegment == 0];
+    OnInputMethodChanged(); RequestNewSession(); [self refresh];
 }
 - (void)changeInputType:(id)sender {
     [appDelegate onInputTypeSelectedIndex:(int)_inputType.indexOfSelectedItem]; RequestNewSession(); [self refresh];

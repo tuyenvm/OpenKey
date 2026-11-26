@@ -167,6 +167,8 @@ extern "C" {
     void queryFrontMostApp() {
         NSRunningApplication *app = [NSWorkspace sharedWorkspace].frontmostApplication;
         _frontMostApp = app.bundleIdentifier ?: @"UnknownApp";
+        id rule = [[[NSUserDefaults standardUserDefaults] dictionaryForKey:@"AppLanguageRules"] objectForKey:_frontMostApp];
+        _appLanguageRule = [rule isKindOfClass:NSNumber.class] && [rule integerValue] >= 0 && [rule integerValue] <= 2 ? [rule integerValue] : -1;
     }
 
     void RefreshInputContext() {
@@ -174,8 +176,6 @@ extern "C" {
         queryFrontMostApp();
         NSUserDefaults *prefs = [NSUserDefaults standardUserDefaults];
         _globeSwitch = [prefs boolForKey:@"GlobeSwitch"];
-        id rule = [[prefs dictionaryForKey:@"AppLanguageRules"] objectForKey:_frontMostApp];
-        _appLanguageRule = [rule isKindOfClass:NSNumber.class] && [rule integerValue] >= 0 && [rule integerValue] <= 2 ? [rule integerValue] : -1;
         _spotlightPID = [NSRunningApplication runningApplicationsWithBundleIdentifier:@"com.apple.Spotlight"].firstObject.processIdentifier;
         BOOL previousSource = _otherInputSource;
         TISInputSourceRef source = TISCopyCurrentKeyboardInputSource();
@@ -263,9 +263,10 @@ extern "C" {
     }
     
     void OnInputMethodChanged() {
+        // Resolve identity and policy together: activation notifications may still be queued.
+        queryFrontMostApp();
         if (_appLanguageRule == 0 || _appLanguageRule == 1) return;
         if (vUseSmartSwitchKey || _appLanguageRule == 2) {
-            queryFrontMostApp();
             setAppInputMethodStatus(string(_frontMostApp.UTF8String), vLanguage | (vCodeTable << 1));
             saveSmartSwitchKeyData();
         }

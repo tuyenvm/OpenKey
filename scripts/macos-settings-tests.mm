@@ -21,6 +21,8 @@ static BOOL trusted=NO,active=NO,paused=NO;
 static SettingsWindowController *previewController;
 BOOL MJAccessibilityIsEnabled(void) { return trusted; }
 void MJAccessibilityOpenPanel(void) {}
+static int languageSaves=0;
+void OnInputMethodChanged(void) { ++languageSaves; }
 void OnActiveAppChanged(void) {}
 void RequestNewSession(void) {}
 void OnSpellCheckingChanged(void) { vSetCheckSpelling(); }
@@ -86,6 +88,20 @@ int main(void) { @autoreleasepool {
     [[controller valueForKey:@"rulesTable"] selectRowIndexes:[NSIndexSet indexSetWithIndex:0] byExtendingSelection:NO];
     [controller removeApp:nil]; assert([testDefaults dictionaryForKey:@"AppLanguageRules"].count==0);
     [controller showPage:@"typing"];
+    if (@available(macOS 13.0, *)) {
+        OKSettingsFormController *form=[controller valueForKey:@"formController"];
+        assert(![form refreshControls]); // Polling unchanged values must leave an open picker alone.
+        NSSwitch *spelling=[controller valueForKey:@"controls"][@"Spelling"];
+        spelling.state=NSControlStateValueOff;
+        assert([form refreshControls]);
+        assert(![form refreshControls]);
+        spelling.state=NSControlStateValueOn;
+        assert([form refreshControls]);
+    }
+    NSSegmentedControl *language=[controller valueForKey:@"language"];
+    language.selectedSegment=1;
+    [controller changeLanguage:language];
+    assert(vLanguage==0 && languageSaves==1); // Explicit settings choices must be remembered too.
     id spelling=[controller valueForKey:@"controls"][@"Spelling"];
     [spelling setState:NSControlStateValueOff]; [controller changeOption:spelling];
     assert(vCheckSpelling==0 && ![testDefaults boolForKey:@"Spelling"]);

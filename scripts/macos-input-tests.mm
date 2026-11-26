@@ -144,6 +144,18 @@ int main() {@autoreleasepool {
     [appDelegate setInputLanguage:1];
     testAppID=@"org.openkey.test.remember";OnActiveAppChanged();
     assert(vLanguage==0);
+    // A shortcut can arrive before the workspace activation notification. Resolve the
+    // current app and its rule together instead of rejecting it using the old app's rule.
+    testAppID=@"org.openkey.test.other"; OnActiveAppChanged();
+    testAppID=@"org.openkey.test.remember"; setAppInputMethodStatus(testAppID.UTF8String,1); vLanguage=0;
+    OnInputMethodChanged();
+    assert(getAppInputMethodStatus(testAppID.UTF8String,1)==0);
+    // A stale remembered-app rule must not save a choice for a fixed-language app.
+    [[NSUserDefaults standardUserDefaults] setObject:@{testAppID:@2, @"org.openkey.test.fixed":@1} forKey:@"AppLanguageRules"];
+    OnActiveAppChanged();
+    testAppID=@"org.openkey.test.fixed"; setAppInputMethodStatus(testAppID.UTF8String,1);
+    vLanguage=0; OnInputMethodChanged();
+    assert(getAppInputMethodStatus(testAppID.UTF8String,1)==1);
     [[NSUserDefaults standardUserDefaults] removeObjectForKey:@"AppLanguageRules"];
     vSwitchKeyStatus=0xFE0000FE;
     _appLanguageRule=-1;
