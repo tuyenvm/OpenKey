@@ -73,7 +73,8 @@ extern bool convertToolDontAlertWhenCompleted;
     NSStatusItem *statusItem;
     NSMenu *theMenu;
     
-    NSMenuItem *menuVietnamese, *menuEnglish, *menuConnection;
+    NSArray<NSMenuItem *> *menuTypingStyles;
+    NSMenuItem *menuEnglish, *menuConnection;
 }
 
 -(void)askPermission {
@@ -164,12 +165,30 @@ extern bool convertToolDontAlertWhenCompleted;
 - (NSMenuItem *)item:(NSString *)title action:(SEL)action key:(NSString *)key inMenu:(NSMenu *)menu {
     NSMenuItem *item=[menu addItemWithTitle:title action:action keyEquivalent:key]; item.target=self; return item;
 }
+- (NSImage *)inputBadge:(NSString *)label {
+    NSImage *image=[[NSImage alloc] initWithSize:NSMakeSize(26,18)];
+    [image lockFocus];
+    [NSColor.blackColor setStroke];
+    NSBezierPath *outline=[NSBezierPath bezierPathWithRoundedRect:NSMakeRect(1,1,24,16) xRadius:4 yRadius:4];
+    outline.lineWidth=1.2; [outline stroke];
+    NSDictionary *attributes=@{NSFontAttributeName:[NSFont boldSystemFontOfSize:10], NSForegroundColorAttributeName:NSColor.blackColor};
+    NSSize size=[label sizeWithAttributes:attributes];
+    [label drawAtPoint:NSMakePoint((26-size.width)/2,(18-size.height)/2) withAttributes:attributes];
+    [image unlockFocus]; image.template=YES; return image;
+}
+- (NSArray<NSString *> *)typingStyleNames { return @[@"Telex",@"VNI",@"Simple Telex 1",@"Simple Telex 2"]; }
 - (void)createStatusBarMenu {
     statusItem=[[NSStatusBar systemStatusBar] statusItemWithLength:NSVariableStatusItemLength];
     theMenu=[NSMenu new]; theMenu.autoenablesItems=NO; theMenu.delegate=self;
     menuConnection=[self item:@"Cho phép OpenKey…" action:@selector(reconnect:) key:@"" inMenu:theMenu];
-    menuVietnamese=[self item:@"Tiếng Việt" action:@selector(selectMenuLanguage:) key:@"" inMenu:theMenu]; menuVietnamese.tag=1;
-    menuEnglish=[self item:@"English" action:@selector(selectMenuLanguage:) key:@"" inMenu:theMenu]; menuEnglish.tag=0;
+    menuEnglish=[self item:@"English" action:@selector(selectMenuSource:) key:@"" inMenu:theMenu]; menuEnglish.tag=-1;
+    menuEnglish.image=[self inputBadge:@"EN"];
+    NSMutableArray *styles=[NSMutableArray new];
+    for (NSString *name in [self typingStyleNames]) {
+        NSMenuItem *item=[self item:name action:@selector(selectMenuSource:) key:@"" inMenu:theMenu];
+        item.tag=styles.count; item.image=[self inputBadge:@"VI"]; [styles addObject:item];
+    }
+    menuTypingStyles=styles;
     [theMenu addItem:NSMenuItem.separatorItem];
     [self item:@"Cài đặt…" action:@selector(onControlPanelSelected) key:@"," inMenu:theMenu];
     [self item:@"Chuyển mã văn bản…" action:@selector(onConvertTool) key:@"" inMenu:theMenu];
@@ -201,20 +220,26 @@ extern bool convertToolDontAlertWhenCompleted;
     NSApp.mainMenu=main;
     [self fillData];
 }
+- (NSInteger)fixedInputLanguage {
+    id rule=[[NSUserDefaults standardUserDefaults] dictionaryForKey:@"AppLanguageRules"][[NSWorkspace sharedWorkspace].frontmostApplication.bundleIdentifier ?: @""];
+    return [rule isKindOfClass:NSNumber.class] && ([rule integerValue]==0 || [rule integerValue]==1) ? [rule integerValue] : -1;
+}
 - (void)menuWillOpen:(NSMenu *)menu {
     BOOL trusted=MJAccessibilityIsEnabled(); BOOL active=[OpenKeyManager isActive];
     menuConnection.hidden=trusted && active;
     menuConnection.title=trusted ? @"Kết nối lại…" : @"Cho phép OpenKey…";
-    NSNumber *rule=[[NSUserDefaults standardUserDefaults] dictionaryForKey:@"AppLanguageRules"][[NSWorkspace sharedWorkspace].frontmostApplication.bundleIdentifier ?: @""];
-    BOOL fixed=[rule isKindOfClass:NSNumber.class] && (rule.integerValue==0 || rule.integerValue==1);
-    menuVietnamese.enabled=menuEnglish.enabled=trusted && active && !fixed;
+    NSInteger fixed=[self fixedInputLanguage];
+    menuEnglish.enabled=trusted && active && fixed!=1;
+    for (NSMenuItem *item in menuTypingStyles) item.enabled=trusted && active && fixed!=0;
     [self fillData];
 }
-- (void)selectMenuLanguage:(NSMenuItem *)sender {
+- (void)selectMenuSource:(NSMenuItem *)sender {
+    if (sender.tag < -1 || sender.tag >= (NSInteger)menuTypingStyles.count) return;
     if (!MJAccessibilityIsEnabled() || ![OpenKeyManager isActive]) { [self onControlPanelSelected]; return; }
-    NSNumber *rule=[[NSUserDefaults standardUserDefaults] dictionaryForKey:@"AppLanguageRules"][[NSWorkspace sharedWorkspace].frontmostApplication.bundleIdentifier ?: @""];
-    if ([rule isKindOfClass:NSNumber.class] && (rule.integerValue==0 || rule.integerValue==1)) return;
-    [self setInputLanguage:(int)sender.tag]; OnInputMethodChanged(); RequestNewSession();
+    int language=sender.tag>=0;
+    NSInteger fixed=[self fixedInputLanguage]; if (fixed!=-1 && fixed!=language) return;
+    if (language) [[NSUserDefaults standardUserDefaults] setInteger:sender.tag forKey:@"InputType"];
+    [self setInputLanguage:language]; OnInputMethodChanged(); RequestNewSession();
 }
 - (void)reconnect:(id)sender {
     if (!MJAccessibilityIsEnabled()) { [self onControlPanelSelected]; return; }
@@ -281,11 +306,16 @@ extern bool convertToolDontAlertWhenCompleted;
     vCodeTable=(int)[prefs integerForKey:@"CodeTable"];
     vSwitchKeyStatus=(int)[prefs integerForKey:@"SwitchKeyStatus"];
     if (!vSwitchKeyStatus) vSwitchKeyStatus=DEFAULT_SWITCH_STATUS;
-    menuVietnamese.state=vLanguage ? NSControlStateValueOn : NSControlStateValueOff;
+    for (NSMenuItem *item in menuTypingStyles) item.state=vLanguage && vInputType==item.tag ? NSControlStateValueOn : NSControlStateValueOff;
     menuEnglish.state=vLanguage ? NSControlStateValueOff : NSControlStateValueOn;
-    statusItem.button.image=[NSImage imageNamed:vLanguage ? @"Status" : @"StatusEng"];
-    statusItem.button.image.template=YES;
-    statusItem.button.toolTip=vLanguage ? @"OpenKey — Tiếng Việt" : @"OpenKey — English";
+    NSString *name=vLanguage ? [self typingStyleNames][MAX(0,MIN(3,vInputType))] : @"English";
+    NSString *badge=vLanguage ? @"VI" : @"EN";
+    if (![statusItem.button.title isEqual:name]) {
+        statusItem.button.image=[self inputBadge:badge];
+        statusItem.button.imagePosition=NSImageLeft; statusItem.button.title=name;
+    }
+    statusItem.button.toolTip=[@"OpenKey — " stringByAppendingString:name];
+    statusItem.button.accessibilityLabel=[NSString stringWithFormat:@"OpenKey, %@",name];
 }
 
 -(void)setInputLanguage:(int)language {

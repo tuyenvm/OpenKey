@@ -40,7 +40,7 @@ BOOL MJAccessibilityIsEnabled(void) { return trusted; }
 @end
 @interface AppDelegate (MenuTests)
 -(void)createStatusBarMenu;
--(void)selectMenuLanguage:(NSMenuItem *)sender;
+-(void)selectMenuSource:(NSMenuItem *)sender;
 @end
 @interface MenuDelegate : AppDelegate
 @end
@@ -65,25 +65,43 @@ int main() { @autoreleasepool {
     MenuDelegate *delegate=[MenuDelegate new]; [delegate createStatusBarMenu];
     method_exchangeImplementations(class_getInstanceMethod(NSWorkspace.class,@selector(frontmostApplication)),
         class_getInstanceMethod(NSWorkspace.class,@selector(menuTestApp)));
-    NSMenuItem *vietnamese=[delegate valueForKey:@"menuVietnamese"], *english=[delegate valueForKey:@"menuEnglish"];
-    [delegate selectMenuLanguage:vietnamese];
-    assert(vLanguage==1 && [prefs integerForKey:@"InputMethod"]==1 && saves==1);
-    [delegate selectMenuLanguage:english];
-    assert(vLanguage==0 && saves==2 && settingsOpened==0);
-    assert(english.state==NSControlStateValueOn && vietnamese.state==NSControlStateValueOff);
+    NSArray<NSMenuItem *> *styles=[delegate valueForKey:@"menuTypingStyles"];
+    NSMenuItem *english=[delegate valueForKey:@"menuEnglish"];
+    assert(styles.count==4);
+    NSStatusItem *status=[delegate valueForKey:@"statusItem"];
+    for (NSUInteger i=0;i<styles.count;i++) {
+        [delegate selectMenuSource:styles[i]];
+        assert(vLanguage==1 && vInputType==i && [prefs integerForKey:@"InputType"]==i);
+        assert(styles[i].state==NSControlStateValueOn && english.state==NSControlStateValueOff);
+        assert([status.button.title isEqual:styles[i].title] && status.button.image.isTemplate);
+        for (NSUInteger j=0;j<styles.count;j++) assert(styles[j].state==(i==j ? NSControlStateValueOn : NSControlStateValueOff));
+    }
+    assert(saves==4);
+    [delegate selectMenuSource:english];
+    assert(vLanguage==0 && vInputType==3 && saves==5 && settingsOpened==0);
+    assert(english.state==NSControlStateValueOn && [status.button.title isEqual:@"English"]);
+    for (NSMenuItem *item in styles) assert(item.state==NSControlStateValueOff);
     [prefs setObject:@{@"org.openkey.menu-test":@1} forKey:@"AppLanguageRules"];
-    [delegate menuWillOpen:[delegate valueForKey:@"theMenu"]]; assert(!english.enabled && !vietnamese.enabled);
-    [delegate selectMenuLanguage:vietnamese]; assert(vLanguage==0 && saves==2);
+    [delegate menuWillOpen:[delegate valueForKey:@"theMenu"]]; assert(!english.enabled && styles[0].enabled);
+    [delegate selectMenuSource:styles[0]]; assert(vLanguage==1 && vInputType==0 && saves==6);
+    [delegate selectMenuSource:english]; assert(vLanguage==1 && saves==6);
+    [prefs setObject:@{@"org.openkey.menu-test":@0} forKey:@"AppLanguageRules"];
+    [delegate menuWillOpen:[delegate valueForKey:@"theMenu"]]; assert(english.enabled && !styles[0].enabled);
+    [delegate selectMenuSource:styles[1]]; assert(vInputType==0 && saves==6);
+    [delegate selectMenuSource:english]; assert(vLanguage==0 && saves==7);
     [prefs removeObjectForKey:@"AppLanguageRules"]; trusted=NO;
-    [delegate menuWillOpen:[delegate valueForKey:@"theMenu"]]; assert(!english.enabled && !vietnamese.enabled);
-    [delegate selectMenuLanguage:vietnamese]; assert(settingsOpened==1 && saves==2);
+    [delegate menuWillOpen:[delegate valueForKey:@"theMenu"]]; assert(!english.enabled && !styles[0].enabled);
+    [delegate selectMenuSource:styles[0]]; assert(settingsOpened==1 && saves==7);
+    trusted=YES; active=NO;
+    [delegate menuWillOpen:[delegate valueForKey:@"theMenu"]]; assert(!english.enabled && !styles[0].enabled);
+    assert(![[delegate valueForKey:@"menuConnection"] isHidden]);
     NSMenu *application=NSApp.mainMenu.itemArray.firstObject.submenu;
     NSMenuItem *settings=[application itemWithTitle:@"Cài đặt…"];
     assert([settings.keyEquivalent isEqual:@","] && settings.target==delegate);
     assert(settings.action==@selector(onControlPanelSelected));
     NSMenu *menu=[delegate valueForKey:@"theMenu"];
-    assert(menu.numberOfItems==9 && [menu itemWithTitle:@"Gõ tắt…"]==nil);
+    assert(menu.numberOfItems==12 && [menu itemWithTitle:@"Gõ tắt…"]==nil);
     [[NSStatusBar systemStatusBar] removeStatusItem:[delegate valueForKey:@"statusItem"]];
     [prefs removePersistentDomainForName:suite];
-    puts("Menu: real language actions, saved mode/checkmarks, fixed rules, permission gate and Command-Comma passed");
+    puts("Menu: all typing sources, active badge/name/checkmarks, saved mode, fixed rules, permission gate and Command-Comma passed");
 } }
