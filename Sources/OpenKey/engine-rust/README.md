@@ -1,6 +1,6 @@
-# Rust engine — macOS milestone 2
+# Rust engine — macOS review checkpoint
 
-The macOS app now links this dependency-free Rust static library instead of the five legacy C++ engine sources. AppKit owns the window, sidebar and keyboard event tap; SwiftUI renders grouped settings forms on macOS 13 and later. `RustBridge.cpp` adapts the existing Objective-C++ callers; composition, spelling, macros, encoding conversion and remembered app data run in Rust. Windows and Linux source/build files are unchanged.
+The macOS app now links this dependency-free Rust static library instead of the five legacy C++ engine sources. AppKit owns the menu bar, settings window and keyboard event tap; SwiftUI renders grouped settings forms on macOS 13 and later. `RustBridge.cpp` adapts the existing Objective-C++ callers; composition, spelling, macros, encoding conversion and remembered app data run in Rust. Windows and Linux source/build files are unchanged.
 
 ## Build and verify
 
@@ -42,7 +42,7 @@ The data and algorithms derive from OpenKey and retain GPL-3.0 licensing and att
 
 ## Review checkpoint
 
-This milestone changes the engine and its build integration only. The draft now also includes milestone 3 event-tap recovery, Spotlight/terminal routing and field-boundary resets. Milestone 4 now adds setup/settings, permissions, app rules and optional Globe switching. Signing and notarization remain deferred. No live-app typing or macOS permission grant is claimed by the automated checks.
+The draft includes the Rust engine, milestone 3 reliability work and milestone 4 menu-bar/settings simplification. Milestone 5 has not started. Updater repair, login-item API migration, signing/notarization and release verification remain deferred. Automated native checks do not establish physical typing compatibility.
 
 ## Milestone 3 reliability checkpoint
 
@@ -71,77 +71,26 @@ Additional milestone 3 computer checks:
 VNI, Unicode, Option-Z, smart switching and browser-workaround settings were restored. The live-authorized app was `/Users/hai/Downloads/OpenKey-milestone-3/OpenKey.app`; it predates the final explicit-pause-on-wake adjustment. That adjustment has native lifecycle coverage, but the final review artifact still needs a live run. Those results remain a draft checkpoint, not a merge-ready live-validation claim.
 
 
-## Milestone 4 user-experience checkpoint
+## Milestone 4: smaller native menu-bar app
 
-The menu-bar control panel and app reopen now show one AppKit sidebar window. All visible settings, macro editing and clipboard conversion are migrated into it; there is no Advanced Settings link or active route to the legacy windows.
+The current interface replaces the earlier sidebar and language selector with a small menu-bar menu and two native toolbar settings panes: **Chung** and **Gõ tiếng Việt**. AppKit owns the window and toolbar; SwiftUI `Form`/`Section`/`Toggle`/`Picker` provide grouped content on macOS 13+, with an AppKit fallback on older systems. There is no Advanced Settings route or disconnected layout preview.
 
-- Engine/preferences initialize independently of the keyboard tap, so existing macros and remembered data are available safely before permission. Missing Accessibility permission leaves OpenKey running and opens setup. An explicit button requests permission and opens the system Accessibility panel; the setup window checks status once per second and attempts connection after approval. Revocation stops interception. An intentional pause survives automatic checks and requires the retry button.
-- Setup explains system-wide keyboard access, recommends macOS ABC to avoid competing input methods, and offers a physical typing test field with Telex/VNI examples. Status reports permission, secure input, pause, active tap or connection failure; it does not claim that a connected tap proves typing compatibility.
-- Everyday controls expose language, input method, encoding and remembering language per app. New installations/reset defaults leave launch-at-login off; existing saved preferences are retained.
-- App rules use bundle identifiers in the separate `AppLanguageRules` preference: English (0), Vietnamese (1), or remember (2). Fixed rules override the switch shortcut; remember works even with global remembering off. Removing a rule restores global behavior. Existing macro and smart-switch persistence formats remain unchanged.
-- `GlobeSwitch` defaults off. A standalone Fn/Globe release toggles language; Fn plus another key/modifier, repeated down events and interrupted gestures do not toggle. Events retain native delivery. Users must manually set macOS's Globe action to Do Nothing to avoid conflicts; OpenKey never changes that OS shortcut.
-- The settings window uses standard window styling and recenters if its saved position is entirely off-screen.
+- Language changes live in the menu bar and existing shortcut. The menu reflects fixed app rules, permission and tap availability. Settings no longer expose a language segment whose foreground application differs from the typing application.
+- General contains launch-at-login, one shortcut recorder, remembering per app, optional application-rule sheet and a link directly to macOS Text Replacements. Typing contains input method, spelling, accent placement and quick consonants. Existing saved preferences remain; new/reset installs leave remembering and launch-at-login off.
+- Missing Accessibility permission gates the whole settings window. Approval connects the tap and dismisses setup; revocation stops interception and restores the gate. Connection failures/intentional pauses have a contextual menu action. No separate permission page, typing field or OS-keyboard shortcut page remains.
+- macOS owns text replacement and Fn/Globe behavior. OpenKey macro expansion is disabled at runtime, while existing macro preferences/data remain intact. Existing records can be exported as Apple's importable shortcut/phrase plist; there is no macro editor or private OS preference write.
+- Application rules and clipboard encoding conversion remain optional sheets. About uses the native panel. Legacy source/storyboard definitions remain for build compatibility but have no active legacy-window route.
+- Remembered-language saves resolve the current app and its rule together, including when global remembering is off. Settings activation does not implicitly replace the typing app's remembered choice. Native regressions cover remembered/fixed transitions and the actual AppDelegate language menu actions.
+- Shortcut recording temporarily bypasses the keyboard tap; Escape cancels, Delete clears, and leaving/closing the window or losing permission ends recording. The same native field is exposed as an accessible button.
 
-Validation: `sh scripts/check-macos-input.sh` now also runs isolated settings tests for permission approval/revocation, explicit pause/retry and rule persistence. Native callback tests cover fixed/inherited/remembered app languages and Fn gesture boundaries. Xcode 27.2 builds both arm64 and x86_64 with deployment target 12.0. Computer use verified all three tabs and adding, changing and removing a TextEdit rule in the isolated settings preview. The preview uses fake permission/tap adapters and a separate preference domain; it does not establish live typing or real TCC approval behavior.
+### Validation and review limits
 
-The milestone-4 app has since been launched and authorized; see the live results below. Physical Globe behavior and the outstanding milestone-3 live checks still need review testing. Updates, login-item API migration, signing/notarization workflow and release verification remain milestone 5.
+`sh scripts/check-macos-input.sh` passes native callback, lifecycle, settings and real AppDelegate menu checks. Coverage includes permission approval/revocation, explicit pause, app rules, shortcut recording, both settings panes, native replacement export, utility sheets and spelling dependencies. The Release build contains arm64 and x86_64, targeting macOS 12 for verification. Older-system runtime behavior remains untested.
 
-Platform references: [Apple Accessibility trust check](https://developer.apple.com/documentation/applicationservices/1459186-axisprocesstrustedwithoptions) (permission prompting is asynchronous), [modifier flag documentation](https://developer.apple.com/documentation/appkit/nsevent/modifierflags-swift.struct/function?language=objc). Fn handling also checks the physical `kVK_Function` keycode, so other keys carrying the function flag do not count as standalone Fn taps.
+Computer use verified the real permission gate and the first smaller build's two panes. It opened macOS Text Replacements through the app, imported a disposable plist and observed its shortcut expand to “Kiểm tra thay thế văn bản” in TextEdit. The temporary entry was removed; all 10 original native replacements remained. The disposable TextEdit document was restored. The final build was authorized and computer-tested: both panes, VNI → Telex → VNI, spelling-dependent controls, Option-X recording followed by restored Option-Z, application-rule add/change/remove through a nested native picker, full application/conversion sheet layouts, native About and Command-Comma all passed. The final nested picker/alert parent correction is included. The app restarted successfully with an enabled keyboard tap. Original tested preferences, macro bytes and remembered-app bytes were preserved; only pane/file-picker UI state changed.
 
+The earlier user-confirmed physical fixed-English/fixed-Vietnamese checks apply to the previous artifact. The complete physical remembered-language shortcut/app-switch/typing sequence remains unverified; injected input bypasses the OpenKey tap and is not a physical pass. Earlier sleep/wake proved tap recreation only. Spotlight composition, secure-input behavior and remote-desktop input remain unverified live; computer control denied Terminal access.
 
-### Milestone 4 live computer-test results
+Review artifact: `/Users/hai/Downloads/OpenKey-milestone-4-small/OpenKey.app` (local ad-hoc signature, not notarized). Stop for user review before milestone 5.
 
-The review artifact at `/Users/hai/Downloads/OpenKey-milestone-4/OpenKey.app` was tested without rebuilding or replacing it.
-
-- **Passed:** missing permission left the app running with setup visible. The setup link opened the system access panel. After user-approved Touch ID and replacing the stale OpenKey permission entry with this artifact, the same process (PID 72189) reported an active keyboard connection without restart; diagnostics confirmed an enabled tap.
-- **Passed:** switching English/Vietnamese, Telex/VNI guidance, toggling the optional Globe preference back off, entering/exiting advanced settings, and adding/changing/removing a real TextEdit application rule.
-- **Passed with physical user input:** with macOS on ABC, fixed English left `a1` literal and Option-Z did not override English. Fixed Vietnamese produced `á` from `a1` and Option-Z did not override Vietnamese. TextEdit's document also visibly contained accented output.
-- **Failed/unresolved:** the user reported that TextEdit's “remember choice” rule did not restore English with global remembering off after selecting Vietnamese outside TextEdit. The user clarified that Option-Z successfully switched TextEdit to English, but returning to TextEdit restored Vietnamese. The restore result is therefore wrong; whether saving or restoring the per-app value is responsible remains unresolved. No production fix is claimed. The expanded native test exercises Option-Z, saving English, leaving for another app, changing the current language and restoring English with global remembering off; it passes with isolated preferences and mocked app identity/delegate.
-- **Inconclusive:** injected setup-field VNI `a1` and Telex `as` remained literal. Physical Fn/Globe behavior, real permission revocation/retry and secure-input status were not exercised in this live session; native checks cover those paths.
-
-Cleanup restored VNI, Unicode, Vietnamese, the original Option-Z configuration and global remembering; the temporary TextEdit rule was removed and Globe switching left off. Saved macro bytes were unchanged. macOS ABC was selected by the user for the physical checks; the earlier active system source was not recorded. The authorized milestone-4 app remains running. No production implementation changed during this follow-up, and milestone 5 has not started. The PR remains draft pending review of the remembered-choice failure.
-
-
-### Milestone 4 interface revision
-
-The first tabbed UI was rejected during review. The replacement uses a resizable native sidebar window with nine searchable pages: typing, shortcuts, application rules, macros, compatibility, conversion, system, permissions and about. Grouped rows align labels and controls, use system switches and semantic colors, and keep help text short. The sidebar uses the platform split-view sidebar, SF Symbols on supported systems, and platform-drawn selection.
-
-All previously visible control-panel options are directly available, including spelling dependencies, accent placement, quick consonants, both shortcuts and their modifiers, per-app language/encoding preferences, compatibility flags, login/display preferences and update-check controls. Macro add/edit/delete/import/export and clipboard conversion options are in the same window. Import retains the choice to merge or replace existing macros. Menu actions for macros, conversion and about select those pages; the old storyboard window-controller instantiation routes are removed. Legacy controller source/storyboard definitions remain in the repository but have no active settings-window route.
-
-Validation: native input/lifecycle/settings checks pass. Isolated settings checks now exercise migrated spelling preference/dependent controls, shortcut modifiers, conversion case options, macro creation and search, along with prior permission and app-rule persistence checks. The Release build contains arm64 and x86_64. Computer use inspected typing, shortcuts, macro editing and conversion/search in an isolated layout preview; the final sidebar selection was visually checked after sizing/selection corrections.
-
-The separate review artifact is `/Users/hai/Downloads/OpenKey-milestone-4-redesign/OpenKey.app` (locally ad-hoc signed, not notarized). The authorized previous milestone-4 typing app was left running; the new artifact has not been live-authorized or typing-tested. The open settings preview uses fake permission/tap adapters and separate preferences. Earlier physical typing results apply to the previous artifact. The reported remembered-language restore failure remains unresolved, and milestone 5 has not started.
-
-AppKit references: [sidebar materials](https://developer.apple.com/documentation/AppKit/NSVisualEffectView?language=objc), [native source-list metrics](https://developer.apple.com/documentation/appkit/nstableview/style-swift.enum/sourcelist?changes=__7).
-
-The final window refinement uses an actual unified `NSToolbar` and the window's native title. The page header is no longer a manually positioned content label; macOS controls the titlebar and traffic-light button placement. Content/search follow `NSWindow.contentLayoutGuide` rather than fixed titlebar offsets. Sidebar rows use `NSTableViewRowSizeStyleDefault`, with AppKit laying out `NSTableCellView.textField` and `imageView`; explicit row heights, intercell spacing and extra cell-leading padding are removed.
-
-Computer use verified the native title changing when selecting another page, the system-inset window buttons, native sidebar layout and active/inactive appearance in the isolated preview. The native checks and universal Release build pass. The latest review artifact is `/Users/hai/Downloads/OpenKey-milestone-4-AppKit/OpenKey.app` (ad-hoc signed, not notarized). It has not been live-authorized or typing-tested. The remembered-language restore failure remains unresolved, and milestone 5 has not started.
-
-Official references: [Apple's AppKit window structure guidance](https://developer.apple.com/videos/play/wwdc2025/310/), [native table row sizes](https://developer.apple.com/documentation/appkit/nstableview/rowsizestyle-swift.enum/default), [automatic cell layout](https://developer.apple.com/documentation/appkit/nstablecellview/rowsizestyle), [toolbar sidebar separator](https://developer.apple.com/documentation/appkit/nstoolbaritem/identifier/sidebartrackingseparator?changes=__11&language=objc).
-
-### Native grouped settings content
-
-On macOS 13 and later, the content uses SwiftUI `Form` with `.grouped` styling, `Section`, `LabeledContent`, native `Toggle` and `Picker`. The framework supplies row sizing, section spacing, backgrounds and dividers. Existing action handlers remain connected through the original controls; shortcut fields, tables and editors retain their AppKit implementations. Older systems retain the AppKit content fallback.
-
-The native input/lifecycle/settings checks and universal Release build pass. Computer use verified spelling dependencies, picker selection and macro add/delete in the isolated preview. The preview uses separate preferences and fake permission/tap adapters. The new review app is `/Users/hai/Downloads/OpenKey-milestone-4-native-form/OpenKey.app`; it is ad-hoc signed and has not been live-authorized or typing-tested. The remembered-language restore failure remains unresolved. Milestone 5 has not started.
-
-Apple references: [grouped form](https://developer.apple.com/documentation/swiftui/formstyle/grouped), [LabeledContent](https://developer.apple.com/documentation/swiftui/labeledcontent/).
-
-### Milestone 4 remembered-language and live-control corrections
-
-Two deterministic save defects are corrected: explicit language selection in settings now invokes the remembered-language save path, and that path resolves the current application and its rule together before deciding whether to save. A queued workspace activation notification can no longer leave the previous app's rule controlling that decision. Regression checks fail on the previous code and pass with these changes, including a fixed-language app following a remembered app.
-
-The native SwiftUI form also compares displayed control values before publishing a refresh. The previous unconditional polling refresh dismissed open picker menus. Native checks verify unchanged polling does not publish another refresh, while changed values do. Computer use selected VNI → Telex → VNI successfully in the corrected review artifact, checked spelling-dependent controls, and added/deleted a disposable macro.
-
-The latest review artifact is `/Users/hai/Downloads/OpenKey-milestone-4-remember-fix/OpenKey.app` and the matching `.zip`. It contains arm64 and x86_64, passes local ad-hoc signature verification and is not notarized. Its actual keyboard connection recovered after the stale permission record was replaced and remained active after a clean restart. The settings save path was verified against stored app data with global remembering off. The user also confirmed an English settings choice survived leaving and returning to the settings window.
-
-The complete physical TextEdit shortcut/app-switch/typing regression remains unverified. Injected Option-Z reached TextEdit as Ω; computer-driven window actions did not provide reliable foreground-app switching. These checks establish the covered save fixes, not a full live resolution claim for the original reported sequence. Temporary diagnostic code/preferences were removed. Tested preferences, app rules, macro bytes and remembered app bytes were restored to the original snapshot. Milestone 5 has not started.
-
-### Milestone 4 selector applies to the typing app
-
-The language selector now updates the previous external app rather than OpenKey's own remembered entry. Input context is captured before settings activation, and an implicit remembered choice for OpenKey no longer replaces the typing app's mode when settings opens. Explicit fixed rules for the target app are retained and disable the selector. Changing language preserves the target's saved encoding and leaves unrelated apps unchanged. The row explains that the choice applies when returning to the previous app.
-
-A native regression reproducing editor → settings → choose English → editor failed with the old handler and passes with the corrected path. Checks also cover per-app remembering with global remembering off, fixed-language policy, preserved encoding and unchanged unrelated app choices. All native input/lifecycle/settings checks and the universal Release build pass.
-
-The actual review artifact is `/Users/hai/Downloads/OpenKey-milestone-4-language-target/OpenKey.app` with the matching `.zip`. Computer use verified the selected segment and stored external-app language changed while OpenKey's own remembered entry remained unchanged, and confirmed the active keyboard connection after authorization/restart. Three old disconnected layout-preview processes were found and closed; their selectors never controlled the real keyboard engine, so they could confound live review. Only the real build remains running. Original tested preferences, macros and app-memory bytes were restored. Physical typing with the final artifact remains a user-review check; injected typing is not claimed as physical validation. Milestone 5 has not started.
+Apple references: [Settings](https://developer.apple.com/design/human-interface-guidelines/settings), [Text Replacements](https://support.apple.com/guide/mac-help/replace-text-punctuation-documents-mac-mh35735/mac), [import/export replacements](https://support.apple.com/en-gb/guide/mac-help/mchl2a7bd795/mac).

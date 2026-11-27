@@ -84,14 +84,13 @@ extern "C" {
     Uint32 _tempChar;
     bool _hasJustUsedHotKey = false;
 
-    BOOL _fnDown = NO, _fnUsed = NO, _globeSwitch = NO;
+    BOOL _recordingShortcut = NO;
     NSInteger _appLanguageRule = -1; // -1: global preference, 0/1: fixed language, 2: remember
 
     int _languageTemp = 0; //use for smart switch key
     vector<Byte> savedSmartSwitchKeyData; ////use for smart switch key
     
     NSString* _frontMostApp = @"UnknownApp";
-    NSString* _lastTypingApp = nil;
     
     void OpenKeyInit() {
         //load saved data
@@ -102,8 +101,7 @@ extern "C" {
         LOAD_DATA(vUseModernOrthography, ModernOrthography);
         LOAD_DATA(vRestoreIfWrongSpelling, RestoreIfInvalidWord);
         LOAD_DATA(vFixRecommendBrowser, FixRecommendBrowser);
-        LOAD_DATA(vUseMacro, UseMacro);
-        LOAD_DATA(vUseMacroInEnglishMode, UseMacroInEnglishMode);
+        vUseMacro = vUseMacroInEnglishMode = 0; // macOS Text Replacements owns expansion; keep stored macros for export.
         LOAD_DATA(vAutoCapsMacro, vAutoCapsMacro);
         LOAD_DATA(vSendKeyStepByStep, SendKeyStepByStep);
         LOAD_DATA(vUseSmartSwitchKey, UseSmartSwitchKey);
@@ -157,7 +155,6 @@ extern "C" {
         OpenKeyResetComposition();
         _syncKey.clear();
         _lastFlag = 0;
-        _fnDown = _fnUsed = NO;
         _hasJustUsedHotKey = false;
     }
 
@@ -173,19 +170,12 @@ extern "C" {
     void queryFrontMostApp() {
         NSRunningApplication *app = [NSWorkspace sharedWorkspace].frontmostApplication;
         _frontMostApp = app.bundleIdentifier ?: @"UnknownApp";
-        if (app.bundleIdentifier.length && ![_frontMostApp isEqual:OPENKEY_BUNDLE]) _lastTypingApp = _frontMostApp;
         _appLanguageRule = AppLanguageRule(_frontMostApp);
-    }
-
-    NSInteger SettingsLanguageRule() {
-        return AppLanguageRule(_lastTypingApp ?: _frontMostApp);
     }
 
     void RefreshInputContext() {
         NSString *previous = _frontMostApp;
         queryFrontMostApp();
-        NSUserDefaults *prefs = [NSUserDefaults standardUserDefaults];
-        _globeSwitch = [prefs boolForKey:@"GlobeSwitch"];
         _spotlightPID = [NSRunningApplication runningApplicationsWithBundleIdentifier:@"com.apple.Spotlight"].firstObject.processIdentifier;
         BOOL previousSource = _otherInputSource;
         TISInputSourceRef source = TISCopyCurrentKeyboardInputSource();
@@ -284,22 +274,8 @@ extern "C" {
         }
     }
     
-    void SetSettingsInputLanguage(int language) {
-        queryFrontMostApp();
-        NSString *target = _lastTypingApp ?: _frontMostApp;
-        NSInteger rule = AppLanguageRule(target);
-        if (rule == 0 || rule == 1) {
-            [appDelegate setInputLanguage:(int)rule];
-        } else {
-            [appDelegate setInputLanguage:language];
-            if (vUseSmartSwitchKey || rule == 2) {
-                int previous = getAppInputMethodStatus(target.UTF8String, vLanguage | (vCodeTable << 1));
-                // Changing language must not replace the target app's remembered encoding.
-                int encoding = previous < 0 ? vCodeTable << 1 : previous & ~1;
-                setAppInputMethodStatus(target.UTF8String, vLanguage | encoding);
-                saveSmartSwitchKeyData();
-            }
-        }
+    void SetShortcutRecording(BOOL recording) {
+        _recordingShortcut = recording;
         ResetInputSession();
     }
 
@@ -686,7 +662,7 @@ extern "C" {
             [OpenKeyManager handleTapDisabledByUser];
             return event;
         }
-        if (!event) return event;
+        if (!event || _recordingShortcut) return event;
         if (IsSecureEventInputEnabled()) {
             ResetInputSession();
             return event;
@@ -706,24 +682,6 @@ extern "C" {
            _keycode = ConvertEventToKeyboadLayoutCompatKeyCode(event, _keycode);
         }
         
-        // A standalone Fn/Globe release toggles; Fn combinations retain native behavior.
-        if (_globeSwitch) {
-            CGEventFlags modifiers = _flag & (kCGEventFlagMaskShift | kCGEventFlagMaskControl |
-                kCGEventFlagMaskAlternate | kCGEventFlagMaskCommand);
-            if (type == kCGEventFlagsChanged && _keycode == kVK_Function) {
-                if (_flag & kCGEventFlagMaskSecondaryFn) {
-                    if (!_fnDown) { _fnDown = YES; _fnUsed = modifiers != 0; }
-                } else {
-                    BOOL toggle = _fnDown && !_fnUsed && !modifiers;
-                    _fnDown = _fnUsed = NO;
-                    if (toggle) { switchLanguage(); ResetInputSession(); }
-                }
-                return event;
-            }
-            if (_fnDown && (type == kCGEventKeyDown || type == kCGEventFlagsChanged ||
-                type == kCGEventLeftMouseDown || type == kCGEventRightMouseDown)) _fnUsed = YES;
-        }
-
         //switch language shortcut; convert hotkey
         if (type == kCGEventKeyDown) {
             if (GET_SWITCH_KEY(vSwitchKeyStatus) != _keycode && GET_SWITCH_KEY(convertToolHotKey) != _keycode) {

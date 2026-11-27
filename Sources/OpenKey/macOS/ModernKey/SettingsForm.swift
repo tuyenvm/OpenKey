@@ -54,7 +54,7 @@ private struct ExistingControl: NSViewRepresentable {
     func sizeThatFits(_ proposal: ProposedViewSize, nsView: NSView, context: Context) -> CGSize? {
         let fitting = nsView.fittingSize
         let intrinsic = nsView.intrinsicContentSize
-        return CGSize(width: proposal.width ?? (intrinsic.width > 0 ? intrinsic.width : fitting.width),
+        return CGSize(width: proposal.width ?? max(intrinsic.width, fitting.width),
                       height: intrinsic.height > 0 ? intrinsic.height : fitting.height)
     }
 }
@@ -108,6 +108,10 @@ private struct NativeSettingsRow: View {
                     }
                 }.pickerStyle(.segmented).labelsHidden().fixedSize()
                 .disabled(!segmented.isEnabled)
+            } label: { label }
+        } else if let button = row["control"] as? NSButton {
+            LabeledContent {
+                Button(button.title) { model.send(button) }.disabled(!button.isEnabled)
             } label: { label }
         } else if let control = row["control"] as? NSView {
             LabeledContent { ExistingControl(control: control).fixedSize() } label: { label }

@@ -28,6 +28,9 @@ xcrun swiftc -target "$(uname -m)-apple-macos12.0" \
     Sources/OpenKey/engine-rust/target/release/libopenkey_engine.a \
     -framework Cocoa -framework Carbon -lc++ -liconv -o "$TEST_DIR/settings"
 "$TEST_DIR/settings"
-if [ -n "${OPENKEY_SETTINGS_PREVIEW_PATH:-}" ]; then
-    cp "$TEST_DIR/settings" "$OPENKEY_SETTINGS_PREVIEW_PATH"
-fi
+
+clang -fobjc-arc -Wno-deprecated-declarations -c Sources/OpenKey/macOS/ModernKey/AppDelegate.m -o "$TEST_DIR/delegate.o"
+clang++ -std=c++17 -fobjc-arc -Wno-incomplete-implementation -Wno-deprecated-declarations \
+    scripts/macos-menu-tests.mm "$TEST_DIR/delegate.o" \
+    -framework Cocoa -framework Carbon -framework ServiceManagement -o "$TEST_DIR/menu"
+"$TEST_DIR/menu"

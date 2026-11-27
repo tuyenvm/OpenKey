@@ -157,52 +157,35 @@ int main() {@autoreleasepool {
     vLanguage=0; OnInputMethodChanged();
     assert(getAppInputMethodStatus(testAppID.UTF8String,1)==1);
     [[NSUserDefaults standardUserDefaults] removeObjectForKey:@"AppLanguageRules"];
-    // Settings activation must not redirect a language choice away from the typing app.
-    testAppID=@"org.openkey.test.editor"; vUseSmartSwitchKey=1; vRememberCode=1;
-    setAppInputMethodStatus(testAppID.UTF8String,1|(3<<1));
-    setAppInputMethodStatus("org.openkey.test.unrelated",1);
-    OnActiveAppChanged();
-    testAppID=OPENKEY_BUNDLE; OnActiveAppChanged();
-    SetSettingsInputLanguage(0);
-    testAppID=@"org.openkey.test.editor"; OnActiveAppChanged();
-    assert(vLanguage==0 && vCodeTable==3);
-    assert(getAppInputMethodStatus("org.openkey.test.unrelated",1)==1);
-    // A per-app remember rule also works when global remembering is off.
-    [[NSUserDefaults standardUserDefaults] setObject:@{testAppID:@2} forKey:@"AppLanguageRules"];
-    vUseSmartSwitchKey=0;
-    testAppID=OPENKEY_BUNDLE; OnActiveAppChanged(); SetSettingsInputLanguage(1);
-    testAppID=@"org.openkey.test.editor"; OnActiveAppChanged(); assert(vLanguage==1);
-    [[NSUserDefaults standardUserDefaults] setObject:@{testAppID:@1} forKey:@"AppLanguageRules"];
-    testAppID=OPENKEY_BUNDLE; OnActiveAppChanged(); SetSettingsInputLanguage(0);
-    assert(vLanguage==1 && SettingsLanguageRule()==1);
-    [[NSUserDefaults standardUserDefaults] removeObjectForKey:@"AppLanguageRules"];
     vUseSmartSwitchKey=0; vRememberCode=0; vCodeTable=0;
+    _appLanguageRule=-1; vLanguage=1; vSwitchKeyStatus=0x7A000206;
+    SetShortcutRecording(YES);
+    shortcut(kCGEventFlagsChanged,kVK_Option,kCGEventFlagMaskAlternate);
+    shortcut(kCGEventKeyDown,kVK_ANSI_Z,kCGEventFlagMaskAlternate);
+    assert(vLanguage==1); // Recording must not trigger the global shortcut first.
+    SetShortcutRecording(NO);
+    shortcut(kCGEventFlagsChanged,kVK_Option,kCGEventFlagMaskAlternate);
+    shortcut(kCGEventKeyDown,kVK_ANSI_Z,kCGEventFlagMaskAlternate);
+    assert(vLanguage==0);
     vSwitchKeyStatus=0xFE0000FE;
-    _appLanguageRule=-1;
-    _globeSwitch=YES;
-    auto input=[&](CGEventType type,CGKeyCode key,CGEventFlags flags) {
-        CGEventRef event=CGEventCreateKeyboardEvent(NULL,key,true);
-        CGEventSetType(event,type);CGEventSetFlags(event,flags);
-        CGEventRef result=OpenKeyCallback(NULL,type,event,NULL);
-        assert(result==event);CFRelease(event);
-    };
-    auto fnDown=[&] {input(kCGEventFlagsChanged,kVK_Function,kCGEventFlagMaskSecondaryFn);};
-    auto fnUp=[&] {input(kCGEventFlagsChanged,kVK_Function,0);};
-    vLanguage=1;fnDown();fnDown();fnUp();assert(vLanguage==0); // Repeated down toggles once.
-    fnUp();assert(vLanguage==0);
-    fnDown();input(kCGEventKeyDown,kVK_LeftArrow,kCGEventFlagMaskSecondaryFn);fnUp();assert(vLanguage==0);
-    input(kCGEventFlagsChanged,kVK_Function,kCGEventFlagMaskSecondaryFn|kCGEventFlagMaskShift);
-    fnUp();assert(vLanguage==0);
-    fnDown();input(kCGEventFlagsChanged,kVK_Shift,kCGEventFlagMaskSecondaryFn|kCGEventFlagMaskShift);
-    input(kCGEventFlagsChanged,kVK_Shift,kCGEventFlagMaskSecondaryFn);fnUp();assert(vLanguage==0);
-    fnDown();ResetInputSession();fnUp();assert(vLanguage==0); // Interrupted gesture cannot switch.
-    _globeSwitch=NO;fnDown();fnUp();assert(vLanguage==0);
-    _globeSwitch=YES;_appLanguageRule=0;fnDown();fnUp();assert(vLanguage==0);
-    _appLanguageRule=-1;_globeSwitch=NO;
+    for (CGEventFlags flags:{CGEventFlags(kCGEventFlagMaskSecondaryFn),CGEventFlags(0)}) {
+        CGEventRef event=CGEventCreateKeyboardEvent(NULL,kVK_Function,true);
+        CGEventSetType(event,kCGEventFlagsChanged); CGEventSetFlags(event,flags);
+        assert(OpenKeyCallback(NULL,kCGEventFlagsChanged,event,NULL)==event); CFRelease(event);
+    }
+    assert(vLanguage==0); // Fn/Globe belongs to macOS.
     vCodeTable=3;_syncKey.clear();SendBackspace();SendShiftAndLeftArrow();
     assert(posts.size()==4); // Empty tracking state must not dereference vector::back().
     for(auto event:posts)CFRelease(event);
     CFRelease(myEventSource);
+    addMacro("legacy","giữ dữ liệu"); vector<Byte> macros; getMacroSaveData(macros);
+    NSData *original=[NSData dataWithBytes:macros.data() length:macros.size()];
+    [[NSUserDefaults standardUserDefaults] setObject:original forKey:@"macroData"];
+    [[NSUserDefaults standardUserDefaults] setBool:YES forKey:@"UseMacro"];
+    OpenKeyInit();
+    assert(!vUseMacro && !vUseMacroInEnglishMode && hasMacro("legacy"));
+    assert([[[NSUserDefaults standardUserDefaults] dataForKey:@"macroData"] isEqual:original]);
+    CFRelease(myEventSource);
     [[NSUserDefaults standardUserDefaults] removePersistentDomainForName:testSuite];
-    puts("Native input: timeout/user-disable, target routing, Unicode delivery, Spotlight ownership, app rules, standalone Fn and empty buffers passed");
+    puts("Native input: timeout/user-disable, target routing, Unicode delivery, Spotlight ownership, app rules, shortcut recording, native Fn, macro retirement and empty buffers passed");
 }}
