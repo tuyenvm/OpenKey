@@ -367,11 +367,6 @@ extern bool convertToolDontAlertWhenCompleted;
     [NSApp activateIgnoringOtherApps:YES];
 }
 
--(void) onMacroSelected {
-    [self onControlPanelSelected];
-    [_settingsWC openTextReplacements:nil];
-}
-
 -(void) onAboutSelected {
     [NSApp orderFrontStandardAboutPanelWithOptions:@{NSAboutPanelOptionCredits:[[NSAttributedString alloc] initWithString:@"Bộ gõ tiếng Việt nguồn mở\nMai Vũ Tuyên và cộng đồng đóng góp · GPL-3.0"]}];
     [NSApp activateIgnoringOtherApps:YES];

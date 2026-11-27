@@ -1,6 +1,6 @@
 ## Bổ sung: engine Rust cho macOS
 
-Bản này dùng engine Rust và giao diện ứng dụng thanh menu với hai trang cài đặt gốc của macOS. Cần cài Rust bằng rustup trước khi build; phiên bản và kiến trúc được chỉ định trong `rust-toolchain.toml`. Xcode tự build và liên kết thư viện Rust cho từng kiến trúc.
+Bản này dùng engine Rust và giao diện ứng dụng thanh menu với bốn trang cài đặt gốc của macOS. Cần cài Rust bằng rustup trước khi build; phiên bản và kiến trúc được chỉ định trong `rust-toolchain.toml`. Xcode tự build và liên kết thư viện Rust cho từng kiến trúc.
 
 Hướng dẫn build và kiểm tra: [engine-rust/README.md](Sources/OpenKey/engine-rust/README.md).
 

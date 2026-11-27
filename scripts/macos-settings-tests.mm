@@ -63,18 +63,15 @@ int main(void) { @autoreleasepool {
     SettingsWindowController *controller=[SettingsWindowController new];
     assert([[controller valueForKey:@"gateVisible"] boolValue]);
     NSTabViewController *panes=[controller valueForKey:@"panes"];
-    assert(panes.tabViewItems.count==2 && panes.selectedTabViewItemIndex==1);
+    assert(panes.tabViewItems.count==4 && panes.selectedTabViewItemIndex==1);
     [controller showWindow:nil]; assert(controller.window.visible);
     trusted=YES; [controller refresh]; assert(active);
     assert(![[controller valueForKey:@"gateVisible"] boolValue] && !controller.window.visible);
     [controller showWindow:nil]; assert(controller.window.contentViewController==panes);
     [controller showPage:@"general"]; assert(panes.selectedTabViewItemIndex==0);
     [controller showPage:@"macros"]; assert(panes.selectedTabViewItemIndex==0);
-    NSArray *replacements=[controller legacyReplacements];
-    assert(replacements.count==1 && [replacements[0][@"shortcut"] isEqual:@"oktest"]);
-    assert([replacements[0][@"phrase"] isEqual:@"kiểm tra tiếng Việt"]);
-    NSData *plist=[NSPropertyListSerialization dataWithPropertyList:replacements format:NSPropertyListXMLFormat_v1_0 options:0 error:NULL];
-    assert([[NSPropertyListSerialization propertyListWithData:plist options:0 format:NULL error:NULL] isEqual:replacements]);
+    assert(![controller respondsToSelector:NSSelectorFromString(@"openTextReplacements:")]);
+    assert(![controller respondsToSelector:NSSelectorFromString(@"exportLegacyReplacements:")]);
     vector<Byte> after; getMacroSaveData(after);
     assert([[NSData dataWithBytes:after.data() length:after.size()] isEqual:originalMacros]);
     MyTextField *recorder=[controller valueForKey:@"inputKey"];
@@ -94,9 +91,23 @@ int main(void) { @autoreleasepool {
     if (@available(macOS 13.0,*)) for (OKSettingsFormController *form in [controller valueForKey:@"formControllers"]) assert(![form refreshControls]);
     NSPopUpButton *method=[controller valueForKey:@"inputType"];
     [method selectItemAtIndex:0]; [controller changeInputType:method]; assert(vInputType==0);
-    [controller showApplications:nil];
-    NSWindow *sheet=[[controller valueForKey:@"utilityWC"] window];
-    assert(sheet.contentLayoutRect.size.width>=600 && sheet.contentLayoutRect.size.height>=360);
+    NSPopUpButton *encoding=[controller valueForKey:@"encoding"];
+    [encoding selectItemAtIndex:2]; [controller changeEncoding:encoding]; assert(vCodeTable==2);
+    NSDictionary *controls=[controller valueForKey:@"controls"];
+    for (NSString *option in @[@"vAllowConsonantZFWJ",@"UpperCaseFirstChar",@"vQuickStartConsonant",@"vQuickEndConsonant",@"vTempOffSpelling",@"vTempOffOpenKey"]) {
+        assert(controls[option]); [controls[option] setState:NSControlStateValueOn]; [controller changeOption:controls[option]];
+        assert([testDefaults boolForKey:option]);
+    }
+    [controller showPage:@"compatibility"]; assert(panes.selectedTabViewItemIndex==3);
+    for (NSString *option in @[@"FixRecommendBrowser",@"vFixChromiumBrowser",@"SendKeyStepByStep",@"vPerformLayoutCompat",@"vOtherLanguage"]) {
+        assert(controls[option]); [controls[option] setState:NSControlStateValueOn]; [controller changeOption:controls[option]];
+        assert([testDefaults boolForKey:option]);
+    }
+    [controller showPage:@"general"];
+    [controls[@"SwitchBeep"] setState:NSControlStateValueOn]; [controller changeOption:controls[@"SwitchBeep"]];
+    [controller onShortcutRecorded:0x7A000206]; assert(vSwitchKeyStatus==0x7A008206);
+    [controller showPage:@"apps"]; assert(panes.selectedTabViewItemIndex==2);
+    assert(controller.window.contentViewController==panes && controller.window.attachedSheet==nil);
     NSPopUpButton *rule=[[NSPopUpButton alloc] initWithFrame:NSZeroRect pullsDown:NO];
     [rule addItemsWithTitles:@[@"English",@"Tiếng Việt",@"Nhớ lựa chọn"]];
     rule.identifier=@"org.openkey.test"; [rule selectItemAtIndex:0];
@@ -104,8 +115,9 @@ int main(void) { @autoreleasepool {
     assert([testDefaults dictionaryForKey:@"AppLanguageRules"].count==1);
     [[controller valueForKey:@"rulesTable"] selectRowIndexes:[NSIndexSet indexSetWithIndex:0] byExtendingSelection:NO];
     [controller removeApp:nil]; assert([testDefaults dictionaryForKey:@"AppLanguageRules"].count==0);
-    [controller closeUtility:nil];
     [controller showConversion];
+    NSWindow *sheet=[[controller valueForKey:@"utilityWC"] window];
+    assert(sheet.contentLayoutRect.size.width>=600 && sheet.contentLayoutRect.size.height>=360);
     NSPopUpButton *from=[controller valueForKey:@"fromCode"]; [from selectItemAtIndex:2];
     [controller changeConversion:nil]; assert(convertToolFromCode==2);
     [controller closeUtility:nil];
@@ -115,5 +127,5 @@ int main(void) { @autoreleasepool {
     paused=YES; trusted=YES; [controller refresh]; assert(!active && paused);
     [controller close];
     [testDefaults removePersistentDomainForName:suite];
-    puts("Settings: two panes, permission gate/revocation, shortcut recorder, native replacement export, app rules and conversion passed");
+    puts("Settings: four panes, restored typing/compatibility controls, permission gate, shortcut recorder, app rules and conversion passed");
 } }

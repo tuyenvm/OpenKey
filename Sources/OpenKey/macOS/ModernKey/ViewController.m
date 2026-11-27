@@ -304,7 +304,7 @@ extern int vPerformLayoutCompat;
 }
 
 - (IBAction)onMacroButton:(id)sender {
-    [appDelegate onMacroSelected];
+    [appDelegate onControlPanelSelected];
 }
 
 - (IBAction)onMacroChanged:(NSButton *)sender {

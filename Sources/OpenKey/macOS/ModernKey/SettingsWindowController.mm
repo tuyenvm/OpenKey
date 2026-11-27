@@ -8,6 +8,7 @@
 #import <Carbon/Carbon.h>
 
 extern AppDelegate *appDelegate;
+extern int vFixChromiumBrowser, vSendKeyStepByStep, vPerformLayoutCompat;
 extern "C" void OnActiveAppChanged(void);
 extern "C" void RequestNewSession(void);
 extern "C" void OnSpellCheckingChanged(void);
@@ -37,7 +38,7 @@ extern "C" void OnSpellCheckingChanged(void);
     NSMapTable<NSView *, NSDictionary *> *_formSpecs;
     NSMutableArray<NSViewController *> *_formControllers;
     NSMutableDictionary<NSString *, NSControl *> *_controls;
-    NSPopUpButton *_inputType, *_fromCode, *_toCode;
+    NSPopUpButton *_inputType, *_encoding, *_fromCode, *_toCode;
     MyTextField *_inputKey;
     NSTableView *_rulesTable;
     NSArray<NSString *> *_ruleIDs;
@@ -174,13 +175,13 @@ static NSTextField *Text(NSString *text, CGFloat size, BOOL secondary) {
     _controls=[NSMutableDictionary new]; _formControllers=[NSMutableArray new];
     _panes=[OKSettingsTabs new]; _panes.tabStyle=NSTabViewControllerTabStyleToolbar;
     NSString *saved=[[NSUserDefaults standardUserDefaults] stringForKey:@"SettingsPane"];
-    for (NSArray *pane in @[@[@"general",@"Chung",@"gearshape"], @[@"typing",@"Gõ tiếng Việt",@"keyboard"]]) {
+    for (NSArray *pane in @[@[@"general",@"Chung",@"gearshape"], @[@"typing",@"Gõ tiếng Việt",@"keyboard"], @[@"apps",@"Ứng dụng",@"app.badge"], @[@"compatibility",@"Tương thích",@"slider.horizontal.3"]]) {
         NSTabViewItem *item=[NSTabViewItem tabViewItemWithViewController:[self formForPage:pane[0]]];
         item.identifier=pane[0]; item.label=pane[1];
         if (@available(macOS 11.0,*)) item.image=[NSImage imageWithSystemSymbolName:pane[2] accessibilityDescription:nil];
         [_panes addTabViewItem:item];
     }
-    _panes.selectedTabViewItemIndex=[saved isEqual:@"typing"] ? 1 : 0;
+    for (NSUInteger i=0;i<_panes.tabViewItems.count;i++) if ([_panes.tabViewItems[i].identifier isEqual:saved]) _panes.selectedTabViewItemIndex=i;
     [self refresh];
     return self;
 }
@@ -190,6 +191,7 @@ static NSTextField *Text(NSString *text, CGFloat size, BOOL secondary) {
     if ([page isEqual:@"general"]) [self generalPage];
     else if ([page isEqual:@"typing"]) [self typingPage];
     else if ([page isEqual:@"apps"]) [self appsPage];
+    else if ([page isEqual:@"compatibility"]) [self compatibilityPage];
     else [self conversionPage];
     NSViewController *controller;
     if (@available(macOS 13.0,*)) {
@@ -210,7 +212,7 @@ static NSTextField *Text(NSString *text, CGFloat size, BOOL secondary) {
             [_content.topAnchor constraintEqualToAnchor:document.topAnchor constant:20],
             [_content.bottomAnchor constraintEqualToAnchor:document.bottomAnchor constant:-20]]];
     }
-    controller.preferredContentSize=NSMakeSize(640,([page isEqual:@"general"] && [self legacyReplacements].count) ? 420 : 340);
+    controller.preferredContentSize=NSMakeSize(640,[page isEqual:@"typing"] ? 540 : [page isEqual:@"apps"] ? 420 : 340);
     [_formControllers addObject:controller]; return controller;
 }
 
@@ -223,24 +225,36 @@ static NSTextField *Text(NSString *text, CGFloat size, BOOL secondary) {
     [self group:@"" rows:@[
         [self option:@"Mở cùng macOS" key:@"RunOnStartup" detail:nil],
         [self row:@"Phím chuyển ngôn ngữ" detail:nil control:_inputKey],
-        [self option:@"Nhớ ngôn ngữ theo ứng dụng" key:@"UseSmartSwitchKey" detail:nil],
-        [self row:@"Quy tắc ứng dụng" detail:nil control:[self button:@"Ứng dụng…" action:@selector(showApplications:)]]]];
-    [self group:@"" rows:@[[self row:@"Thay thế văn bản" detail:@"Quản lý gõ tắt bằng tính năng có sẵn của macOS."
-        control:[self button:@"Mở cài đặt…" action:@selector(openTextReplacements:)]]]];
-    if ([self legacyReplacements].count) {
-        [self group:@"Gõ tắt cũ" rows:@[[self row:@"Chuyển sang macOS" detail:@"Xuất danh sách rồi nhập vào Thay thế văn bản. Dữ liệu gốc được giữ lại."
-            control:[self button:@"Xuất danh sách…" action:@selector(exportLegacyReplacements:)]]]];
-    }
+        [self option:@"Âm báo khi chuyển ngôn ngữ" key:@"SwitchBeep" detail:nil]]];
 }
 - (void)typingPage {
     _inputType=[self popup:@[@"Telex",@"VNI",@"Simple Telex 1",@"Simple Telex 2"] action:@selector(changeInputType:)];
-    [_inputType setAccessibilityLabel:@"Kiểu gõ"];
+    _encoding=[self popup:[OpenKeyManager getTableCodes] action:@selector(changeEncoding:)];
+    [_inputType setAccessibilityLabel:@"Kiểu gõ"]; [_encoding setAccessibilityLabel:@"Bảng mã"];
     [self group:@"" rows:@[
         [self row:@"Kiểu gõ" detail:nil control:_inputType],
+        [self row:@"Bảng mã" detail:@"Unicode dùng cho hầu hết ứng dụng." control:_encoding]]];
+    [self group:@"Chính tả và dấu" rows:@[
         [self option:@"Kiểm tra âm tiết" key:@"Spelling" detail:nil],
         [self option:@"Khôi phục từ không hợp lệ" key:@"RestoreIfInvalidWord" detail:nil],
+        [self option:@"Cho phép z, w, j, f làm phụ âm" key:@"vAllowConsonantZFWJ" detail:nil],
         [self option:@"Đặt dấu oà, uý" key:@"ModernOrthography" detail:@"Tắt để dùng òa, úy."],
-        [self option:@"Gõ phụ âm nhanh" key:@"QuickTelex" detail:@"cc → ch, gg → gi, kk → kh, nn → ng"]]];
+        [self option:@"Viết hoa đầu câu" key:@"UpperCaseFirstChar" detail:nil]]];
+    [self group:@"Gõ nhanh" rows:@[
+        [self option:@"Telex nhanh" key:@"QuickTelex" detail:@"cc → ch, gg → gi, kk → kh, nn → ng"],
+        [self option:@"Phụ âm đầu nhanh" key:@"vQuickStartConsonant" detail:@"f → ph, j → gi, w → qu"],
+        [self option:@"Phụ âm cuối nhanh" key:@"vQuickEndConsonant" detail:@"g → ng, h → nh, k → ch"]]];
+    [self group:@"Tạm bỏ qua khi gõ" rows:@[
+        [self option:@"Chạm Control để tắt kiểm tra chính tả" key:@"vTempOffSpelling" detail:@"Chỉ áp dụng cho từ đang gõ."],
+        [self option:@"Chạm Command để tạm tắt OpenKey" key:@"vTempOffOpenKey" detail:@"Tự bật lại ở từ tiếp theo."]]];
+}
+- (void)compatibilityPage {
+    [self group:@"" rows:@[
+        [self option:@"Sửa lỗi gợi ý từ" key:@"FixRecommendBrowser" detail:@"Dành cho trình duyệt, Excel và ô tự hoàn thành."],
+        [self option:@"Tương thích Chromium" key:@"vFixChromiumBrowser" detail:nil],
+        [self option:@"Gửi từng phím riêng" key:@"SendKeyStepByStep" detail:nil],
+        [self option:@"Theo bố cục bàn phím hiện tại" key:@"vPerformLayoutCompat" detail:nil],
+        [self option:@"Bỏ qua khi macOS dùng bộ gõ khác" key:@"vOtherLanguage" detail:@"Tránh hai bộ gõ cùng xử lý tiếng Việt."]]];
 }
 - (NSViewController *)permissionGate {
     NSViewController *controller=[NSViewController new]; controller.view=[NSView new];
@@ -264,8 +278,8 @@ static NSTextField *Text(NSString *text, CGFloat size, BOOL secondary) {
     return controller;
 }
 - (void)showPage:(NSString *)page {
-    if (![@[@"general",@"typing"] containsObject:page]) return;
-    _panes.selectedTabViewItemIndex=[page isEqual:@"typing"] ? 1 : 0;
+    if (![@[@"general",@"typing",@"apps",@"compatibility"] containsObject:page]) return;
+    for (NSUInteger i=0;i<_panes.tabViewItems.count;i++) if ([_panes.tabViewItems[i].identifier isEqual:page]) _panes.selectedTabViewItemIndex=i;
     [self refresh];
 }
 - (void)showWindow:(id)sender {
@@ -303,6 +317,7 @@ static NSTextField *Text(NSString *text, CGFloat size, BOOL secondary) {
     }
     _wasTrusted=trusted;
     if (_inputType.indexOfSelectedItem!=vInputType) [_inputType selectItemAtIndex:MAX(0,MIN(3,vInputType))];
+    if (_encoding.indexOfSelectedItem!=vCodeTable) [_encoding selectItemAtIndex:MAX(0,MIN(4,vCodeTable))];
     for (NSString *key in _controls) { id control=_controls[key]; [control setState:[self optionValue:key]]; }
     _controls[@"RestoreIfInvalidWord"].enabled=vCheckSpelling;
     if (self.window.firstResponder!=_inputKey) [_inputKey displayShortcut:vSwitchKeyStatus];
@@ -311,14 +326,26 @@ static NSTextField *Text(NSString *text, CGFloat size, BOOL secondary) {
 - (NSDictionary<NSString *,NSValue *> *)optionBindings {
     return @{@"Spelling":[NSValue valueWithPointer:&vCheckSpelling], @"ModernOrthography":[NSValue valueWithPointer:&vUseModernOrthography],
         @"QuickTelex":[NSValue valueWithPointer:&vQuickTelex], @"RestoreIfInvalidWord":[NSValue valueWithPointer:&vRestoreIfWrongSpelling],
-        @"UseSmartSwitchKey":[NSValue valueWithPointer:&vUseSmartSwitchKey], @"vRememberCode":[NSValue valueWithPointer:&vRememberCode]};
+        @"UseSmartSwitchKey":[NSValue valueWithPointer:&vUseSmartSwitchKey], @"vRememberCode":[NSValue valueWithPointer:&vRememberCode],
+        @"vAllowConsonantZFWJ":[NSValue valueWithPointer:&vAllowConsonantZFWJ], @"UpperCaseFirstChar":[NSValue valueWithPointer:&vUpperCaseFirstChar],
+        @"vQuickStartConsonant":[NSValue valueWithPointer:&vQuickStartConsonant], @"vQuickEndConsonant":[NSValue valueWithPointer:&vQuickEndConsonant],
+        @"vTempOffSpelling":[NSValue valueWithPointer:&vTempOffSpelling], @"vTempOffOpenKey":[NSValue valueWithPointer:&vTempOffOpenKey],
+        @"FixRecommendBrowser":[NSValue valueWithPointer:&vFixRecommendBrowser], @"vFixChromiumBrowser":[NSValue valueWithPointer:&vFixChromiumBrowser],
+        @"SendKeyStepByStep":[NSValue valueWithPointer:&vSendKeyStepByStep], @"vPerformLayoutCompat":[NSValue valueWithPointer:&vPerformLayoutCompat],
+        @"vOtherLanguage":[NSValue valueWithPointer:&vOtherLanguage]};
 }
 - (BOOL)optionValue:(NSString *)key {
+    if ([key isEqual:@"SwitchBeep"]) return (vSwitchKeyStatus & 0x8000)!=0;
     NSValue *binding=[self optionBindings][key];
     return binding ? *(int *)binding.pointerValue!=0 : [[NSUserDefaults standardUserDefaults] boolForKey:key];
 }
 - (void)changeOption:(id)sender {
     NSString *key=[sender identifier]; BOOL value=[sender state]==NSControlStateValueOn;
+    if ([key isEqual:@"SwitchBeep"]) {
+        vSwitchKeyStatus=(vSwitchKeyStatus & ~0x8000) | (value ? 0x8000 : 0);
+        [[NSUserDefaults standardUserDefaults] setInteger:vSwitchKeyStatus forKey:@"SwitchKeyStatus"];
+        [self refresh]; return;
+    }
     NSValue *binding=[self optionBindings][key]; if (binding) *(int *)binding.pointerValue=value;
     [[NSUserDefaults standardUserDefaults] setBool:value forKey:key];
     if ([key isEqual:@"Spelling"]) OnSpellCheckingChanged();
@@ -327,7 +354,7 @@ static NSTextField *Text(NSString *text, CGFloat size, BOOL secondary) {
     RequestNewSession(); [self refresh];
 }
 - (void)onShortcutRecorded:(int)shortcut {
-    vSwitchKeyStatus=shortcut; [[NSUserDefaults standardUserDefaults] setInteger:shortcut forKey:@"SwitchKeyStatus"];
+    vSwitchKeyStatus=shortcut | (vSwitchKeyStatus & 0x8000); [[NSUserDefaults standardUserDefaults] setInteger:vSwitchKeyStatus forKey:@"SwitchKeyStatus"];
     RequestNewSession(); [self refresh];
 }
 - (void)changeInputType:(id)sender {
@@ -335,28 +362,7 @@ static NSTextField *Text(NSString *text, CGFloat size, BOOL secondary) {
 }
 - (void)openAccessibility:(id)sender { MJAccessibilityOpenPanel(); }
 - (void)quit:(id)sender { [NSApp terminate:nil]; }
-- (void)openTextReplacements:(id)sender {
-    [[NSWorkspace sharedWorkspace] openURL:[NSURL URLWithString:@"x-apple.systempreferences:com.apple.Keyboard-Settings.extension?TextReplacements"]];
-}
-- (NSArray<NSDictionary *> *)legacyReplacements {
-    vector<vector<Uint32>> keys; vector<string> names,contents; getAllMacro(keys,names,contents);
-    NSMutableArray *items=[NSMutableArray new];
-    for (NSUInteger i=0;i<names.size();i++) [items addObject:@{@"shortcut":[NSString stringWithUTF8String:names[i].c_str()],
-        @"phrase":[NSString stringWithUTF8String:contents[i].c_str()]}];
-    return items;
-}
-- (void)exportLegacyReplacements:(id)sender {
-    NSSavePanel *panel=NSSavePanel.savePanel; panel.allowedFileTypes=@[@"plist"]; panel.nameFieldStringValue=@"OpenKey Text Replacements.plist";
-    [panel beginSheetModalForWindow:self.window completionHandler:^(NSModalResponse result){
-        if (result!=NSModalResponseOK) return;
-        NSError *error=nil;
-        NSData *data=[NSPropertyListSerialization dataWithPropertyList:[self legacyReplacements] format:NSPropertyListXMLFormat_v1_0 options:0 error:&error];
-        if (!data || ![data writeToURL:panel.URL options:NSDataWritingAtomic error:&error]) {
-            [OpenKeyManager showMessage:self.window message:@"Không thể xuất danh sách" subMsg:error.localizedDescription]; return;
-        }
-        [OpenKeyManager showMessage:self.window message:@"Đã xuất danh sách" subMsg:@"Kéo tệp vào danh sách Thay thế văn bản trong Cài đặt hệ thống. Dữ liệu gốc vẫn được giữ lại."];
-    }];
-}
+- (void)changeEncoding:(id)sender { [appDelegate onCodeTableChanged:(int)_encoding.indexOfSelectedItem]; RequestNewSession(); [self refresh]; }
 - (void)showUtility:(NSString *)page title:(NSString *)title {
     if (!MJAccessibilityIsEnabled()) { [self showWindow:nil]; return; }
     if (_utilityWC.window.sheetParent) return;
@@ -381,10 +387,11 @@ static NSTextField *Text(NSString *text, CGFloat size, BOOL secondary) {
     [self.window beginSheet:window completionHandler:nil];
 }
 - (void)closeUtility:(id)sender { [self.window endSheet:_utilityWC.window]; [_utilityWC close]; }
-- (void)showApplications:(id)sender { [self showUtility:@"apps" title:@"Ứng dụng"]; }
 - (void)showConversion { [self showUtility:@"conversion" title:@"Chuyển mã văn bản"]; }
 - (void)appsPage {
-    [self group:@"" rows:@[[self option:@"Nhớ bảng mã theo ứng dụng" key:@"vRememberCode" detail:nil]]];
+    [self group:@"" rows:@[
+        [self option:@"Nhớ ngôn ngữ theo ứng dụng" key:@"UseSmartSwitchKey" detail:nil],
+        [self option:@"Nhớ bảng mã theo ứng dụng" key:@"vRememberCode" detail:nil]]];
     _rulesTable=[self tableWithColumns:@[@"Ứng dụng",@"Ngôn ngữ"] identifiers:@[@"app",@"rule"] height:200];
     [self reloadRules];
     [_content addArrangedSubview:[NSStackView stackViewWithViews:@[[self button:@"Thêm…" action:@selector(addApp:)],
@@ -446,11 +453,11 @@ static NSTextField *Text(NSString *text, CGFloat size, BOOL secondary) {
     NSOpenPanel *panel = [NSOpenPanel openPanel];
     panel.allowedFileTypes = @[@"app"]; panel.allowsMultipleSelection = NO;
     panel.canChooseDirectories = NO; panel.directoryURL = [NSURL fileURLWithPath:@"/Applications"];
-    [panel beginSheetModalForWindow:_utilityWC.window completionHandler:^(NSModalResponse result) {
+    [panel beginSheetModalForWindow:self.window completionHandler:^(NSModalResponse result) {
         if (result != NSModalResponseOK) return;
         NSString *bundleID = [NSBundle bundleWithURL:panel.URL].bundleIdentifier;
         if (!bundleID.length) {
-            [OpenKeyManager showMessage:self->_utilityWC.window message:@"Không thể thêm ứng dụng" subMsg:@"Ứng dụng cần có mã định danh bundle hợp lệ."];
+            [OpenKeyManager showMessage:self.window message:@"Không thể thêm ứng dụng" subMsg:@"Ứng dụng cần có mã định danh bundle hợp lệ."];
             return;
         }
         NSMutableDictionary *rules = [[self rules] mutableCopy];
