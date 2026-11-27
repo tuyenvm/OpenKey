@@ -117,7 +117,7 @@ extern int vPerformLayoutCompat;
 
 -(void)initKey {
     dispatch_async(dispatch_get_main_queue(), ^{
-        if (![OpenKeyManager initEventTap]) {
+        if (![OpenKeyManager resumeEventTap]) {
             //self.permissionWarning.hidden = NO;
             //self.retryButton.enabled = YES;
         } else {
@@ -304,7 +304,7 @@ extern int vPerformLayoutCompat;
 }
 
 - (IBAction)onMacroButton:(id)sender {
-    [appDelegate onMacroSelected];
+    [appDelegate onControlPanelSelected];
 }
 
 - (IBAction)onMacroChanged:(NSButton *)sender {
@@ -503,8 +503,8 @@ extern int vPerformLayoutCompat;
             [[NSUserDefaults standardUserDefaults] setInteger:0 forKey:@"ShowUIOnStartup"];
             self.ShowUIButton.state = NSControlStateValueOff;
             
-            [[NSUserDefaults standardUserDefaults] setInteger:1 forKey:@"RunOnStartup"];
-            self.RunOnStartupButton.state = NSControlStateValueOn;
+            [[NSUserDefaults standardUserDefaults] setInteger:0 forKey:@"RunOnStartup"];
+            self.RunOnStartupButton.state = NSControlStateValueOff;
         }
     }];
 }

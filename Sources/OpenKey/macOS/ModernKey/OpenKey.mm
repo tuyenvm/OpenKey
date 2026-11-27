@@ -11,8 +11,10 @@
 #import "Engine.h"
 #import "AppDelegate.h"
 #import "ViewController.h"
+#import "OpenKeyManager.h"
+#import "InputCompatibility.h"
 
-#define FRONT_APP [[NSWorkspace sharedWorkspace] frontmostApplication].bundleIdentifier
+#define FRONT_APP _frontMostApp
 #define OTHER_CONTROL_KEY (_flag & kCGEventFlagMaskCommand) || (_flag & kCGEventFlagMaskControl) || \
                             (_flag & kCGEventFlagMaskAlternate) || (_flag & kCGEventFlagMaskSecondaryFn) || \
                             (_flag & kCGEventFlagMaskNumericPad) || (_flag & kCGEventFlagMaskHelp)
@@ -61,8 +63,9 @@ extern "C" {
     
     CGEventSourceRef myEventSource = NULL;
     vKeyHookState* pData;
-    CGEventRef eventBackSpaceDown;
-    CGEventRef eventBackSpaceUp;
+    BOOL _otherInputSource = NO;
+    pid_t _spotlightPID = 0, _eventTargetPID = 0;
+    int64_t _eventTargetSerial = 0;
     UniChar _newChar, _newCharHi;
     CGEventRef _newEventDown, _newEventUp;
     CGKeyCode _keycode;
@@ -81,6 +84,9 @@ extern "C" {
     Uint32 _tempChar;
     bool _hasJustUsedHotKey = false;
 
+    BOOL _recordingShortcut = NO;
+    NSInteger _appLanguageRule = -1; // -1: global preference, 0/1: fixed language, 2: remember
+
     int _languageTemp = 0; //use for smart switch key
     vector<Byte> savedSmartSwitchKeyData; ////use for smart switch key
     
@@ -95,8 +101,7 @@ extern "C" {
         LOAD_DATA(vUseModernOrthography, ModernOrthography);
         LOAD_DATA(vRestoreIfWrongSpelling, RestoreIfInvalidWord);
         LOAD_DATA(vFixRecommendBrowser, FixRecommendBrowser);
-        LOAD_DATA(vUseMacro, UseMacro);
-        LOAD_DATA(vUseMacroInEnglishMode, UseMacroInEnglishMode);
+        vUseMacro = vUseMacroInEnglishMode = 0; // macOS Text Replacements owns expansion; keep stored macros for export.
         LOAD_DATA(vAutoCapsMacro, vAutoCapsMacro);
         LOAD_DATA(vSendKeyStepByStep, SendKeyStepByStep);
         LOAD_DATA(vUseSmartSwitchKey, UseSmartSwitchKey);
@@ -117,8 +122,7 @@ extern "C" {
         myEventSource = CGEventSourceCreate(kCGEventSourceStatePrivate);
         pData = (vKeyHookState*)vKeyInit();
 
-        eventBackSpaceDown = CGEventCreateKeyboardEvent (myEventSource, 51, true);
-        eventBackSpaceUp = CGEventCreateKeyboardEvent (myEventSource, 51, false);
+
         
         //init and load macro data
         NSUserDefaults *prefs = [NSUserDefaults standardUserDefaults];
@@ -144,24 +148,49 @@ extern "C" {
         }
     }
     
+    void OpenKeyResetComposition();
+
+    void ResetInputSession() {
+        if (!pData) return;
+        OpenKeyResetComposition();
+        _syncKey.clear();
+        _lastFlag = 0;
+        _hasJustUsedHotKey = false;
+    }
+
     void RequestNewSession() {
-        //send event signal to Engine
-        vKeyHandleEvent(vKeyEvent::Mouse, vKeyEventState::MouseDown, 0);
-        
-        if (IS_DOUBLE_CODE(vCodeTable)) { //VNI
-            _syncKey.clear();
-        }
+        ResetInputSession();
     }
-    
+
+    NSInteger AppLanguageRule(NSString *bundleID) {
+        id rule = [[[NSUserDefaults standardUserDefaults] dictionaryForKey:@"AppLanguageRules"] objectForKey:bundleID];
+        return [rule isKindOfClass:NSNumber.class] && [rule integerValue] >= 0 && [rule integerValue] <= 2 ? [rule integerValue] : -1;
+    }
+
     void queryFrontMostApp() {
-        if ([[[NSWorkspace sharedWorkspace] frontmostApplication].bundleIdentifier compare:OPENKEY_BUNDLE] != 0) {
-            _frontMostApp = [[NSWorkspace sharedWorkspace] frontmostApplication].bundleIdentifier;
-            if (_frontMostApp == nil)
-                _frontMostApp = [[NSWorkspace sharedWorkspace] frontmostApplication].localizedName != nil ?
-                [[NSWorkspace sharedWorkspace] frontmostApplication].localizedName : @"UnknownApp";
-        }
+        NSRunningApplication *app = [NSWorkspace sharedWorkspace].frontmostApplication;
+        _frontMostApp = app.bundleIdentifier ?: @"UnknownApp";
+        _appLanguageRule = AppLanguageRule(_frontMostApp);
     }
-    
+
+    void RefreshInputContext() {
+        NSString *previous = _frontMostApp;
+        queryFrontMostApp();
+        _spotlightPID = [NSRunningApplication runningApplicationsWithBundleIdentifier:@"com.apple.Spotlight"].firstObject.processIdentifier;
+        BOOL previousSource = _otherInputSource;
+        TISInputSourceRef source = TISCopyCurrentKeyboardInputSource();
+        _otherInputSource = NO;
+        if (source) {
+            CFArrayRef languages = (CFArrayRef)TISGetInputSourceProperty(source, kTISPropertyInputSourceLanguages);
+            if (languages && CFArrayGetCount(languages)) {
+                _otherInputSource = ![(__bridge NSString *)CFArrayGetValueAtIndex(languages, 0) isEqual:@"en"];
+            }
+            // The source is copied; its language array and strings are borrowed.
+            CFRelease(source);
+        }
+        if (![previous isEqual:_frontMostApp] || previousSource != _otherInputSource) ResetInputSession();
+    }
+
     NSString* ConvertUtil(NSString* str) {
         return [NSString stringWithUTF8String:convertUtil([str UTF8String]).c_str()];
     }
@@ -176,41 +205,37 @@ extern "C" {
     }
 
     BOOL isSpotlightVisible() {
-        NSArray *windows = CFBridgingRelease(CGWindowListCopyWindowInfo(kCGWindowListOptionOnScreenOnly | kCGWindowListExcludeDesktopElements,
-                                                                        kCGNullWindowID));
-        for (NSDictionary *window in windows) {
-            if ([[window objectForKey:(__bridge NSString *)kCGWindowOwnerName] isEqualToString:@"Spotlight"]) {
-                return true;
-            }
-        }
-        return false;
+        return OKTargetsSpotlight(_eventTargetPID, _spotlightPID, FRONT_APP);
     }
 
     BOOL shouldUseRecommendWorkaround(NSString* topApp) {
-        if (!vFixRecommendBrowser) return false;
-        if (isSpotlightVisible()) return false;
-        if (topApp == nil) return true;
-        return ![_recommendWorkaroundDisabledApp containsObject:topApp];
+        return vFixRecommendBrowser && !isSpotlightVisible() && !OKIsTerminalApp(topApp);
     }
 
     BOOL shouldUseSelectionReplacement(NSString* topApp) {
-        return isSpotlightVisible() || [_recommendWorkaroundDisabledApp containsObject:topApp];
+        return isSpotlightVisible();
     }
-    
+
     void saveSmartSwitchKeyData() {
+        if (!pData) return; // Setup can edit options before permission/engine initialization.
         getSmartSwitchKeySaveData(savedSmartSwitchKeyData);
         NSData* _data = [NSData dataWithBytes:savedSmartSwitchKeyData.data() length:savedSmartSwitchKeyData.size()];
         NSUserDefaults *prefs = [NSUserDefaults standardUserDefaults];
         [prefs setObject:_data forKey:@"smartSwitchKey"];
     }
     
-    void OnActiveAppChanged() { //use for smart switch key; improved on Sep 28th, 2019
-        queryFrontMostApp();
+    void ApplyAppLanguageSettings() {
+        // Opening settings must retain the typing app's mode, rather than recall OpenKey's own default memory.
+        if ([_frontMostApp isEqual:OPENKEY_BUNDLE] && _appLanguageRule == -1) return;
+        if (_appLanguageRule == 0 || _appLanguageRule == 1) {
+            [appDelegate setInputLanguage:(int)_appLanguageRule];
+            ResetInputSession();
+        }
+        if (!vUseSmartSwitchKey && _appLanguageRule != 2) return;
         _languageTemp = getAppInputMethodStatus(string(_frontMostApp.UTF8String), vLanguage | (vCodeTable << 1));
-        if ((_languageTemp & 0x01) != vLanguage) { //for input method
+        if (_appLanguageRule != 0 && _appLanguageRule != 1 && (_languageTemp & 0x01) != vLanguage) { //for input method
             if (_languageTemp != -1) {
-                vLanguage = _languageTemp;
-                [appDelegate onImputMethodChanged:NO];
+                [appDelegate setInputLanguage:(_languageTemp & 1)];
                 startNewSession();
             } else {
                 saveSmartSwitchKeyData();
@@ -225,6 +250,11 @@ extern "C" {
         }
     }
     
+    void OnActiveAppChanged() {
+        RefreshInputContext();
+        ApplyAppLanguageSettings();
+    }
+
     void OnTableCodeChange() {
         onTableCodeChange();
         if (vRememberCode) {
@@ -235,13 +265,20 @@ extern "C" {
     }
     
     void OnInputMethodChanged() {
-        if (vUseSmartSwitchKey) {
-            queryFrontMostApp();
+        // Resolve identity and policy together: activation notifications may still be queued.
+        queryFrontMostApp();
+        if (_appLanguageRule == 0 || _appLanguageRule == 1) return;
+        if (vUseSmartSwitchKey || _appLanguageRule == 2) {
             setAppInputMethodStatus(string(_frontMostApp.UTF8String), vLanguage | (vCodeTable << 1));
             saveSmartSwitchKeyData();
         }
     }
     
+    void SetShortcutRecording(BOOL recording) {
+        _recordingShortcut = recording;
+        ResetInputSession();
+    }
+
     void OnSpellCheckingChanged() {
         vSetCheckSpelling();
     }
@@ -250,13 +287,22 @@ extern "C" {
         _syncKey.push_back(len);
     }
     
+    void PostTapEvent(CGEventRef event) {
+        // Keep replacement events in the original target, including remote/direct app input.
+        if (_eventTargetPID > 0) {
+            CGEventSetIntegerValueField(event, kCGEventTargetUnixProcessID, _eventTargetPID);
+            CGEventSetIntegerValueField(event, kCGEventTargetProcessSerialNumber, _eventTargetSerial);
+        }
+        CGEventTapPostEvent(_proxy, event);
+    }
+
     void SendPureCharacter(const Uint16& ch) {
         _newEventDown = CGEventCreateKeyboardEvent(myEventSource, 0, true);
         _newEventUp = CGEventCreateKeyboardEvent(myEventSource, 0, false);
         CGEventKeyboardSetUnicodeString(_newEventDown, 1, &ch);
         CGEventKeyboardSetUnicodeString(_newEventUp, 1, &ch);
-        CGEventTapPostEvent(_proxy, _newEventDown);
-        CGEventTapPostEvent(_proxy, _newEventUp);
+        PostTapEvent(_newEventDown);
+        PostTapEvent(_newEventUp);
         CFRelease(_newEventDown);
         CFRelease(_newEventUp);
         if (IS_DOUBLE_CODE(vCodeTable)) {
@@ -283,16 +329,16 @@ extern "C" {
             
             CGEventSetFlags(_newEventDown, _privateFlag);
             CGEventSetFlags(_newEventUp, _privateFlag);
-            CGEventTapPostEvent(_proxy, _newEventDown);
-            CGEventTapPostEvent(_proxy, _newEventUp);
+            PostTapEvent(_newEventDown);
+            PostTapEvent(_newEventUp);
         } else {
             if (vCodeTable == 0) { //unicode 2 bytes code
                 _newEventDown = CGEventCreateKeyboardEvent(myEventSource, 0, true);
                 _newEventUp = CGEventCreateKeyboardEvent(myEventSource, 0, false);
                 CGEventKeyboardSetUnicodeString(_newEventDown, 1, &_newChar);
                 CGEventKeyboardSetUnicodeString(_newEventUp, 1, &_newChar);
-                CGEventTapPostEvent(_proxy, _newEventDown);
-                CGEventTapPostEvent(_proxy, _newEventUp);
+                PostTapEvent(_newEventDown);
+                PostTapEvent(_newEventUp);
             } else if (vCodeTable == 1 || vCodeTable == 2 || vCodeTable == 4) { //others such as VNI Windows, TCVN3: 1 byte code
                 _newCharHi = HIBYTE(_newChar);
                 _newChar = LOBYTE(_newChar);
@@ -301,8 +347,8 @@ extern "C" {
                 _newEventUp = CGEventCreateKeyboardEvent(myEventSource, 0, false);
                 CGEventKeyboardSetUnicodeString(_newEventDown, 1, &_newChar);
                 CGEventKeyboardSetUnicodeString(_newEventUp, 1, &_newChar);
-                CGEventTapPostEvent(_proxy, _newEventDown);
-                CGEventTapPostEvent(_proxy, _newEventUp);
+                PostTapEvent(_newEventDown);
+                PostTapEvent(_newEventUp);
                 if (_newCharHi > 32) {
                     if (vCodeTable == 2) //VNI
                         InsertKeyLength(2);
@@ -312,8 +358,8 @@ extern "C" {
                     _newEventUp = CGEventCreateKeyboardEvent(myEventSource, 0, false);
                     CGEventKeyboardSetUnicodeString(_newEventDown, 1, &_newCharHi);
                     CGEventKeyboardSetUnicodeString(_newEventUp, 1, &_newCharHi);
-                    CGEventTapPostEvent(_proxy, _newEventDown);
-                    CGEventTapPostEvent(_proxy, _newEventUp);
+                    PostTapEvent(_newEventDown);
+                    PostTapEvent(_newEventUp);
                 } else {
                     if (vCodeTable == 2) //VNI
                         InsertKeyLength(1);
@@ -328,8 +374,8 @@ extern "C" {
                 _newEventUp = CGEventCreateKeyboardEvent(myEventSource, 0, false);
                 CGEventKeyboardSetUnicodeString(_newEventDown, (_newCharHi > 0 ? 2 : 1), _uniChar);
                 CGEventKeyboardSetUnicodeString(_newEventUp, (_newCharHi > 0 ? 2 : 1), _uniChar);
-                CGEventTapPostEvent(_proxy, _newEventDown);
-                CGEventTapPostEvent(_proxy, _newEventUp);
+                PostTapEvent(_newEventDown);
+                PostTapEvent(_newEventUp);
             }
         }
         CFRelease(_newEventDown);
@@ -349,8 +395,8 @@ extern "C" {
         _newEventUp = CGEventCreateKeyboardEvent(myEventSource, 0, false);
         CGEventKeyboardSetUnicodeString(_newEventDown, 1, &_newChar);
         CGEventKeyboardSetUnicodeString(_newEventUp, 1, &_newChar);
-        CGEventTapPostEvent(_proxy, _newEventDown);
-        CGEventTapPostEvent(_proxy, _newEventUp);
+        PostTapEvent(_newEventDown);
+        PostTapEvent(_newEventUp);
         CFRelease(_newEventDown);
         CFRelease(_newEventUp);
     }
@@ -359,25 +405,33 @@ extern "C" {
         CGEventRef eventVkeyDown = CGEventCreateKeyboardEvent (myEventSource, vKey, true);
         CGEventRef eventVkeyUp = CGEventCreateKeyboardEvent (myEventSource, vKey, false);
         
-        CGEventTapPostEvent(_proxy, eventVkeyDown);
-        CGEventTapPostEvent(_proxy, eventVkeyUp);
+        PostTapEvent(eventVkeyDown);
+        PostTapEvent(eventVkeyUp);
         
         CFRelease(eventVkeyDown);
         CFRelease(eventVkeyUp);
     }
 
+    void PostBackspace() {
+        // Quartz events are mutable; each posted pair needs fresh timestamps/state.
+        CGEventRef down = CGEventCreateKeyboardEvent(myEventSource, KEY_DELETE, true);
+        CGEventRef up = CGEventCreateKeyboardEvent(myEventSource, KEY_DELETE, false);
+        PostTapEvent(down);
+        PostTapEvent(up);
+        CFRelease(down);
+        CFRelease(up);
+    }
+
     void SendBackspace() {
-        CGEventTapPostEvent(_proxy, eventBackSpaceDown);
-        CGEventTapPostEvent(_proxy, eventBackSpaceUp);
+        PostBackspace();
         
         if (IS_DOUBLE_CODE(vCodeTable)) { //VNI or Unicode Compound
-            if (_syncKey.back() > 1) {
+            if (!_syncKey.empty() && _syncKey.back() > 1) {
                 if (!(vCodeTable == 3 && containUnicodeCompoundApp(FRONT_APP))) {
-                    CGEventTapPostEvent(_proxy, eventBackSpaceDown);
-                    CGEventTapPostEvent(_proxy, eventBackSpaceUp);
+                    PostBackspace();
                 }
             }
-            _syncKey.pop_back();
+            if (!_syncKey.empty()) _syncKey.pop_back();
         }
     }
     
@@ -389,17 +443,17 @@ extern "C" {
         CGEventSetFlags(eventVkeyDown, _privateFlag);
         CGEventSetFlags(eventVkeyUp, _privateFlag);
         
-        CGEventTapPostEvent(_proxy, eventVkeyDown);
-        CGEventTapPostEvent(_proxy, eventVkeyUp);
+        PostTapEvent(eventVkeyDown);
+        PostTapEvent(eventVkeyUp);
         
         if (IS_DOUBLE_CODE(vCodeTable)) { //VNI or Unicode Compound
-            if (_syncKey.back() > 1) {
+            if (!_syncKey.empty() && _syncKey.back() > 1) {
                 if (!(vCodeTable == 3 && containUnicodeCompoundApp(FRONT_APP))) {
-                    CGEventTapPostEvent(_proxy, eventVkeyDown);
-                    CGEventTapPostEvent(_proxy, eventVkeyUp);
+                    PostTapEvent(eventVkeyDown);
+                    PostTapEvent(eventVkeyUp);
                 }
             }
-            _syncKey.pop_back();
+            if (!_syncKey.empty()) _syncKey.pop_back();
         }
         CFRelease(eventVkeyDown);
         CFRelease(eventVkeyUp);
@@ -413,8 +467,8 @@ extern "C" {
         CGEventSetFlags(eventVkeyDown, _privateFlag);
         CGEventSetFlags(eventVkeyUp, _privateFlag);
         
-        CGEventTapPostEvent(_proxy, eventVkeyDown);
-        CGEventTapPostEvent(_proxy, eventVkeyUp);
+        PostTapEvent(eventVkeyDown);
+        PostTapEvent(eventVkeyUp);
         
         CFRelease(eventVkeyDown);
         CFRelease(eventVkeyUp);
@@ -497,8 +551,8 @@ extern "C" {
         _newEventUp = CGEventCreateKeyboardEvent(myEventSource, 0, false);
         CGEventKeyboardSetUnicodeString(_newEventDown, _willContinuteSending ? 16 : _newCharSize - offset, _newCharString);
         CGEventKeyboardSetUnicodeString(_newEventUp, _willContinuteSending ? 16 : _newCharSize - offset, _newCharString);
-        CGEventTapPostEvent(_proxy, _newEventDown);
-        CGEventTapPostEvent(_proxy, _newEventUp);
+        PostTapEvent(_newEventDown);
+        PostTapEvent(_newEventUp);
         CFRelease(_newEventDown);
         CFRelease(_newEventUp);
 
@@ -531,6 +585,7 @@ extern "C" {
     }
     
     void switchLanguage() {
+        if (_appLanguageRule == 0 || _appLanguageRule == 1) return;
         if (vLanguage == 0)
             vLanguage = 1;
         else
@@ -599,11 +654,26 @@ extern "C" {
      * MAIN Callback.
      */
     CGEventRef OpenKeyCallback(CGEventTapProxy proxy, CGEventType type, CGEventRef event, void *refcon) {
-        //dont handle my event
+        if (type == kCGEventTapDisabledByTimeout) {
+            [OpenKeyManager recoverEventTap];
+            return event;
+        }
+        if (type == kCGEventTapDisabledByUserInput) {
+            [OpenKeyManager handleTapDisabledByUser];
+            return event;
+        }
+        if (!event || _recordingShortcut) return event;
+        if (IsSecureEventInputEnabled()) {
+            ResetInputSession();
+            return event;
+        }
+        // Ignore replacement events from our private source.
         if (CGEventGetIntegerValueField(event, kCGEventSourceStateID) == CGEventSourceGetSourceStateID(myEventSource)) {
             return event;
         }
         
+        _eventTargetPID = (pid_t)CGEventGetIntegerValueField(event, kCGEventTargetUnixProcessID);
+        _eventTargetSerial = CGEventGetIntegerValueField(event, kCGEventTargetProcessSerialNumber);
         _flag = CGEventGetFlags(event);
         _keycode = (CGKeyCode)CGEventGetIntegerValueField(event, kCGKeyboardEventKeycode);
         
@@ -668,6 +738,11 @@ extern "C" {
         
         _proxy = proxy;
         
+        if (type == kCGEventLeftMouseDown || type == kCGEventRightMouseDown) {
+            RequestNewSession();
+            return event;
+        }
+
         //If is in english mode
         if (vLanguage == 0) {
             if (vUseMacro && vUseMacroInEnglishMode && type == kCGEventKeyDown) {
@@ -684,31 +759,11 @@ extern "C" {
             return event;
         }
         
-        //handle mouse
-        if (type == kCGEventLeftMouseDown || type == kCGEventRightMouseDown || type == kCGEventLeftMouseDragged || type == kCGEventRightMouseDragged) {
-            RequestNewSession();
+        if (vOtherLanguage && _otherInputSource) {
+            ResetInputSession();
             return event;
         }
 
-        //if "turn off Vietnamese when in other language" mode on
-        if(vOtherLanguage){
-            TISInputSourceRef isource = TISCopyCurrentKeyboardInputSource();
-            if ( isource != NULL )
-            {
-                CFArrayRef languages = (CFArrayRef) TISGetInputSourceProperty(isource, kTISPropertyInputSourceLanguages);
-                
-                if (CFArrayGetCount(languages) > 0) {
-                    CFStringRef langRef = (CFStringRef)CFArrayGetValueAtIndex(languages, 0);
-                    NSString *currentLanguage = (__bridge NSString *)langRef;
-                    if(![currentLanguage isLike:@"en"]){
-                        return event;
-                    }
-                    CFRelease(langRef);
-                    CFRelease(isource);
-                }
-            }
-        }
-        
         //handle keyboard
         if (type == kCGEventKeyDown) {
             //send event signal to Engine
@@ -725,10 +780,9 @@ extern "C" {
                         if (_syncKey.size() > 0) {
                             if (_syncKey.back() > 1 && (vCodeTable == 2 || !containUnicodeCompoundApp(FRONT_APP))) {
                                 //send one more backspace
-                                CGEventTapPostEvent(_proxy, eventBackSpaceDown);
-                                CGEventTapPostEvent(_proxy, eventBackSpaceUp);
+                                PostBackspace();
                             }
-                            _syncKey.pop_back();
+                            if (!_syncKey.empty()) _syncKey.pop_back();
                         }
                        
                     } else if (pData->extCode == 3) { //normal key

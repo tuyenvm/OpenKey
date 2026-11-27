@@ -1,3 +1,9 @@
+## Bổ sung: engine Rust cho macOS
+
+Bản này dùng engine Rust và giao diện ứng dụng thanh menu với bốn trang cài đặt gốc của macOS. Cần cài Rust bằng rustup trước khi build; phiên bản và kiến trúc được chỉ định trong `rust-toolchain.toml`. Xcode tự build và liên kết thư viện Rust cho từng kiến trúc.
+
+Hướng dẫn build và kiểm tra: [engine-rust/README.md](Sources/OpenKey/engine-rust/README.md).
+
 ## Cách build cho macOS:
 Vì một số lý do mà OpenKey không thể đưa lêp Mac App Store được, nếu các bạn không yên tâm về file build chính thức từ tác giả, các bạn có thể tải mã nguồn về tự build lấy OpenKey cho mình. 
 

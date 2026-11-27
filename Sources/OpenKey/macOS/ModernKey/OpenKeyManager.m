@@ -7,8 +7,12 @@
 //
 
 #import "OpenKeyManager.h"
+#import "MJAccessibilityUtils.h"
+#import <Carbon/Carbon.h>
 
 extern void OpenKeyInit(void);
+extern void ResetInputSession(void);
+extern void RefreshInputContext(void);
 
 extern CGEventRef OpenKeyCallback(CGEventTapProxy proxy,
                                   CGEventType type,
@@ -29,66 +33,100 @@ static BOOL _isInited = NO;
 static CFMachPortRef      eventTap;
 static CGEventMask        eventMask;
 static CFRunLoopSourceRef runLoopSource;
+static BOOL engineInitialized;
+static BOOL userDisabled;
+static NSTimer *healthTimer;
 
 +(BOOL)isInited {
     return _isInited;
 }
 
+// The tap, timers and engine share the AppKit run loop; no cross-thread engine calls.
++(BOOL)isActive {
+    return eventTap && CFMachPortIsValid(eventTap) && CGEventTapIsEnabled(eventTap);
+}
+
++(BOOL)isPaused { return userDisabled; }
+
++(void)recoverEventTap {
+    if (userDisabled || !MJAccessibilityIsEnabled() || IsSecureEventInputEnabled()) return;
+    if (eventTap && CFMachPortIsValid(eventTap)) {
+        ResetInputSession();
+        CGEventTapEnable(eventTap, true);
+    }
+}
+
++(void)handleTapDisabledByUser {
+    userDisabled = YES;
+    ResetInputSession();
+}
+
++(BOOL)resumeEventTap {
+    return userDisabled ? NO : [self initEventTap];
+}
+
++(void)prepareEngine {
+    if (!engineInitialized) {
+        OpenKeyInit();
+        engineInitialized = YES;
+    }
+}
+
 +(BOOL)initEventTap {
-    if (_isInited)
-        return true;
-    
-    //init modernKey
-    OpenKeyInit();
-    
-    // Create an event tap. We are interested in key presses.
-    eventMask = ((1 << kCGEventKeyDown) |
-                 (1 << kCGEventKeyUp) |
-                 (1 << kCGEventFlagsChanged) |
-                 (1 << kCGEventLeftMouseDown) |
-                 (1 << kCGEventRightMouseDown) |
-                 (1 << kCGEventLeftMouseDragged) |
-                 (1 << kCGEventRightMouseDragged));
-    
-    eventTap = CGEventTapCreate(kCGSessionEventTap,
-                                kCGHeadInsertEventTap,
-                                0,
-                                eventMask,
-                                OpenKeyCallback,
-                                NULL);
-    
-    if (!eventTap) {
-        
-        fprintf(stderr, "failed to create event tap\n");
+    if (!MJAccessibilityIsEnabled()) return NO;
+    userDisabled = NO; // Only an explicit initialization/retry clears an intentional pause.
+    if (eventTap && CFMachPortIsValid(eventTap)) {
+        if (![self isActive]) [self recoverEventTap];
+        return [self isActive];
+    }
+    [self stopEventTap];
+    [self prepareEngine];
+    eventMask = CGEventMaskBit(kCGEventKeyDown) | CGEventMaskBit(kCGEventKeyUp) |
+                CGEventMaskBit(kCGEventFlagsChanged) | CGEventMaskBit(kCGEventLeftMouseDown) |
+                CGEventMaskBit(kCGEventRightMouseDown);
+    // Keep the established session tap location while repairing lifecycle/recovery.
+    eventTap = CGEventTapCreate(kCGSessionEventTap, kCGHeadInsertEventTap,
+                               kCGEventTapOptionDefault, eventMask, OpenKeyCallback, NULL);
+    if (!eventTap) return NO;
+    runLoopSource = CFMachPortCreateRunLoopSource(kCFAllocatorDefault, eventTap, 0);
+    if (!runLoopSource) {
+        CFRelease(eventTap);
+        eventTap = NULL;
         return NO;
     }
-    
+    CFRunLoopAddSource(CFRunLoopGetMain(), runLoopSource, kCFRunLoopCommonModes);
     _isInited = YES;
-    
-    // Create a run loop source.
-    runLoopSource = CFMachPortCreateRunLoopSource(kCFAllocatorDefault, eventTap, 0);
-    
-    // Add to the current run loop.
-    CFRunLoopAddSource(CFRunLoopGetCurrent(), runLoopSource, kCFRunLoopCommonModes);
-    
-    // Enable the event tap.
+    ResetInputSession();
+    RefreshInputContext();
     CGEventTapEnable(eventTap, true);
-    
-    return YES;
+    healthTimer = [NSTimer timerWithTimeInterval:1 repeats:YES block:^(NSTimer *timer) {
+        RefreshInputContext();
+        if (!MJAccessibilityIsEnabled()) {
+            [self stopEventTap];
+        } else if (!userDisabled && !IsSecureEventInputEnabled()) {
+            if (!eventTap || !CFMachPortIsValid(eventTap)) [self initEventTap];
+            else if (!CGEventTapIsEnabled(eventTap)) [self recoverEventTap];
+        }
+    }];
+    [[NSRunLoop mainRunLoop] addTimer:healthTimer forMode:NSRunLoopCommonModes];
+    return [self isActive];
 }
 
 +(BOOL)stopEventTap {
-    if (_isInited) { //release all object
-        CFRunLoopRemoveSource(CFRunLoopGetCurrent(), runLoopSource, kCFRunLoopCommonModes);
+    [healthTimer invalidate];
+    healthTimer = nil;
+    if (runLoopSource) {
+        CFRunLoopRemoveSource(CFRunLoopGetMain(), runLoopSource, kCFRunLoopCommonModes);
         CFRelease(runLoopSource);
-        runLoopSource = nil;
-        
+        runLoopSource = NULL;
+    }
+    if (eventTap) {
         CFMachPortInvalidate(eventTap);
         CFRelease(eventTap);
-        eventTap = nil;
-        
-        _isInited = false;
+        eventTap = NULL;
     }
+    _isInited = NO;
+    if (engineInitialized) ResetInputSession();
     return YES;
 }
 

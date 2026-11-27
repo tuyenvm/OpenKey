@@ -12,8 +12,16 @@
 
 #import <Foundation/Foundation.h>
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 BOOL MJAccessibilityIsEnabled(void);
 void MJAccessibilityOpenPanel(void);
+
+#ifdef __cplusplus
+}
+#endif
 
 #define MJAccessibilityUtils_h
 

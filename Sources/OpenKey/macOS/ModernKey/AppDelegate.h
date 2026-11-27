@@ -11,12 +11,14 @@
 
 #define OPENKEY_BUNDLE @"com.tuyenmai.openkey"
 
-@interface AppDelegate : NSObject <NSApplicationDelegate>
+@interface AppDelegate : NSObject <NSApplicationDelegate, NSMenuDelegate>
 
 -(void)onImputMethodChanged:(BOOL)willNotify;
 -(void)onInputMethodSelected;
+-(void)setInputLanguage:(int)language;
 
 -(void)askPermission;
+-(void)onControlPanelSelected;
 
 -(void)onInputTypeSelectedIndex:(int)index;
 -(void)onCodeTableChanged:(int)index;
@@ -26,7 +28,6 @@
 
 -(void)setGrayIcon:(BOOL)val;
 
--(void)onMacroSelected;
 -(void)onQuickConvert;
 -(void)setQuickConvertString;
 
